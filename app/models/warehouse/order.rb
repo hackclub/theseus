@@ -57,7 +57,7 @@ class Warehouse::Order < ApplicationRecord
 
   def contents_declared_unit_cost
     line_items.includes(:sku).sum do |line_item|
-      line_item.sku.declared_unit_cost * line_item.quantity
+      (line_item.sku.declared_unit_cost || 0) * line_item.quantity
     end
   end
 
