@@ -14,6 +14,6 @@ SourceTag.find_or_create_by!(
 )
 
 Warehouse::PurposeCode.find_or_create_by!(
-  code: 'HQ',
+  code: Rails.env.production? ? 'HQ' : 'HQ-dev',
   description: 'general HQ mailing'
 )
