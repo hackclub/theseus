@@ -16,8 +16,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_user!
     unless user_signed_in?
-      redirect_to login_path, alert: ("you need to be logged in!" unless request.env['PATH_INFO'] == '/')
+      redirect_to login_path, alert: ("you need to be logged in!" unless request.env["PATH_INFO"] == "/")
     end
   end
-
 end

@@ -22,6 +22,6 @@ class Address < ApplicationRecord
   validates_presence_of :first_name, :line_1, :city, :state, :postal_code, :country
 
   def name_line
-    [first_name, last_name].join(' ')
+    [ first_name, last_name ].join(" ")
   end
 end

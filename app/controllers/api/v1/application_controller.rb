@@ -1,7 +1,6 @@
 module API
   module V1
     class ApplicationController < ActionController::API
-
       before_action :set_expand
 
       rescue_from Pundit::NotAuthorizedError do |e|

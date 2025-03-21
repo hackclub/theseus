@@ -14,7 +14,7 @@ class Warehouse::UpdateMailingInfo < ApplicationJob
       "ship_client",
       startDate: start_date,
       endDate: end_date
-    ).index_by{ |order| order[:order_number] }
+    ).index_by { |order| order[:order_number] }
 
     orders.each do |order|
       zen_order = zen_orders[order.hc_id]

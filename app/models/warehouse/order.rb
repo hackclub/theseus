@@ -52,7 +52,7 @@ class Warehouse::Order < ApplicationRecord
   end
 
   def contents_actual_cost_to_hc
-    line_items.joins(:sku).sum('warehouse_skus.actual_cost_to_hc * warehouse_line_items.quantity')
+    line_items.joins(:sku).sum("warehouse_skus.actual_cost_to_hc * warehouse_line_items.quantity")
   end
 
   def contents_declared_unit_cost
@@ -140,7 +140,7 @@ class Warehouse::Order < ApplicationRecord
           customer: {
             name: address.first_name,
             surname: address.last_name || "​",
-            email: recipient_email,
+            email: recipient_email
           }.compact_blank,
           shippingAddress: {
             name: address.name_line,
@@ -178,7 +178,7 @@ class Warehouse::Order < ApplicationRecord
   def set_hc_id
     ActiveRecord::Base.transaction do
       purpose_code.increment!(:sequence_number)
-      self.hc_id = "HC-#{purpose_code.code}-#{purpose_code.sequence_number.to_s.rjust(4,'0')}"
+      self.hc_id = "HC-#{purpose_code.code}-#{purpose_code.sequence_number.to_s.rjust(4, '0')}"
     end
   end
 

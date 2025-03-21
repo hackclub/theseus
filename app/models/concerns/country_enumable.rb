@@ -6,9 +6,9 @@ module CountryEnumable
   included do
     def self.countries_for_select
       countries = self.countries.keys.map do |alpha2|
-        [alpha2, ISO3166::Country[alpha2].common_name]
+        [ alpha2, ISO3166::Country[alpha2].common_name ]
       end.sort_by { |c| I18n.transliterate(c.last) }
-      countries.unshift(["US", "United States"], ["CA", "Canada"]).uniq!
+      countries.unshift([ "US", "United States" ], [ "CA", "Canada" ]).uniq!
     end
   end
 
@@ -269,9 +269,8 @@ module CountryEnumable
         YT: 143,
         ZA: 207,
         ZM: 248,
-        ZW: 249,
+        ZW: 249
       }
     end
   end
-
 end

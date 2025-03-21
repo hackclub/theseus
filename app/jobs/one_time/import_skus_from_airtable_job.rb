@@ -8,7 +8,7 @@ class OneTime::ImportSKUsFromAirtableJob < ApplicationJob
       Warehouse::SKU.find_or_create_by!(sku: at_sku.sku) do |sku|
         sku.name = at_sku.name
         sku.category = case at_sku.item_type
-                       when "Printed Material"
+        when "Printed Material"
                          name = at_sku.name.downcase
                          if name.include? "card"
                            :card
@@ -19,19 +19,19 @@ class OneTime::ImportSKUsFromAirtableJob < ApplicationJob
                          else
                            :other_printed_material
                          end
-                       when "Grant"
+        when "Grant"
                          :grant
-                       when "Sticker"
+        when "Sticker"
                          :sticker
-                       when "Hardware"
+        when "Hardware"
                          :hardware
-                       when "Swag"
+        when "Swag"
                          :swag
-                       when "Book"
+        when "Book"
                          :book
-                       when "Prize"
+        when "Prize"
                          :prize
-                       end
+        end
         sku.in_stock = at_sku.in_stock
         sku.average_po_cost = at_sku.unit_cost
       end

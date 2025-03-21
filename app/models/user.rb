@@ -13,9 +13,8 @@
 #  slack_id      :string
 #
 class User < ApplicationRecord
-
   has_many :warehouse_templates, class_name: "Warehouse::Template", inverse_of: :user
-  
+
   def admin?
     is_admin
   end

@@ -148,7 +148,7 @@ Rails.application.routes.draw do
       end
     end
     resources :purpose_codes
-    resources :skus, except: [:destroy]
+    resources :skus, except: [ :destroy ]
   end
   resources :users
   root "static_pages#index"

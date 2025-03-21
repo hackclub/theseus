@@ -13,7 +13,7 @@ class PurposeCodeDashboard < Administrate::BaseDashboard
     description: Field::String,
     sequence_number: Field::Number,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime,
+    updated_at: Field::DateTime
   }.freeze
 
   # COLLECTION_ATTRIBUTES

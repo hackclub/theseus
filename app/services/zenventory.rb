@@ -112,7 +112,7 @@ class Zenventory
         c.request :json
         c.response :zenventory_error
         c.response :json, parser_options: { symbolize_names: true }
-        c.headers['SecureKey'] = Rails.application.credentials.dig(:zenventory, :legacy_secure_key) || (raise "zenv: no legacy secure key set!")
+        c.headers["SecureKey"] = Rails.application.credentials.dig(:zenventory, :legacy_secure_key) || (raise "zenv: no legacy secure key set!")
       end
     end
   end

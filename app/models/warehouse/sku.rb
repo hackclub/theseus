@@ -26,7 +26,6 @@
 #  index_warehouse_skus_on_sku  (sku) UNIQUE
 #
 class Warehouse::SKU < ApplicationRecord
-
   scope :in_inventory, -> { where.not(in_stock: nil, inbound: nil) }
   scope :backordered, -> { where("in_stock < 0") }
 
@@ -60,7 +59,7 @@ class Warehouse::SKU < ApplicationRecord
                    declared_unit_cost: :declared_unit_cost,
                    actual_cost_to_hc: :actual_cost_to_hc,
                    in_stock: :in_stock,
-                   inbound: :inbound,
+                   inbound: :inbound
                  }
 
   has_zenventory_url "https://app.zenventory.com/admin/item-details/%s/basic", :zenventory_id

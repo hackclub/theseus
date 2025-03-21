@@ -3,22 +3,22 @@ class Airtable::WarehouseSKU < Norairrecord::Table
   self.table_name = "tblvSJMqoXnQyN7co"
 
   def sku
-    fields['SKU']
+    fields["SKU"]
   end
 
   def name
-    fields['Name (Must Match Poster Requests)']
+    fields["Name (Must Match Poster Requests)"]
   end
 
   def in_stock
-    fields['In Stock']
+    fields["In Stock"]
   end
 
   def unit_cost
-    fields['Unit Cost']
+    fields["Unit Cost"]
   end
 
   def item_type
-    fields['Item Type']
+    fields["Item Type"]
   end
 end

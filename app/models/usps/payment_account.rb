@@ -22,19 +22,19 @@
 #  fk_rails_...  (usps_mailer_id_id => usps_mailer_ids.id)
 #
 class USPS::PaymentAccount < ApplicationRecord
-  belongs_to :usps_mailer_id, class_name: 'USPS::MailerId'
+  belongs_to :usps_mailer_id, class_name: "USPS::MailerId"
 
   enum :account_type, {
     EPS: 0,
-    PERMIT: 1,
+    PERMIT: 1
     # METER: 2 # someday.... someday i will be a PC Postage vendor..,,,..,
   }
 
   def display_name
     case account_type
-    when 'EPS'
+    when "EPS"
       "#{name} (#{obscured_last_4(account_number)})"
-    when 'PERMIT'
+    when "PERMIT"
       "#{name} (#{permit_number} @ #{permit_zip})"
     else
       name

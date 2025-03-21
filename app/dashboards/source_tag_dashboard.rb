@@ -14,7 +14,7 @@ class SourceTagDashboard < Administrate::BaseDashboard
     slug: Field::String,
     warehouse_orders: Field::HasMany,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime,
+    updated_at: Field::DateTime
   }.freeze
 
   # COLLECTION_ATTRIBUTES

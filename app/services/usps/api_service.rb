@@ -117,7 +117,7 @@ class USPS::APIService
     #  {:city=>"BURLINGTON", :state=>"VT", :ZIPCode=>"05401"}
     # @param [String] zip zip code
     def city_state_from_zip(zip)
-      conn.get("/addresses/v3/city-state", {ZIPCode: zip}).body
+      conn.get("/addresses/v3/city-state", { ZIPCode: zip }).body
     end
 
     # Returns the ZIP Code; and ZIP + 4; corresponding to the given address, city, and state (use USPS state abbreviations).
@@ -208,12 +208,12 @@ class USPS::APIService
             length: length,
             height: height,
             thickness: thickness,
-            nonMachinableIndicators: non_machinable_indicators,
+            nonMachinableIndicators: non_machinable_indicators
           },
           imageInfo: {
             receiptOption: receipt_option,
             imageType: image_type,
-            labelType: label_type,
+            labelType: label_type
           }
         },
         {
@@ -226,7 +226,7 @@ class USPS::APIService
     # see https://developers.usps.com/paymentsv3#tag/Resources/operation/post-payments-payment-authorization
     # @return [String] USPS v3 payment account token
     def create_payment_token(roles:)
-      conn.post('/payments/v3/payment-authorization', {roles:}).body.dig("paymentAuthorizationToken")
+      conn.post("/payments/v3/payment-authorization", { roles: }).body.dig("paymentAuthorizationToken")
     end
 
     private

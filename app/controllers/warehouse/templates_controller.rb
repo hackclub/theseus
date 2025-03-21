@@ -65,6 +65,6 @@ class Warehouse::TemplatesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def warehouse_template_params
-      params.expect(warehouse_template: [ :name, line_items_attributes: [:sku_id, :quantity, :_destroy] ])
+      params.expect(warehouse_template: [ :name, line_items_attributes: [ :sku_id, :quantity, :_destroy ] ])
     end
 end

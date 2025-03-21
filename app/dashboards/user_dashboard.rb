@@ -17,7 +17,7 @@ class UserDashboard < Administrate::BaseDashboard
     username: Field::String,
     warehouse_templates: Field::HasMany,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime,
+    updated_at: Field::DateTime
   }.freeze
 
   # COLLECTION_ATTRIBUTES

@@ -26,12 +26,10 @@
 #  fk_rails_...  (usps_payment_account_id => usps_payment_accounts.id)
 #
 class USPS::Indicium < ApplicationRecord
-
   enum :processing_category, {
     letter: 0,
     flat: 1
   }
 
   has_one :payment_account
-
 end

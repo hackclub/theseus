@@ -17,7 +17,7 @@ module Warehouse
       source_tag: Field::BelongsTo,
       user: Field::BelongsTo,
       created_at: Field::DateTime,
-      updated_at: Field::DateTime,
+      updated_at: Field::DateTime
     }.freeze
 
     # COLLECTION_ATTRIBUTES
@@ -77,5 +77,4 @@ module Warehouse
     #   "Warehouse::Template ##{template.id}"
     # end
   end
-
 end

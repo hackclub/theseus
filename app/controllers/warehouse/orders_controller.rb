@@ -1,5 +1,5 @@
 class Warehouse::OrdersController < ApplicationController
-  before_action :set_warehouse_order, except: [:new, :create, :index]
+  before_action :set_warehouse_order, except: [ :new, :create, :index ]
   before_action :set_allowed_purpose_codes
 
   # GET /warehouse/orders or /warehouse/orders.json
@@ -35,7 +35,7 @@ class Warehouse::OrdersController < ApplicationController
     rescue AASM::InvalidTransition => e
       redirect_to @warehouse_order, alert: "couldn't dispatch order! wrong state?"
     end
-    redirect_to @warehouse_order, flash: {success: 'successfully sent to warehouse!'}
+    redirect_to @warehouse_order, flash: { success: "successfully sent to warehouse!" }
   end
 
   # POST /warehouse/orders or /warehouse/orders.json
@@ -115,7 +115,7 @@ class Warehouse::OrdersController < ApplicationController
       params.require(:warehouse_order).permit(
         :purpose_code_id,
         :recipient_email,
-        line_items_attributes: [:sku_id, :quantity, :_destroy],
+        line_items_attributes: [ :sku_id, :quantity, :_destroy ],
         address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country]
       ).compact_blank
     end

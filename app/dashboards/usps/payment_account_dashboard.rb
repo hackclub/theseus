@@ -18,7 +18,7 @@ module USPS
       permit_zip: Field::String,
       usps_mailer_id: Field::BelongsTo,
       created_at: Field::DateTime,
-      updated_at: Field::DateTime,
+      updated_at: Field::DateTime
     }.freeze
 
     # COLLECTION_ATTRIBUTES

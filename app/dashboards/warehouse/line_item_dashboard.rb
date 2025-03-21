@@ -15,7 +15,7 @@ module Warehouse
     sku: Field::BelongsTo,
     template: Field::BelongsTo,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime,
+    updated_at: Field::DateTime
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -64,11 +64,11 @@ module Warehouse
   #   }.freeze
   COLLECTION_FILTERS = {}.freeze
 
-  # Overwrite this method to customize how line items are displayed
-  # across all pages of the admin dashboard.
-  #
-  # def display_resource(line_item)
-  #   "Warehouse::LineItem ##{line_item.id}"
-  # end
+    # Overwrite this method to customize how line items are displayed
+    # across all pages of the admin dashboard.
+    #
+    # def display_resource(line_item)
+    #   "Warehouse::LineItem ##{line_item.id}"
+    # end
   end
 end

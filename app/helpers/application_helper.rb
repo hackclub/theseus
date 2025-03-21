@@ -1,5 +1,4 @@
 module ApplicationHelper
-
   def admin_tool(class_name: "", element: "div", **options, &block)
     return unless current_user&.is_admin?
     concat content_tag(element, class: "admin-tool #{class_name}", **options, &block)
@@ -7,7 +6,7 @@ module ApplicationHelper
 
   def nav_item(path, &block)
     active = current_page?(path)
-    content_tag('li') do
+    content_tag("li") do
       link_to(path, class: "nav-item #{active && 'active'}", &block) + ("(you are here!)" if active)
     end
   end
@@ -20,7 +19,7 @@ module ApplicationHelper
   end
 
   def inspector_toggle(thing)
-    admin_tool(class_name: 'mt4') do
+    admin_tool(class_name: "mt4") do
       param = "inspect_#{thing}".to_sym
       if params[param]
         link_to "uninspect #{thing}?", url_for(param => nil)
@@ -33,5 +32,4 @@ module ApplicationHelper
   def render_checkbox(value)
     content_tag(:span, style: "color: var(--checkbox-#{value ? 'true' : 'false' })") { value ? "☑" : "☒" }
   end
-
 end

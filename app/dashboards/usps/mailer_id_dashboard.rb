@@ -14,7 +14,7 @@ module USPS
     mid: Field::String,
     name: Field::String,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime,
+    updated_at: Field::DateTime
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -61,11 +61,11 @@ module USPS
   #   }.freeze
   COLLECTION_FILTERS = {}.freeze
 
-  # Overwrite this method to customize how mailer ids are displayed
-  # across all pages of the admin dashboard.
-  #
-  # def display_resource(mailer_id)
-  #   "USPS::MailerId ##{mailer_id.id}"
-  # end
-end
+    # Overwrite this method to customize how mailer ids are displayed
+    # across all pages of the admin dashboard.
+    #
+    # def display_resource(mailer_id)
+    #   "USPS::MailerId ##{mailer_id.id}"
+    # end
+  end
 end
