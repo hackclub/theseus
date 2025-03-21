@@ -32,7 +32,7 @@ module HasTableSync
             headers: { "Authorization" => "Bearer #{ENV["AIRTABLE_PAT"]}", "Content-Type" => "text/csv" },
             body: csv
           ))
-          raise res["error"] if res["error"]
+          raise StandardError, res["error"] if res["error"]
         end
         nil
       end
