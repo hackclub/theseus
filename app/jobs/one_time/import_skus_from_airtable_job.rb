@@ -34,6 +34,7 @@ class OneTime::ImportSKUsFromAirtableJob < ApplicationJob
         end
         sku.in_stock = at_sku.in_stock
         sku.average_po_cost = at_sku.unit_cost
+        sku.actual_cost_to_hc = at_sku.unit_cost
       end
     end
   end
