@@ -1,0 +1,11 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @usps_payment_account %>
+<%= render partial: "admin_inspector", locals: { record: @usps_payment_account } %>
+
+<div>
+  <%= link_to "Edit this payment account", edit_usps_payment_account_path(@usps_payment_account) %> |
+  <%= link_to "Back to payment accounts", usps_payment_accounts_path %>
+
+  <%= button_to "Destroy this payment account", @usps_payment_account, method: :delete %>
+</div>

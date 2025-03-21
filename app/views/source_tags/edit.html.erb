@@ -1,0 +1,12 @@
+<% content_for :title, "Editing source tag" %>
+
+<h1>Editing source tag</h1>
+
+<%= render "form", source_tag: @source_tag %>
+
+<br>
+
+<div>
+  <%= link_to "Show this source tag", @source_tag %> |
+  <%= link_to "Back to source tags", source_tags_path %>
+</div>

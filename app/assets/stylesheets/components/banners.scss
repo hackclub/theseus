@@ -1,0 +1,28 @@
+.banner {
+    border: 1px solid;
+    border-radius: 8px;
+}
+
+.banner-warning {
+    background: var(--warning-bg);
+    border-color: var(--warning-border);
+    color: var(--warning-fg-strong);
+}
+
+.banner-alert {
+    background: var(--error-bg);
+    border-color: var(--error-border);
+    color: var(--error-fg-strong);
+}
+
+.banner-notice {
+    background: var(--info-bg);
+    border-color: var(--info-border);
+    color: var(--info-fg-strong);
+}
+
+.banner-success {
+    background: var(--success-bg);
+    border-color: var(--success-border);
+    color: var(--success-fg-strong);
+}

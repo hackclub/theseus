@@ -1,0 +1,2 @@
+module USPS::PaymentAccountsHelper
+end

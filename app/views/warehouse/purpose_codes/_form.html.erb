@@ -1,0 +1,27 @@
+<%= form_with(model: warehouse_purpose_code) do |form| %>
+  <% if warehouse_purpose_code.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(warehouse_purpose_code.errors.count, "error") %> prohibited this warehouse_purpose_code from being saved:</h2>
+
+      <ul>
+        <% warehouse_purpose_code.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :code, style: "display: block" %>
+    <%= form.text_field :code %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.text_field :description %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

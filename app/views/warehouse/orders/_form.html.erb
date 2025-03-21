@@ -1,0 +1,38 @@
+<%= form_with(model: warehouse_order) do |form| %>
+  <% if warehouse_order.errors.any? %>
+    <%= render layout: 'shared/banner', locals: {color: 'alert'} do %>
+        <b>hey, slight issue:</b>
+        <ul>
+          <% warehouse_order.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+    <% end %>
+  <% end %>
+  <div>
+    <%= form.label :purpose_code_id, "purpose:" %>
+    <%= form.collection_select(:purpose_code_id, @allowed_purpose_codes, :id, :display_name, prompt: 'select one...', required: true) %>
+  </div>
+  <div>
+    <%= form.label :recipient_email, "recipient email:" %>
+    <%= form.email_field(:recipient_email) %>
+  </div>
+  <b>address:</b>
+  <%= render 'addresses/nested_form', form: %>
+
+  <h4>contents:</h4>
+  <div id='line_items'>
+    <%= form.fields_for :line_items do |line_item| %>
+      <%= render 'line_item_fields', :f => line_item %>
+    <% end %>
+    <div class='links'>
+      <%= link_to_add_association 'add item', form, :line_items %>
+    </div>
+  </div>
+
+
+
+  <div class="pt-3">
+    <%= form.submit "save" %>
+  </div>
+<% end %>

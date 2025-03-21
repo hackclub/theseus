@@ -1,0 +1,55 @@
+<div id="<%= dom_id sku %>" class="card mt-2">
+  <div style="min-width:0;flex:1">
+    <%= link_to sku.sku, sku %>
+
+    <% if sku.in_stock&.> 0 %>
+      <span class="badge success float-end">in stock</span>
+    <% elsif sku.in_stock&.< 0 %>
+      <% if sku.inbound&.>= sku.in_stock %>
+        <span class="badge warning float-end">backordered (more on the way)!</span>
+      <% else %>
+        <span class="badge error float-end">backordered!</span>
+      <% end %>
+    <% else %>
+      <span class="badge pending float-end">not in inventory</span>
+    <% end %>
+  </div>
+
+  <p>
+    <strong>Name:</strong>
+    <%= sku.name %>
+  </p>
+
+  <p>
+    <strong>In stock:</strong>
+    <%= sku.in_stock %>
+  </p>
+
+
+  <% if sku.description.present? %>
+  <p>
+    <strong>Description:</strong>
+    <%= sku.description %>
+  </p>
+    <% end %>
+
+  <p>
+    <strong>Unit cost:</strong>
+    <%= number_to_currency sku.declared_unit_cost %>
+  </p>
+
+  <p>
+    <strong>Customs description:</strong>
+    <%= sku.customs_description %>
+  </p>
+
+  <p>
+    <strong>AI enabled:</strong>
+    <%= render_checkbox sku.ai_enabled %>
+  </p>
+
+  <p>
+    <strong>Enabled:</strong>
+    <%= render_checkbox sku.enabled  %>
+  </p>
+</div>

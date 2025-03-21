@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @source_tag %>
+
+<div>
+  <%= link_to "Edit this source tag", edit_source_tag_path(@source_tag) %> |
+  <%= link_to "Back to source tags", source_tags_path %>
+
+  <%= button_to "Destroy this source tag", @source_tag, method: :delete %>
+</div>

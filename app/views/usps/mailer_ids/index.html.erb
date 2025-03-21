@@ -1,0 +1,13 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Mailers" %>
+
+<h1>CRID/Mailer ID Pairs:</h1>
+
+<div id="usps_mailer_ids">
+  <% @usps_mailer_ids.each do |mid| %>
+    <%= link_to mid.name, mid %> (<%= mid.crid %>/<%= mid.mid %>) <br/>
+  <% end %>
+</div>
+<hr/>
+<%= link_to "enter a new MID?", new_usps_mailer_id_path %>

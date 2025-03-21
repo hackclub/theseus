@@ -1,0 +1,12 @@
+<% content_for :title, "Editing indicium" %>
+
+<h1>Editing indicium</h1>
+
+<%= render "form", usps_indicium: @usps_indicium %>
+
+<br>
+
+<div>
+  <%= link_to "Show this indicium", @usps_indicium %> |
+  <%= link_to "Back to indicia", usps_indicia_path %>
+</div>

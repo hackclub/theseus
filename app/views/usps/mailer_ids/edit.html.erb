@@ -1,0 +1,12 @@
+<% content_for :title, "Editing mailer" %>
+
+<h1>Editing mailer</h1>
+
+<%= render "form", usps_mailer_id: @usps_mailer_id %>
+
+<br>
+
+<div>
+  <%= link_to "back to MID", @usps_mailer_id %> |
+  <%= link_to "back to all MIDs", usps_mailer_ids_path %>
+</div>

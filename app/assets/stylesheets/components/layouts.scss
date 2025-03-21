@@ -1,0 +1,147 @@
+.container {
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container--full {
+  max-width: none;
+  padding: 0px;
+}
+
+.container--xl {
+  max-width: 96rem;
+}
+.container--md {
+  max-width: 56rem;
+}
+.container--sm {
+  max-width: 32rem;
+}
+.container--xs {
+  max-width: 24rem;
+}
+
+.app {
+  max-width: none;
+
+  @media (min-width: 56em) {
+    display: grid;
+    grid-template-columns: 13rem 1fr;
+    grid-gap: 1rem;
+  }
+
+  @media (min-width: 72em) {
+    grid-template-columns: 16rem 1fr;
+    grid-gap: 2rem;
+  }
+
+  @media (min-width: 84em) {
+    max-width: 84rem;
+  }
+}
+.app__sidebar {
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  padding-top: 2rem;
+  z-index: 2;
+
+  // @media (min-width: 56em) {
+  //   position: sticky;
+  //   position: -webkit-sticky;
+  //   top: 0;
+  // }
+}
+
+.app__content {
+  padding-bottom: 2rem;
+  z-index: 1;
+
+  h1:first-child {
+    margin-top: 2rem;
+    text-box-trim: start;
+    text-box-edge: cap alphabetic;
+  }
+}
+
+.app__sidebar,
+.app__content {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.grid {
+  display: grid;
+  grid-gap: 1rem;
+  width: 100%;
+
+  > a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+.list-reset,
+ul.grid,
+ul.mixed-grid {
+  list-style: none;
+  padding-left: 0;
+}
+
+.mixed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-gap: 1rem;
+
+  @media (min-width: 32em) {
+    .comment__name {
+      margin-left: 0;
+      margin-top: 0;
+    }
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@media screen and (min-width: 32em) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+
+    .comment__name {
+      margin-left: 0;
+      margin-top: 0;
+    }
+  }
+
+  .grid--narrow {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  }
+
+  .grid--medium-narrow {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+
+  .grid--wide {
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  }
+
+  .grid--split {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid--spacious {
+    grid-gap: 2rem;
+  }
+
+  .grid__fill {
+    grid-column: -1 / 1;
+  }
+}

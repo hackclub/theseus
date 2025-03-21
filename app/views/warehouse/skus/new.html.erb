@@ -1,0 +1,11 @@
+<% content_for :title, "New sku" %>
+
+<h1>New sku</h1>
+
+<%= render "form", warehouse_sku: @warehouse_sku %>
+
+<br>
+
+<div>
+  <%= link_to "Back to skus", warehouse_skus_path %>
+</div>

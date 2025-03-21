@@ -1,0 +1,33 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Skus" %>
+
+<h1>SKUs:</h1>
+<div class="mb-2">
+  <a href="#" onclick="$('details').prop('open', true)">expand all</a>
+</div>
+<div id="warehouse_skus">
+  <% @warehouse_skus.group_by(&:category).each do |cat, skus| %>
+  <details>
+    <summary>
+      <span style="font-size: 1.5em"><%= cat.humanize %>:</span>
+    </summary>
+    <ul class="grid grid--medium-narrow">
+      <% skus.each do |warehouse_sku| %>
+        <li>
+          <%= render warehouse_sku %>
+        </li>
+      <% end %>
+    </ul>
+
+  </details>
+<% end %>
+
+
+</div>
+
+<div class="mt-4">
+  <% admin_tool(element: 'span') do %>
+    <%= link_to "create SKU", new_warehouse_sku_path %>
+  <% end %>
+</div>

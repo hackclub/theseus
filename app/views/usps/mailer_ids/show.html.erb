@@ -1,0 +1,11 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @usps_mailer_id %>
+<%= render partial: "admin_inspector", locals: { record: @usps_mailer_id } %>
+
+<div>
+  <%= link_to "edit this MID", edit_usps_mailer_id_path(@usps_mailer_id) %> |
+  <%= link_to "back to MIDs", usps_mailer_ids_path %>
+
+  <%= button_to "destroy this MID", @usps_mailer_id, method: :delete %>
+</div>

@@ -1,0 +1,2 @@
+module Warehouse::TemplatesHelper
+end

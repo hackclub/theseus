@@ -1,0 +1,27 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Templates" %>
+
+<h1>Order Templates</h1>
+
+<h2>Your templates:</h2>
+<div id="your_templates">
+  <%= current_user&.warehouse_templates&.each do |warehouse_template| %>
+    <%= render warehouse_template %>
+    <p>
+      <%= link_to "view this template", warehouse_template %>
+    </p>
+  <% end.presence || "none yet!" %>
+</div>
+
+<h2>Public templates:</h2>
+<div id="public_templates">
+  <%= Warehouse::Template.shared.each do |warehouse_template| %>
+    <%= render warehouse_template %>
+    <p>
+      <%= link_to "view this template", warehouse_template %>
+    </p>
+  <% end.presence || "none yet!" %>
+</div>
+
+<%= link_to "create template!", new_warehouse_template_path %>

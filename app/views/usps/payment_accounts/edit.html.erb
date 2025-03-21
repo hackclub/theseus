@@ -1,0 +1,12 @@
+<% content_for :title, "Editing payment account" %>
+
+<h1>Editing payment account</h1>
+
+<%= render "form", usps_payment_account: @usps_payment_account %>
+
+<br>
+
+<div>
+  <%= link_to "Show this payment account", @usps_payment_account %> |
+  <%= link_to "Back to payment accounts", usps_payment_accounts_path %>
+</div>

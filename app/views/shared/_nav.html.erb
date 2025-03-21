@@ -1,0 +1,52 @@
+<aside class="nav">
+  <h1>Theseus</h1>
+  <%= render 'shared/flash' %>
+
+  <% if current_user %>
+    <%= Flavor.greeting(name: current_user&.username) %><br/>
+    <%= button_to "log out", signout_path, {method: :delete} %>
+  <% end %>
+
+  <hr />
+
+  <ul class="list-inside list-disc p-5">
+    <%= nav_item root_path do %>
+      Home
+    <% end %>
+    <li>
+      Warehouse
+      <ul>
+        <%= nav_item warehouse_skus_path do %>
+          SKUs
+        <% end %>
+        <%= nav_item warehouse_orders_path do %>
+          Orders
+        <% end %>
+        <%= nav_item warehouse_templates_path do %>
+          Order templates
+        <% end %>
+      </ul>
+    </li>
+    <li>
+      USPS
+      <ul>
+        <li>
+          sorry nothing
+        </li>
+      </ul>
+    </li>
+    <% admin_tool do %>
+      <li>
+        admin stuff:
+        <ul>
+          <%= nav_item good_job_path do %>
+            hey, good job <%= current_user.username %>!
+          <% end %>
+          <%= nav_item admin_root_path do %>
+            admin panel..?
+          <% end %>
+        </ul>
+      </li>
+    <% end %>
+  </ul>
+</aside> 

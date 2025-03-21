@@ -1,0 +1,34 @@
+<% admin_tool do %>
+  <details>
+    <summary>
+      Inspect "<%= record.class.name.underscore %>" record
+    </summary>
+
+    <% unless record.nil? %>
+
+      <%== ap record %>
+
+      <div class="border-left ml1">
+
+        <!-- JSON -->
+        <details class="ml2">
+          <summary>
+            View JSON
+          </summary>
+          <div class="overflow-x-auto">
+            <pre class="w-max">
+              <%= JSON.pretty_generate(record.as_json) %>
+            </pre>
+          </div>
+        </details>
+      </div>
+
+    <% else %>
+
+      <p>
+        <code>nil</code> (does not exist)
+      </p>
+
+    <% end %>
+  </details>
+<% end %>

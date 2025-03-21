@@ -1,0 +1,33 @@
+.nav-item.active {
+  color: var(--primary-color);
+}
+
+.nav > ul {
+  list-style: none;
+  padding: 0;
+}
+
+a.nav-item {
+  text-decoration: none;
+}
+
+aside.nav {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 250px;
+  padding: 20px;
+}
+
+/* Add styles for the main content wrapper */
+body {
+  display: flex;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  margin-left: 250px;
+  padding: 20px;
+}

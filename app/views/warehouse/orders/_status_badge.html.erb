@@ -1,0 +1,25 @@
+<!--state :draft, initial: true-->
+<!--state :dispatched-->
+<!--state :mailed-->
+<!--state :errored-->
+<!--state :canceled-->
+<%
+  color, text = case order.aasm.current_state
+  when :draft
+    %w[muted draft]
+  when :dispatched
+    ["info", "sent to warehouse"]
+  when :mailed
+    %w[success mailed!]
+  when :errored
+    %w[error errored?]
+  when :canceled
+    %w[warning canceled]
+  else
+    ["purple", "this shouldn't happen?!"]
+  end
+%>
+
+<span class="badge <%= color %> float-end">
+  <%= text %>
+</span>

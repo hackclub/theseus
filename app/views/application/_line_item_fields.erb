@@ -1,0 +1,17 @@
+
+
+<div class="nested-fields">
+  <% skus_by_category = Warehouse::SKU.in_inventory.order(:sku).group_by(&:category) %>
+
+  <%= f.grouped_collection_select :sku_id,
+                                     skus_by_category,
+                                     :last, # gets the array of products
+                                     lambda { |group| group.first.humanize }, # humanized category name
+                                     :id,
+                                     -> (sku) { "#{sku.sku} - #{sku.name} (#{sku.in_stock} in stock)"},
+                                     { include_blank: 'pick a SKU!' },
+                                     { class: 'needs-select2' } %>
+  <%= f.number_field :quantity %>
+  <%= link_to_remove_association "remove", f %>
+
+</div>

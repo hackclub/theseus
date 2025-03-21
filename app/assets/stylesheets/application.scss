@@ -1,0 +1,56 @@
+@import 'colors';
+
+@import 'basscss';
+@import 'dark';
+@import 'components/banners';
+@import 'components/badges';
+@import 'components/nav';
+@import 'components/cards';
+@import 'components/layouts';
+@import 'select2';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  pre,
+  code {
+    @apply font-mono;
+  }
+}
+
+@layer utilities {
+  .caps {
+    @apply uppercase tracking-widest;
+  }
+
+  .line-height-0 {
+    @apply leading-[0];
+  }
+
+  .text-shadow {
+    text-shadow:
+            0 1px 2px rgba(0, 0, 0, 0.25),
+            0 2px 4px rgba(0, 0, 0, 0.125);
+  }
+}
+
+.admin-tool {
+  border: 1.5px dashed orange;
+  border-radius: 7px;
+  padding: 2px;
+}
+
+span.admin-tool {
+  border-radius: 8px;
+  padding: 3px 2px;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  font-family: Sans-Serif
+}

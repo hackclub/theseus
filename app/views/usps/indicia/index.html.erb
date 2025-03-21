@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Indicia" %>
+
+<h1>Indicia</h1>
+
+<div id="usps_indicia">
+  <% @usps_indicia.each do |usps_indicium| %>
+    <%= render usps_indicium %>
+    <p>
+      <%= link_to "Show this indicium", usps_indicium %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New indicium", new_usps_indicium_path %>

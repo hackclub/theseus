@@ -1,0 +1,4 @@
+<div>
+  <%= link_to line_item.sku.name, line_item.sku, target: '_blank' %>
+  <%= render partial: "admin_inspector", locals: {record: line_item} if params[:inspect_line_items] %>
+</div>

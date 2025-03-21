@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @warehouse_template %>
+
+<div>
+  <%= link_to "Edit this template", edit_warehouse_template_path(@warehouse_template) %> |
+  <%= link_to "Back to templates", warehouse_templates_path %>
+
+  <%= button_to "Destroy this template", @warehouse_template, method: :delete %>
+</div>

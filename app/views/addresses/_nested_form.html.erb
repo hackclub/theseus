@@ -1,0 +1,32 @@
+<%= form.fields_for :address do |a| %>
+  <div>
+    <%= a.label :first_name %>
+    <%= a.text_field :first_name %>
+    <%= a.label :last_name %>
+    <%= a.text_field :last_name %>
+  </div>
+  <div>
+    <%= a.label :line_1 %>
+    <%= a.text_field :line_1 %>
+  </div>
+  <div>
+    <%= a.label :line_2 %>
+    <%= a.text_field :line_2 %>
+  </div>
+  <div>
+    <%= a.label :city %>
+    <%= a.text_field :city %>
+  </div>
+  <div>
+    <%= a.label :state %>
+    <%= a.text_field :state %>
+  </div>
+  <div>
+    <%= a.label :postal_code %>
+    <%= a.text_field :postal_code %>
+  </div>
+  <div>
+    <%= a.label :country, "Country" %>
+    <%= a.collection_select :country, Address.countries_for_select, :first, :last, { include_blank: "Select a country" } %>
+  </div>
+<% end %>

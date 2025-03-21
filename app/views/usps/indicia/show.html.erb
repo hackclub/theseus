@@ -1,0 +1,11 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @usps_indicium %>
+<%= render partial: "admin_inspector", locals: { record: @usps_indicium } %>
+
+<div>
+  <%= link_to "Edit this indicium", edit_usps_indicium_path(@usps_indicium) %> |
+  <%= link_to "Back to indicia", usps_indicia_path %>
+
+  <%= button_to "Destroy this indicium", @usps_indicium, method: :delete %>
+</div>

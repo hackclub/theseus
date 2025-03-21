@@ -1,0 +1,12 @@
+<% content_for :title, "Editing sku" %>
+
+<h1>Editing SKU: <%= @warehouse_sku.sku %></h1>
+
+<%= render "form", warehouse_sku: @warehouse_sku %>
+
+<br>
+
+<div>
+  <%= link_to "back to this SKU", @warehouse_sku %> |
+  <%= link_to "back to SKUs", warehouse_skus_path %>
+</div>

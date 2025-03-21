@@ -1,0 +1,11 @@
+<% content_for :title, "New template" %>
+
+<h1>New template</h1>
+
+<%= render "form", warehouse_template: @warehouse_template %>
+
+<br>
+
+<div>
+  <%= link_to "Back to templates", warehouse_templates_path %>
+</div>

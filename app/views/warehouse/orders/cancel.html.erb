@@ -1,0 +1,9 @@
+<h1>Cancel order <%= @warehouse_order.hc_id %>:</h1>
+Please try to avoid needing to do this. <br/>
+If fulfillment of this order is already underway at the warehouse, this will error out and you'll need to contact them directly.
+<br/><br/>
+<%= form_with method: :post do |form| %>
+  <%= form.label :cancellation_reason, "Reason for cancellation (visible to AGH crew): " %>
+  <%= form.text_field :cancellation_reason %>
+  <%= form.submit "do it!" %>
+<% end %>

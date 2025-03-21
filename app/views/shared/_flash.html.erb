@@ -1,0 +1,5 @@
+<% flash.each do |name, msg| %>
+  <%= render layout: 'shared/banner', locals: { color: name } do %>
+    <%= msg %>
+  <% end %>
+<% end %>

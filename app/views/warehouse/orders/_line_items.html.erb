@@ -1,0 +1,33 @@
+<table class="table-fixed text-left border border-gray-300 border-collapse">
+  <tr>
+    <th class="border border-gray-300">SKU</th>
+    <th class="border border-gray-300">Quantity</th>
+    <th class="border border-gray-300">Cost to HC</th>
+    <th class="border border-gray-300">Declared value</th>
+  </tr>
+  <% order.line_items.each do |li| %>
+    <tr>
+      <td class="border border-gray-400">
+        <%= link_to li.sku.name, li.sku, target: '_blank' %>
+      </td>
+      <td class="border border-gray-400">
+        <%= li.quantity %>
+      </td>
+      <td class="border border-gray-400">
+        <%= number_to_currency li.sku.actual_cost_to_hc %>
+      </td>
+      <td class="border border-gray-400">
+        <%= number_to_currency li.sku.declared_unit_cost %>
+      </td>
+    </tr>
+  <% end %>
+  <tr>
+    <td colspan="2">Total:</td>
+    <td class="border border-gray-400">
+      <%= number_to_currency order.contents_actual_cost_to_hc %>
+    </td>
+    <td class="border border-gray-400">
+      <%= number_to_currency order.contents_declared_unit_cost %>
+    </td>
+  </tr>
+</table>

@@ -1,0 +1,67 @@
+<%= form_with(model: usps_indicium) do |form| %>
+  <% if usps_indicium.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(usps_indicium.errors.count, "error") %> prohibited this usps_indicium from being saved:</h2>
+
+      <ul>
+        <% usps_indicium.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :processing_category, style: "display: block" %>
+    <%= form.number_field :processing_category %>
+  </div>
+
+  <div>
+    <%= form.label :postage_weight, style: "display: block" %>
+    <%= form.text_field :postage_weight %>
+  </div>
+
+  <div>
+    <%= form.label :postage_length, style: "display: block" %>
+    <%= form.text_field :postage_length %>
+  </div>
+
+  <div>
+    <%= form.label :postage_height, style: "display: block" %>
+    <%= form.text_field :postage_height %>
+  </div>
+
+  <div>
+    <%= form.label :postage_thickness, style: "display: block" %>
+    <%= form.text_field :postage_thickness %>
+  </div>
+
+  <div>
+    <%= form.label :nonmachinable, style: "display: block" %>
+    <%= form.checkbox :nonmachinable %>
+  </div>
+
+  <div>
+    <%= form.label :usps_sku, style: "display: block" %>
+    <%= form.text_field :usps_sku %>
+  </div>
+
+  <div>
+    <%= form.label :raw_usps_response, style: "display: block" %>
+    <%= form.textarea :raw_usps_response %>
+  </div>
+
+  <div>
+    <%= form.label :postage, style: "display: block" %>
+    <%= form.text_field :postage %>
+  </div>
+
+  <div>
+    <%= form.label :mailing_date, style: "display: block" %>
+    <%= form.date_field :mailing_date %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

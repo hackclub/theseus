@@ -1,0 +1,12 @@
+<% content_for :title, "Editing template" %>
+
+<h1>Editing template</h1>
+
+<%= render "form", warehouse_template: @warehouse_template %>
+
+<br>
+
+<div>
+  <%= link_to "Show this template", @warehouse_template %> |
+  <%= link_to "Back to templates", warehouse_templates_path %>
+</div>

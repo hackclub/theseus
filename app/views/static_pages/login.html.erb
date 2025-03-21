@@ -1,0 +1,13 @@
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <%= stylesheet_link_tag "login" %>
+  <%= stylesheet_link_tag "tailwind" %>
+</head>
+<body>
+<img src="<%= asset_url "treasure.png" %>" id="treasure"/>
+<%= render 'shared/flash' %>
+<h1>welcome ashore...</h1>
+<%= link_to "log in?", slack_auth_path %>
+</body>
+</html>

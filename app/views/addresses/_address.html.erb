@@ -1,0 +1,5 @@
+<%= address.first_name %> <%= address.last_name %> <br/>
+<%= address.line_1 %> <br/>
+<% if address.line_2.present? %> <%= address.line_2 %> <br/> <% end %>
+<%= address.city %>, <%= address.state %> <%= address.postal_code %> <br/>
+<%= address.country %>

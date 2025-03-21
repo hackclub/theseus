@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Payment accounts" %>
+
+<h1>Payment accounts</h1>
+
+<div id="usps_payment_accounts">
+  <% @usps_payment_accounts.each do |usps_payment_account| %>
+    <%= render usps_payment_account %>
+    <p>
+      <%= link_to "Show this payment account", usps_payment_account %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New payment account", new_usps_payment_account_path %>

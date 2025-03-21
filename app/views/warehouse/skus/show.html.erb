@@ -1,0 +1,15 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @warehouse_sku %>
+<%= render partial: "admin_inspector", locals: { record: @warehouse_sku } %>
+<% zenv_link sku %>
+
+<div>
+  <% admin_tool do %>
+    <%= link_to "edit this SKU", edit_warehouse_sku_path(@warehouse_sku) %>
+  <% end %>
+
+
+  <%= link_to "back to SKUs", warehouse_skus_path %>
+
+</div>

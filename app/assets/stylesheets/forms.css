@@ -1,0 +1,37 @@
+input[type='date'],
+input[type='email'],
+input[type='number'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='text'],
+input[type='url'],
+.input,
+select,
+textarea {
+    /*-webkit-appearance: none;*/
+    background-color: #f9fafc;
+    border-radius: 6px;
+    border: 1px solid  #e0e6ed;
+    color: inherit;
+    display: block;
+    font-size: 1rem;
+    min-height: 2.5rem;
+    margin-left: 0;
+    outline: 0;
+    padding: 0.25rem 0.5rem;
+    position: relative;
+    transition: border 0.2s ease;
+    width: 100%;
+    max-width: 24rem;
+
+    &:focus-within {
+        /*border-color: map-get($palette, info);*/
+    }
+
+    &[readonly],
+    &[disabled] {
+        cursor: no-drop;
+        /*color: map-get($palette, slate);*/
+    }
+}

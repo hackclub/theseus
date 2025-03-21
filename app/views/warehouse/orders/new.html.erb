@@ -1,0 +1,11 @@
+<% content_for :title, "New order" %>
+
+<h1>New order</h1>
+
+<%= render "form", warehouse_order: @warehouse_order %>
+
+<br>
+
+<div>
+  <%= link_to "Back to orders", warehouse_orders_path %>
+</div>

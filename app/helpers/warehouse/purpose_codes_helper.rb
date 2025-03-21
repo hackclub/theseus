@@ -1,0 +1,2 @@
+module Warehouse::PurposeCodesHelper
+end

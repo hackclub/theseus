@@ -1,0 +1,2 @@
+module USPS::MailerIdsHelper
+end

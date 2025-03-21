@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Source tags" %>
+
+<h1>Source tags</h1>
+
+<div id="source_tags">
+  <% @source_tags.each do |source_tag| %>
+    <%= render source_tag %>
+    <p>
+      <%= link_to "Show this source tag", source_tag %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New source tag", new_source_tag_path %>

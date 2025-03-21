@@ -1,0 +1,2 @@
+module Warehouse::OrdersHelper
+end

@@ -1,0 +1,48 @@
+<div>
+  <h2 class="inline">
+    Order <%= @warehouse_order.hc_id %>:
+  </h2>
+  <%= render 'status_badge', order: @warehouse_order %>
+</div>
+
+<div class="my-2">
+  <b>email:</b> <%= link_to @warehouse_order.recipient_email, "mailto:#{@warehouse_order.recipient_email}" %><br/>
+  <b>recipient:</b> <br/>
+  <%= render 'addresses/address', address: @warehouse_order.address %>
+</div>
+
+<b>contents:</b>
+<%= render 'warehouse/orders/line_items', order: @warehouse_order %>
+<div class="my-2">
+  <b>labor cost:</b> <%= number_to_currency @warehouse_order.labor_cost %>
+</div>
+<div class="my-2">
+  <b>actual contents cost:</b> <%= number_to_currency @warehouse_order.contents_actual_cost_to_hc %>
+</div>
+<div class="my-2">
+  <b>postage cost:</b>
+  <% if @warehouse_order.postage_cost.present? %>
+    <%= number_to_currency @warehouse_order.postage_cost %>
+  <% else %>
+    $?.??
+  <% end %>
+</div>
+<div class="my-2">
+  <b>all in<%= " (excluding postage)" unless @warehouse_order.postage_cost.present? %>:</b> <%= number_to_currency((@warehouse_order.contents_actual_cost_to_hc || 0) + (@warehouse_order.labor_cost || 0) + (@warehouse_order.postage_cost || 0)) %>
+</div>
+
+
+<% zenv_link @warehouse_order %>
+
+<% if policy(@warehouse_order).send_to_warehouse? && @warehouse_order.may_mark_dispatched? %>
+  <%= button_to "send it!", action: :send_to_warehouse %>
+<% end %>
+<div>
+  <%= link_to "Edit this order", edit_warehouse_order_path(@warehouse_order) %> |
+  <%= link_to "Back to orders", warehouse_orders_path %>
+
+  <%= button_to "Destroy this order", @warehouse_order, method: :delete %>
+</div>
+<%= render partial: "admin_inspector", locals: { record: @warehouse_order } %>
+<% inspector_toggle :line_items %>
+

@@ -1,0 +1,52 @@
+<%= form_with(model: usps_payment_account) do |form| %>
+  <% if usps_payment_account.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(usps_payment_account.errors.count, "error") %> prohibited this usps_payment_account from being saved:</h2>
+
+      <ul>
+        <% usps_payment_account.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div>
+    <%= form.label :name, "Display name:" %>
+    <%= form.text_field :name %>
+  </div>
+  <div>
+    <%= form.label :usps_mailer_id_id, "CRID/MID:" %>
+    <%= form.collection_select(:usps_mailer_id_id, USPS::MailerId.all, :id, :display_name, prompt: 'select one...', required: true) %>
+  </div>
+  <div x-data="{account_type: '<%= @usps_payment_account.account_type %>'}" x-effect="console.log(account_type)">
+    <%= form.label :account_type, "Account type:" %>
+    <%= form.select :account_type, USPS::PaymentAccount.account_types.keys, { selected: @usps_payment_account.account_type }, { 'x-model' => 'account_type' } %>
+    <template x-if="account_type=='EPS'">
+      <div>
+        <%= form.label :account_number, "EPS account number:" %>
+        <%= form.text_field :account_number %>
+      </div>
+    </template>
+    <template x-if="account_type=='PERMIT'">
+      <div>
+        <div>
+          <%= form.label :permit_number, "Permit number:" %>
+          <%= form.text_field :permit_number %>
+        </div>
+        <div>
+          <%= form.label :permit_zip, "Permit ZIP:" %>
+          <%= form.text_field :permit_zip %>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <div>
+    <%= form.label :manifest_mid, "Manifest MID:" %>
+    <%= form.text_field :manifest_mid %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

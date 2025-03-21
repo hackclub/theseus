@@ -1,0 +1,52 @@
+<%= form_with(model: warehouse_sku) do |form| %>
+  <% if warehouse_sku.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(warehouse_sku.errors.count, "error") %> prohibited this SKU from being saved:</h2>
+
+      <ul>
+        <% warehouse_sku.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :sku, style: "display: block" %>
+    <%= form.text_field :sku %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.textarea :description %>
+  </div>
+
+  <div>
+    <%= form.label :unit_cost, style: "display: block" %>
+    <%= form.text_field :unit_cost %>
+  </div>
+
+  <div>
+    <%= form.label :customs_description, style: "display: block" %>
+    <%= form.textarea :customs_description %>
+  </div>
+
+  <div>
+    <%= form.label :in_stock, style: "display: block" %>
+    <%= form.number_field :in_stock %>
+  </div>
+
+  <div>
+    <%= form.label :ai_enabled, style: "display: block" %>
+    <%= form.checkbox :ai_enabled %>
+  </div>
+
+  <div>
+    <%= form.label :enabled, style: "display: block" %>
+    <%= form.checkbox :enabled %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

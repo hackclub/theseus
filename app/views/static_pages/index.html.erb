@@ -1,0 +1,11 @@
+<h1>Where do you want to go today?</h1>
+<h3>I'd like to...</h3>
+<ul>
+  <li>
+    Go to the warehouse and...
+    <ul>
+      <li> <%= link_to "look at SKUs", warehouse_skus_path %></li>
+      <li> <%= link_to "request a package!", new_warehouse_order_path %></li>
+    </ul>
+  </li>
+</ul>
