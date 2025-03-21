@@ -114,3 +114,5 @@ gem "awesome_print", "~> 1.9"
 gem "cocoon", "~> 1.2"
 
 gem "administrate", "~> 0.19.0"
+
+gem "slim-rails", "~> 3.7"

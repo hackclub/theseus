@@ -114,6 +114,9 @@ class Warehouse::OrdersController < ApplicationController
     def warehouse_order_params
       params.require(:warehouse_order).permit(
         :purpose_code_id,
+        :user_facing_title,
+        :user_facing_description,
+        :internal_notes,
         :recipient_email,
         line_items_attributes: [ :sku_id, :quantity, :_destroy ],
         address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country]
