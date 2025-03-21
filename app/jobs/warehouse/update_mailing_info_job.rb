@@ -1,4 +1,4 @@
-class Warehouse::UpdateMailingInfo < ApplicationJob
+class Warehouse::UpdateMailingInfoJob < ApplicationJob
   queue_as :default
 
   FUDGE_FACTOR = 2.weeks
