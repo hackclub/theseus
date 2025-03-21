@@ -1,0 +1,35 @@
+= form_with(model: warehouse_order) do |form|
+  - if warehouse_order.errors.any?
+    = render layout: 'shared/banner', locals: {color: 'alert'} do
+      b hey, slight issue:
+      ul
+        - warehouse_order.errors.each do |error|
+          li= error.full_message
+  div
+    = form.label :user_facing_title, "short title (shown to recipient):"
+    = form.text_field :user_facing_title
+
+  div
+    = form.label :purpose_code_id, "purpose:"
+    = form.collection_select :purpose_code_id, @allowed_purpose_codes, :id, :display_name, prompt: 'select one...', required: true
+
+  div
+    = form.label :recipient_email, "recipient email:"
+    = form.email_field :recipient_email
+
+  b address:
+  = render 'addresses/nested_form', form: form
+  .py-3
+    = form.label :internal_notes, "internal notes:"
+    .display-block
+      = form.text_area :internal_notes
+  h4 contents:
+  #line_items
+    = form.fields_for :line_items do |line_item|
+      = render 'line_item_fields', f: line_item
+
+    .links
+      = link_to_add_association 'add item', form, :line_items
+
+  .pt-3
+    = form.submit "save"

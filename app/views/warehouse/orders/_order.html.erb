@@ -1,6 +1,6 @@
 <div class="card mb-3">
-  <!--  <h4 class="display-inline">-->
   <div>
+
     <b>
       <%= link_to order.hc_id, order %>
     </b>
@@ -8,11 +8,13 @@
     <%= render 'status_badge', order: %>
   </div>
 
+  <div class="my-2">
+    <b>going to: </b>
+    <%= order.address.name_line %> (<% order.recipient_email %>)
+  </div>
+
 
   <b>contents:</b>
   <%= render 'warehouse/orders/line_items', order: %>
-
-  <%= render 'addresses/address', address: order.address %>
-
 
 </div>

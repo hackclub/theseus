@@ -2,7 +2,8 @@
 
 <%= render @warehouse_sku %>
 <%= render partial: "admin_inspector", locals: { record: @warehouse_sku } %>
-<% zenv_link sku %>
+
+<% zenv_link @warehouse_sku %>
 
 <div>
   <% admin_tool do %>
