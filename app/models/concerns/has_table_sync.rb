@@ -29,7 +29,7 @@ module HasTableSync
           url = "#{ENV["AIRTABLE_BASE_URL"] || "https://api.airtable.com"}/v0/#{@table_sync_base}/#{@table_sync_table}/sync/#{sync_id}"
           res = JSON.parse(HTTP.post(
             url,
-            headers: { "Authorization" => "Bearer #{ENV["AIRTABLE_PAT"]}", "Content-Type" => "text/csv" },
+            headers: { "Authorization" => "Bearer #{Rails.application.credentials.dig(:airtable, :pat)}", "Content-Type" => "text/csv" },
             body: csv
           ))
           raise StandardError, res["error"] if res["error"]
