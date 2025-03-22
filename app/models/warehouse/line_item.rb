@@ -23,10 +23,10 @@
 #  fk_rails_...  (template_id => warehouse_templates.id)
 #
 class Warehouse::LineItem < ApplicationRecord
-  belongs_to :sku
-  belongs_to :order, optional: true
+  belongs_to :order, class_name: "Warehouse::Order", optional: true
+  belongs_to :sku, class_name: "Warehouse::SKU", optional: true
   belongs_to :template, optional: true
 
+  validates :quantity, presence: true, numericality: { greater_than: 0 }
   validates :sku, presence: true
-  validates :quantity, presence: true
 end

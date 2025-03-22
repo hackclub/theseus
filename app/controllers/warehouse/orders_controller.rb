@@ -118,7 +118,7 @@ class Warehouse::OrdersController < ApplicationController
         :user_facing_description,
         :internal_notes,
         :recipient_email,
-        line_items_attributes: [ :sku_id, :quantity, :_destroy ],
+        line_items_attributes: [ :id, :sku_id, :quantity, :_destroy ],
         address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country]
       ).compact_blank
     end

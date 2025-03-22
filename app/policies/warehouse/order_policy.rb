@@ -12,6 +12,11 @@ class Warehouse::OrderPolicy < ApplicationPolicy
     record_belongs_to_user || user_is_admin
   end
 
+  def update?
+    return false unless user_can_warehouse
+    record_belongs_to_user || user_is_admin
+  end
+
   def show?
     user_can_warehouse
   end

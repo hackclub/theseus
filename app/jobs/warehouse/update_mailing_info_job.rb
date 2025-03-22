@@ -7,7 +7,7 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
     orders = Warehouse::Order.dispatched.order(dispatched_at: :asc)
 
     return if orders.empty?
-    
+
     start_date = orders.first.dispatched_at - FUDGE_FACTOR
     end_date = orders.last.dispatched_at + FUDGE_FACTOR
 

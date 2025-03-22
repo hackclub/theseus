@@ -30,7 +30,9 @@ class Zenventory
     end
 
     def get_customer_order(id)
-      conn.get("customer-orders/#{id}").body
+      response = conn.get("customer-orders/#{id}").body
+      Rails.logger.debug { "Zenventory Order Response: #{response.inspect}" }
+      response
     end
 
     def create_customer_order(params = {})
@@ -40,7 +42,9 @@ class Zenventory
     end
 
     def update_customer_order(id, params = {})
-      conn.put("customer-orders/#{id}", params).body
+      conn.put("customer-orders/#{id}", 
+      saveAsDraft: !(ENV["SEND_REAL_ORDERS"] == "yeah"),
+      **params).body
     end
 
     def get_inventory(params = {})

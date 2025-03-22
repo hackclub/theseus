@@ -30,7 +30,7 @@ class Warehouse::SKU < ApplicationRecord
   scope :backordered, -> { where("in_stock < 0") }
 
   def declared_unit_cost
-    declared_unit_cost_override || average_po_cost
+    declared_unit_cost_override || average_po_cost || 0
   end
 
   enum :category, {
