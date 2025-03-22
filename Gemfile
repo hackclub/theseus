@@ -118,5 +118,5 @@ gem "administrate", "~> 0.19.0"
 gem "slim-rails", "~> 3.7"
 
 group :development do
-  gem 'letter_opener_web', '~> 3.0'
+  gem "letter_opener_web", "~> 3.0"
 end

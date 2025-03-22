@@ -42,7 +42,7 @@ class Zenventory
     end
 
     def update_customer_order(id, params = {})
-      conn.put("customer-orders/#{id}", 
+      conn.put("customer-orders/#{id}",
       saveAsDraft: !(ENV["SEND_REAL_ORDERS"] == "yeah"),
       **params).body
     end

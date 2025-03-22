@@ -98,7 +98,7 @@ class Warehouse::OrdersController < ApplicationController
   def destroy
     authorize @warehouse_order
     @warehouse_order.destroy!
-  
+
     respond_to do |format|
       format.html { redirect_to warehouse_orders_path, status: :see_other, notice: "it's gone." }
       format.json { head :no_content }

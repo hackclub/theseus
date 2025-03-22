@@ -61,11 +61,11 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:         'smtp.loops.so',
+    address:         "smtp.loops.so",
     port:            587,
-    user_name:       'loops',
+    user_name:       "loops",
     password:        Rails.application.credentials.dig(:loops, :api_key),
-    authentication:  'plain',
+    authentication:  "plain",
     enable_starttls: true
   }
 
