@@ -62,7 +62,7 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
-  aasm do
+  aasm timestamps: true do
     state :draft, initial: true
     state :dispatched
     state :mailed
