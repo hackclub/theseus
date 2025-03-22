@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_18_175021) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -212,6 +212,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_18_175021) do
     t.decimal "postage_cost"
     t.decimal "weight"
     t.string "idempotency_key"
+    t.boolean "notify_on_dispatch"
     t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
     t.index ["idempotency_key"], name: "index_warehouse_orders_on_idempotency_key", unique: true

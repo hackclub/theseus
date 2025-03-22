@@ -10,6 +10,7 @@
 #  idempotency_key         :string
 #  internal_notes          :text
 #  mailed_at               :datetime
+#  notify_on_dispatch      :boolean
 #  postage_cost            :decimal(, )
 #  recipient_email         :string
 #  service                 :string
