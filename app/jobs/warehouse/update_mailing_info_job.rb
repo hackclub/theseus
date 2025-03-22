@@ -29,6 +29,7 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
         mailed_at: DateTime.parse(zen_order[:shipped_date]),
         aasm_state: "mailed"
       )
+      Warehouse::OrderMailer.with(order:).order_shipped.deliver_later
     end
   end
 end

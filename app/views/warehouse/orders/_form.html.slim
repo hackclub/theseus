@@ -23,6 +23,12 @@
     = form.label :internal_notes, "internal notes:"
     .display-block
       = form.text_area :internal_notes
+    
+    = form.label :notify_on_dispatch, 'send the recipient a "sent to warehouse" email? '
+    = form.check_box :notify_on_dispatch
+    br
+    small
+      | (they'll get an email when it ships regardless)
   h4 contents:
   #line_items
     = form.fields_for :line_items do |line_item|
@@ -30,6 +36,5 @@
 
     .links
       = link_to_add_association 'add item', form, :line_items
-
   .pt-3
     = form.submit "save"

@@ -48,5 +48,15 @@
         </ul>
       </li>
     <% end %>
+    <% if Rails.env.development? %>
+      <li>
+        dev tools:
+        <ul>
+          <%= nav_item letter_opener_web_path, true do %>
+            mail (not the physical kind)
+          <% end %>
+        </ul>
+      </li>
+    <% end %>
   </ul>
 </aside> 

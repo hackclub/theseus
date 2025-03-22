@@ -10,6 +10,7 @@
 #  idempotency_key         :string
 #  internal_notes          :text
 #  mailed_at               :datetime
+#  notify_on_dispatch      :boolean
 #  postage_cost            :decimal(, )
 #  recipient_email         :string
 #  service                 :string
@@ -158,6 +159,10 @@ class Warehouse::Order < ApplicationRecord
       )
       mark_dispatched!(order[:id])
     end
+
+    if notify_on_dispatch?
+      Warehouse::OrderMailer.with(order: self).order_created.deliver_later
+    end
   end
 
   def zenv_attributes_changed?
@@ -220,6 +225,31 @@ class Warehouse::Order < ApplicationRecord
         price: line_item.sku.declared_unit_cost,
         quantity: line_item.quantity
       }
+    end
+  end
+
+  def tracking_format
+    @tracking_format ||= Tracking.get_format_by_zenv_info(carrier:, service:)
+  end
+
+  def tracking_url
+    Tracking.tracking_url_for(tracking_format, tracking_number)
+  end
+
+  def might_be_slow?
+    %i[asendia usps].include?(tracking_format)
+  end
+
+  def pretty_via
+    case tracking_format
+    when :usps
+      "USPS"
+    when :asendia
+      "Asendia"
+    when :ups
+      "UPS #{service}"
+    else
+      "#{carrier} #{service}"
     end
   end
 
