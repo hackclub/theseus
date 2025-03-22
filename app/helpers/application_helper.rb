@@ -4,10 +4,10 @@ module ApplicationHelper
     concat content_tag(element, class: "admin-tool #{class_name}", **options, &block)
   end
 
-  def nav_item(path, &block)
+  def nav_item(path, new_tab=false, &block)
     active = current_page?(path)
     content_tag("li") do
-      link_to(path, class: "nav-item #{active && 'active'}", &block) + ("(you are here!)" if active)
+      link_to(path, class: "nav-item #{active && 'active'}", target: ('_blank' if new_tab), &block) + ("(you are here!)" if active)
     end
   end
 
