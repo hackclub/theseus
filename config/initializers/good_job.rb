@@ -10,23 +10,23 @@ Rails.application.configure do
     },
     update_median_postage_costs: {
       cron: "*/30 * * * *",
-      class: "Warehouse::UpdateMedianPostageCostsJob",
+      class: "Warehouse::UpdateMedianPostageCostsJob"
     },
     update_inventory_levels: {
       cron: "*/5 * * * *",
-      class: "Warehouse::UpdateInventoryLevelsJob",
+      class: "Warehouse::UpdateInventoryLevelsJob"
     },
     update_cancellations: {
       cron: "*/10 * * * *",
-      class: "Warehouse::UpdateCancellationsJob",
+      class: "Warehouse::UpdateCancellationsJob"
     },
     sync_skus: {
       cron: "*/7 * * * *",
-      class: "TableSync::SKUSyncJob",
+      class: "TableSync::SKUSyncJob"
     },
     sync_orders: {
       cron: "*/8 * * * *",
-      class: "TableSync::OrderSyncJob",
-    },
+      class: "TableSync::OrderSyncJob"
+    }
   }
 end

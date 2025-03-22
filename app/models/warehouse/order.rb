@@ -90,7 +90,7 @@ class Warehouse::Order < ApplicationRecord
   belongs_to :source_tag
   has_many :line_items, dependent: :destroy
   accepts_nested_attributes_for :line_items, reject_if: :all_blank, allow_destroy: true
-  accepts_nested_attributes_for :address
+  accepts_nested_attributes_for :address, update_only: true
 
   has_many :skus, through: :line_items
   validates :line_items, presence: true
@@ -133,7 +133,7 @@ class Warehouse::Order < ApplicationRecord
 
   def dispatch!
     ActiveRecord::Base.transaction do
-      raise "wrong state" unless may_mark_dispatched?
+      raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
       order = Zenventory.create_customer_order(
         {
           orderNumber: hc_id,
@@ -160,6 +160,59 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
+  def zenv_attributes_changed?
+    return true if recipient_email_changed?
+
+    return true if address&.changed?
+
+    return true if line_items.any?(&:marked_for_destruction?) ||
+                  line_items.any?(&:new_record?) ||
+                  line_items.any?(&:changed?)
+
+    false
+  end
+
+
+  before_update { |rec| try_zenventory_update! if rec.zenv_attributes_changed? && !rec.draft? }
+
+  def try_zenventory_update!
+    if mailed?
+      errors.add(:base, "can't edit an order that's already been shipped!")
+      throw(:abort)
+    end
+    if canceled?
+      errors.add(:base, "can't edit an order that's canceled!")
+      throw(:abort)
+    end
+    begin
+      update_hash = {
+        customer: {
+          name: address.first_name,
+          surname: address.last_name || "​",
+          email: recipient_email
+        },
+        shippingAddress: {
+          name: address.name_line,
+          line1: address.line_1,
+          line2: address.line_2,
+          city: address.city,
+          state: address.state,
+          zip: address.postal_code,
+          countryCode: address.country,
+          phone: address.phone_number
+        }.compact_blank,
+        billingAddress: {
+          sameAsShipping: true
+        },
+        items: generate_order_items_for_update
+      }.compact_blank
+      Zenventory.update_customer_order(zenventory_id, update_hash) unless update_hash.empty?
+    rescue Zenventory::ZenventoryError => e
+      errors.add(:base, "couldn't edit order, Zenventory said: #{e.message}")
+      throw(:abort)
+    end
+  end
+
   def generate_order_items
     line_items.map do |line_item|
       {
@@ -168,6 +221,64 @@ class Warehouse::Order < ApplicationRecord
         quantity: line_item.quantity
       }
     end
+  end
+
+  # nora: entirely v*becoded because i can't be fucked
+  def generate_order_items_for_update
+    # Check if we need to fetch existing order details from Zenventory
+    has_deletions = line_items.any?(&:marked_for_destruction?)
+    has_modifications = line_items.reject(&:marked_for_destruction?).any? { |li| li.changed? }
+
+    # Only fetch from Zenventory if we need IDs for updates or deletions
+    zenventory_item_map = {}
+    if has_deletions || has_modifications
+      # Fetch current order from Zenventory to get line item IDs
+      zenventory_order = Zenventory.get_customer_order(zenventory_id)
+      zenventory_items = zenventory_order[:items] || []
+
+      # Use index_by to create a lookup hash of existing Zenventory line items by SKU
+      zenventory_item_map = zenventory_items.index_by { |item| item[:sku] }
+    end
+
+    items_to_update = []
+
+    # Process items marked for deletion
+    if has_deletions
+      line_items.select(&:marked_for_destruction?).each do |line_item|
+        zenv_item = zenventory_item_map[line_item.sku.sku]
+        next unless zenv_item # Skip if we can't find the item in Zenventory
+
+        items_to_update << create_item_hash(line_item, zenv_item[:id], 0) # Set quantity to 0 for deletion
+      end
+    end
+
+    # Process new and modified items
+    line_items.reject(&:marked_for_destruction?).each do |line_item|
+      if line_item.new_record?
+        # New line item - don't include ID
+        items_to_update << create_item_hash(line_item)
+      elsif line_item.changed?
+        # Modified line item - include ID if available
+        zenv_item = zenventory_item_map[line_item.sku.sku]
+        items_to_update << create_item_hash(line_item, zenv_item&.dig(:id))
+      end
+    end
+
+    items_to_update
+  end
+
+  # Helper method just for updates
+  private def create_item_hash(line_item, item_id = nil, quantity = nil)
+    item_hash = {
+      sku: line_item.sku.sku,
+      price: line_item.sku.declared_unit_cost,
+      quantity: quantity || line_item.quantity
+    }
+
+    # Only include ID if one was provided
+    item_hash[:id] = item_id if item_id
+
+    item_hash
   end
 
   def to_param
