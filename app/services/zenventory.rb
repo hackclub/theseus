@@ -103,7 +103,6 @@ class Zenventory
       data = []
       loop do
         response = conn.get(url, page:, perPage: page_size, **params).body
-        puts response
         data.concat(response[obj] || [])
         page += 1
         break if page > (response.dig(:meta, :totalPages) || 0) or no_paginate
