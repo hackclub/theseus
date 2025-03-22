@@ -6,7 +6,7 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
     Rails.logger.info("taking zenventory...")
     inventory = Zenventory
                   .get_inventory
-                  .index_by { |i| i.dig("item", "sku") }
+                  .index_by { |i| i.dig(:item, :sku) }
 
     Rails.logger.info("achievement get! fetched #{inventory.length} inventory items ^_^")
 
