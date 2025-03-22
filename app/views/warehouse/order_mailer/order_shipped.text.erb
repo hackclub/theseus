@@ -1,0 +1,23 @@
+{
+  "transactionalId": "cm8jigjb90pnkol7fy24kbv64",
+  "email": "nora@hackclub.com",
+  "dataVariables": 
+  <%=
+    {
+        user_facing_title: @order.user_facing_title,
+        address: @order.address.us_format,
+        hc_id: @order.hc_id,
+        tracking_here_if_tracking: if @order.tracking_number.present?
+            "tracking number: #{link_to @order.tracking_number, @order.tracking_url}"
+        else
+            ""
+        end,
+        usps_disclaimer_if_usps: if @order.might_be_slow?
+            "<b>as a small nonprofit, we send most packages by USPS First Class Mail to save on postage. estimated delivery time: <ul><li>within USA: 3-7 days</li><li>outside USA: 4-6 weeks</li></ul>"
+        else
+            ""
+        end,
+        via: @order.pretty_via
+    }.to_json
+    %>
+}

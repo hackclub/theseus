@@ -223,6 +223,31 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
+  def tracking_format
+    @tracking_format ||= Tracking.get_format_by_zenv_info(carrier:, service:)
+  end
+
+  def tracking_url
+    Tracking.tracking_url_for(tracking_format, tracking_number)
+  end
+
+  def might_be_slow?
+    %i[asendia usps].include?(tracking_format)
+  end
+
+  def pretty_via
+    case tracking_format
+    when :usps
+      "USPS"
+    when :asendia
+      "Asendia"
+    when :ups
+      "UPS #{service}"
+    else
+      "#{carrier} #{service}"
+    end
+  end
+
   # nora: entirely v*becoded because i can't be fucked
   def generate_order_items_for_update
     # Check if we need to fetch existing order details from Zenventory

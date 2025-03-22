@@ -24,4 +24,13 @@ class Address < ApplicationRecord
   def name_line
     [ first_name, last_name ].join(" ")
   end
+
+  def us_format
+  <<~EOA
+  #{name_line}
+  #{[ line_1, line_2 ].compact_blank.join("\n")}
+  #{city}, #{state} #{postal_code}
+  #{country}
+  EOA
+  end
 end
