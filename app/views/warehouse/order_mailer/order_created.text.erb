@@ -1,12 +1,9 @@
-{
-  "transactionalId": "cm8jh9gzf0nm6wek854cgi7y6",
-  "email": "<%= @recipient %>",
-  "dataVariables": <%=
-    {
+<%= {
+      transactionalId: "cm8jh9gzf0nm6wek854cgi7y6",
+      email: @recipient,
+      dataVariables: {
         user_facing_title: @order.user_facing_title,
         address: @order.address.us_format,
-        hc_id: @order.hc_id
-    }.to_json 
-  %>
-  }
-}
+        hc_id: @order.hc_id,
+      }
+    }.to_json %>
