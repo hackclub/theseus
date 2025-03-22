@@ -159,6 +159,10 @@ class Warehouse::Order < ApplicationRecord
       )
       mark_dispatched!(order[:id])
     end
+
+    if notify_on_dispatch?
+      Warehouse::OrderMailer.with(order: self).order_created.deliver_later
+    end
   end
 
   def zenv_attributes_changed?
