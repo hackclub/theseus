@@ -53,6 +53,10 @@
   <%= button_to "send to warehouse!", action: :send_to_warehouse %>
 <% end %>
 
+<% if policy(@warehouse_order).destroy? %>
+  <%= button_to "delete draft order.", @warehouse_order, method: :delete %>
+<% end %>
+
 <div>
   <%= link_to "edit this order", edit_warehouse_order_path(@warehouse_order) %><br>
   <%= link_to "back to orders", warehouse_orders_path %>

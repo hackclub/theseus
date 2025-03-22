@@ -95,14 +95,15 @@ class Warehouse::OrdersController < ApplicationController
   end
 
   # # DELETE /warehouse/orders/1 or /warehouse/orders/1.json
-  # def destroy
-  #   @warehouse_order.destroy!
-  #
-  #   respond_to do |format|
-  #     format.html { redirect_to warehouse_orders_path, status: :see_other, notice: "Order was successfully destroyed." }
-  #     format.json { head :no_content }
-  #   end
-  # end
+  def destroy
+    authorize @warehouse_order
+    @warehouse_order.destroy!
+  
+    respond_to do |format|
+      format.html { redirect_to warehouse_orders_path, status: :see_other, notice: "it's gone." }
+      format.json { head :no_content }
+    end
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

@@ -34,4 +34,10 @@ class Warehouse::OrderPolicy < ApplicationPolicy
     return false unless user_can_warehouse
     record_belongs_to_user || user_is_admin
   end
+
+  def destroy?
+    return false unless record.draft?
+    return false unless user_can_warehouse
+    record_belongs_to_user || user_is_admin
+  end
 end
