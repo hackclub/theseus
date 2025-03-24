@@ -32,7 +32,7 @@ class SessionsController < ApplicationController
       redirect_to root_path
     else
       Rails.logger.error "Failed to create/update user from Slack data"
-      redirect_to login_path, alert: "Failed to sign in with Slack"
+      redirect_to login_path, alert: "are you sure you should be here?"
     end
   end
 

@@ -63,7 +63,8 @@ class User < ApplicationRecord
     return nil unless user
 
     user.email = user_data.dig("user", "profile", "email")
-    user.username = user_data.dig("user", "name")
+    user.username ||= user_data.dig("user", "profile", "username")
+    user.username ||= user_data.dig("user", "profile", "display_name_normalized")
     user.icon_url = user_data.dig("user", "profile", "image_192") || user_data.dig("user", "profile", "image_72")
     # Store the OAuth data
     user.save!
