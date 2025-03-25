@@ -1,5 +1,4 @@
 @import 'colors';
-
 @import 'basscss';
 @import 'dark';
 @import 'components/banners';
@@ -52,5 +51,10 @@ html {
 }
 
 body {
-  font-family: Sans-Serif
+  font-family: sans-serif
+}
+
+.not_prod {
+  outline-offset: -6px;
+  outline: 2px dotted lawngreen !important;
 }

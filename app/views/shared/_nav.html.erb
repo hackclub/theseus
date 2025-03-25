@@ -1,5 +1,5 @@
 <aside class="nav">
-  <h1>Theseus</h1>
+  <h1>Theseus<% if Rails.env.development? %> (dev)<% end %></h1>
   <%= render 'shared/flash' %>
 
   <% if current_user %>
