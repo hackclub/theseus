@@ -3,7 +3,7 @@
 <h1>Orders</h1>
 
 <div id="warehouse_orders">
-  <% @warehouse_orders.each do |warehouse_order| %>
+  <% @warehouse_orders.order(created_at: :desc).each do |warehouse_order| %>
     <%= render warehouse_order %>
   <% end %>
 </div>
