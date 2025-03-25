@@ -2,7 +2,7 @@
   <div>
 
     <b>
-      <%= link_to order.hc_id, order %>
+      <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
     </b>
 
     <%= render 'status_badge', order: %>
