@@ -1,0 +1,11 @@
+<% content_for :title, "New batch" %>
+
+<h1>New batch</h1>
+
+<%= render "form", batch: @batch %>
+
+<br>
+
+<div>
+  <%= link_to "Back to batches", batches_path %>
+</div>

@@ -1,0 +1,54 @@
+<h1>Map CSV Fields to Address Fields</h1>
+
+<% if flash[:error] %>
+  <div class="alert alert-danger">
+    <%= flash[:error] %>
+  </div>
+<% end %>
+
+<div class="csv-preview">
+  <h2>CSV Preview</h2>
+  <table>
+    <thead>
+      <tr>
+        <% @csv_headers.each do |header| %>
+          <th><%= header %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @csv_preview.each do |row| %>
+        <tr>
+          <% row.each do |cell| %>
+            <td><%= cell %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mapping-form">
+  <%= form_with(model: @batch, url: process_mapping_batch_path(@batch), method: :post) do |f| %>
+    <div class="field-mappings">
+      <% @address_fields.each do |field| %>
+        <div class="field-mapping">
+          <label for="mapping_<%= field %>">
+            <%= field.titleize %>
+            <% if BatchesController::REQUIRED_FIELDS.include?(field) %>
+              <span class="required">*</span>
+            <% end %>
+            <%= select_tag "mapping[#{field}]",
+                         options_for_select(@csv_headers),
+                         prompt: "Select CSV column...",
+                         class: "form-select #{'required-field' if BatchesController::REQUIRED_FIELDS.include?(field)}" %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Save Mapping", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

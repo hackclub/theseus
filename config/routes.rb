@@ -109,6 +109,8 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
+  get "batches/new"
+  get "batches/import"
   namespace :admin do
       resources :addresses
       resources :source_tags
@@ -151,6 +153,12 @@ Rails.application.routes.draw do
     resources :skus, except: [ :destroy ]
   end
   resources :users
+  resources :batches do
+    member do
+      get :map_fields
+      post :process_mapping
+    end
+  end
   root "static_pages#index"
 
   get "/auth/slack", to: "sessions#new", as: :slack_auth
