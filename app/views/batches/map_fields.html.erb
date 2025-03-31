@@ -6,43 +6,27 @@
   </div>
 <% end %>
 
-<div class="csv-preview">
-  <h2>CSV Preview</h2>
-  <table>
-    <thead>
-      <tr>
-        <% @csv_headers.each do |header| %>
-          <th><%= header %></th>
-        <% end %>
-      </tr>
-    </thead>
-    <tbody>
-      <% @csv_preview.each do |row| %>
-        <tr>
-          <% row.each do |cell| %>
-            <td><%= cell %></td>
-          <% end %>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
-
 <div class="mapping-form">
   <%= form_with(model: @batch, url: process_mapping_batch_path(@batch), method: :post) do |f| %>
-    <div class="field-mappings">
-      <% @address_fields.each do |field| %>
-        <div class="field-mapping">
-          <label for="mapping_<%= field %>">
-            <%= field.titleize %>
-            <% if BatchesController::REQUIRED_FIELDS.include?(field) %>
-              <span class="required">*</span>
-            <% end %>
-            <%= select_tag "mapping[#{field}]",
-                         options_for_select(@csv_headers),
-                         prompt: "Select CSV column...",
-                         class: "form-select #{'required-field' if BatchesController::REQUIRED_FIELDS.include?(field)}" %>
-          </label>
+    <div class="mapping-container">
+      <% @csv_headers.each do |header| %>
+        <div class="mapping-row">
+          <div class="csv-field">
+            <div class="field-name"><%= header %></div>
+            <div class="field-preview">
+              <% if @csv_preview.first %>
+                <%= @csv_preview.first[@csv_headers.index(header)] %>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="field-mapping">
+            <%= select_tag "mapping[#{header}]",
+                         options_for_select(@address_fields),
+                         prompt: "Select address field...",
+                         class: "form-select",
+                         data: { csv_field: header } %>
+          </div>
         </div>
       <% end %>
     </div>
@@ -52,3 +36,136 @@
     </div>
   <% end %>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const selects = document.querySelectorAll('.form-select');
+  
+  function updateSelects() {
+    // Get all currently selected values
+    const selectedValues = Array.from(selects)
+      .map(select => select.value)
+      .filter(value => value !== '');
+
+    // Update each select
+    selects.forEach(select => {
+      const currentValue = select.value;
+      
+      // Enable all options first
+      Array.from(select.options).forEach(option => {
+        option.disabled = false;
+      });
+
+      // Disable options that are selected in other dropdowns
+      selectedValues.forEach(value => {
+        if (value !== currentValue) {
+          const option = select.querySelector(`option[value="${value}"]`);
+          if (option) option.disabled = true;
+        }
+      });
+    });
+  }
+
+  // Initial update
+  updateSelects();
+
+  // Update on change
+  selects.forEach(select => {
+    select.addEventListener('change', updateSelects);
+  });
+});
+</script>
+
+<style>
+.mapping-container {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.mapping-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.csv-field {
+  padding: 0.75rem;
+  background: #2d2d2d;
+  border-radius: 4px;
+  border: 1px solid #404040;
+}
+
+.field-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #e0e0e0;
+}
+
+.field-preview {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+}
+
+.field-mapping {
+  padding: 0.5rem;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.375rem;
+  background: #1a1a1a;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #e0e0e0;
+}
+
+.form-select option {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.form-select option:disabled {
+  color: #666;
+  background-color: #1a1a1a;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background: #4a9eff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background: #357abd;
+}
+
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.alert-danger {
+  background-color: #2d1a1a;
+  border: 1px solid #4a1a1a;
+  color: #ff6b6b;
+}
+</style>

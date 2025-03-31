@@ -29,14 +29,10 @@ class BatchesController < ApplicationController
       batch_params.merge(user: current_user)
     )
 
-    respond_to do |format|
-      if @batch.save
-        format.html { redirect_to map_fields_batch_path(@batch), notice: "Please map your CSV fields to address fields." }
-        format.json { render :show, status: :created, location: @batch }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @batch.errors, status: :unprocessable_entity }
-      end
+    if @batch.save
+      redirect_to map_fields_batch_path(@batch), notice: "Please map your CSV fields to address fields."
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -46,8 +42,11 @@ class BatchesController < ApplicationController
   def process_mapping
     mapping = mapping_params.to_h
     
+    # Invert the mapping to get from CSV columns to address fields
+    inverted_mapping = mapping.invert
+    
     # Validate required fields
-    missing_fields = REQUIRED_FIELDS.reject { |field| mapping[field].present? }
+    missing_fields = REQUIRED_FIELDS.reject { |field| inverted_mapping[field].present? }
     
     if missing_fields.any?
       flash.now[:error] = "Please map the following required fields: #{missing_fields.join(', ')}"
@@ -55,7 +54,7 @@ class BatchesController < ApplicationController
       return
     end
 
-    if @batch.update(field_mapping: mapping)
+    if @batch.update(field_mapping: inverted_mapping)
       redirect_to @batch, notice: "Field mapping saved successfully."
     else
       flash.now[:error] = "Failed to save field mapping."
@@ -108,6 +107,6 @@ class BatchesController < ApplicationController
     end
 
     def mapping_params
-      params.require(:mapping).permit(@address_fields)
+      params.require(:mapping).permit(@csv_headers)
     end
 end
