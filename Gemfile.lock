@@ -84,6 +84,7 @@ GEM
       kaminari (>= 1.0)
       sassc-rails (~> 2.1)
       selectize-rails (~> 0.6)
+    andand (1.3.3)
     annotaterb (4.14.0)
     ast (2.4.2)
     awesome_print (1.9.2)
@@ -250,6 +251,7 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.2)
+    memoizer (1.0.3)
     mini_mime (1.1.5)
     minitest (5.25.4)
     msgpack (1.8.0)
@@ -306,9 +308,14 @@ GEM
     parser (3.3.7.1)
       ast (~> 2.4.1)
       racc
+    pdf-core (0.10.0)
     pg (1.5.9)
     pp (0.6.2)
       prettyprint
+    prawn (2.5.0)
+      matrix (~> 0.4)
+      pdf-core (~> 0.10.0)
+      ttfunk (~> 1.8)
     prettyprint (0.2.0)
     propshaft (1.1.0)
       actionpack (>= 7.0.0)
@@ -480,6 +487,8 @@ GEM
     thruster (0.1.11-x86_64-linux)
     tilt (2.6.0)
     timeout (0.4.3)
+    ttfunk (1.8.0)
+      bigdecimal (~> 3.1)
     turbo-rails (2.0.13)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
@@ -491,6 +500,9 @@ GEM
     unicode-emoji (4.0.4)
     uri (1.0.3)
     useragent (0.16.11)
+    usps_intelligent_barcode (1.0.0)
+      andand (~> 1.3)
+      memoizer (~> 1.0)
     version_gem (1.1.6)
     web-console (4.2.1)
       actionview (>= 6.0.0)
@@ -548,6 +560,7 @@ DEPENDENCIES
   norairrecord (~> 0.3.0)
   oauth2 (~> 2.0)
   pg (~> 1.1)
+  prawn (~> 2.5)
   propshaft
   puma (>= 5.0)
   pundit (~> 2.5)
@@ -567,6 +580,7 @@ DEPENDENCIES
   thruster
   turbo-rails
   tzinfo-data
+  usps_intelligent_barcode (~> 1.0)
   web-console
 
 BUNDLED WITH

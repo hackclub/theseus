@@ -21,11 +21,9 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Warehouse::Template < ApplicationRecord
+  include HasWarehouseLineItems
   scope :shared, -> { where(public: true) }
 
   belongs_to :user
   belongs_to :source_tag
-  has_many :line_items, dependent: :destroy
-  accepts_nested_attributes_for :line_items, reject_if: :all_blank, allow_destroy: true
-  has_many :skus, through: :line_items
 end

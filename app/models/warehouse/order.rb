@@ -22,43 +22,57 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  address_id              :bigint           not null
+#  batch_id                :bigint
 #  hc_id                   :string
 #  purpose_code_id         :bigint           not null
 #  source_tag_id           :bigint           not null
+#  template_id             :bigint
 #  user_id                 :bigint           not null
 #  zenventory_id           :integer
 #
 # Indexes
 #
 #  index_warehouse_orders_on_address_id       (address_id)
+#  index_warehouse_orders_on_batch_id         (batch_id)
 #  index_warehouse_orders_on_hc_id            (hc_id)
 #  index_warehouse_orders_on_idempotency_key  (idempotency_key) UNIQUE
 #  index_warehouse_orders_on_purpose_code_id  (purpose_code_id)
 #  index_warehouse_orders_on_source_tag_id    (source_tag_id)
+#  index_warehouse_orders_on_template_id      (template_id)
 #  index_warehouse_orders_on_user_id          (user_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (address_id => addresses.id)
+#  fk_rails_...  (batch_id => batches.id)
 #  fk_rails_...  (purpose_code_id => warehouse_purpose_codes.id)
 #  fk_rails_...  (source_tag_id => source_tags.id)
+#  fk_rails_...  (template_id => warehouse_templates.id)
 #  fk_rails_...  (user_id => users.id)
 #
 class Warehouse::Order < ApplicationRecord
   include AASM
 
-  def labor_cost
-    # $1.80 base * 20¢/SKU
-    1.80 + (0.20 * skus.distinct.count)
+  belongs_to :template, class_name: 'Warehouse::Template'
+
+  def self.from_template(template, attributes)
+    new(
+      attributes.merge(
+        template: template,
+        source_tag: template.source_tag,
+      )
+    )
   end
 
-  def contents_actual_cost_to_hc
-    line_items.joins(:sku).sum("warehouse_skus.actual_cost_to_hc * warehouse_line_items.quantity")
-  end
-
-  def contents_declared_unit_cost
-    line_items.includes(:sku).sum do |line_item|
-      (line_item.sku.declared_unit_cost || 0) * line_item.quantity
+  def initialize(attributes = {})
+    super
+    if attributes[:template]
+      template.line_items.each do |template_line_item|
+        line_items.build(
+          sku: template_line_item.sku,
+          quantity: template_line_item.quantity
+        )
+      end
     end
   end
 
@@ -89,17 +103,15 @@ class Warehouse::Order < ApplicationRecord
   belongs_to :user
   belongs_to :address
   belongs_to :source_tag
-  has_many :line_items, dependent: :destroy
-  accepts_nested_attributes_for :line_items, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :address, update_only: true
 
-  has_many :skus, through: :line_items
   validates :line_items, presence: true
   validates :recipient_email, presence: true
   validate :can_mail_parcels_to_country
 
   before_create :set_hc_id
 
+  include HasWarehouseLineItems
   include HasTableSync
   include HasZenventoryUrl
 

@@ -4,7 +4,7 @@
 
 <h2>Your templates:</h2>
 <div id="your_templates">
-  <%= current_user&.warehouse_templates&.each do |warehouse_template| %>
+  <% current_user&.warehouse_templates&.each do |warehouse_template| %>
     <%= render warehouse_template %>
     <p>
       <%= link_to "view this template", warehouse_template %>

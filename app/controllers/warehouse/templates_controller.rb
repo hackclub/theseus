@@ -21,7 +21,7 @@ class Warehouse::TemplatesController < ApplicationController
 
   # POST /warehouse/templates or /warehouse/templates.json
   def create
-    @warehouse_template = Warehouse::Template.new(warehouse_template_params)
+    @warehouse_template = Warehouse::Template.new(warehouse_template_params.merge(user: current_user, source_tag: SourceTag.web_tag))
 
     respond_to do |format|
       if @warehouse_template.save
@@ -60,11 +60,14 @@ class Warehouse::TemplatesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_warehouse_template
-      @warehouse_template = Warehouse::Template.find(params.expect(:id))
+      @warehouse_template = Warehouse::Template.find(params.require(:id))
     end
 
     # Only allow a list of trusted parameters through.
     def warehouse_template_params
-      params.expect(warehouse_template: [ :name, line_items_attributes: [ :sku_id, :quantity, :_destroy ] ])
+      params.require(:warehouse_template).permit(
+        :name, :public,
+        line_items_attributes: [ :id, :sku_id, :quantity, :_destroy ]
+      )
     end
 end

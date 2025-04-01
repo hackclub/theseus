@@ -1,0 +1,12 @@
+<% content_for :title, "Editing letter" %>
+
+<h1>Editing letter</h1>
+
+<%= render "form", letter: @letter %>
+
+<br>
+
+<div>
+  <%= link_to "Show this letter", @letter %> |
+  <%= link_to "Back to letters", letters_path %>
+</div>

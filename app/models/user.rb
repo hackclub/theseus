@@ -3,6 +3,7 @@
 # Table name: users
 #
 #  id            :bigint           not null, primary key
+#  back_office   :boolean          default(FALSE)
 #  can_warehouse :boolean
 #  email         :string
 #  icon_url      :string

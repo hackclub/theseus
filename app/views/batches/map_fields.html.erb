@@ -7,7 +7,7 @@
 <% end %>
 
 <div class="mapping-form">
-  <%= form_with(model: @batch, url: process_mapping_batch_path(@batch), method: :post) do |f| %>
+  <%= form_with(model: @batch, url: set_mapping_batch_path(@batch), method: :post) do |f| %>
     <div class="mapping-container">
       <% @csv_headers.each do |header| %>
         <div class="mapping-row">

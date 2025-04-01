@@ -1,16 +1,13 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Batches" %>
 
-<h1>Batches</h1>
+<h1>Batches <sup><small>(<%= link_to "create!", new_batch_path %>)</small></sup></h1>
 
 <div id="batches">
   <% @batches.each do |batch| %>
-    <%= render batch %>
+    <%= render partial: "batch", locals: { batch: batch } %>
     <p>
       <%= link_to "Show this batch", batch %>
     </p>
   <% end %>
 </div>
 
-<%= link_to "New batch", new_batch_path %>

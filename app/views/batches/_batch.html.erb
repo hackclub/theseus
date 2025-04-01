@@ -1,2 +1,22 @@
 <div id="<%= dom_id batch %>">
+  <div class="batch-info">
+    <h2>Batch Details</h2>
+    <p><strong>Type:</strong> <%= batch.type.split('::').first.titleize %></p>
+    <p><strong>Created:</strong> <%= batch.created_at.strftime("%B %d, %Y") %></p>
+    <p><strong>CSV File:</strong> <%= batch.csv.filename %></p>
+    <p><strong>Status:</strong>
+      <% case batch.aasm.current_state %>
+      <% when :awaiting_field_mapping %>
+        <%= link_to("needs fields mapped", map_fields_batch_path(batch)) %>!
+      <% when :fields_mapped %>
+        ready to <%= link_to("process", process_confirm_batch_path(batch)) %>!
+      <% end %>
+    </p>
+  </div>
+
+  <% if batch.may_mark_processed? %>
+    <div class="batch-actions">
+      <%= button_to "Process Batch", process_confirm_batch_path(batch), method: :get, class: "btn btn-primary" %>
+    </div>
+  <% end %>
 </div>

@@ -2,21 +2,96 @@
 #
 # Table name: batches
 #
-#  id            :bigint           not null, primary key
-#  field_mapping :jsonb
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  user_id       :bigint           not null
+#  id                          :bigint           not null, primary key
+#  aasm_state                  :string
+#  address_count               :integer
+#  field_mapping               :jsonb
+#  type                        :string           not null
+#  warehouse_user_facing_title :string
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  user_id                     :bigint           not null
+#  warehouse_purpose_code_id   :bigint
+#  warehouse_template_id       :bigint
 #
 # Indexes
 #
-#  index_batches_on_user_id  (user_id)
+#  index_batches_on_type                       (type)
+#  index_batches_on_user_id                    (user_id)
+#  index_batches_on_warehouse_purpose_code_id  (warehouse_purpose_code_id)
+#  index_batches_on_warehouse_template_id      (warehouse_template_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (user_id => users.id)
+#  fk_rails_...  (warehouse_purpose_code_id => warehouse_purpose_codes.id)
+#  fk_rails_...  (warehouse_template_id => warehouse_templates.id)
 #
 class Batch < ApplicationRecord
+  include AASM
+
+  aasm timestamps: true do
+    state :awaiting_field_mapping, initial: true
+    state :fields_mapped
+    state :processed
+
+    event :mark_fields_mapped do
+      transitions from: :awaiting_field_mapping, to: :fields_mapped
+    end
+
+    event :mark_processed do
+      transitions from: :fields_mapped, to: :processed
+    end
+
+  end
+
+  self.inheritance_column = 'type'
   belongs_to :user
+  belongs_to :warehouse_template, class_name: 'Warehouse::Template', optional: true
   has_one_attached :csv
+  has_one_attached :labels_pdf
+  has_many :addresses, dependent: :destroy
+  has_many :letters, dependent: :destroy
+
+  def total_cost
+    raise NotImplementedError, "Subclasses must implement total_cost"
+  end
+
+  def run_map!
+    csv_content = csv.download
+    CSV.parse(csv_content, headers: true)&.each_with_index do |row, i|
+      begin
+        build_address(row)
+      end
+    rescue StandardError => e
+      raise e.class, "CSV row #{i+1}: #{e.message}"
+    end
+    mark_fields_mapped
+    save!
+  end
+
+
+  private
+  def build_address(row)
+    csv_country = row[field_mapping['country']]
+
+    country = ISO3166::Country.find_country_by_alpha2(csv_country) || ISO3166::Country.find_country_by_alpha3(csv_country) || ISO3166::Country.find_country_by_any_name(csv_country)
+
+    unless country
+      raise "couldn't parse #{csv_country} as a country!"
+    end
+
+    address = addresses.build(
+      first_name: row[field_mapping['first_name']],
+      last_name: row[field_mapping['last_name']],
+      line_1: row[field_mapping['line_1']],
+      line_2: row[field_mapping['line_2']],
+      city: row[field_mapping['city']],
+      state: row[field_mapping['state']],
+      postal_code: row[field_mapping['postal_code']],
+      country: country.alpha2,
+      phone_number: row[field_mapping['phone_number']],
+      email: row[field_mapping['email']],
+      )
+  end
 end

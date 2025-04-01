@@ -1,13 +1,19 @@
 class BatchesController < ApplicationController
-  before_action :set_batch, only: %i[ show edit update destroy map_fields process_mapping ]
-  before_action :setup_csv_fields, only: %i[ map_fields process_mapping ]
+  before_action :set_batch, except: %i[ index new create ]
+  before_action :set_allowed_templates, only: %i[ new create ]
+  before_action :setup_csv_fields, only: %i[ map_fields set_mapping ]
 
-  REQUIRED_FIELDS = %w[first_name last_name line_1 city state postal_code country].freeze
+  REQUIRED_FIELDS = %w[first_name line_1 city state postal_code country].freeze
   PREVIEW_ROWS = 3
+
+  BATCH_TYPES = [
+    ['Warehouse', 'Warehouse::Batch'],
+    ['Letter', 'Letter::Batch']
+  ].freeze
 
   # GET /batches or /batches.json
   def index
-    @batches = Batch.all
+    @batches = Batch.all.order(created_at: :desc)
   end
 
   # GET /batches/1 or /batches/1.json
@@ -16,7 +22,7 @@ class BatchesController < ApplicationController
 
   # GET /batches/new
   def new
-    @batch = Batch.new
+    @batch_types = BATCH_TYPES
   end
 
   # GET /batches/1/edit
@@ -25,11 +31,20 @@ class BatchesController < ApplicationController
 
   # POST /batches or /batches.json
   def create
-    @batch = Batch.new(
-      batch_params.merge(user: current_user)
-    )
+    @batch_types = BATCH_TYPES
+    batch_type = batch_params[:type]
+    
+    # Validate that the type is one of our allowed types
+    unless BATCH_TYPES.map(&:last).include?(batch_type)
+      @batch = Batch.new(batch_params.merge(user: current_user))
+      @batch.errors.add(:type, "must be one of: #{BATCH_TYPES.map(&:last).join(', ')}")
+      render :new, status: :unprocessable_entity
+      return
+    end
 
-    if @batch.save
+    @batch = batch_type.constantize.new(batch_params.merge(user: current_user))
+
+    if @batch.save!
       redirect_to map_fields_batch_path(@batch), notice: "Please map your CSV fields to address fields."
     else
       render :new, status: :unprocessable_entity
@@ -39,7 +54,7 @@ class BatchesController < ApplicationController
   def map_fields
   end
 
-  def process_mapping
+  def set_mapping
     mapping = mapping_params.to_h
     
     # Invert the mapping to get from CSV columns to address fields
@@ -55,10 +70,39 @@ class BatchesController < ApplicationController
     end
 
     if @batch.update(field_mapping: inverted_mapping)
-      redirect_to @batch, notice: "Field mapping saved successfully."
+      begin
+        @batch.run_map!
+      rescue StandardError => e
+        Rails.logger.warn(e)
+        redirect_to @batch, flash: { alert: "error mapping fields! #{e.message}" }
+        return
+      end
+      redirect_to @batch, notice: "mapped! send it?"
     else
-      flash.now[:error] = "Failed to save field mapping."
+      flash.now[:error] = "failed to save field mapping. #{@batch.errors.full_messages.join(', ')}"
       render :map_fields, status: :unprocessable_entity
+    end
+  end
+
+  def process_form
+    case @batch.type
+    when "Warehouse::Batch"
+      render :process_warehouse
+    when "Letter::Batch"
+      render :process_letter
+    end
+  end
+
+  def process_batch
+    if @batch.warehouse_template.nil? && @batch.is_a?(Warehouse::Batch)
+      redirect_to process_form_batch_path(@batch), alert: "Please select a warehouse template before processing."
+      return
+    end
+
+    if @batch.process!
+      redirect_to @batch, notice: " Batch processed successfully."
+    else
+      redirect_to @batch, error: "Failed to process batch."
     end
   end
 
@@ -92,21 +136,40 @@ class BatchesController < ApplicationController
     end
 
     def setup_csv_fields
-      require 'csv'
-      
       csv_content = @batch.csv.download
       csv_rows = CSV.parse(csv_content)
       @csv_headers = csv_rows.first
       @csv_preview = csv_rows[1..PREVIEW_ROWS] || []
-      @address_fields = (Address.column_names - ['id', 'created_at', 'updated_at']) + ['email']
+      
+      # Get fields based on batch type
+      @address_fields = if @batch.is_a?(Letter::Batch)
+        # For letter batches, include address fields and extra_data
+        (Address.column_names - ['id', 'created_at', 'updated_at', 'batch_id']) +
+        ['extra_data']
+      else
+        # For other batches, just include address fields
+        (Address.column_names - ['id', 'created_at', 'updated_at'])
+      end
     end
 
     # Only allow a list of trusted parameters through.
     def batch_params
-      params.require(:batch).permit(:csv)
+      params.require(:batch).permit(
+        :csv, 
+        :warehouse_template_id, 
+        :type, 
+        :warehouse_purpose_code_id, 
+        :warehouse_user_facing_title,
+        :letter_height,
+        :letter_width,
+        :letter_weight
+      )
     end
 
     def mapping_params
       params.require(:mapping).permit(@csv_headers)
+    end
+    def set_allowed_templates
+      @allowed_templates = Warehouse::Template.where(public: true).or(Warehouse::Template.where(user: current_user))
     end
 end

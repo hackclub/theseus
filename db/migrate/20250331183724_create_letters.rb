@@ -4,7 +4,7 @@ class CreateLetters < ActiveRecord::Migration[8.0]
       t.integer :processing_category
       t.text :body
       t.string :aasm_state
-      t.references :mailer_id, null: false, foreign_key: true
+      t.references :usps_mailer_id, null: false, foreign_key: true
       t.decimal :postage
       t.integer :imb_serial_number
       t.references :address, null: false, foreign_key: true
@@ -15,8 +15,6 @@ class CreateLetters < ActiveRecord::Migration[8.0]
       t.decimal :width
       t.decimal :height
       t.boolean :non_machinable
-      t.string :aasm_state
-
       t.timestamps
     end
   end

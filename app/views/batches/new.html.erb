@@ -1,11 +1,73 @@
 <% content_for :title, "New batch" %>
 
-<h1>New batch</h1>
+<h1>New Batch</h1>
 
-<%= render "form", batch: @batch %>
+<%= form_with(url: batches_path, scope: :batch) do |form| %>
+  <div class="field">
+    <%= form.label :type, "Batch Type" %>
+    <%= form.select :type, 
+                   @batch_types,
+                   { include_blank: "select a batch type..." },
+                   { onchange: "toggleFields(this.value)" } %>
+  </div>
 
-<br>
+  <div id="warehouse-fields" style="display: none;">
+    <div class="field">
+      <%= form.label :warehouse_template_id, "Warehouse Template" %>
+      <%= link_to "(create?)", new_warehouse_template_path %>
+      <%= form.collection_select :warehouse_template_id,
+                                 @allowed_templates,
+                                 :id,
+                                 :name,
+                                 { prompt: "select an order template..." } %>
+    </div>
+    <div class="field">
+      <%= form.label :warehouse_purpose_code_id, "Major purpose code" %>
+      <%= form.collection_select :warehouse_purpose_code_id,
+                                 Warehouse::PurposeCode.all,
+                                 :id,
+                                 :display_name,
+                                 { prompt: "select an purpose code..." } %>
+    </div>
+    <div class="field">
+      <%= form.label :warehouse_user_facing_title, "User-facing title:" %>
+      <%= form.text_field :warehouse_user_facing_title %>
+    </div>
+  </div>
 
-<div>
-  <%= link_to "Back to batches", batches_path %>
-</div>
+  <div id="letter-fields" style="display: none;">
+    <div class="field">
+      <%= form.label :letter_height, "Letter Height (inches)" %>
+      <%= form.number_field :letter_height, step: "0.01", min: 0 %>
+    </div>
+    <div class="field">
+      <%= form.label :letter_width, "Letter Width (inches)" %>
+      <%= form.number_field :letter_width, step: "0.01", min: 0 %>
+    </div>
+    <div class="field">
+      <%= form.label :letter_weight, "Letter Weight (ounces)" %>
+      <%= form.number_field :letter_weight, step: "0.01", min: 0 %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :csv, "CSV File" %>
+    <%= form.file_field :csv, accept: ".csv" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Create Batch" %>
+    <%= link_to "Back to batches", batches_path %>
+  </div>
+<% end %>
+
+<script>
+function toggleFields(type) {
+  const warehouseFields = document.getElementById('warehouse-fields');
+  const letterFields = document.getElementById('letter-fields');
+  
+  warehouseFields.style.display = type === 'Warehouse::Batch' ? 'block' : 'none';
+  letterFields.style.display = type === 'Letter::Batch' ? 'block' : 'none';
+}
+toggleFields(document.getElementById('batch_type').value)
+</script>

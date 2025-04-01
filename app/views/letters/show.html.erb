@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @letter %>
+
+<div>
+  <%= link_to "Edit this letter", edit_letter_path(@letter) %> |
+  <%= link_to "Back to letters", letters_path %>
+
+  <%= button_to "Destroy this letter", @letter, method: :delete %>
+</div>

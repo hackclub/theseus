@@ -1,0 +1,3 @@
+class NumberTenEnvelopeTemplate < BaseTemplate
+
+end

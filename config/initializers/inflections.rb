@@ -18,4 +18,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "EasyPost"
   inflect.acronym "SKU"
   inflect.acronym "SKUs"
+  inflect.acronym "IMb"
 end

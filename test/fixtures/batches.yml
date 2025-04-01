@@ -4,19 +4,30 @@
 #
 # Table name: batches
 #
-#  id            :bigint           not null, primary key
-#  field_mapping :jsonb
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  user_id       :bigint           not null
+#  id                          :bigint           not null, primary key
+#  aasm_state                  :string
+#  address_count               :integer
+#  field_mapping               :jsonb
+#  type                        :string           not null
+#  warehouse_user_facing_title :string
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  user_id                     :bigint           not null
+#  warehouse_purpose_code_id   :bigint
+#  warehouse_template_id       :bigint
 #
 # Indexes
 #
-#  index_batches_on_user_id  (user_id)
+#  index_batches_on_type                       (type)
+#  index_batches_on_user_id                    (user_id)
+#  index_batches_on_warehouse_purpose_code_id  (warehouse_purpose_code_id)
+#  index_batches_on_warehouse_template_id      (warehouse_template_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (user_id => users.id)
+#  fk_rails_...  (warehouse_purpose_code_id => warehouse_purpose_codes.id)
+#  fk_rails_...  (warehouse_template_id => warehouse_templates.id)
 #
 one:
   user: one
