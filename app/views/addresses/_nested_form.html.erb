@@ -1,32 +1,48 @@
 <%= form.fields_for :address do |a| %>
-  <div>
-    <%= a.label :first_name %>
-    <%= a.text_field :first_name %>
-    <%= a.label :last_name %>
-    <%= a.text_field :last_name %>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="form-group">
+      <%= a.label :first_name, class: "form-label" %>
+      <%= a.text_field :first_name, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= a.label :last_name, class: "form-label" %>
+      <%= a.text_field :last_name, class: "form-control" %>
+    </div>
   </div>
-  <div>
-    <%= a.label :line_1 %>
-    <%= a.text_field :line_1 %>
+  
+  <div class="form-group">
+    <%= a.label :line_1, "Address Line 1", class: "form-label" %>
+    <%= a.text_field :line_1, class: "form-control" %>
   </div>
-  <div>
-    <%= a.label :line_2 %>
-    <%= a.text_field :line_2 %>
+  
+  <div class="form-group">
+    <%= a.label :line_2, "Address Line 2", class: "form-label" %>
+    <%= a.text_field :line_2, class: "form-control" %>
+    <div class="form-hint">Optional</div>
   </div>
-  <div>
-    <%= a.label :city %>
-    <%= a.text_field :city %>
+  
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="form-group">
+      <%= a.label :city, class: "form-label" %>
+      <%= a.text_field :city, class: "form-control" %>
+    </div>
+    
+    <div class="form-group">
+      <%= a.label :state, "State/Province", class: "form-label" %>
+      <%= a.text_field :state, class: "form-control" %>
+    </div>
+    
+    <div class="form-group">
+      <%= a.label :postal_code, "Postal/ZIP Code", class: "form-label" %>
+      <%= a.text_field :postal_code, class: "form-control" %>
+    </div>
   </div>
-  <div>
-    <%= a.label :state %>
-    <%= a.text_field :state %>
-  </div>
-  <div>
-    <%= a.label :postal_code %>
-    <%= a.text_field :postal_code %>
-  </div>
-  <div>
-    <%= a.label :country, "Country" %>
-    <%= a.collection_select :country, Address.countries_for_select, :first, :last, { include_blank: "Select a country" } %>
+  
+  <div class="form-group">
+    <%= a.label :country, "Country", class: "form-label" %>
+    <%= a.collection_select :country, Address.countries_for_select, 
+                         :first, :last, 
+                         { include_blank: "Select a country" }, 
+                         { class: "form-control" } %>
   </div>
 <% end %>

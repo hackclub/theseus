@@ -1,7 +1,7 @@
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
     <div style="color: red">
-      <h2><%= pluralize(warehouse_template.errors.count, "error") %> prohibited this warehouse_template from being saved:</h2>
+      <h2><%= pluralize(warehouse_template.errors.count, "error") %> prohibited this template from being saved:</h2>
 
       <ul>
         <% warehouse_template.errors.each do |error| %>
@@ -14,6 +14,11 @@
   <div>
     <%= form.label :name, style: "display: block" %>
     <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :public, "share this template with all users?" %>
+    <%= form.check_box :public %>
   </div>
 
   <h4>contents:</h4>

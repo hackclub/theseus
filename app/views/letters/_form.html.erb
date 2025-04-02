@@ -1,0 +1,87 @@
+<%= form_with(model: letter, class: "form-container") do |form| %>
+  <% if letter.errors.any? %>
+    <div class="alert alert-danger mb-6">
+      <h2 class="text-lg font-medium mb-2"><%= pluralize(letter.errors.count, "error") %> prohibited this letter from being saved:</h2>
+
+      <ul class="list-disc list-inside">
+        <% letter.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card mb-6">
+    <div class="card-header">
+      <h3 class="text-lg font-medium">letter specs:</h3>
+    </div>
+    <div class="card-body">
+      <%= render partial: "letters/letter_attributes_form", locals: { form: form } %>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-header">
+      <h3 class="text-lg font-medium">Recipient Address</h3>
+    </div>
+    <div class="card-body">
+      <%= render partial: "addresses/nested_form", locals: { form: form } %>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-header">
+      <h3 class="text-lg font-medium">Return Address</h3>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <%= form.label :return_address_id, "Select Return Address", class: "form-label" %>
+        <%= form.collection_select :return_address_id,
+                                 ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
+                                 :id,
+                                 :display_name,
+                                 { prompt: "Select a return address...", selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id },
+                                 { class: "form-control" } %>
+        <p class="text-sm text-gray-500 mt-2">
+          <%= link_to "Manage Return Addresses", return_addresses_path, class: "text-blue-600 hover:text-blue-800" %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-header">
+      <h3 class="text-lg font-medium">USPS Mailer ID</h3>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <%= form.label :usps_mailer_id_id, "Mailer ID", class: "form-label" %>
+        <%= form.collection_select :usps_mailer_id_id,
+                                 USPS::MailerId.all,
+                               :id,
+                               :name,
+                               { prompt: "Select a mailer ID...", selected: USPS::MailerId.first&.id },
+                               { class: "form-control" } %>
+      </div>
+      <p>leave this at the default if you're mailing from HQ – otherwise talk to nora ( )</p>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-header">
+      <h3 class="text-lg font-medium">Additional Data</h3>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <%= form.label :rubber_stamps, "Rubber Stamps", class: "form-label" %>
+        <%= form.text_area :rubber_stamps, rows: 5, class: "form-control" %>
+        <div class="form-hint">extra text to print on the label!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", letters_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

@@ -1,24 +1,27 @@
 .container {
   width: 100%;
-  max-width: 64rem;
-  margin: 0 auto;
-  padding: 0 1rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 var(--space-4);
 }
 
 .container--full {
   max-width: none;
-  padding: 0px;
 }
 
 .container--xl {
-  max-width: 96rem;
+  max-width: 100%;
 }
+
 .container--md {
-  max-width: 56rem;
+  max-width: 100%;
+  margin: 0;
 }
+
 .container--sm {
   max-width: 32rem;
 }
+
 .container--xs {
   max-width: 24rem;
 }
@@ -38,9 +41,10 @@
   }
 
   @media (min-width: 84em) {
-    max-width: 84rem;
+    max-width: none;
   }
 }
+
 .app__sidebar {
   display: flex;
   flex-direction: column;

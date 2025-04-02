@@ -1,0 +1,30 @@
+<% content_for :title, "New Letter" %>
+
+<%= render partial: "shared/page_header", locals: { 
+  title: "Create New Letter",
+  actions: link_to("Back to Letters", letters_path, class: "btn btn-secondary") 
+} %>
+
+<div class="grid md:grid-cols-12 gap-6">
+  <div class="md:col-span-8">
+    <%= render "form", letter: @letter %>
+  </div>
+  
+  <div class="md:col-span-4">
+    <div class="card sticky top-4">
+      <div class="card-header">
+        <h2 class="text-lg font-medium">About Letters</h2>
+      </div>
+      <div class="card-body">
+        <p>this should be nicer than Dymo Label!</p>
+        
+        <div class="bg-blue-50 border border-blue-200 rounded p-3 mt-4">
+          <h3 class="text-md font-medium text-blue-800 mb-2">Helpful Tips</h3>
+          <ul class="list-disc list-inside text-sm text-blue-700 space-y-1">
+            <li>uuuhhh idk make sure you use enough stamps</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

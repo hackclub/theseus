@@ -1,0 +1,53 @@
+<h1>Process Letter Batch #<%= @batch.id %></h1>
+
+<p>This will generate labels for <%= pluralize(@batch.addresses.count, 'address') %>.</p>
+
+<%= form_with(model: @batch, url: process_batch_path(@batch), method: :post) do |form| %>
+  <div class="field">
+    <%= form.label :template_cycle, "Label Templates" %>
+    <div class="help-text">Select multiple templates to cycle through them, or just one for all labels.</div>
+    <select name="batch[template_cycle][]" id="batch_template_cycle" multiple="multiple" size="8" class="template-select">
+      <% standard_templates = SnailMail::Service.templates_for_size(:standard) %>
+      <% if standard_templates.present? %>
+        <optgroup label="Standard 4x6 Labels">
+          <% standard_templates.uniq.each do |template| %>
+            <option value="<%= template %>"><%= template.to_s.humanize %></option>
+          <% end %>
+        </optgroup>
+      <% end %>
+      
+      <% envelope_templates = SnailMail::Service.templates_for_size(:envelope) %>
+      <% if envelope_templates.present? %>
+        <optgroup label="#10 Envelopes">
+          <% envelope_templates.uniq.each do |template| %>
+            <option value="<%= template %>"><%= template.to_s.humanize %></option>
+          <% end %>
+        </optgroup>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field">
+    <div class="form-check">
+      <%= form.check_box :include_qr_code, id: "batch_include_qr_code" %>
+      <%= form.label :include_qr_code, "Include QR Code on Labels", for: "batch_include_qr_code" %>
+    </div>
+    <div class="help-text">Add a QR code to each label for tracking purposes.</div>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Generate Labels", class: "button primary" %>
+    <%= link_to "Back to batch", @batch, class: "button secondary" %>
+  </div>
+<% end %>
+
+<!--<ul>-->
+  <%# @batch.warehouse_template.line_items.each do |line_item| %>
+<!--    <li><%#= line_item.quantity %>x <%#= line_item.sku.name %> <br/></li>-->
+  <%# end %>
+<!--</ul>-->
+
+<!--The contents will cost <%#= number_to_currency @batch.contents_cost %> <br/>-->
+<!--The warehouse labor will cost <%#= number_to_currency @batch.labor_cost %> <br/>-->
+<!--The postage will cost some indeterminate amount.<br/>-->
+<!--Total: ~<%#= number_to_currency @batch.total_cost %>-->

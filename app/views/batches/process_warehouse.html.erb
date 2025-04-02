@@ -1,0 +1,14 @@
+<h1>Process batch #<%= @batch.id %></h1>
+This will create <%= @batch.addresses.count %> warehouse orders, containing: <br/>
+<ul>
+  <% @batch.warehouse_template.line_items.each do |line_item| %>
+    <li><%= line_item.quantity %>x <%= line_item.sku.name %> <br/></li>
+  <% end %>
+</ul>
+
+The contents will cost <%= number_to_currency @batch.contents_cost %> <br/>
+The warehouse labor will cost <%= number_to_currency @batch.labor_cost %> <br/>
+The postage will cost some indeterminate amount.<br/>
+Total: ~<%= number_to_currency @batch.total_cost %>
+
+<%= button_to "do it!", process_batch_path(@batch), method: :post %>

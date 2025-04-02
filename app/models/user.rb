@@ -3,6 +3,7 @@
 # Table name: users
 #
 #  id            :bigint           not null, primary key
+#  back_office   :boolean          default(FALSE)
 #  can_warehouse :boolean
 #  email         :string
 #  icon_url      :string
@@ -14,6 +15,7 @@
 #
 class User < ApplicationRecord
   has_many :warehouse_templates, class_name: "Warehouse::Template", inverse_of: :user
+  has_many :return_addresses, dependent: :destroy
 
   def admin?
     is_admin

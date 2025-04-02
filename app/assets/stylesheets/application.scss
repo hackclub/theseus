@@ -1,18 +1,86 @@
-@import 'colors';
-@import 'basscss';
-@import 'dark';
-@import 'components/banners';
-@import 'components/badges';
-@import 'components/nav';
-@import 'components/cards';
-@import 'components/layouts';
-@import 'select2';
-
+/* Import Tailwind directives first */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Design System */
+@import "colors";
+@import "design_system";
+@import "utilities";
+
+/* Then import our own styles */
+@import "basscss";
+@import "dark";
+
+/* Components */
+@import "components/base";
+@import "components/forms";
+@import "components/nav";
+@import "components/buttons";
+@import "components/badges";
+@import "components/cards";
+@import "components/tables";
+@import "components/return_address_picker";
+@import "components/return_addresses";
+@import "components/document";
+@import "components/letter";
+@import "components/batch";
+@import "components/warehouse";
+
+/* Third party */
+@import "select2";
+
 @layer base {
+  /* Base Styles */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: var(--space-3);
+    font-weight: var(--font-bold);
+    line-height: 1.2;
+  }
+  
+  h1 {
+    font-size: var(--text-3xl);
+  }
+  
+  h2 {
+    font-size: var(--text-2xl);
+  }
+  
+  h3 {
+    font-size: var(--text-xl);
+  }
+  
+  h4 {
+    font-size: var(--text-lg);
+  }
+  
+  p {
+    margin-top: 0;
+    margin-bottom: var(--space-4);
+  }
+  
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition);
+    
+    &:hover {
+      color: var(--color-primary-dark);
+    }
+  }
+  
   pre,
   code {
     @apply font-mono;
@@ -33,6 +101,55 @@
             0 1px 2px rgba(0, 0, 0, 0.25),
             0 2px 4px rgba(0, 0, 0, 0.125);
   }
+
+  .content-wrapper {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .content-container {
+    flex: 1;
+    padding: var(--space-6);
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  /* Wider container without center alignment */
+  .wide-container {
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    
+    h1 {
+      margin-bottom: 0;
+    }
+    
+    .actions {
+      display: flex;
+      gap: var(--space-3);
+    }
+  }
+
+  .admin-tools {
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-gray-50);
+  }
+
+  body.development {
+    border: 5px solid rgba(var(--color-warning-rgb), 0.7);
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
 }
 
 .admin-tool {
@@ -41,20 +158,25 @@
   padding: 2px;
 }
 
+.dev-tool {
+  border: 1.5px dashed lawngreen;
+  border-radius: 7px;
+  padding: 2px;
+}
+
 span.admin-tool {
   border-radius: 8px;
   padding: 3px 2px;
 }
-
-html {
-  color-scheme: light dark;
-}
-
-body {
-  font-family: sans-serif
-}
-
-.not_prod {
-  outline-offset: -6px;
-  outline: 2px dotted lawngreen !important;
+/* Development mode border overlay */
+.dev-border-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border: 5px dashed #00FF00;
+  box-sizing: border-box;
 }

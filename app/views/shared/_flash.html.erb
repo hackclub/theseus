@@ -1,5 +1,7 @@
-<% flash.each do |name, msg| %>
-  <%= render layout: 'shared/banner', locals: { color: name } do %>
-    <%= msg %>
+<% flash.each do |type, message| %>
+  <% if message.present? %>
+    <div class="alert <%= type == 'notice' ? 'alert-success' : 'alert-danger' %> mb-4">
+      <%= message %>
+    </div>
   <% end %>
 <% end %>

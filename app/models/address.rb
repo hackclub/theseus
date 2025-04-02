@@ -5,6 +5,7 @@
 #  id           :bigint           not null, primary key
 #  city         :string
 #  country      :integer
+#  email        :string
 #  first_name   :string
 #  last_name    :string
 #  line_1       :string
@@ -14,6 +15,15 @@
 #  state        :string
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  batch_id     :bigint
+#
+# Indexes
+#
+#  index_addresses_on_batch_id  (batch_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (batch_id => batches.id)
 #
 class Address < ApplicationRecord
   include CountryEnumable
@@ -32,5 +42,21 @@ class Address < ApplicationRecord
   #{city}, #{state} #{postal_code}
   #{country}
   EOA
+  end
+
+  def us?
+    country == "US"
+  end
+
+  def snailify
+    Snail.new(
+      name: name_line,
+      line_1:,
+      line_2:,
+      city:,
+      region: state,
+      postal_code:,
+      country: country
+    ).to_s
   end
 end

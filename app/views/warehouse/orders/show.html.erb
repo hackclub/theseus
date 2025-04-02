@@ -13,6 +13,10 @@
   <%= render 'addresses/address', address: @warehouse_order.address %>
 </div>
 
+<% if @warehouse_order.batch.present? %>
+  <%= render 'shared/batch_info', record: @warehouse_order %>
+<% end %>
+
 <b>contents:</b>
 <%= render 'warehouse/orders/line_items', order: @warehouse_order %>
 

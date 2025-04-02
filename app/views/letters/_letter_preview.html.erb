@@ -1,0 +1,51 @@
+<div class="document document-letter">
+  <% if @letter.pending? %>
+    <div class="document-watermark">PENDING</div>
+  <% end %>
+  
+  <div class="document-header">
+    <div class="document-title">Theseus Mail Service</div>
+    <div class="document-subtitle">Letter #<%= letter.public_id %></div>
+  </div>
+  
+  <div class="document-addresses">
+    <div class="address-block">
+      <div class="address-title">From</div>
+      <div class="address-content">
+        <% if letter.return_address.present? %>
+          <strong><%= letter.return_address.name %></strong><br>
+          <%= letter.return_address.line_1 %><br>
+          <% if letter.return_address.line_2.present? %>
+            <%= letter.return_address.line_2 %><br>
+          <% end %>
+          <%= letter.return_address.city %>, <%= letter.return_address.state %> <%= letter.return_address.postal_code %><br>
+          <%= letter.return_address.country %>
+        <% else %>
+          No return address specified
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="address-block">
+      <div class="address-title">To</div>
+      <div class="address-content">
+        <strong><%= letter.address.name_line %></strong><br>
+        <%= letter.address.line_1 %><br>
+        <% if letter.address.line_2.present? %>
+          <%= letter.address.line_2 %><br>
+        <% end %>
+        <%= letter.address.city %>, <%= letter.address.state %> <%= letter.address.postal_code %><br>
+        <%= letter.address.country %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="document-body">
+    <p>This is a mail piece being processed through the Theseus Mail Service.</p>
+    <p>It will be delivered to the recipient address shown above.</p>
+  </div>
+  
+  <div class="document-footer">
+    Theseus Mail Service • Generated on <%= Time.current.strftime("%B %d, %Y at %I:%M %p") %>
+  </div>
+</div> 

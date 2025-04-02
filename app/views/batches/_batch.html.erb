@@ -1,0 +1,70 @@
+<div id="<%= dom_id batch %>" class="batch-card">
+  <div class="batch-header">
+    <h2><%= batch.type.split('::').first.titleize %> Batch</h2>
+    <span class="batch-status <%= batch.aasm.current_state.to_s.gsub('_', '-') %>">
+      <%= batch.aasm.current_state.to_s.titleize %>
+    </span>
+  </div>
+  
+  <div class="batch-content">
+    <div class="batch-info-grid">
+      <div class="batch-info-panel">
+        <h3>Batch Information</h3>
+        <div class="batch-info-list">
+          <p><span class="field-label">ID:</span> #<%= batch.id %></p>
+          <p><span class="field-label">Created:</span> <%= batch.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+          <p><span class="field-label">CSV File:</span> <%= batch.csv.filename if batch.csv.attached? %></p>
+          <p><span class="field-label">Address Count:</span> <%= batch.addresses.count %></p>
+          <% if batch.is_a?(Letter::Batch) %>
+            <p><span class="field-label">Letter Dimensions:</span> <%= "#{batch.letter_width}\" × #{batch.letter_height}\"" %></p>
+            <p><span class="field-label">Letter Weight:</span> <%= batch.letter_weight %> oz</p>
+          <% end %>
+          <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
+            <p><span class="field-label">Warehouse Template:</span> <%= batch.warehouse_template.name %></p>
+            <% if batch.warehouse_purpose_code.present? %>
+              <p><span class="field-label">Purpose Code:</span> <%= batch.warehouse_purpose_code.display_name %></p>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="batch-info-panel">
+        <h3>Cost Information</h3>
+        <div class="batch-info-list">
+          <% if batch.is_a?(Warehouse::Batch) %>
+            <p><span class="field-label">Contents Cost:</span> $<%= sprintf('%.2f', batch.contents_cost) %></p>
+            <p><span class="field-label">Labor Cost:</span> $<%= sprintf('%.2f', batch.labor_cost) %></p>
+            <p><span class="field-label">Shipping Cost:</span> $<%= sprintf('%.2f', batch.postage_cost) %></p>
+          <% end %>
+          <p><span class="field-label">Total Cost:</span> $<%= sprintf('%.2f', batch.total_cost) %></p>
+        </div>
+      </div>
+    </div>
+    
+    <% if batch.is_a?(Letter::Batch) && batch.labels_pdf.attached? %>
+      <div class="batch-labels-section">
+        <h3>Letter Labels</h3>
+        <p>PDF labels are available for this batch.</p>
+        <%= primary_outline_link_to "Download Labels PDF", rails_blob_path(batch.labels_pdf, disposition: "attachment"), target: "_blank" do %>
+          <%= download_icon %>Download Labels PDF
+        <% end %>
+      </div>
+    <% end %>
+    
+    <div class="batch-actions">
+      <% case batch.aasm.current_state %>
+      <% when :awaiting_field_mapping %>
+        <%= warning_link_to "Map Fields", map_fields_batch_path(batch) do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          Map Fields
+        <% end %>
+      <% when :fields_mapped %>
+        <%= success_link_to "Process Batch", process_confirm_batch_path(batch) do %>
+          <%= check_icon %>Process Batch
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

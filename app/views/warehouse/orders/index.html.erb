@@ -1,11 +1,41 @@
 <% content_for :title, "Orders" %>
 
-<h1>Orders</h1>
-
-<div id="warehouse_orders">
-  <% @warehouse_orders.order(created_at: :desc).each do |warehouse_order| %>
-    <%= render warehouse_order %>
-  <% end %>
+<div class="page-header mb-8 flex justify-between items-center">
+  <h1 class="text-2xl font-bold">Orders</h1>
+  <div class="actions">
+    <%= success_link_to "Create New Order", new_warehouse_order_path do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      Create New Order
+    <% end %>
+  </div>
 </div>
 
-<%= link_to "New order", new_warehouse_order_path %>
+<div class="mb-4 flex space-x-4">
+  <%= link_to "Unbatched Orders", warehouse_orders_path, class: "btn #{params[:view] != 'batched' ? 'btn-primary' : 'btn-secondary'}" %>
+  <%= link_to "Batched Orders", warehouse_orders_path(view: 'batched'), class: "btn #{params[:view] == 'batched' ? 'btn-primary' : 'btn-secondary'}" %>
+</div>
+
+<div class="orders-container">
+  <div class="bg-gray-100 rounded-lg border border-gray-200">
+    <div class="border-b border-gray-200 p-4">
+      <h2 class="text-xl font-medium"><%= params[:view] == 'batched' ? 'Batched' : 'Unbatched' %> Orders</h2>
+    </div>
+    <div class="p-6">
+      <% if @warehouse_orders.any? %>
+        <%= render partial: 'batches/orders_collection', locals: { orders: @warehouse_orders } %>
+      <% else %>
+        <div class="text-center py-8">
+          <p class="text-gray-500">No <%= params[:view] == 'batched' ? 'batched' : 'unbatched' %> orders found.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% if params[:view] != 'batched' %>
+  <div class="mt-8">
+    <%= paginate @warehouse_orders %>
+  </div>
+<% end %>

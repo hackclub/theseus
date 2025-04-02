@@ -1,0 +1,21 @@
+<div class="grid gap-4">
+  <% orders.each do |order| %>
+    <div class="card">
+      <div>
+        <b>
+          <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
+        </b>
+
+        <%= render 'warehouse/orders/status_badge', order: order %>
+      </div>
+
+      <div class="my-2">
+        <b>going to: </b>
+        <%= order.address.name_line %> (<%= order.recipient_email %>)
+      </div>
+
+      <b>contents:</b>
+      <%= render 'warehouse/orders/line_items', order: order %>
+    </div>
+  <% end %>
+</div> 

@@ -10,10 +10,48 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_02_175442) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "action_text_rich_texts", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "body"
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "addresses", force: :cascade do |t|
     t.string "first_name"
@@ -27,6 +65,33 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "phone_number"
+    t.bigint "batch_id"
+    t.string "email"
+    t.index ["batch_id"], name: "index_addresses_on_batch_id"
+  end
+
+  create_table "batches", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.jsonb "field_mapping"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type", null: false
+    t.bigint "warehouse_template_id"
+    t.integer "address_count"
+    t.bigint "warehouse_purpose_code_id"
+    t.string "warehouse_user_facing_title"
+    t.string "aasm_state"
+    t.decimal "letter_height"
+    t.decimal "letter_width"
+    t.decimal "letter_weight"
+    t.bigint "letter_mailer_id_id"
+    t.bigint "letter_return_address_id"
+    t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
+    t.index ["letter_return_address_id"], name: "index_batches_on_letter_return_address_id"
+    t.index ["type"], name: "index_batches_on_type"
+    t.index ["user_id"], name: "index_batches_on_user_id"
+    t.index ["warehouse_purpose_code_id"], name: "index_batches_on_warehouse_purpose_code_id"
+    t.index ["warehouse_template_id"], name: "index_batches_on_warehouse_template_id"
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -119,6 +184,48 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
+  create_table "letters", force: :cascade do |t|
+    t.integer "processing_category"
+    t.text "body"
+    t.string "aasm_state"
+    t.bigint "usps_mailer_id_id", null: false
+    t.decimal "postage"
+    t.integer "imb_serial_number"
+    t.bigint "address_id", null: false
+    t.integer "imb_rollover_count"
+    t.string "recipient_email"
+    t.decimal "weight"
+    t.decimal "width"
+    t.decimal "height"
+    t.boolean "non_machinable"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "rubber_stamps"
+    t.bigint "batch_id"
+    t.bigint "return_address_id", null: false
+    t.jsonb "metadata"
+    t.index ["address_id"], name: "index_letters_on_address_id"
+    t.index ["batch_id"], name: "index_letters_on_batch_id"
+    t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
+    t.index ["return_address_id"], name: "index_letters_on_return_address_id"
+    t.index ["usps_mailer_id_id"], name: "index_letters_on_usps_mailer_id_id"
+  end
+
+  create_table "return_addresses", force: :cascade do |t|
+    t.string "name"
+    t.string "line_1"
+    t.string "line_2"
+    t.string "city"
+    t.string "state"
+    t.string "postal_code"
+    t.integer "country"
+    t.boolean "shared"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_return_addresses_on_user_id"
+  end
+
   create_table "source_tags", force: :cascade do |t|
     t.string "slug"
     t.string "name"
@@ -136,6 +243,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
     t.string "icon_url"
     t.string "username"
     t.boolean "can_warehouse"
+    t.boolean "back_office", default: false
   end
 
   create_table "usps_indicia", force: :cascade do |t|
@@ -161,6 +269,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name"
+    t.integer "rollover_count"
+    t.bigint "sequence_number"
   end
 
   create_table "usps_payment_accounts", force: :cascade do |t|
@@ -213,11 +323,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
     t.decimal "weight"
     t.string "idempotency_key"
     t.boolean "notify_on_dispatch"
+    t.bigint "batch_id"
+    t.bigint "template_id"
+    t.jsonb "metadata"
     t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
+    t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
     t.index ["idempotency_key"], name: "index_warehouse_orders_on_idempotency_key", unique: true
     t.index ["purpose_code_id"], name: "index_warehouse_orders_on_purpose_code_id"
     t.index ["source_tag_id"], name: "index_warehouse_orders_on_source_tag_id"
+    t.index ["template_id"], name: "index_warehouse_orders_on_template_id"
     t.index ["user_id"], name: "index_warehouse_orders_on_user_id"
   end
 
@@ -262,15 +377,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_014230) do
     t.index ["user_id"], name: "index_warehouse_templates_on_user_id"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "addresses", "batches"
+  add_foreign_key "batches", "return_addresses", column: "letter_return_address_id"
+  add_foreign_key "batches", "users"
+  add_foreign_key "batches", "usps_mailer_ids", column: "letter_mailer_id_id"
+  add_foreign_key "batches", "warehouse_purpose_codes"
+  add_foreign_key "batches", "warehouse_templates"
+  add_foreign_key "letters", "addresses"
+  add_foreign_key "letters", "batches"
+  add_foreign_key "letters", "return_addresses"
+  add_foreign_key "letters", "usps_mailer_ids"
+  add_foreign_key "return_addresses", "users"
   add_foreign_key "usps_indicia", "usps_payment_accounts"
   add_foreign_key "usps_payment_accounts", "usps_mailer_ids"
   add_foreign_key "warehouse_line_items", "warehouse_orders", column: "order_id"
   add_foreign_key "warehouse_line_items", "warehouse_skus", column: "sku_id"
   add_foreign_key "warehouse_line_items", "warehouse_templates", column: "template_id"
   add_foreign_key "warehouse_orders", "addresses"
+  add_foreign_key "warehouse_orders", "batches"
   add_foreign_key "warehouse_orders", "source_tags"
   add_foreign_key "warehouse_orders", "users"
   add_foreign_key "warehouse_orders", "warehouse_purpose_codes", column: "purpose_code_id"
+  add_foreign_key "warehouse_orders", "warehouse_templates", column: "template_id"
   add_foreign_key "warehouse_templates", "source_tags"
   add_foreign_key "warehouse_templates", "users"
 end

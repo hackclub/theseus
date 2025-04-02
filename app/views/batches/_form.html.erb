@@ -1,0 +1,19 @@
+<%= form_with(model: batch) do |form| %>
+  <% if batch.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(batch.errors.count, "error") %> prohibited this batch from being saved:</h2>
+
+      <ul>
+        <% batch.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= form.label :csv, "upload a CSV:" %>
+
+  <%= form.file_field :csv, accept: 'text/csv' %>
+  <div>
+    <%= form.submit "onward!" %>
+  </div>
+<% end %>

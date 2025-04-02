@@ -1,0 +1,79 @@
+<% content_for :title, "New batch" %>
+
+<h1>New Batch</h1>
+
+<%= form_with(url: batches_path, scope: :batch) do |form| %>
+  <div class="field">
+    <%= form.label :type, "Batch Type" %>
+    <%= form.select :type, 
+                   @batch_types,
+                   { include_blank: "select a batch type..." },
+                   { onchange: "toggleFields(this.value)" } %>
+  </div>
+
+  <div id="warehouse-fields" style="display: none;">
+    <div class="field">
+      <%= form.label :warehouse_template_id, "Warehouse Template" %>
+      <%= link_to "(create?)", new_warehouse_template_path %>
+      <%= form.collection_select :warehouse_template_id,
+                                 @allowed_templates,
+                                 :id,
+                                 :name,
+                                 { prompt: "select an order template..." } %>
+    </div>
+    <div class="field">
+      <%= form.label :warehouse_purpose_code_id, "Major purpose code" %>
+      <%= form.collection_select :warehouse_purpose_code_id,
+                                 Warehouse::PurposeCode.all,
+                                 :id,
+                                 :display_name,
+                                 { prompt: "select an purpose code..." } %>
+    </div>
+    <div class="field">
+      <%= form.label :warehouse_user_facing_title, "User-facing title:" %>
+      <%= form.text_field :warehouse_user_facing_title %>
+    </div>
+  </div>
+
+  <div id="letter-fields" style="display: none;">
+    <%= render partial: "letters/letter_attributes_form", locals: { form: form, is_batch: true } %>
+    <div class="field">
+      <%= form.label :letter_mailer_id_id, "USPS Mailer ID" %>
+      <%= form.collection_select :letter_mailer_id_id,
+                               USPS::MailerId.all,
+                               :id,
+                               :display_name,
+                               { prompt: "Select a mailer ID..." } %>
+    </div>
+    <div class="field">
+      <%= form.label :letter_return_address_id, "Return Address" %>
+      <%= link_to "(manage)", return_addresses_path %>
+      <%= form.collection_select :letter_return_address_id,
+                               ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
+                               :id,
+                               :display_name,
+                               { prompt: "Select a return address..." } %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :csv, "CSV File" %>
+    <%= form.file_field :csv, accept: ".csv" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Create Batch" %>
+    <%= link_to "Back to batches", batches_path %>
+  </div>
+<% end %>
+
+<script>
+function toggleFields(type) {
+  const warehouseFields = document.getElementById('warehouse-fields');
+  const letterFields = document.getElementById('letter-fields');
+  
+  warehouseFields.style.display = type === 'Warehouse::Batch' ? 'block' : 'none';
+  letterFields.style.display = type === 'Letter::Batch' ? 'block' : 'none';
+}
+toggleFields(document.getElementById('batch_type').value)
+</script>

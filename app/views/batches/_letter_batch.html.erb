@@ -1,0 +1,110 @@
+<div class="letter-batch-preview">
+  <div class="card mb-4">
+    <div class="card-header flex items-center justify-between py-2">
+      <h2 class="text-base font-medium">Letter Batch Preview</h2>
+    </div>
+    
+    <div class="card-body p-3">
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <h3 class="text-sm font-medium mb-1">From</h3>
+          <% if batch.letter_return_address.present? %>
+            <div class="p-2 border rounded bg-gray-50 text-sm">
+              <div><%= batch.letter_return_address.name %></div>
+              <div><%= batch.letter_return_address.line_1 %></div>
+              <% if batch.letter_return_address.line_2.present? %>
+                <div><%= batch.letter_return_address.line_2 %></div>
+              <% end %>
+              <div><%= batch.letter_return_address.city %>, <%= batch.letter_return_address.state %> <%= batch.letter_return_address.postal_code %></div>
+              <div><%= batch.letter_return_address.country %></div>
+            </div>
+          <% else %>
+            <div class="text-muted text-sm">No return address</div>
+          <% end %>
+        </div>
+        
+        <div>
+          <h3 class="text-sm font-medium mb-1">Batch Information</h3>
+          <div class="p-2 border rounded bg-gray-50 text-sm">
+            <div><span class="text-gray-500">Dimensions:</span> <%= batch.letter_width %> × <%= batch.letter_height %> in</div>
+            <div><span class="text-gray-500">Weight:</span> <%= batch.letter_weight %> oz</div>
+            <div><span class="text-gray-500">Mailer ID:</span> <%= batch.mailer_id&.display_name %></div>
+            <div><span class="text-gray-500">Address Count:</span> <%= batch.addresses.count %></div>
+          </div>
+        </div>
+      </div>
+      
+      <% if batch.pdf_label.attached? %>
+        <div class="mb-4">
+          <h3 class="text-sm font-medium mb-2">Generated Labels</h3>
+          <div class="p-3 border rounded bg-gray-50">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium">Labels PDF</p>
+                <p class="text-xs text-gray-500">Generated on <%= batch.pdf_label.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+              </div>
+              <div class="flex gap-2">
+                <%= link_to rails_blob_path(batch.pdf_label, disposition: "attachment"), class: "btn btn-sm btn-primary" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download PDF
+                <% end %>
+                
+                <% if batch.letters.any? && batch.letters.all?(&:pending?) %>
+                  <%= button_to mark_printed_batch_path(batch), method: :post, class: "btn btn-sm btn-success", data: { confirm: "Are you sure you want to mark all letters as printed?" } do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Mark All Printed
+                  <% end %>
+                <% end %>
+                
+                <% if batch.letters.any? && batch.letters.all?(&:printed?) %>
+                  <%= button_to mark_mailed_batch_path(batch), method: :post, class: "btn btn-sm btn-info", data: { confirm: "Are you sure you want to mark all letters as mailed?" } do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Mark All Mailed
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="p-3 border rounded bg-gray-50 text-center">
+          <p class="text-muted">No labels have been generated yet.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+  .letter-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .letter-preview-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+  
+  .letter-preview-item .document-letter {
+    transform: scale(0.7);
+    transform-origin: top left;
+  }
+  
+  .letter-preview-more {
+    border: 1px dashed #e2e8f0;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style> 
