@@ -2,7 +2,7 @@ module SnailMail
   module Templates
     class HackatimeStickersTemplate < KestrelHeidiTemplate
       MSG = <<~EOT
-        you're getting these because you coded for
+        you're getting this because you coded for
         ≥15 minutes during Scrapyard and tracked
         it w/ Hackatime V2! ^_^
 
