@@ -20,4 +20,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "SKUs"
   inflect.acronym "IMb"
   inflect.acronym "QR"
+  inflect.acronym "HCB"
 end

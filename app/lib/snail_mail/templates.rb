@@ -6,6 +6,7 @@ module SnailMail
     TEMPLATES = [
       JoyousCatTemplate,
       MailOrpheusTemplate,
+      HCBStickersTemplate,
     ].freeze
 
     # Default template to use when none is specified
