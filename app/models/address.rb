@@ -52,7 +52,7 @@ class Address < ApplicationRecord
     Snail.new(
       name: name_line,
       line_1:,
-      line_2:,
+      line_2: line_2.presence,
       city:,
       region: state,
       postal_code:,
