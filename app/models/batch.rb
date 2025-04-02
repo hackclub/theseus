@@ -66,9 +66,13 @@ class Batch < ApplicationRecord
     raise NotImplementedError, "Subclasses must implement total_cost"
   end
 
+  GREMLINS = [
+    '‎',
+    '​'
+  ].join
   def run_map!
     csv_content = csv.download
-    CSV.parse(csv_content, headers: true, encoding: 'UTF-8')&.each_with_index do |row, i|
+    CSV.parse(csv_content, headers: true, encoding: 'UTF-8', converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])&.each_with_index do |row, i|
     begin
         build_mapping(row)
         # figure out how to rescue this
