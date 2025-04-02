@@ -128,3 +128,5 @@ gem "usps_intelligent_barcode", "~> 1.0"
 gem "rqrcode", "~> 2.2"
 
 gem "kaminari", "~> 1.2"
+
+gem "aws-sdk-s3", require: false
