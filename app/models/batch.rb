@@ -86,14 +86,22 @@ class Batch < ApplicationRecord
 
     country = FrickinCountryNames.find_country!(csv_country)
 
+    postal_code = row[field_mapping['postal_code']]
+
+    if country.alpha2 == 'US' && postal_code.length < 5
+      postal_code = postal_code.rjust(5, '0')
+    end
+
+    state = FrickinCountryNames.normalize_state(country, row[field_mapping['state']])
+
     addresses.build(
       first_name: row[field_mapping['first_name']],
       last_name: row[field_mapping['last_name']],
       line_1: row[field_mapping['line_1']],
       line_2: row[field_mapping['line_2']],
       city: row[field_mapping['city']],
-      state: row[field_mapping['state']],
-      postal_code: row[field_mapping['postal_code']],
+      state: state,
+      postal_code: postal_code,
       country: country.alpha2,
       phone_number: row[field_mapping['phone_number']],
       email: row[field_mapping['email']],
