@@ -172,25 +172,16 @@
         <% when 'printed' %>
           <div class="mb-4">
             <h3 class="text-sm font-medium mb-2">Label</h3>
-            <div class="mb-3">
-              <%= link_to "View Label", rails_blob_path(@letter.label, disposition: 'inline'), class: "btn btn-primary btn-sm w-full", target: "_blank" %>
-            </div>
             <%= button_to "I Mailed It", mark_mailed_letter_path(@letter), method: :post, class: "btn btn-success btn-sm w-full" %>
           </div>
         <% when 'mailed' %>
           <div class="mb-4">
             <h3 class="text-sm font-medium mb-2">Label</h3>
-            <div class="mb-3">
-              <%= link_to "View Label", rails_blob_path(@letter.label, disposition: 'inline'), class: "btn btn-primary btn-sm w-full", target: "_blank" %>
-            </div>
             <%= button_to "Mark as Received", mark_received_letter_path(@letter), method: :post, class: "btn btn-success btn-sm w-full" %>
           </div>
         <% when 'received' %>
           <div class="mb-4">
             <h3 class="text-sm font-medium mb-2">Label</h3>
-            <div class="mb-3">
-              <%= link_to "View Label", rails_blob_path(@letter.label, disposition: 'inline'), class: "btn btn-primary btn-sm w-full", target: "_blank" %>
-            </div>
             <div class="text-sm text-muted">
               Letter has been received.
             </div>
