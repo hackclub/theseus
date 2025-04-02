@@ -38,7 +38,8 @@ module SnailMail
         # Render IMb barcode
         render_imb(pdf, letter, 191, 87, 226)
 
-        pdf.font('f25') { pdf.text_box(letter.public_id, at: [341, 19], size: 10, overflow: :shrink_to_fit, valign: :top ) }
+        render_letter_id(pdf, letter, 341, 19, 10)
+
       end
     end
   end

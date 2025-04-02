@@ -79,7 +79,8 @@ module SnailMail
         "comic" => { normal: font_path("comic sans.ttf") },
         "arial" => { normal: font_path("arial.otf") },
         "f25" => { normal: font_path("f25.ttf") },
-        "imb" => { normal: font_path("imb.ttf") }
+        "imb" => { normal: font_path("imb.ttf") },
+        "gohu" => { normal: font_path("gohu.ttf") }
       )
     end
 

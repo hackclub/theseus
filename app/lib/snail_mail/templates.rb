@@ -7,10 +7,12 @@ module SnailMail
       JoyousCatTemplate,
       MailOrpheusTemplate,
       HCBStickersTemplate,
+      KestrelHeidiTemplate,
+      HackatimeStickersTemplate
     ].freeze
 
     # Default template to use when none is specified
-    DEFAULT_TEMPLATE = MailOrpheusTemplate
+    DEFAULT_TEMPLATE = KestrelHeidiTemplate
 
     class << self
       # Get all template classes

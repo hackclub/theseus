@@ -120,7 +120,11 @@ module SnailMail
       return unless options[:include_qr_code]
       SnailMail::QRCodeGenerator.generate_qr_code(pdf, "https://mail.hack.club/#{letter.public_id}", x, y, size)
     end
-    
+
+    def render_letter_id(pdf, letter, x, y, size, font = 'f25')
+      return if options[:include_qr_code]
+      pdf.font(font) { pdf.text_box(letter.public_id, at: [x, y], size:, overflow: :shrink_to_fit, valign: :top ) }
+    end
     # Helper for path to image assets
     def image_path(image_name)
       File.join(Rails.root, "app", "lib", "snail_mail", "assets", "images", image_name)
