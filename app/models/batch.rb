@@ -68,7 +68,7 @@ class Batch < ApplicationRecord
 
   def run_map!
     csv_content = csv.download
-    CSV.parse(csv_content, headers: true)&.each_with_index do |row, i|
+    CSV.parse(csv_content, headers: true, encoding: 'UTF-8')&.each_with_index do |row, i|
     begin
         build_mapping(row)
         # figure out how to rescue this
@@ -80,16 +80,13 @@ class Batch < ApplicationRecord
 
 
   private
-  def build_mapping(row)
+
+  def build_address(row)
     csv_country = row[field_mapping['country']]
 
-    country = ISO3166::Country.find_country_by_alpha2(csv_country) || ISO3166::Country.find_country_by_alpha3(csv_country) || ISO3166::Country.find_country_by_any_name(csv_country)
+    country = FrickinCountryNames.find_country!(csv_country)
 
-    unless country
-      raise "couldn't parse #{csv_country} as a country!"
-    end
-
-    address = addresses.build(
+    addresses.build(
       first_name: row[field_mapping['first_name']],
       last_name: row[field_mapping['last_name']],
       line_1: row[field_mapping['line_1']],
@@ -101,5 +98,8 @@ class Batch < ApplicationRecord
       phone_number: row[field_mapping['phone_number']],
       email: row[field_mapping['email']],
       )
+  end
+  def build_mapping(row)
+    build_address(row)
   end
 end

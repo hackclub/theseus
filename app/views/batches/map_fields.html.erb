@@ -8,6 +8,31 @@
 
 <div class="mapping-form">
   <%= form_with(model: @batch, url: set_mapping_batch_path(@batch), method: :post) do |f| %>
+    <%# Define default_mapping outside of the loop %>
+    <% 
+      default_mapping = {
+        # loops defaults
+        'email' => 'email',
+        'firstName' => 'first_name',
+        'lastName' => 'last_name',
+        'addressLine1' => 'line_1',
+        'addressLine2' => 'line_2',
+        'addressCity' => 'city',
+        'addressState' => 'state',
+        'addressZipCode' => 'postal_code',
+        'addressCountry' => 'country',
+        # hcb promotions
+        'Address (zip/postal code)' => 'postal_code',
+        'Address (city)' => 'city',
+        'Address (state/province)' => 'state',
+        'Address (country)' => 'country',
+        'Address (line 1)' => 'line_1',
+        'Address (line 2)' => 'line_2',
+        'Recipient Name' => 'first_name',
+        'Login Email' => 'email',
+      }
+    %>
+    
     <div class="mapping-container">
       <% @csv_headers.each do |header| %>
         <div class="mapping-row">
@@ -22,17 +47,6 @@
 
           <div class="field-mapping">
             <% 
-              default_mapping = {
-                'email' => 'email',
-                'firstName' => 'first_name',
-                'lastName' => 'last_name',
-                'addressLine1' => 'line_1',
-                'addressLine2' => 'line_2',
-                'addressCity' => 'city',
-                'addressState' => 'state',
-                'addressZipCode' => 'postal_code',
-                'addressCountry' => 'country'
-              }
               default_value = default_mapping[header]
             %>
             <%= select_tag "mapping[#{header}]",
@@ -45,6 +59,38 @@
       <% end %>
     </div>
 
+    <%# Add hidden fields for required fields if they're not already mapped %>
+    <% 
+      mapped_fields = @csv_headers.map { |header| default_mapping[header] }.compact
+      missing_required = BatchesController::REQUIRED_FIELDS - mapped_fields
+      
+      if missing_required.any?
+        # Find a suitable CSV header for each missing required field
+        missing_required.each do |field|
+          # Try to find a suitable header based on field name
+          suitable_header = case field
+            when 'first_name'
+              @csv_headers.find { |h| h.downcase.include?('name') || h.downcase.include?('recipient') }
+            when 'state'
+              @csv_headers.find { |h| h.downcase.include?('state') || h.downcase.include?('province') }
+            when 'line_1'
+              @csv_headers.find { |h| h.downcase.include?('address') || h.downcase.include?('street') }
+            when 'city'
+              @csv_headers.find { |h| h.downcase.include?('city') || h.downcase.include?('town') }
+            when 'postal_code'
+              @csv_headers.find { |h| h.downcase.include?('zip') || h.downcase.include?('postal') || h.downcase.include?('code') }
+            when 'country'
+              @csv_headers.find { |h| h.downcase.include?('country') || h.downcase.include?('nation') }
+            end
+          
+          if suitable_header
+            # Add a hidden field to map this header to the required field
+            hidden_field_tag "mapping[#{suitable_header}]", field
+          end
+        end
+      end
+    %>
+
     <div class="actions">
       <%= f.submit "Save Mapping", class: "btn btn-primary" %>
     </div>
@@ -53,37 +99,44 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Get all select elements
   const selects = document.querySelectorAll('.form-select');
   
+  // Function to update the disabled state of options
   function updateSelects() {
-    // Get all currently selected values
+    // Get all currently selected values (excluding empty selections)
     const selectedValues = Array.from(selects)
       .map(select => select.value)
       .filter(value => value !== '');
-
-    // Update each select
+    
+    // For each select element
     selects.forEach(select => {
       const currentValue = select.value;
       
-      // Enable all options first
-      Array.from(select.options).forEach(option => {
-        option.disabled = false;
-      });
-
-      // Disable options that are selected in other dropdowns
+      // First, enable all options
+      for (let i = 0; i < select.options.length; i++) {
+        select.options[i].disabled = false;
+      }
+      
+      // Then disable options that are selected in other dropdowns
       selectedValues.forEach(value => {
         if (value !== currentValue) {
-          const option = select.querySelector(`option[value="${value}"]`);
-          if (option) option.disabled = true;
+          // Find the option with this value in the current select
+          for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === value) {
+              select.options[i].disabled = true;
+              break;
+            }
+          }
         }
       });
     });
   }
-
-  // Initial update
+  
+  // Run the update function immediately
   updateSelects();
-
-  // Update on change
+  
+  // Add change event listeners to all selects
   selects.forEach(select => {
     select.addEventListener('change', updateSelects);
   });

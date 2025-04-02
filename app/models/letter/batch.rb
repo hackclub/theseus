@@ -88,27 +88,7 @@ class Letter::Batch < Batch
   end
 
   def build_mapping(row)
-    csv_country = row[field_mapping['country']]
-
-    country = ISO3166::Country.find_country_by_alpha2(csv_country) || ISO3166::Country.find_country_by_alpha3(csv_country) || ISO3166::Country.find_country_by_any_name(csv_country)
-
-    unless country
-      raise "couldn't parse #{csv_country} as a country!"
-    end
-
-    # Build address with standard fields
-    address = addresses.build(
-      first_name: row[field_mapping['first_name']],
-      last_name: row[field_mapping['last_name']],
-      line_1: row[field_mapping['line_1']],
-      line_2: row[field_mapping['line_2']],
-      city: row[field_mapping['city']],
-      state: row[field_mapping['state']],
-      postal_code: row[field_mapping['postal_code']],
-      country: country.alpha2,
-      phone_number: row[field_mapping['phone_number']],
-      email: row[field_mapping['email']],
-    )
+    address = build_address(row)
 
     # Build letter with batch-level specs and extra data
     letters.build(

@@ -59,7 +59,7 @@ class BatchesController < ApplicationController
     
     # Invert the mapping to get from CSV columns to address fields
     inverted_mapping = mapping.invert
-    
+    # ap inverted_mapping
     # Validate required fields
     missing_fields = REQUIRED_FIELDS.reject { |field| inverted_mapping[field].present? }
     
@@ -218,7 +218,7 @@ class BatchesController < ApplicationController
     end
 
     def mapping_params
-      params.require(:mapping).permit(@csv_headers)
+      params.require(:mapping).permit!
     end
     def set_allowed_templates
       @allowed_templates = Warehouse::Template.where(public: true).or(Warehouse::Template.where(user: current_user))
