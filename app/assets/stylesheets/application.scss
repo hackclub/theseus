@@ -110,6 +110,8 @@
   .content-container {
     flex: 1;
     padding: var(--space-6);
+    max-width: 100%;
+    margin: 0;
   }
   
   /* Wider container without center alignment */

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_02_023019) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_02_175442) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -85,7 +85,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_023019) do
     t.decimal "letter_width"
     t.decimal "letter_weight"
     t.bigint "letter_mailer_id_id"
+    t.bigint "letter_return_address_id"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
+    t.index ["letter_return_address_id"], name: "index_batches_on_letter_return_address_id"
     t.index ["type"], name: "index_batches_on_type"
     t.index ["user_id"], name: "index_batches_on_user_id"
     t.index ["warehouse_purpose_code_id"], name: "index_batches_on_warehouse_purpose_code_id"
@@ -191,7 +193,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_023019) do
     t.integer "imb_serial_number"
     t.bigint "address_id", null: false
     t.integer "imb_rollover_count"
-    t.integer "imb_stid"
     t.string "recipient_email"
     t.decimal "weight"
     t.decimal "width"
@@ -199,9 +200,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_023019) do
     t.boolean "non_machinable"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "extra_data"
+    t.text "rubber_stamps"
     t.bigint "batch_id"
     t.bigint "return_address_id", null: false
+    t.jsonb "metadata"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
     t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
@@ -323,6 +325,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_023019) do
     t.boolean "notify_on_dispatch"
     t.bigint "batch_id"
     t.bigint "template_id"
+    t.jsonb "metadata"
     t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
     t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
@@ -377,6 +380,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_023019) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "batches"
+  add_foreign_key "batches", "return_addresses", column: "letter_return_address_id"
   add_foreign_key "batches", "users"
   add_foreign_key "batches", "usps_mailer_ids", column: "letter_mailer_id_id"
   add_foreign_key "batches", "warehouse_purpose_codes"

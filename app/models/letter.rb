@@ -39,27 +39,13 @@ class Letter < ApplicationRecord
   set_public_id_prefix 'ltr'
 
   include HasAddress
+  include CanBeBatched
   include AASM
 
   # Add ActiveStorage attachment for the label PDF
   has_one_attached :label
   belongs_to :return_address, optional: true
   
-  # Only build a new return address if either:
-  # 1. A return_address_id is not provided AND 
-  # 2. At least one field besides user_id has a value
-  accepts_nested_attributes_for :return_address, 
-    reject_if: proc { |attributes| 
-      # Skip if return_address_id is present, meaning an existing address was selected
-      return true if attributes['id'].present?
-      
-      # Count non-blank attributes excluding user_id
-      non_blank_count = attributes.reject { |k, v| k == 'user_id' || v.blank? }.size
-      
-      # Reject if no substantial attributes were provided
-      non_blank_count == 0
-    }
-
   aasm timestamps: true do
     state :pending, initial: true
     state :printed
@@ -84,10 +70,6 @@ class Letter < ApplicationRecord
   end
 
   belongs_to :usps_mailer_id, class_name: "USPS::MailerId"
-  belongs_to :batch, optional: true
-
-  scope :in_batch, -> { where.not(batch_id: nil) }
-  scope :not_in_batch, -> { where(batch_id: nil) }
 
   after_create :set_imb_sequence, if: -> { address.us? }
 

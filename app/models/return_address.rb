@@ -12,7 +12,14 @@ class ReturnAddress < ApplicationRecord
   scope :shared, -> { where(shared: true) }
   scope :owned_by, ->(user) { where(user: user) }
   
-  def render_for_country(other_country)
+  # Add an attribute accessor for the from_letter parameter
+  attr_accessor :from_letter
+
+  def display_name
+    "#{name} / #{line_1}"
+  end
+
+  def format_for_country(other_country)
     <<~EOA
     #{name}
     #{[ line_1, line_2 ].compact_blank.join("\n")}

@@ -103,6 +103,11 @@ class BatchesController < ApplicationController
       redirect_to process_form_batch_path(@batch), alert: "Please select a USPS Mailer ID before processing."
       return
     end
+
+    if @batch.is_a?(Letter::Batch) && @batch.letter_return_address.nil?
+      redirect_to process_form_batch_path(@batch), alert: "Please select a return address before processing."
+      return
+    end
     
     # Handle template selection for Letter batches
     if @batch.is_a?(Letter::Batch)
@@ -114,12 +119,37 @@ class BatchesController < ApplicationController
       @batch.template_cycle = selected_templates
     end
 
-    if @batch.process!
+    # Process the batch with the QR code option if specified
+    include_qr_code = params[:batch][:include_qr_code] == "1"
+    
+    if @batch.process!(include_qr_code: include_qr_code)
       # Mark the batch as processed after successful processing
       @batch.mark_processed! if @batch.may_mark_processed?
       redirect_to @batch, notice: "Batch processed successfully."
     else
       redirect_to @batch, alert: "Failed to process batch."
+    end
+  end
+
+  def mark_printed
+    if @batch.is_a?(Letter::Batch) && @batch.processed?
+      @batch.letters.each do |letter|
+        letter.mark_printed! if letter.may_mark_printed?
+      end
+      redirect_to @batch, notice: "All letters have been marked as printed."
+    else
+      redirect_to @batch, alert: "Cannot mark letters as printed. Batch must be a processed letter batch."
+    end
+  end
+  
+  def mark_mailed
+    if @batch.is_a?(Letter::Batch) && @batch.processed?
+      @batch.letters.each do |letter|
+        letter.mark_mailed! if letter.may_mark_mailed?
+      end
+      redirect_to @batch, notice: "All letters have been marked as mailed."
+    else
+      redirect_to @batch, alert: "Cannot mark letters as mailed. Batch must be a processed letter batch."
     end
   end
 
@@ -160,9 +190,9 @@ class BatchesController < ApplicationController
       
       # Get fields based on batch type
       @address_fields = if @batch.is_a?(Letter::Batch)
-        # For letter batches, include address fields and extra_data
+        # For letter batches, include address fields and rubber_stamps
         (Address.column_names - ['id', 'created_at', 'updated_at', 'batch_id']) +
-        ['extra_data']
+        ['rubber_stamps']
       else
         # For other batches, just include address fields
         (Address.column_names - ['id', 'created_at', 'updated_at'])
@@ -181,6 +211,8 @@ class BatchesController < ApplicationController
         :letter_width,
         :letter_weight,
         :letter_mailer_id_id,
+        :letter_return_address_id,
+        :include_qr_code,
         template_cycle: []
       )
     end

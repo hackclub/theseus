@@ -119,7 +119,7 @@ Specify a template when generating a label:
 SnailMail::Service.generate_label(letter, template: "my_awesome")
 ```
 
-For backward compatibility, the system will still check `letter.extra_data['template']` if no template is specified in the options.
+For backward compatibility, the system will still check `letter.rubber_stamps['template']` if no template is specified in the options.
 
 ### Template Cycling
 

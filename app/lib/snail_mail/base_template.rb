@@ -56,7 +56,7 @@ module SnailMail
       
       pdf.font(font_name) do
         pdf.text_box(
-          format_return_address(letter),
+          letter.return_address.format_for_country(letter.address.country),
           at: [x, y],
           width: width,
           height: height,
@@ -127,12 +127,7 @@ module SnailMail
     end
     
     private
-    
-    # Format return address
-    def format_return_address(letter)
-      letter.return_address
-    end
-    
+
     # Format destination address
     def format_destination_address(letter)
       letter.address.snailify

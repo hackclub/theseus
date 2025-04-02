@@ -36,7 +36,7 @@ module SnailMail
         )
 
         # Render IMb barcode
-        render_imb(pdf, letter, 78, 102, 237, 16)
+        render_imb(pdf, letter, 78, 102, 237)
 
         # Render QR code for tracking
         render_qr_code(pdf, letter, 7, 67, 60)

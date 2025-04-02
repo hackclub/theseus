@@ -37,6 +37,14 @@ module ApplicationHelper
     end
   end
 
+  def param_toggle(thing)
+    if params[thing]
+      link_to "hide #{thing}?", url_for(thing => nil)
+    else
+      link_to "show #{thing}?", url_for(thing => 'yeah')
+    end
+  end
+
   def render_checkbox(value)
     content_tag(:span, style: "color: var(--checkbox-#{value ? 'true' : 'false' })") { value ? "☑" : "☒" }
   end

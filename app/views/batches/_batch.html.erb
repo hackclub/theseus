@@ -22,7 +22,7 @@
           <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
             <p><span class="field-label">Warehouse Template:</span> <%= batch.warehouse_template.name %></p>
             <% if batch.warehouse_purpose_code.present? %>
-              <p><span class="field-label">Purpose Code:</span> <%= batch.warehouse_purpose_code.name %></p>
+              <p><span class="field-label">Purpose Code:</span> <%= batch.warehouse_purpose_code.display_name %></p>
             <% end %>
           <% end %>
         </div>

@@ -112,6 +112,10 @@ Rails.application.routes.draw do
   resources :letters do
     member do
       post :generate_label
+      post :mark_printed
+      post :mark_mailed
+      post :mark_received
+      post :clear_label
       get :preview_template if Rails.env.development?
     end
   end
@@ -167,6 +171,8 @@ Rails.application.routes.draw do
       post :set_mapping
       get '/process', to: "batches#process_form", as: :process_confirm
       post '/process', to: "batches#process_batch", as: :process
+      post :mark_printed
+      post :mark_mailed
     end
   end
   root "static_pages#index"

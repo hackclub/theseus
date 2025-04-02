@@ -9,9 +9,9 @@
         <span class="badge success">in stock</span>
       <% elsif sku.in_stock&.< 0 %>
         <% if sku.inbound&.>= sku.in_stock.abs %>
-          <span class="badge warning">backordered</span>
+          <span class="badge warning">backordered (more otw)</span>
         <% else %>
-          <span class="badge error">backordered</span>
+          <span class="badge error">backordered (!)</span>
         <% end %>
       <% else %>
         <span class="badge pending">not in inventory</span>

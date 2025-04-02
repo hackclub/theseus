@@ -1,20 +1,15 @@
-
 module SnailMail
   module Templates
     class TemplateNotFoundError < StandardError; end
 
     # All available templates hardcoded in a single array
     TEMPLATES = [
-      StandardTemplate,
-      EnvelopeTemplate,
-      CorporateEnvelopeTemplate,
-      OrpheusTemplate,
       JoyousCatTemplate,
       MailOrpheusTemplate,
     ].freeze
 
     # Default template to use when none is specified
-    DEFAULT_TEMPLATE = StandardTemplate
+    DEFAULT_TEMPLATE = MailOrpheusTemplate
 
     class << self
       # Get all template classes
@@ -31,7 +26,7 @@ module SnailMail
 
       # Get a template instance for a letter
       # Options:
-      #   template: Specifies the template to use, overriding any template in letter.extra_data
+      #   template: Specifies the template to use, overriding any template in letter.rubber_stamps
       #   template_class: Pre-fetched template class to use (fastest option)
       def template_for(letter, options = {})
         # First check if template_class is provided (fastest path)
@@ -41,10 +36,7 @@ module SnailMail
         
         # Next check if template name is specified in options
         template_name = options[:template]&.to_sym
-        
-        # If no template in options, fall back to letter.extra_data
-        template_name ||= extract_template_name(letter)
-        
+
         template_class = if template_name
           # Find template by name
           TEMPLATES.find { |t| t.template_name.to_sym == template_name }
@@ -73,12 +65,6 @@ module SnailMail
         TEMPLATES.any? { |t| t.template_name.to_sym == name.to_sym }
       end
 
-      private
-      
-      def extract_template_name(letter)
-        return nil unless letter.respond_to?(:extra_data) && letter.extra_data.present?
-        letter.extra_data.dig('template')&.to_sym
-      end
     end
   end
 end 

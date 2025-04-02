@@ -3,25 +3,29 @@
 // Layout
 .container {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
   padding: 0 var(--space-4);
 }
 
 .container-sm {
-  max-width: 640px;
+  max-width: 100%;
+  margin: 0;
 }
 
 .container-md {
-  max-width: 768px;
+  max-width: 100%;
+  margin: 0;
 }
 
 .container-lg {
-  max-width: 1024px;
+  max-width: 100%;
+  margin: 0;
 }
 
 .container-xl {
-  max-width: 1280px;
+  max-width: 100%;
+  margin: 0;
 }
 
 // Flexbox

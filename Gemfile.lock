@@ -560,6 +560,7 @@ DEPENDENCIES
   jquery-rails (~> 4.6)
   jsbundling-rails
   kamal
+  kaminari (~> 1.2)
   letter_opener_web (~> 3.0)
   net-http (~> 0.6.0)
   norairrecord (~> 0.3.0)

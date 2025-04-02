@@ -55,7 +55,7 @@ module SnailMail
         pdf
       rescue => e
         Rails.logger.error("Failed to generate labels: #{e.message}")
-        raise Error, "Failed to generate labels: #{e.message}"
+        raise
       end
     end
 

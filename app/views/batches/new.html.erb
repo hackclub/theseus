@@ -43,7 +43,16 @@
                                USPS::MailerId.all,
                                :id,
                                :display_name,
-                               { required: true, prompt: "Select a mailer ID..." } %>
+                               { prompt: "Select a mailer ID..." } %>
+    </div>
+    <div class="field">
+      <%= form.label :letter_return_address_id, "Return Address" %>
+      <%= link_to "(manage)", return_addresses_path %>
+      <%= form.collection_select :letter_return_address_id,
+                               ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
+                               :id,
+                               :display_name,
+                               { prompt: "Select a return address..." } %>
     </div>
   </div>
 

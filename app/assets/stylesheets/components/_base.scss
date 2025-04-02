@@ -362,8 +362,8 @@
 // Page layouts
 .content-container {
   padding: var(--space-6);
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
 }
 
 .main-content {
@@ -455,9 +455,9 @@
 
 .container {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-4) var(--space-4) var(--space-6);
+  max-width: 100%;
+  margin: 0;
+  padding: 0 var(--space-4);
 }
 
 .flash {

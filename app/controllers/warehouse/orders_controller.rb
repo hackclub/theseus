@@ -5,7 +5,16 @@ class Warehouse::OrdersController < ApplicationController
   # GET /warehouse/orders or /warehouse/orders.json
   def index
     authorize Warehouse::Order
-    @warehouse_orders = Warehouse::Order.all
+    
+    # Get all orders with their associations
+    @all_orders = Warehouse::Order.includes(:batch, :address, :purpose_code, :source_tag, :user)
+    
+    # Filter by batched/unbatched based on view parameter
+    if params[:view] == 'batched'
+      @warehouse_orders = @all_orders.in_batch
+    else
+      @warehouse_orders = @all_orders.not_in_batch.page(params[:page]).per(20)
+    end
   end
 
   # GET /warehouse/orders/1 or /warehouse/orders/1.json

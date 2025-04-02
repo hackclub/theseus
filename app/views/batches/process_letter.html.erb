@@ -4,15 +4,6 @@
 
 <%= form_with(model: @batch, url: process_batch_path(@batch), method: :post) do |form| %>
   <div class="field">
-    <%= form.label :letter_mailer_id_id, "USPS Mailer ID" %>
-    <%= form.collection_select :letter_mailer_id_id,
-                             USPS::MailerId.all,
-                             :id,
-                             :display_name,
-                             { required: true, selected: @batch.letter_mailer_id_id, prompt: "Select a mailer ID..." } %>
-  </div>
-
-  <div class="field">
     <%= form.label :template_cycle, "Label Templates" %>
     <div class="help-text">Select multiple templates to cycle through them, or just one for all labels.</div>
     <select name="batch[template_cycle][]" id="batch_template_cycle" multiple="multiple" size="8" class="template-select">
@@ -36,34 +27,19 @@
     </select>
   </div>
 
+  <div class="field">
+    <div class="form-check">
+      <%= form.check_box :include_qr_code, id: "batch_include_qr_code" %>
+      <%= form.label :include_qr_code, "Include QR Code on Labels", for: "batch_include_qr_code" %>
+    </div>
+    <div class="help-text">Add a QR code to each label for tracking purposes.</div>
+  </div>
+
   <div class="actions">
     <%= form.submit "Generate Labels", class: "button primary" %>
     <%= link_to "Back to batch", @batch, class: "button secondary" %>
   </div>
 <% end %>
-
-<style>
-  .help-text {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 5px;
-  }
-  
-  .template-select {
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  optgroup {
-    font-weight: bold;
-    font-style: normal;
-    padding: 5px 0;
-  }
-  
-  option {
-    padding: 3px 5px;
-  }
-</style>
 
 <!--<ul>-->
   <%# @batch.warehouse_template.line_items.each do |line_item| %>

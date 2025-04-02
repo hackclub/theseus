@@ -25,10 +25,52 @@
 
   <%= render @batch %>
   
+  <% if @batch.is_a?(Letter::Batch) && @batch.processed? %>
+    <%= render partial: "letter_batch", locals: { batch: @batch } %>
+    
+    <% if @batch.letters.any? %>
+      <div class="card">
+        <details class="letters-details">
+          <summary class="card-header">
+            <h2 class="section-title mb-0">Letters (<%= @batch.letters.count %>)</h2>
+            <div class="caret-icon">▼</div>
+          </summary>
+          <div class="card-body">
+            <%= render partial: 'letters_collection', locals: { letters: @batch.letters } %>
+          </div>
+        </details>
+      </div>
+    <% end %>
+  <% end %>
+  
+  <% if @batch.is_a?(Warehouse::Batch) && @batch.orders.any? %>
+    <div class="card">
+      <details class="orders-details">
+        <summary class="card-header">
+          <h2 class="section-title mb-0">Orders (<%= @batch.orders.count %>)</h2>
+          <div class="caret-icon">▼</div>
+        </summary>
+        <div class="card-body">
+          <%= render partial: 'orders_collection', locals: { orders: @batch.orders } %>
+        </div>
+      </details>
+    </div>
+  <% end %>
+  
   <%= render partial: 'admin_inspector', locals: { record: @batch } %>
   
   <% if @batch.addresses.any? %>
-    <%= render partial: 'addresses_table', locals: { addresses: @batch.addresses } %>
+    <div class="card">
+      <details class="addresses-details">
+        <summary class="card-header">
+          <h2 class="section-title mb-0">Addresses (<%= @batch.addresses.count %>)</h2>
+          <div class="caret-icon">▼</div>
+        </summary>
+        <div class="card-body">
+          <%= render partial: 'addresses_table', locals: { addresses: @batch.addresses } %>
+        </div>
+      </details>
+    </div>
   <% end %>
   
   <div class="danger-zone">

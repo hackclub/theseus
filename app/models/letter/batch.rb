@@ -38,6 +38,7 @@ class Letter::Batch < Batch
   # default_scope { where(type: 'letters') }
   has_many :letters, dependent: :destroy
   belongs_to :mailer_id, class_name: 'USPS::MailerId', foreign_key: 'letter_mailer_id_id', optional: true
+  belongs_to :letter_return_address, class_name: 'ReturnAddress', optional: true
   
   # Add ActiveStorage attachment for the batch label PDF
   has_one_attached :pdf_label
@@ -50,6 +51,7 @@ class Letter::Batch < Batch
 
   validates :letter_height, :letter_width, :letter_weight, presence: true, numericality: { greater_than: 0 }
   validates :mailer_id, presence: true
+  validates :letter_return_address, presence: true, on: :process
 
   def self.model_name
     Batch.model_name
@@ -66,10 +68,10 @@ class Letter::Batch < Batch
     )
   end
 
-  def process!
+  def process!(options = {})
     return false unless fields_mapped?
-    # Generate PDF labels
-    generate_labels
+    # Generate PDF labels with the provided options
+    generate_labels(options)
     
     mark_processed!
   end
@@ -81,9 +83,8 @@ class Letter::Batch < Batch
   private
 
   def address_fields
-    # Only include address fields and extra_data for letter mapping
-    (Address.column_names - ['id', 'created_at', 'updated_at', 'batch_id']) +
-    ['extra_data']
+    # Only include address fields and rubber_stamps for letter mapping
+    ['rubber_stamps']
   end
 
   def build_mapping(row)
@@ -106,18 +107,19 @@ class Letter::Batch < Batch
       postal_code: row[field_mapping['postal_code']],
       country: country.alpha2,
       phone_number: row[field_mapping['phone_number']],
-      email: row[field_mapping['email']]
+      email: row[field_mapping['email']],
     )
 
     # Build letter with batch-level specs and extra data
     letters.build(
-      extra_data: row[field_mapping['extra_data']],
       height: letter_height,
       width: letter_width,
       weight: letter_weight,
       recipient_email: row[field_mapping['email']],
       address: address,
-      usps_mailer_id: mailer_id
+      usps_mailer_id: mailer_id,
+      return_address: letter_return_address,
+      rubber_stamps: row[field_mapping['rubber_stamps']]
     )
   end
 

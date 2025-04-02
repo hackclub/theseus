@@ -22,7 +22,12 @@ class ReturnAddressesController < ApplicationController
     @return_address.user = current_user if user_signed_in?
 
     if @return_address.save
-      redirect_to @return_address, notice: "Return address was successfully created."
+      # If this was created from the letter form, redirect back to the letter
+      if params[:from_letter].present?
+        redirect_to new_letter_path, notice: "Return address was successfully created. Please select it from the dropdown."
+      else
+        redirect_to @return_address, notice: "Return address was successfully created."
+      end
     else
       render :new, status: :unprocessable_entity
     end

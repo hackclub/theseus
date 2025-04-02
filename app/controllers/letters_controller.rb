@@ -3,11 +3,14 @@ class LettersController < ApplicationController
 
   # GET /letters
   def index
-    @batched_letters = Letter.in_batch
-                             .includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
-                             .group_by(&:batch)
-    @unbatched_letters = Letter.not_in_batch
-                               .includes(:address, :usps_mailer_id, :label_attachment, :label_blob)
+    # Get all letters with their associations
+    @all_letters = Letter.includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
+    
+    # Get unbatched letters with pagination
+    @unbatched_letters = @all_letters.not_in_batch.page(params[:page]).per(20)
+    
+    # Get batched letters grouped by batch
+    @batched_letters = @all_letters.in_batch.group_by(&:batch)
   end
 
   # GET /letters/1
@@ -19,13 +22,13 @@ class LettersController < ApplicationController
   def new
     @letter = Letter.new
     @letter.build_address
-    @letter.build_return_address
+    # Don't build a return address by default - let the user select one
   end
 
   # GET /letters/1/edit
   def edit
-    # If letter doesn't have a return address already, build one
-    @letter.build_return_address unless @letter.return_address
+    # If letter doesn't have a return address already, don't build one
+    # Let the user select one from the dropdown
   end
 
   # POST /letters
@@ -57,14 +60,15 @@ class LettersController < ApplicationController
   # POST /letters/1/generate_label
   def generate_label
     template = params[:template]
+    include_qr_code = params[:qr].present?
     
     # Generate label with specified template
     begin
       # Let the model method handle saving itself
-      if @letter.generate_label(template:)
+      if @letter.generate_label(template:, include_qr_code:)
         if @letter.label.attached?
-          # Redirect to the label URL
-          redirect_to rails_blob_path(@letter.label, disposition: 'inline')
+          # Redirect back to the letter page with a success message
+          redirect_to @letter, notice: "Label was successfully generated."
         else
           redirect_to @letter, alert: "Failed to generate label."
         end
@@ -72,14 +76,52 @@ class LettersController < ApplicationController
         redirect_to @letter, alert: "Failed to generate label: #{@letter.errors.full_messages.join(', ')}"
       end
     rescue => e
+      raise
       redirect_to @letter, alert: "Error generating label: #{e.message}"
     end
   end
 
   def preview_template
     template = params['template']
-    include_qr_code = params['qr']
+    include_qr_code = params['qr'].present?
     send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code:  }).render, type: 'application/pdf', disposition: 'inline'
+  end
+  
+  # POST /letters/1/mark_printed
+  def mark_printed
+    if @letter.mark_printed
+      redirect_to @letter, notice: "Letter has been marked as printed."
+    else
+      redirect_to @letter, alert: "Could not mark letter as printed: #{@letter.errors.full_messages.join(', ')}"
+    end
+  end
+  
+  # POST /letters/1/mark_mailed
+  def mark_mailed
+    if @letter.mark_mailed
+      redirect_to @letter, notice: "Letter has been marked as mailed."
+    else
+      redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(', ')}"
+    end
+  end
+  
+  # POST /letters/1/mark_received
+  def mark_received
+    if @letter.mark_received
+      redirect_to @letter, notice: "Letter has been marked as received."
+    else
+      redirect_to @letter, alert: "Could not mark letter as received: #{@letter.errors.full_messages.join(', ')}"
+    end
+  end
+
+  # POST /letters/1/clear_label
+  def clear_label
+    if @letter.pending? && @letter.label.attached?
+      @letter.label.purge
+      redirect_to @letter, notice: "Label has been cleared."
+    else
+      redirect_to @letter, alert: "Cannot clear label: Letter is not in pending state or has no label attached."
+    end
   end
 
   private
@@ -94,7 +136,7 @@ class LettersController < ApplicationController
         :height,
         :width,
         :weight,
-        :extra_data,
+        :rubber_stamps,
         :usps_mailer_id_id,
         :return_address_id,
         address_attributes: [
@@ -118,7 +160,8 @@ class LettersController < ApplicationController
           :postal_code,
           :country,
           :shared,
-          :user_id
+          :user_id,
+          :from_letter
         ]
       )
     end

@@ -53,6 +53,7 @@
 class Warehouse::Order < ApplicationRecord
   include AASM
   include HasAddress
+  include CanBeBatched
   include PublicIdentifiable
   set_public_id_prefix 'pkg'
 

@@ -33,10 +33,10 @@
       <div class="text-sm text-muted mb-2">Choose a preset size:</div>
       <div class="flex gap-2">
         <button type="button" class="btn btn-sm btn-secondary" onclick="setEnvelopeSize('5x7'); return false;">
-          5×7 Envelope
+          5x7 envelope (the cute colorful ones!)
         </button>
         <button type="button" class="btn btn-sm btn-secondary" onclick="setEnvelopeSize('10'); return false;">
-          #10 Business Envelope
+          boring ol' #10 envelope
         </button>
       </div>
     </div>
@@ -45,11 +45,11 @@
   <script>
   function setEnvelopeSize(type) {
     if (type === '5x7') {
-      document.getElementById('letter_height').value = '7';
-      document.getElementById('letter_width').value = '5';
+        document.getElementById('letter_height').value = '5';
+      document.getElementById('letter_width').value = '7';
     } else if (type === '10') {
-      document.getElementById('letter_height').value = '9.5';
-      document.getElementById('letter_width').value = '4.125';
+      document.getElementById('letter_height').value = '4.125';
+      document.getElementById('letter_width').value = '9.5';
     }
   }
   </script> 

@@ -47,6 +47,7 @@ class Warehouse::Batch < Batch
     addresses.each do |address|
       Warehouse::Order.from_template(
         warehouse_template,
+        batch: self,
         recipient_email: address.email,
         address: address,
         user: user,

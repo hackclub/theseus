@@ -69,6 +69,30 @@
   padding: var(--space-4);
 }
 
+.addresses-details,
+.letters-details,
+.orders-details {
+  summary {
+    cursor: pointer;
+    position: relative;
+    
+    .caret-icon {
+      position: absolute;
+      right: var(--space-4);
+      top: 50%;
+      transform: translateY(-50%);
+      transition: transform var(--transition-fast);
+      color: var(--text-secondary);
+    }
+  }
+  
+  &[open] {
+    summary .caret-icon {
+      transform: translateY(-50%) rotate(180deg);
+    }
+  }
+}
+
 .batch-info-grid {
   display: grid;
   grid-template-columns: 1fr;
