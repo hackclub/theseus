@@ -57,6 +57,6 @@ class Address < ApplicationRecord
       region: state,
       postal_code:,
       country: country
-    )
+    ).to_s
   end
 end

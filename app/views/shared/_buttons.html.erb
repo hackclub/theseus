@@ -1,0 +1,61 @@
+<%# Primary button (blue) %>
+<% if defined?(button_path) && defined?(button_text) %>
+  <%= link_to button_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg" do %>
+    <% if defined?(button_icon) && button_icon.present? %>
+      <%= button_icon %>
+    <% end %>
+    <%= button_text %>
+  <% end %>
+<% end %>
+
+<%# Secondary button (white/gray) %>
+<% if defined?(secondary_path) && defined?(secondary_text) %>
+  <%= link_to secondary_path, class: "inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600" do %>
+    <% if defined?(secondary_icon) && secondary_icon.present? %>
+      <%= secondary_icon %>
+    <% end %>
+    <%= secondary_text %>
+  <% end %>
+<% end %>
+
+<%# Danger button (red) %>
+<% if defined?(danger_path) && defined?(danger_text) %>
+  <%= button_to danger_path, method: defined?(danger_method) ? danger_method : :delete, 
+    class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500",
+    data: { confirm: defined?(danger_confirm) ? danger_confirm : "Are you sure? This action cannot be undone." } do %>
+    <% if defined?(danger_icon) && danger_icon.present? %>
+      <%= danger_icon %>
+    <% end %>
+    <%= danger_text %>
+  <% end %>
+<% end %>
+
+<%# Warning button (yellow) %>
+<% if defined?(warning_path) && defined?(warning_text) %>
+  <%= link_to warning_path, class: "inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg" do %>
+    <% if defined?(warning_icon) && warning_icon.present? %>
+      <%= warning_icon %>
+    <% end %>
+    <%= warning_text %>
+  <% end %>
+<% end %>
+
+<%# Back button - with default back icon %>
+<% if defined?(back_path) %>
+  <%= link_to back_path, class: "inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <%= defined?(back_text) ? back_text : "Back" %>
+  <% end %>
+<% end %>
+
+<%# Edit button - with default edit icon %>
+<% if defined?(edit_path) %>
+  <%= link_to edit_path, class: "inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+    <%= defined?(edit_text) ? edit_text : "Edit" %>
+  <% end %>
+<% end %> 

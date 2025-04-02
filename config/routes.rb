@@ -109,11 +109,17 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
-  resources :letters
+  resources :letters do
+    member do
+      post :generate_label
+      get :preview_template if Rails.env.development?
+    end
+  end
   get "batches/new"
   get "batches/import"
   namespace :admin do
       resources :addresses
+      resources :return_addresses
       resources :source_tags
       resources :users
 
@@ -154,6 +160,7 @@ Rails.application.routes.draw do
     resources :skus, except: [ :destroy ]
   end
   resources :users
+  resources :return_addresses
   resources :batches do
     member do
       get '/map', to: "batches#map_fields", as: :map_fields
@@ -168,6 +175,9 @@ Rails.application.routes.draw do
   get "/auth/slack/callback", to: "sessions#create"
 
   delete "signout", to: "sessions#destroy", as: :signout
+
+  # Route for publicly identifiable objects
+  get "/j/:public_id", to: "public_identifiable#show", as: :public_id
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

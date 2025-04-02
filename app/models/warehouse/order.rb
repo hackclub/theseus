@@ -52,58 +52,14 @@
 #
 class Warehouse::Order < ApplicationRecord
   include AASM
+  include HasAddress
+  include PublicIdentifiable
+  set_public_id_prefix 'pkg'
 
   belongs_to :template, class_name: 'Warehouse::Template'
-
-  def self.from_template(template, attributes)
-    new(
-      attributes.merge(
-        template: template,
-        source_tag: template.source_tag,
-      )
-    )
-  end
-
-  def initialize(attributes = {})
-    super
-    if attributes[:template]
-      template.line_items.each do |template_line_item|
-        line_items.build(
-          sku: template_line_item.sku,
-          quantity: template_line_item.quantity
-        )
-      end
-    end
-  end
-
-  aasm timestamps: true do
-    state :draft, initial: true
-    state :dispatched
-    state :mailed
-    state :errored
-    state :canceled
-
-    event :mark_dispatched do
-      transitions from: :draft, to: :dispatched
-      after do |zenventory_id|
-        update!(zenventory_id:)
-      end
-    end
-
-    event :mark_mailed do
-      transitions from: :dispatched, to: :mailed
-    end
-
-    event :mark_canceled do
-      transitions from: :dispatched, to: :canceled
-    end
-  end
-
   belongs_to :purpose_code
   belongs_to :user
-  belongs_to :address
   belongs_to :source_tag
-  accepts_nested_attributes_for :address, update_only: true
 
   validates :line_items, presence: true
   validates :recipient_email, presence: true
@@ -136,6 +92,27 @@ class Warehouse::Order < ApplicationRecord
 
   has_zenventory_url "https://app.zenventory.com/orders/edit-order/%s", :zenventory_id
 
+  def shipping_address_attributes
+    {
+      name: address.name_line,
+      line1: address.line_1,
+      line2: address.line_2,
+      city: address.city,
+      state: address.state,
+      zip: address.postal_code,
+      countryCode: address.country,
+      phone: address.phone_number
+    }.compact_blank
+  end
+
+  def customer_attributes
+    {
+      name: address.first_name,
+      surname: address.last_name || "​",
+      email: recipient_email
+    }.compact_blank
+  end
+
   def cancel!(reason)
     transaction do
       mark_canceled!
@@ -143,28 +120,14 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
-
   def dispatch!
     ActiveRecord::Base.transaction do
       raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
       order = Zenventory.create_customer_order(
         {
           orderNumber: hc_id,
-          customer: {
-            name: address.first_name,
-            surname: address.last_name || "​",
-            email: recipient_email
-          }.compact_blank,
-          shippingAddress: {
-            name: address.name_line,
-            line1: address.line_1,
-            line2: address.line_2,
-            city: address.city,
-            state: address.state,
-            zip: address.postal_code,
-            countryCode: address.country,
-            phone: address.phone_number
-          }.compact_blank,
+          customer: customer_attributes,
+          shippingAddress: shipping_address_attributes,
           billingAddress: { sameAsShipping: true },
           items: generate_order_items
         }
@@ -179,16 +142,12 @@ class Warehouse::Order < ApplicationRecord
 
   def zenv_attributes_changed?
     return true if recipient_email_changed?
-
     return true if address&.changed?
-
     return true if line_items.any?(&:marked_for_destruction?) ||
                   line_items.any?(&:new_record?) ||
                   line_items.any?(&:changed?)
-
     false
   end
-
 
   before_update { |rec| try_zenventory_update! if rec.zenv_attributes_changed? && !rec.draft? }
 
@@ -203,24 +162,9 @@ class Warehouse::Order < ApplicationRecord
     end
     begin
       update_hash = {
-        customer: {
-          name: address.first_name,
-          surname: address.last_name || "​",
-          email: recipient_email
-        },
-        shippingAddress: {
-          name: address.name_line,
-          line1: address.line_1,
-          line2: address.line_2,
-          city: address.city,
-          state: address.state,
-          zip: address.postal_code,
-          countryCode: address.country,
-          phone: address.phone_number
-        }.compact_blank,
-        billingAddress: {
-          sameAsShipping: true
-        },
+        customer: customer_attributes,
+        shippingAddress: shipping_address_attributes,
+        billingAddress: { sameAsShipping: true },
         items: generate_order_items_for_update
       }.compact_blank
       Zenventory.update_customer_order(zenventory_id, update_hash) unless update_hash.empty?
@@ -230,13 +174,47 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
-  def generate_order_items
-    line_items.map do |line_item|
-      {
-        sku: line_item.sku.sku,
-        price: line_item.sku.declared_unit_cost,
-        quantity: line_item.quantity
-      }
+  def self.from_template(template, attributes)
+    new(
+      attributes.merge(
+        template: template,
+        source_tag: template.source_tag,
+      )
+    )
+  end
+
+  def initialize(attributes = {})
+    super
+    if attributes&.[](:template)
+      template.line_items.each do |template_line_item|
+        line_items.build(
+          sku: template_line_item.sku,
+          quantity: template_line_item.quantity
+        )
+      end
+    end
+  end
+
+  aasm timestamps: true do
+    state :draft, initial: true
+    state :dispatched
+    state :mailed
+    state :errored
+    state :canceled
+
+    event :mark_dispatched do
+      transitions from: :draft, to: :dispatched
+      after do |zenventory_id|
+        update!(zenventory_id:)
+      end
+    end
+
+    event :mark_mailed do
+      transitions from: :dispatched, to: :mailed
+    end
+
+    event :mark_canceled do
+      transitions from: :dispatched, to: :canceled
     end
   end
 
@@ -262,6 +240,16 @@ class Warehouse::Order < ApplicationRecord
       "UPS #{service}"
     else
       "#{carrier} #{service}"
+    end
+  end
+
+  def generate_order_items
+    line_items.map do |line_item|
+      {
+        sku: line_item.sku.sku,
+        price: line_item.sku.declared_unit_cost,
+        quantity: line_item.quantity
+      }
     end
   end
 

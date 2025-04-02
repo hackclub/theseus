@@ -3,63 +3,81 @@
   <%= render 'shared/flash' %>
 
   <% if current_user %>
-    <%= Flavor.greeting(name: current_user&.username) %><br/>
-    <%= button_to "log out", signout_path, {method: :delete} %>
+    <div class="user-info mb-4">
+      <div class="flex items-center gap-2 mb-2">
+        <% if current_user.icon_url.present? %>
+          <img src="<%= current_user.icon_url %>" alt="<%= current_user.username %>" class="w-8 h-8 rounded-full">
+        <% end %>
+        <div>
+          <div class="font-medium"><%= current_user&.username %></div>
+          <div class="text-xs text-muted"><%= current_user&.email %></div>
+        </div>
+      </div>
+      <%= button_to "Log out", signout_path, {method: :delete, class: "btn btn-sm btn-secondary"} %>
+    </div>
   <% end %>
 
   <hr />
 
-  <ul class="list-inside list-disc p-5">
-    <%= nav_item root_path do %>
-      Home
-    <% end %>
-    <li>
-      Warehouse
-      <ul>
-        <%= nav_item warehouse_skus_path do %>
-          SKUs
-        <% end %>
-        <%= nav_item warehouse_orders_path do %>
-          Orders
-        <% end %>
-        <%= nav_item warehouse_templates_path do %>
-          Order templates
-        <% end %>
-      </ul>
-    </li>
-    <li>
-      USPS
-      <ul>
+  <nav class="nav-menu">
+    <ul>
+      <%= nav_item(root_path, "Home") %>
+      <%= nav_item(batches_path, "Batches") %>
+
+      <li>
+        <div class="menu-heading">Warehouse</div>
+        <ul>
+          <%= nav_item(warehouse_skus_path, "SKUs") %>
+          <%= nav_item(warehouse_orders_path, "Orders") %>
+          <%= nav_item(warehouse_templates_path, "Order templates") %>
+        </ul>
+      </li>
+      
+      <li>
+        <div class="menu-heading">Mail</div>
+        <ul>
+          <%= nav_item(letters_path, "Letters") %>
+          <%= nav_item(return_addresses_path, "Return Addresses") %>
+        </ul>
+      </li>
+      
+      <% admin_tool do %>
         <li>
-          sorry nothing
+          <div class="menu-heading">admin:</div>
+          <ul>
+            <%= nav_item(good_job_path, "good job, #{current_user.username}!") %>
+            <%= nav_item(admin_root_path, "admin panel?") %>
+          </ul>
         </li>
-      </ul>
-    </li>
-    <%= nav_item batches_path do %>
-      Batches
-    <% end %>
-    <% admin_tool do %>
-      <li>
-        admin stuff:
-        <ul>
-          <%= nav_item good_job_path do %>
-            hey, good job <%= current_user.username %>!
-          <% end %>
-          <%= nav_item admin_root_path do %>
-            admin panel..?
-          <% end %>
-        </ul>
-      </li>
-    <% end %>
-    <% if Rails.env.development? %>
-      <li>
-        dev tools:
-        <ul>
-          <%= nav_item letter_opener_web_path, true do %>
-            mail (not the physical kind)
-          <% end %>
-        </ul>
-      </li>
-    <% end %>
-  </ul>
-</aside> 
+      <% end %>
+      
+      <% dev_tool do %>
+        <li>
+          <div class="menu-heading">secret developer stuff:</div>
+          <ul>
+            <%= nav_item(letter_opener_web_path, "mail (not the real kind)", target: "_blank") %>
+          </ul>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+</aside>
+
+<button class="nav-toggle md:hidden">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const navToggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    
+    if (navToggle && nav) {
+      navToggle.addEventListener('click', function() {
+        nav.classList.toggle('active');
+      });
+    }
+  });
+</script> 

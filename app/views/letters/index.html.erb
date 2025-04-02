@@ -2,15 +2,68 @@
 
 <% content_for :title, "Letters" %>
 
-<h1>Letters</h1>
-
-<div id="letters">
-  <% @letters.each do |letter| %>
-    <%= render letter %>
-    <p>
-      <%= link_to "Show this letter", letter %>
-    </p>
-  <% end %>
+<div class="page-header mb-6">
+  <h1>Letters</h1>
+  <div class="actions">
+    <%= link_to "Create New Letter", new_letter_path, class: "btn btn-primary" %>
+  </div>
 </div>
 
-<%= link_to "New letter", new_letter_path %>
+<div class="letters-container">
+  <div class="card mb-6">
+    <div class="card-header">
+      <h2 class="text-lg font-medium">Unbatched Letters</h2>
+    </div>
+    <div class="card-body">
+      <% if @unbatched_letters.any? %>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <% @unbatched_letters.each do |letter| %>
+            <div class="letter-card">
+              <%= render letter %>
+              <div class="mt-3">
+                <%= link_to "View Details", letter, class: "btn btn-sm btn-secondary" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-center py-4 text-muted">No unbatched letters found.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="text-lg font-medium">Batched Letters</h2>
+    </div>
+    <div class="card-body">
+      <% if @batched_letters.any? %>
+        <div class="divide-y">
+          <% @batched_letters.each do |batch, letters| %>
+            <details class="batch-details py-3">
+              <summary class="flex items-center justify-between cursor-pointer">
+                <div class="flex items-center">
+                  <span class="font-medium">Batch #<%= batch.id %></span>
+                  <span class="badge ml-2"><%= pluralize(letters.size, 'letter') %></span>
+                </div>
+                <small class="text-muted">Created <%= time_ago_in_words(batch.created_at) %> ago</small>
+              </summary>
+              <div class="batch-letters mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% letters.each do |letter| %>
+                  <div class="letter-card">
+                    <%= render letter %>
+                    <div class="mt-3">
+                      <%= link_to "View Details", letter, class: "btn btn-sm btn-secondary" %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </details>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-center py-4 text-muted">No batched letters found.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -6,16 +6,21 @@
 #  aasm_state                  :string
 #  address_count               :integer
 #  field_mapping               :jsonb
+#  letter_height               :decimal(, )
+#  letter_weight               :decimal(, )
+#  letter_width                :decimal(, )
 #  type                        :string           not null
 #  warehouse_user_facing_title :string
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
+#  letter_mailer_id_id         :bigint
 #  user_id                     :bigint           not null
 #  warehouse_purpose_code_id   :bigint
 #  warehouse_template_id       :bigint
 #
 # Indexes
 #
+#  index_batches_on_letter_mailer_id_id        (letter_mailer_id_id)
 #  index_batches_on_type                       (type)
 #  index_batches_on_user_id                    (user_id)
 #  index_batches_on_warehouse_purpose_code_id  (warehouse_purpose_code_id)
@@ -23,6 +28,7 @@
 #
 # Foreign Keys
 #
+#  fk_rails_...  (letter_mailer_id_id => usps_mailer_ids.id)
 #  fk_rails_...  (user_id => users.id)
 #  fk_rails_...  (warehouse_purpose_code_id => warehouse_purpose_codes.id)
 #  fk_rails_...  (warehouse_template_id => warehouse_templates.id)
@@ -47,11 +53,14 @@ class Batch < ApplicationRecord
 
   self.inheritance_column = 'type'
   belongs_to :user
-  belongs_to :warehouse_template, class_name: 'Warehouse::Template', optional: true
   has_one_attached :csv
   has_one_attached :labels_pdf
+  has_one_attached :pdf_document
   has_many :addresses, dependent: :destroy
-  has_many :letters, dependent: :destroy
+
+  def attach_pdf(pdf_data)
+    PdfAttachmentUtil.attach_pdf(pdf_data, self, :pdf_document)
+  end
 
   def total_cost
     raise NotImplementedError, "Subclasses must implement total_cost"
@@ -60,11 +69,10 @@ class Batch < ApplicationRecord
   def run_map!
     csv_content = csv.download
     CSV.parse(csv_content, headers: true)&.each_with_index do |row, i|
-      begin
-        build_address(row)
-      end
-    rescue StandardError => e
-      raise e.class, "CSV row #{i+1}: #{e.message}"
+    begin
+        build_mapping(row)
+        # figure out how to rescue this
+    end
     end
     mark_fields_mapped
     save!
@@ -72,7 +80,7 @@ class Batch < ApplicationRecord
 
 
   private
-  def build_address(row)
+  def build_mapping(row)
     csv_country = row[field_mapping['country']]
 
     country = ISO3166::Country.find_country_by_alpha2(csv_country) || ISO3166::Country.find_country_by_alpha3(csv_country) || ISO3166::Country.find_country_by_any_name(csv_country)

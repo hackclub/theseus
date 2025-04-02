@@ -1,10 +1,143 @@
-<p style="color: green"><%= notice %></p>
+<%# Notice message with improved styling %>
+<% if notice.present? %>
+  <div class="alert alert-success bg-success-bg border border-success-border text-success-fg rounded-lg py-3 px-4 mb-4 shadow-sm">
+    <%= notice %>
+  </div>
+<% end %>
 
-<%= render @letter %>
+<div class="page-header mb-6">
+  <h1>Letter <%= @letter.public_id %></h1>
+  <div class="actions">
+    <%= link_to "Back to Letters", letters_path, class: "btn btn-secondary" %>
+    <%= link_to "Edit Letter", edit_letter_path(@letter), class: "btn btn-primary" %>
+    <%= button_to "Delete Letter", letter_path(@letter), method: :delete, data: { confirm: "Are you sure you want to delete this letter?" }, class: "btn btn-danger" %>
+  </div>
+</div>
 
-<div>
-  <%= link_to "Edit this letter", edit_letter_path(@letter) %> |
-  <%= link_to "Back to letters", letters_path %>
-
-  <%= button_to "Destroy this letter", @letter, method: :delete %>
+<div class="grid md:grid-cols-12 gap-6">
+  <div class="md:col-span-8">
+    <div class="card mb-6">
+      <div class="card-header flex items-center justify-between">
+        <h2 class="text-lg font-medium">Letter Details</h2>
+        <div class="badge <%= letter_status_class(@letter.aasm_state) %>">
+          <%= @letter.aasm_state.humanize %>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h3 class="text-md font-medium mb-2">From</h3>
+            <% if @letter.return_address.present? %>
+              <div class="p-3 border rounded bg-gray-50">
+                <div class="font-medium"><%= @letter.return_address.name %></div>
+                <div><%= @letter.return_address.line_1 %></div>
+                <% if @letter.return_address.line_2.present? %>
+                  <div><%= @letter.return_address.line_2 %></div>
+                <% end %>
+                <div><%= @letter.return_address.city %>, <%= @letter.return_address.state %> <%= @letter.return_address.postal_code %></div>
+                <div><%= @letter.return_address.country %></div>
+              </div>
+            <% else %>
+              <div class="text-muted">No return address specified</div>
+            <% end %>
+          </div>
+          
+          <div>
+            <h3 class="text-md font-medium mb-2">To</h3>
+            <div class="p-3 border rounded bg-gray-50">
+              <div class="font-medium"><%= @letter.address.name_line %></div>
+              <div><%= @letter.address.line_1 %></div>
+              <% if @letter.address.line_2.present? %>
+                <div><%= @letter.address.line_2 %></div>
+              <% end %>
+              <div><%= @letter.address.city %>, <%= @letter.address.state %> <%= @letter.address.postal_code %></div>
+              <div><%= @letter.address.country %></div>
+            </div>
+          </div>
+        </div>
+        
+        <h3 class="text-md font-medium mb-3">Specifications</h3>
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+          <div class="spec-item">
+            <div class="text-sm text-muted">Dimensions</div>
+            <div><%= @letter.height %> × <%= @letter.width %> inches</div>
+          </div>
+          <div class="spec-item">
+            <div class="text-sm text-muted">Weight</div>
+            <div><%= @letter.weight %> oz</div>
+          </div>
+          <% if @letter.batch_id? %>
+            <div class="spec-item">
+              <div class="text-sm text-muted">Batch</div>
+              <div>#<%= @letter.batch_id %></div>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if @letter.imb_serial_number.present? && @letter.address.country&.upcase == 'US' %>
+          <h3 class="text-md font-medium mb-3">IMb Information</h3>
+          <div class="grid md:grid-cols-2 gap-4 mb-6">
+            <div class="spec-item">
+              <div class="text-sm text-muted">Serial Number</div>
+              <div class="font-mono"><%= @letter.imb_serial_number.to_s.rjust(6, '0') %></div>
+            </div>
+            <div class="spec-item">
+              <div class="text-sm text-muted">Epoch</div>
+              <div><%= @letter.imb_rollover_count %></div>
+            </div>
+          </div>
+        <% end %>
+        
+        <% if @letter.extra_data.present? %>
+          <h3 class="text-md font-medium mb-3">Extra Data</h3>
+          <div class="bg-gray-50 p-3 rounded border font-mono text-sm overflow-auto mb-6">
+            <pre><%= @letter.extra_data %></pre>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <%= render partial: "admin_inspector", locals: {record: @letter} %>
+  </div>
+  
+  <% if @letter.pending? %>
+    <div class="md:col-span-4">
+      <div class="card sticky top-4">
+        <div class="card-header">
+          <h2 class="text-lg font-medium">Generation Options</h2>
+        </div>
+        
+        <div class="card-body">
+          <%= form_tag(generate_label_letter_path(@letter), method: :post) do %>
+            <div class="form-group">
+              <label for="template" class="form-label">Template Style</label>
+              <select name="template" id="template" class="form-control">
+                <% standard_templates = SnailMail::Service.templates_for_size(:standard) %>
+                <% if standard_templates.present? %>
+                  <optgroup label="Standard 4x6 Labels">
+                    <% standard_templates.each do |template| %>
+                      <option value="<%= template %>"><%= template.to_s.humanize %></option>
+                    <% end %>
+                  </optgroup>
+                <% end %>
+                <% envelope_templates = SnailMail::Service.templates_for_size(:envelope) %>
+                <% if envelope_templates.present? %>
+                  <optgroup label="#10 Envelopes">
+                    <% envelope_templates.each do |template| %>
+                      <option value="<%= template %>"><%= template.to_s.humanize %></option>
+                    <% end %>
+                  </optgroup>
+                <% end %>
+              </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-4 w-full">
+              Generate Label
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

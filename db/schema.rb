@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_01_194031) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_02_023019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -81,6 +81,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_01_194031) do
     t.bigint "warehouse_purpose_code_id"
     t.string "warehouse_user_facing_title"
     t.string "aasm_state"
+    t.decimal "letter_height"
+    t.decimal "letter_width"
+    t.decimal "letter_weight"
+    t.bigint "letter_mailer_id_id"
+    t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
     t.index ["type"], name: "index_batches_on_type"
     t.index ["user_id"], name: "index_batches_on_user_id"
     t.index ["warehouse_purpose_code_id"], name: "index_batches_on_warehouse_purpose_code_id"
@@ -195,8 +200,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_01_194031) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "extra_data"
+    t.bigint "batch_id"
+    t.bigint "return_address_id", null: false
     t.index ["address_id"], name: "index_letters_on_address_id"
+    t.index ["batch_id"], name: "index_letters_on_batch_id"
+    t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
+    t.index ["return_address_id"], name: "index_letters_on_return_address_id"
     t.index ["usps_mailer_id_id"], name: "index_letters_on_usps_mailer_id_id"
+  end
+
+  create_table "return_addresses", force: :cascade do |t|
+    t.string "name"
+    t.string "line_1"
+    t.string "line_2"
+    t.string "city"
+    t.string "state"
+    t.string "postal_code"
+    t.integer "country"
+    t.boolean "shared"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_return_addresses_on_user_id"
   end
 
   create_table "source_tags", force: :cascade do |t|
@@ -353,10 +378,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_01_194031) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "batches"
   add_foreign_key "batches", "users"
+  add_foreign_key "batches", "usps_mailer_ids", column: "letter_mailer_id_id"
   add_foreign_key "batches", "warehouse_purpose_codes"
   add_foreign_key "batches", "warehouse_templates"
   add_foreign_key "letters", "addresses"
+  add_foreign_key "letters", "batches"
+  add_foreign_key "letters", "return_addresses"
   add_foreign_key "letters", "usps_mailer_ids"
+  add_foreign_key "return_addresses", "users"
   add_foreign_key "usps_indicia", "usps_payment_accounts"
   add_foreign_key "usps_payment_accounts", "usps_mailer_ids"
   add_foreign_key "warehouse_line_items", "warehouse_orders", column: "order_id"

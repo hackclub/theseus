@@ -21,8 +21,22 @@
           </div>
 
           <div class="field-mapping">
+            <% 
+              default_mapping = {
+                'email' => 'email',
+                'firstName' => 'first_name',
+                'lastName' => 'last_name',
+                'addressLine1' => 'line_1',
+                'addressLine2' => 'line_2',
+                'addressCity' => 'city',
+                'addressState' => 'state',
+                'addressZipCode' => 'postal_code',
+                'addressCountry' => 'country'
+              }
+              default_value = default_mapping[header]
+            %>
             <%= select_tag "mapping[#{header}]",
-                         options_for_select(@address_fields),
+                         options_for_select(@address_fields, default_value),
                          prompt: "Select address field...",
                          class: "form-select",
                          data: { csv_field: header } %>

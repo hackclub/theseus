@@ -124,3 +124,5 @@ end
 gem "prawn", "~> 2.5"
 
 gem "usps_intelligent_barcode", "~> 1.0"
+
+gem "rqrcode", "~> 2.2"

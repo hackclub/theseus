@@ -36,17 +36,14 @@
   </div>
 
   <div id="letter-fields" style="display: none;">
+    <%= render partial: "letters/letter_attributes_form", locals: { form: form, is_batch: true } %>
     <div class="field">
-      <%= form.label :letter_height, "Letter Height (inches)" %>
-      <%= form.number_field :letter_height, step: "0.01", min: 0 %>
-    </div>
-    <div class="field">
-      <%= form.label :letter_width, "Letter Width (inches)" %>
-      <%= form.number_field :letter_width, step: "0.01", min: 0 %>
-    </div>
-    <div class="field">
-      <%= form.label :letter_weight, "Letter Weight (ounces)" %>
-      <%= form.number_field :letter_weight, step: "0.01", min: 0 %>
+      <%= form.label :letter_mailer_id_id, "USPS Mailer ID" %>
+      <%= form.collection_select :letter_mailer_id_id,
+                               USPS::MailerId.all,
+                               :id,
+                               :display_name,
+                               { required: true, prompt: "Select a mailer ID..." } %>
     </div>
   </div>
 

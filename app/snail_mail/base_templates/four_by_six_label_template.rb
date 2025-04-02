@@ -1,3 +1,0 @@
-class FourBySixLabelTemplate < BaseLabelTemplate
-  
-end

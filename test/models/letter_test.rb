@@ -19,16 +19,19 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  address_id          :bigint           not null
+#  batch_id            :bigint
 #  usps_mailer_id_id   :bigint           not null
 #
 # Indexes
 #
 #  index_letters_on_address_id         (address_id)
+#  index_letters_on_batch_id           (batch_id)
 #  index_letters_on_usps_mailer_id_id  (usps_mailer_id_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (address_id => addresses.id)
+#  fk_rails_...  (batch_id => batches.id)
 #  fk_rails_...  (usps_mailer_id_id => usps_mailer_ids.id)
 #
 require "test_helper"

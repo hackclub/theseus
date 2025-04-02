@@ -1,0 +1,55 @@
+  <%# Letter attributes form partial that can be used for both batches and individual letters %>
+  <%# Usage: render 'letters/letter_attributes_form', form: form, is_batch: true/false %>
+  <% is_batch ||= false %>
+  <div class="letter-attributes">
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+      <div class="form-group">
+        <%= form.label is_batch ? :letter_width : :width, "Letter Width (inches)", class: "form-label" %>
+        <%= form.number_field is_batch ? :letter_width : :width, 
+                           step: "0.5", 
+                           min: 0, 
+                           id: "letter_width",
+                           class: "form-control" %>
+      </div>  
+      <div class="form-group">
+        <%= form.label is_batch ? :letter_height : :height, "Letter Height (inches)", class: "form-label" %>
+        <%= form.number_field is_batch ? :letter_height : :height, 
+                           step: "0.5", 
+                           min: 0, 
+                           id: "letter_height",
+                           class: "form-control" %>
+      </div>
+      <div class="form-group">
+        <%= form.label is_batch ? :letter_weight : :weight, "Letter Weight (ounces)", class: "form-label" %>
+        <%= form.number_field is_batch ? :letter_weight : :weight, 
+                           step: "0.1", 
+                           min: 0, 
+                           value: 1,
+                           class: "form-control" %>
+      </div>
+    </div>
+    
+    <div class="preset-buttons mt-2 mb-4">
+      <div class="text-sm text-muted mb-2">Choose a preset size:</div>
+      <div class="flex gap-2">
+        <button type="button" class="btn btn-sm btn-secondary" onclick="setEnvelopeSize('5x7'); return false;">
+          5×7 Envelope
+        </button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="setEnvelopeSize('10'); return false;">
+          #10 Business Envelope
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  function setEnvelopeSize(type) {
+    if (type === '5x7') {
+      document.getElementById('letter_height').value = '7';
+      document.getElementById('letter_width').value = '5';
+    } else if (type === '10') {
+      document.getElementById('letter_height').value = '9.5';
+      document.getElementById('letter_width').value = '4.125';
+    }
+  }
+  </script> 

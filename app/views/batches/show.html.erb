@@ -1,10 +1,38 @@
-<p style="color: green"><%= notice %></p>
+<div class="container">
+  <% if notice.present? %>
+    <div class="flash success">
+      <div class="flash-content">
+        <svg xmlns="http://www.w3.org/2000/svg" class="flash-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <%= notice %>
+      </div>
+    </div>
+  <% end %>
 
-<%= render @batch %>
+  <div class="page-header">
+    <h1 class="page-title"><%= @batch.type.split('::').first.titleize %> Batch #<%= @batch.id %></h1>
+    <div class="actions">
+      <%= secondary_link_to "Back to batches", batches_path do %>
+        <%= back_icon %>Back to batches
+      <% end %>
+      
+      <%= secondary_link_to "Edit this batch", edit_batch_path(@batch) do %>
+        <%= edit_icon %>Edit this batch
+      <% end %>
+    </div>
+  </div>
 
-<div>
-  <%= link_to "Edit this batch", edit_batch_path(@batch) %> |
-  <%= link_to "Back to batches", batches_path %>
-
-  <%= button_to "Destroy this batch", @batch, method: :delete %>
+  <%= render @batch %>
+  
+  <%= render partial: 'admin_inspector', locals: { record: @batch } %>
+  
+  <% if @batch.addresses.any? %>
+    <%= render partial: 'addresses_table', locals: { addresses: @batch.addresses } %>
+  <% end %>
+  
+  <div class="danger-zone">
+    <h3 class="text-danger">Danger Zone</h3>
+    <%= danger_button_to "Delete this batch", @batch, data: { confirm: "Are you sure you want to delete this batch? This action cannot be undone." } %>
+  </div>
 </div>

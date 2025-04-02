@@ -1,2 +1,14 @@
-<div id="<%= dom_id letter %>">
+<div id="<%= dom_id letter %>" class="letter-item p-4 border rounded shadow-sm">
+  <div class="letter-recipient font-medium">To: <%= letter.address.name_line %></div>
+  <div class="letter-details text-sm text-muted mt-2">
+    <% if letter.return_address.present? %>
+      <div>From: <%= letter.return_address.name %></div>
+    <% end %>
+    <div>Created: <%= time_ago_in_words(letter.created_at) %> ago</div>
+    <div>Status: 
+      <span class="badge <%= letter.batch_id? ? 'badge-success' : 'badge-warning' %>">
+        <%= letter.batch_id? ? 'Batched' : 'Unbatched' %>
+      </span>
+    </div>
+  </div>
 </div>

@@ -15,6 +15,7 @@
 #
 class User < ApplicationRecord
   has_many :warehouse_templates, class_name: "Warehouse::Template", inverse_of: :user
+  has_many :return_addresses, dependent: :destroy
 
   def admin?
     is_admin

@@ -69,7 +69,7 @@ class BatchesController < ApplicationController
       return
     end
 
-    if @batch.update(field_mapping: inverted_mapping)
+    if @batch.update!(field_mapping: inverted_mapping)
       begin
         @batch.run_map!
       rescue StandardError => e
@@ -94,15 +94,32 @@ class BatchesController < ApplicationController
   end
 
   def process_batch
-    if @batch.warehouse_template.nil? && @batch.is_a?(Warehouse::Batch)
+    if @batch.is_a?(Warehouse::Batch) && @batch.warehouse_template.nil?
       redirect_to process_form_batch_path(@batch), alert: "Please select a warehouse template before processing."
       return
     end
 
+    if @batch.is_a?(Letter::Batch) && @batch.mailer_id.nil?
+      redirect_to process_form_batch_path(@batch), alert: "Please select a USPS Mailer ID before processing."
+      return
+    end
+    
+    # Handle template selection for Letter batches
+    if @batch.is_a?(Letter::Batch)
+      selected_templates = params[:batch][:template_cycle]
+      if selected_templates.blank?
+        redirect_to process_form_batch_path(@batch), alert: "Please select at least one template."
+        return
+      end
+      @batch.template_cycle = selected_templates
+    end
+
     if @batch.process!
-      redirect_to @batch, notice: " Batch processed successfully."
+      # Mark the batch as processed after successful processing
+      @batch.mark_processed! if @batch.may_mark_processed?
+      redirect_to @batch, notice: "Batch processed successfully."
     else
-      redirect_to @batch, error: "Failed to process batch."
+      redirect_to @batch, alert: "Failed to process batch."
     end
   end
 
@@ -162,7 +179,9 @@ class BatchesController < ApplicationController
         :warehouse_user_facing_title,
         :letter_height,
         :letter_width,
-        :letter_weight
+        :letter_weight,
+        :letter_mailer_id_id,
+        template_cycle: []
       )
     end
 

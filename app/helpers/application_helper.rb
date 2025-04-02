@@ -1,13 +1,21 @@
 module ApplicationHelper
+  include ButtonHelper
+  
   def admin_tool(class_name: "", element: "div", **options, &block)
     return unless current_user&.is_admin?
     concat content_tag(element, class: "admin-tool #{class_name}", **options, &block)
   end
 
-  def nav_item(path, new_tab = false, &block)
-    active = current_page?(path)
+  def dev_tool(class_name: "", element: "div", **options, &block)
+    return unless Rails.env.development?
+    concat content_tag(element, class: "dev-tool #{class_name}", **options, &block)
+  end
+
+  def nav_item(path, text, options = {})
     content_tag("li") do
-      link_to(path, class: "nav-item #{active && 'active'}", target: ("_blank" if new_tab), &block) + ("(you are here!)" if active)
+      link_to path, class: current_page?(path) ? 'active' : '', **options do
+        text
+      end
     end
   end
 

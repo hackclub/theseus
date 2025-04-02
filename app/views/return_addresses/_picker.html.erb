@@ -1,0 +1,214 @@
+<%# 
+  This partial expects the following variables:
+  - form: the form object
+  
+  You can call it like this:
+  <%= render 'return_addresses/picker', form: form %>
+%>
+
+<div class="return-address-picker">
+  <h3>Return Address</h3>
+  
+  <div class="tabs">
+    <ul class="tab-list">
+      <li><a href="#shared-addresses" class="tab-link active">Shared Addresses</a></li>
+      <li><a href="#my-addresses" class="tab-link">My Addresses</a></li>
+      <li><a href="#new-address" class="tab-link">Add New</a></li>
+    </ul>
+    
+    <div id="shared-addresses" class="tab-content active">
+      <% shared_addresses = ReturnAddress.shared %>
+      <% if shared_addresses.any? %>
+        <div class="address-options">
+          <%= form.collection_radio_buttons :return_address_id, shared_addresses, :id, :name do |b| %>
+            <div class="address-option">
+              <%= b.radio_button %>
+              <label for="<%= b.object_id %>">
+                <div class="address-name"><%= b.object.name %></div>
+                <div class="address-details">
+                  <%= b.object.line_1 %><br>
+                  <% if b.object.line_2.present? %><%= b.object.line_2 %><br><% end %>
+                  <%= b.object.city %>, <%= b.object.state %> <%= b.object.postal_code %><br>
+                  <%= b.object.country %>
+                </div>
+              </label>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p>No shared addresses available.</p>
+      <% end %>
+    </div>
+    
+    <div id="my-addresses" class="tab-content">
+      <% user_addresses = ReturnAddress.owned_by(current_user) %>
+      <% if user_addresses.any? %>
+        <div class="address-options">
+          <%= form.collection_radio_buttons :return_address_id, user_addresses, :id, :name do |b| %>
+            <div class="address-option">
+              <%= b.radio_button %>
+              <label for="<%= b.object_id %>">
+                <div class="address-name"><%= b.object.name %></div>
+                <div class="address-details">
+                  <%= b.object.line_1 %><br>
+                  <% if b.object.line_2.present? %><%= b.object.line_2 %><br><% end %>
+                  <%= b.object.city %>, <%= b.object.state %> <%= b.object.postal_code %><br>
+                  <%= b.object.country %>
+                </div>
+              </label>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p>You don't have any saved return addresses. Click the "Add New" tab to create one.</p>
+      <% end %>
+    </div>
+    
+    <div id="new-address" class="tab-content">
+      <div class="new-address-form">
+        <%= form.fields_for :return_address, ReturnAddress.new do |ra| %>
+          <%= ra.hidden_field :user_id, value: current_user.id %>
+          
+          <div class="field">
+            <%= ra.label :name %>
+            <%= ra.text_field :name, placeholder: "Organization or Personal Name" %>
+          </div>
+          
+          <div class="field">
+            <%= ra.label :line_1, "Address Line 1" %>
+            <%= ra.text_field :line_1, placeholder: "Street address, P.O. box, etc." %>
+          </div>
+          
+          <div class="field">
+            <%= ra.label :line_2, "Address Line 2" %>
+            <%= ra.text_field :line_2, placeholder: "Apartment, suite, unit, etc. (optional)" %>
+          </div>
+          
+          <div class="field">
+            <%= ra.label :city %>
+            <%= ra.text_field :city %>
+          </div>
+          
+          <div class="field">
+            <%= ra.label :state %>
+            <%= ra.text_field :state %>
+          </div>
+          
+          <div class="field">
+            <%= ra.label :postal_code, "Postal Code" %>
+            <%= ra.text_field :postal_code %>
+          </div>
+          
+          <div class="field">
+            <%= ra.label :country %>
+            <%= ra.collection_select :country, ReturnAddress.countries_for_select, :first, :last, 
+                { include_blank: "Select a country" } %>
+          </div>
+          
+          <div class="field checkbox">
+            <%= ra.check_box :shared %>
+            <%= ra.label :shared, "Make this address available to everyone" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const radioButtons = document.querySelectorAll('input[type="radio"][name$="[return_address_id]"]');
+    const newAddressFields = document.querySelectorAll('#new-address input:not([type="hidden"]), #new-address select');
+    
+    // Keep track of which tab is active
+    let activeTab = 'shared-addresses';
+    
+    tabLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Remove active class from all tabs
+        tabLinks.forEach(l => l.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to current tab
+        this.classList.add('active');
+        
+        // Show corresponding content
+        const targetId = this.getAttribute('href').substring(1); // Remove the # 
+        document.getElementById(targetId).classList.add('active');
+        
+        // Update active tab
+        activeTab = targetId;
+        
+        // If switching to new-address tab, clear any selected radio buttons
+        if (targetId === 'new-address') {
+          radioButtons.forEach(radio => {
+            radio.checked = false;
+          });
+          
+          // Enable all fields in the new address form
+          newAddressFields.forEach(field => {
+            field.disabled = false;
+          });
+        }
+        
+        // If switching away from new-address tab and no existing address is selected,
+        // clear the new address form fields to avoid validation errors
+        if (targetId !== 'new-address') {
+          const hasSelectedAddress = Array.from(radioButtons).some(radio => radio.checked);
+          
+          if (!hasSelectedAddress) {
+            // Select the first radio button if available
+            if (radioButtons.length > 0) {
+              radioButtons[0].checked = true;
+            }
+          }
+          
+          // If a radio is now checked, clear and disable the new address fields
+          updateFieldStatus();
+        }
+      });
+    });
+    
+    function updateFieldStatus() {
+      const hasSelectedAddress = Array.from(radioButtons).some(radio => radio.checked);
+      
+      if (hasSelectedAddress) {
+        // If an address is selected, disable the new address form fields
+        newAddressFields.forEach(field => {
+          field.disabled = true;
+          
+          // Also clear the fields to prevent validation errors
+          if (field.type !== 'checkbox') {
+            field.value = '';
+          } else {
+            field.checked = false;
+          }
+        });
+      } else {
+        // Enable the new address form fields
+        newAddressFields.forEach(field => {
+          field.disabled = false;
+        });
+      }
+    }
+    
+    // Set initial state
+    updateFieldStatus();
+    
+    // Update when selection changes
+    radioButtons.forEach(radio => {
+      radio.addEventListener('change', function() {
+        // If an address is selected, switch to that tab
+        if (this.checked) {
+          const tabId = this.closest('.tab-content').id;
+          document.querySelector(`a[href="#${tabId}"]`).click();
+          updateFieldStatus();
+        }
+      });
+    });
+  });
+</script> 
