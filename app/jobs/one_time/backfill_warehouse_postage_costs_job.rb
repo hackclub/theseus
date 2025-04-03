@@ -1,10 +1,10 @@
-class Warehouse::UpdateMailingInfoJob < ApplicationJob
+class OneTime::BackfillWarehousePostageCostsJob < ApplicationJob
   queue_as :default
 
-  FUDGE_FACTOR = 2.weeks
+  FUDGE_FACTOR = 4.weeks
 
   def perform(*args)
-    orders = Warehouse::Order.dispatched.order(dispatched_at: :asc)
+    orders = Warehouse::Order.mailed.order(mailed_at: :asc)
 
     return if orders.empty?
 
@@ -22,15 +22,8 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
       zen_order = zen_orders[order.hc_id]
       next unless zen_order
       order.update(
-        carrier: zen_order[:carrier],
-        service: zen_order[:service],
-        weight: zen_order[:weight],
-        tracking_number: zen_order[:tracking_number],
-        mailed_at: DateTime.parse(zen_order[:shipped_date]),
         postage_cost: zen_order[:shipping_handling],
-        aasm_state: "mailed"
       )
-      Warehouse::OrderMailer.with(order:).order_shipped.deliver_later
     end
   end
 end
