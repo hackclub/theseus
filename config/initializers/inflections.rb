@@ -21,4 +21,6 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "IMb"
   inflect.acronym "QR"
   inflect.acronym "HCB"
+  inflect.acronym "IV"
+  inflect.acronym "MTR"
 end
