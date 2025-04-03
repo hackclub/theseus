@@ -49,7 +49,7 @@ class Address < ApplicationRecord
   end
 
   def snailify
-    Snail.new(
+    SnailButNbsp.new(
       name: name_line,
       line_1:,
       line_2: line_2.presence,
