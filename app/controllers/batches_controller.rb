@@ -96,6 +96,7 @@ class BatchesController < ApplicationController
   def process_batch
     unless @batch.may_mark_processed?
       redirect_to process_form_batch_path(@batch), alert: "huh?"
+      return
     end
 
     if @batch.is_a?(Warehouse::Batch) && @batch.warehouse_template.nil?
