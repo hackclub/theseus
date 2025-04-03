@@ -43,7 +43,7 @@ class Warehouse::Batch < Batch
     Batch.model_name
   end
 
-  def process!
+  def process!(options = {})
     addresses.each do |address|
       Warehouse::Order.from_template(
         warehouse_template,
@@ -59,6 +59,7 @@ class Warehouse::Batch < Batch
     orders.each do |order|
       order.dispatch!
     end
+    mark_processed!
   end
 
   def contents_cost

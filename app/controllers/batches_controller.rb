@@ -94,37 +94,37 @@ class BatchesController < ApplicationController
   end
 
   def process_batch
+    unless @batch.may_mark_processed?
+      redirect_to process_form_batch_path(@batch), alert: "huh?"
+    end
+
     if @batch.is_a?(Warehouse::Batch) && @batch.warehouse_template.nil?
       redirect_to process_form_batch_path(@batch), alert: "Please select a warehouse template before processing."
       return
     end
 
-    if @batch.is_a?(Letter::Batch) && @batch.mailer_id.nil?
-      redirect_to process_form_batch_path(@batch), alert: "Please select a USPS Mailer ID before processing."
-      return
-    end
-
-    if @batch.is_a?(Letter::Batch) && @batch.letter_return_address.nil?
-      redirect_to process_form_batch_path(@batch), alert: "Please select a return address before processing."
-      return
-    end
-    
-    # Handle template selection for Letter batches
     if @batch.is_a?(Letter::Batch)
+      if @batch.mailer_id.nil?
+        redirect_to process_form_batch_path(@batch), alert: "Please select a USPS Mailer ID before processing."
+        return
+      end
+      if @batch.letter_return_address.nil?
+        redirect_to process_form_batch_path(@batch), alert: "Please select a return address before processing."
+        return
+      end
+
       selected_templates = params[:batch][:template_cycle]
       if selected_templates.blank?
         redirect_to process_form_batch_path(@batch), alert: "Please select at least one template."
         return
       end
       @batch.template_cycle = selected_templates
+      include_qr_code = params[:batch][:include_qr_code] == "1"
     end
 
     # Process the batch with the QR code option if specified
-    include_qr_code = params[:batch][:include_qr_code] == "1"
-    
+
     if @batch.process!(include_qr_code: include_qr_code)
-      # Mark the batch as processed after successful processing
-      @batch.mark_processed! if @batch.may_mark_processed?
       redirect_to @batch, notice: "Batch processed successfully."
     else
       redirect_to @batch, alert: "Failed to process batch."
