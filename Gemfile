@@ -130,3 +130,5 @@ gem "rqrcode", "~> 2.2"
 gem "kaminari", "~> 1.2"
 
 gem "aws-sdk-s3", require: false
+
+gem "acts-as-taggable-array-on", "~> 0.7.0"

@@ -74,6 +74,9 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    acts-as-taggable-array-on (0.7.0)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     administrate (0.19.0)
@@ -556,6 +559,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm (~> 5.5)
+  acts-as-taggable-array-on (~> 0.7.0)
   administrate (~> 0.19.0)
   annotaterb (~> 4.14)
   awesome_print (~> 1.9)
