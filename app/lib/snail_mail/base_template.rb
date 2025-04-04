@@ -73,12 +73,14 @@ module SnailMail
         align: :left,
         valign: :center,
         overflow: :shrink_to_fit,
-        min_font_size: 6
+        min_font_size: 6,
+        disable_wrap_by_char: true,
       }
       
       options = default_options.merge(options)
       font_name = options.delete(:font)
-      
+      stroke = options.delete(:dbg_stroke)
+
       pdf.font(font_name) do
         pdf.text_box(
           letter.address.snailify,
@@ -87,6 +89,9 @@ module SnailMail
           height: height,
           **options
         )
+      end
+      if stroke
+        pdf.stroke {pdf.rectangle([x,y], width, height)}
       end
     end
     
@@ -121,9 +126,9 @@ module SnailMail
       SnailMail::QRCodeGenerator.generate_qr_code(pdf, "https://mail.hack.club/#{letter.public_id}", x, y, size)
     end
 
-    def render_letter_id(pdf, letter, x, y, size, font = 'f25')
+    def render_letter_id(pdf, letter, x, y, size, opts = {})
       return if options[:include_qr_code]
-      pdf.font(font) { pdf.text_box(letter.public_id, at: [x, y], size:, overflow: :shrink_to_fit, valign: :top ) }
+      pdf.font(opts.delete(:font) || 'f25') { pdf.text_box(letter.public_id, at: [x, y], size:, overflow: :shrink_to_fit, valign: :top, **opts) }
     end
     # Helper for path to image assets
     def image_path(image_name)
