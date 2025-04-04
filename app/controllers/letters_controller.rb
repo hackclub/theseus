@@ -89,7 +89,7 @@ class LettersController < ApplicationController
   
   # POST /letters/1/mark_printed
   def mark_printed
-    if @letter.mark_printed
+    if @letter.mark_printed!
       redirect_to @letter, notice: "Letter has been marked as printed."
     else
       redirect_to @letter, alert: "Could not mark letter as printed: #{@letter.errors.full_messages.join(', ')}"
@@ -98,7 +98,7 @@ class LettersController < ApplicationController
   
   # POST /letters/1/mark_mailed
   def mark_mailed
-    if @letter.mark_mailed
+    if @letter.mark_mailed!
       redirect_to @letter, notice: "Letter has been marked as mailed."
     else
       redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(', ')}"
@@ -107,7 +107,7 @@ class LettersController < ApplicationController
   
   # POST /letters/1/mark_received
   def mark_received
-    if @letter.mark_received
+    if @letter.mark_received!
       redirect_to @letter, notice: "Letter has been marked as received."
     else
       redirect_to @letter, alert: "Could not mark letter as received: #{@letter.errors.full_messages.join(', ')}"
