@@ -49,7 +49,7 @@ Faraday::Request.register_middleware usps_refresh: FaradayMiddleware::USPSRefres
 Faraday::Response.register_middleware usps_error: FaradayMiddleware::USPSErrorMiddleware
 
 class USPS::APIService
-  ENVIRONMENT = Rails.env.production? ? :prod : :cat_no_s
+  ENVIRONMENT = Rails.env.production? ? :prod : :tem
 
   class << self
     # Returns the best standardized address for a given address
