@@ -87,4 +87,4 @@ class ReturnAddressDashboard < Administrate::BaseDashboard
   def display_resource(return_address)
     return_address.name
   end
-end 
+end

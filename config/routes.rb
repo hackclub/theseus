@@ -167,10 +167,10 @@ Rails.application.routes.draw do
   resources :return_addresses
   resources :batches do
     member do
-      get '/map', to: "batches#map_fields", as: :map_fields
+      get "/map", to: "batches#map_fields", as: :map_fields
       post :set_mapping
-      get '/process', to: "batches#process_form", as: :process_confirm
-      post '/process', to: "batches#process_batch", as: :process
+      get "/process", to: "batches#process_form", as: :process_confirm
+      post "/process", to: "batches#process_batch", as: :process
       post :mark_printed
       post :mark_mailed
     end

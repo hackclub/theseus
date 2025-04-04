@@ -36,7 +36,7 @@
 #
 class Letter < ApplicationRecord
   include PublicIdentifiable
-  set_public_id_prefix 'ltr'
+  set_public_id_prefix "ltr"
 
   include HasAddress
   include CanBeBatched
@@ -45,7 +45,7 @@ class Letter < ApplicationRecord
   # Add ActiveStorage attachment for the label PDF
   has_one_attached :label
   belongs_to :return_address, optional: true
-  
+
   aasm timestamps: true do
     state :pending, initial: true
     state :printed
@@ -76,22 +76,22 @@ class Letter < ApplicationRecord
   # Generate a label for this letter
   def generate_label(options = {})
     pdf = SnailMail::Service.generate_label(self, options)
-    
+
     # Directly attach the PDF to this letter
     attach_pdf(pdf.render)
-    
+
     # Save the record to persist the attachment
     save
   end
-  
+
   # Directly attach a PDF to this letter
   def attach_pdf(pdf_data)
     io = StringIO.new(pdf_data)
-    
+
     label.attach(
       io: io,
       filename: "label_#{Time.now.to_i}.pdf",
-      content_type: 'application/pdf'
+      content_type: "application/pdf"
     )
   end
 

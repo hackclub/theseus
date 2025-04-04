@@ -7,8 +7,8 @@ class BatchesController < ApplicationController
   PREVIEW_ROWS = 3
 
   BATCH_TYPES = [
-    ['Warehouse', 'Warehouse::Batch'],
-    ['Letter', 'Letter::Batch']
+    [ "Warehouse", "Warehouse::Batch" ],
+    [ "Letter", "Letter::Batch" ]
   ].freeze
 
   # GET /batches or /batches.json
@@ -33,7 +33,7 @@ class BatchesController < ApplicationController
   def create
     @batch_types = BATCH_TYPES
     batch_type = batch_params[:type]
-    
+
     # Validate that the type is one of our allowed types
     unless BATCH_TYPES.map(&:last).include?(batch_type)
       @batch = Batch.new(batch_params.merge(user: current_user))
@@ -56,13 +56,13 @@ class BatchesController < ApplicationController
 
   def set_mapping
     mapping = mapping_params.to_h
-    
+
     # Invert the mapping to get from CSV columns to address fields
     inverted_mapping = mapping.invert
     # ap inverted_mapping
     # Validate required fields
     missing_fields = REQUIRED_FIELDS.reject { |field| inverted_mapping[field].present? }
-    
+
     if missing_fields.any?
       flash.now[:error] = "Please map the following required fields: #{missing_fields.join(', ')}"
       render :map_fields, status: :unprocessable_entity
@@ -142,7 +142,7 @@ class BatchesController < ApplicationController
       redirect_to @batch, alert: "Cannot mark letters as printed. Batch must be a processed letter batch."
     end
   end
-  
+
   def mark_mailed
     if @batch.is_a?(Letter::Batch) && @batch.processed?
       @batch.letters.each do |letter|
@@ -188,25 +188,25 @@ class BatchesController < ApplicationController
       csv_rows = CSV.parse(csv_content)
       @csv_headers = csv_rows.first
       @csv_preview = csv_rows[1..PREVIEW_ROWS] || []
-      
+
       # Get fields based on batch type
       @address_fields = if @batch.is_a?(Letter::Batch)
         # For letter batches, include address fields and rubber_stamps
-        (Address.column_names - ['id', 'created_at', 'updated_at', 'batch_id']) +
-        ['rubber_stamps']
+        (Address.column_names - [ "id", "created_at", "updated_at", "batch_id" ]) +
+        [ "rubber_stamps" ]
       else
         # For other batches, just include address fields
-        (Address.column_names - ['id', 'created_at', 'updated_at'])
+        (Address.column_names - [ "id", "created_at", "updated_at" ])
       end
     end
 
     # Only allow a list of trusted parameters through.
     def batch_params
       params.require(:batch).permit(
-        :csv, 
-        :warehouse_template_id, 
-        :type, 
-        :warehouse_purpose_code_id, 
+        :csv,
+        :warehouse_template_id,
+        :type,
+        :warehouse_purpose_code_id,
         :warehouse_user_facing_title,
         :letter_height,
         :letter_width,

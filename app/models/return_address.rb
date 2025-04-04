@@ -1,17 +1,17 @@
 class ReturnAddress < ApplicationRecord
   include CountryEnumable
   has_country_enum
-  
+
   belongs_to :user, optional: true
-  
+
   # Only validate if the record has at least some data (indicating user attempted to create one)
   with_options if: :partially_filled_out? do |address|
     address.validates_presence_of :name, :line_1, :city, :state, :postal_code, :country
   end
-  
+
   scope :shared, -> { where(shared: true) }
   scope :owned_by, ->(user) { where(user: user) }
-  
+
   # Add an attribute accessor for the from_letter parameter
   attr_accessor :from_letter
 
@@ -29,11 +29,11 @@ class ReturnAddress < ApplicationRecord
     .strip
   end
 
-  
+
   private
-  
+
   # Return true if any fields have been filled out, indicating user's intent to create a return address
   def partially_filled_out?
-    [name, line_1, city, state, postal_code].any?(&:present?)
+    [ name, line_1, city, state, postal_code ].any?(&:present?)
   end
 end

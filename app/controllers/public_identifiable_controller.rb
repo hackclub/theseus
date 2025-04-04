@@ -2,14 +2,14 @@ class PublicIdentifiableController < ApplicationController
   # GET /id/:public_id
   def show
     # The public_id contains the prefix that determines the model class
-    prefix = params[:public_id].split('!').first&.downcase
-    
+    prefix = params[:public_id].split("!").first&.downcase
+
     # Find the corresponding model based on the prefix
     case prefix
-    when 'ltr'
+    when "ltr"
       @record = Letter.find_by_public_id!(params[:public_id])
       redirect_to letter_path(@record)
-    when 'pkg'
+    when "pkg"
       @record = Warehouse::Order.find_by_public_id!(params[:public_id])
       redirect_to warehouse_order_path(@record)
     else
@@ -20,4 +20,4 @@ class PublicIdentifiableController < ApplicationController
     flash[:alert] = "Record not found"
     redirect_to root_path
   end
-end 
+end

@@ -1,6 +1,6 @@
 module ApplicationHelper
   include ButtonHelper
-  
+
   def admin_tool(class_name: "", element: "div", **options, &block)
     return unless current_user&.is_admin?
     concat content_tag(element, class: "admin-tool #{class_name}", **options, &block)
@@ -13,7 +13,7 @@ module ApplicationHelper
 
   def nav_item(path, text, options = {})
     content_tag("li") do
-      link_to path, class: current_page?(path) ? 'active' : '', **options do
+      link_to path, class: current_page?(path) ? "active" : "", **options do
         text
       end
     end
@@ -41,7 +41,7 @@ module ApplicationHelper
     if params[thing]
       link_to "hide #{thing}?", url_for(thing => nil)
     else
-      link_to "show #{thing}?", url_for(thing => 'yeah')
+      link_to "show #{thing}?", url_for(thing => "yeah")
     end
   end
 

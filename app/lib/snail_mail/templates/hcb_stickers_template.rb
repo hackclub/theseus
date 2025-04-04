@@ -1,7 +1,6 @@
 module SnailMail
   module Templates
     class HCBStickersTemplate < BaseTemplate
-
       def self.template_name
         "HCB Stickers"
       end
@@ -9,8 +8,8 @@ module SnailMail
 
       def render(pdf, letter)
         pdf.image(
-          image_path('lilia-hcb-stickers-bg.png'),
-          at: [0, 288],
+          image_path("lilia-hcb-stickers-bg.png"),
+          at: [ 0, 288 ],
           width: 432
         )
 
@@ -39,7 +38,6 @@ module SnailMail
         render_imb(pdf, letter, 191, 87, 226)
 
         render_letter_id(pdf, letter, 341, 19, 10)
-
       end
     end
   end

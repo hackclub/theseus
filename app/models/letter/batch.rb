@@ -34,15 +34,15 @@
 #  fk_rails_...  (warehouse_template_id => warehouse_templates.id)
 #
 class Letter::Batch < Batch
-  self.inheritance_column = 'type'
+  self.inheritance_column = "type"
   # default_scope { where(type: 'letters') }
   has_many :letters, dependent: :destroy
-  belongs_to :mailer_id, class_name: 'USPS::MailerId', foreign_key: 'letter_mailer_id_id', optional: true
-  belongs_to :letter_return_address, class_name: 'ReturnAddress', optional: true
-  
+  belongs_to :mailer_id, class_name: "USPS::MailerId", foreign_key: "letter_mailer_id_id", optional: true
+  belongs_to :letter_return_address, class_name: "ReturnAddress", optional: true
+
   # Add ActiveStorage attachment for the batch label PDF
   has_one_attached :pdf_label
-  
+
   # Add batch-level letter specifications
   attribute :letter_height, :decimal
   attribute :letter_width, :decimal
@@ -60,11 +60,11 @@ class Letter::Batch < Batch
   # Directly attach a PDF to this batch
   def attach_pdf(pdf_data)
     io = StringIO.new(pdf_data)
-    
+
     pdf_label.attach(
       io: io,
       filename: "label_batch_#{Time.now.to_i}.pdf",
-      content_type: 'application/pdf'
+      content_type: "application/pdf"
     )
   end
 
@@ -72,7 +72,7 @@ class Letter::Batch < Batch
     return false unless fields_mapped?
     # Generate PDF labels with the provided options
     generate_labels(options)
-    
+
     mark_processed!
   end
 
@@ -84,7 +84,7 @@ class Letter::Batch < Batch
 
   def address_fields
     # Only include address fields and rubber_stamps for letter mapping
-    ['rubber_stamps']
+    [ "rubber_stamps" ]
   end
 
   def build_mapping(row)
@@ -95,39 +95,39 @@ class Letter::Batch < Batch
       height: letter_height,
       width: letter_width,
       weight: letter_weight,
-      recipient_email: row[field_mapping['email']],
+      recipient_email: row[field_mapping["email"]],
       address: address,
       usps_mailer_id: mailer_id,
       return_address: letter_return_address,
-      rubber_stamps: row[field_mapping['rubber_stamps']]
+      rubber_stamps: row[field_mapping["rubber_stamps"]]
     )
   end
 
   def generate_labels(options = {})
     return unless letters.any?
-    
+
     # Preload associations to avoid N+1 queries
     preloaded_letters = letters.includes(:address, :usps_mailer_id)
-    
+
     # Build options for label generation
     label_options = {}
-    
+
     # Add template information
     if template_cycle.present?
       label_options[:template_cycle] = template_cycle
     elsif template.present?
       label_options[:template] = template
     end
-    
+
     # Use the SnailMail service to generate labels
     pdf = SnailMail::Service.generate_batch_labels(
       preloaded_letters,
       label_options.merge(options)
     )
-    
+
     # Directly attach the PDF to this batch
     attach_pdf(pdf.render)
-    
+
     # Return the PDF
     pdf
   end

@@ -1,7 +1,6 @@
 module SnailMail
   module Templates
     class MailOrpheusTemplate < BaseTemplate
-
       def self.template_name
         "Mail Orpheus!"
       end
@@ -9,8 +8,8 @@ module SnailMail
 
       def render(pdf, letter)
         pdf.image(
-          image_path('eleeza-mail-orpheus.png'),
-          at: [320, 113],
+          image_path("eleeza-mail-orpheus.png"),
+          at: [ 320, 113 ],
           width: 106.4
         )
 
@@ -43,4 +42,4 @@ module SnailMail
       end
     end
   end
-end 
+end

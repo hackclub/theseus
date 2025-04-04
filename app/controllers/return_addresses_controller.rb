@@ -1,5 +1,5 @@
 class ReturnAddressesController < ApplicationController
-  before_action :set_return_address, only: [:show, :edit, :update, :destroy]
+  before_action :set_return_address, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @return_addresses = ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
@@ -35,7 +35,7 @@ class ReturnAddressesController < ApplicationController
 
   def update
     authorize @return_address
-    
+
     if @return_address.update(return_address_params)
       redirect_to @return_address, notice: "Return address was successfully updated."
     else
@@ -45,7 +45,7 @@ class ReturnAddressesController < ApplicationController
 
   def destroy
     authorize @return_address
-    
+
     @return_address.destroy
     redirect_to return_addresses_url, notice: "Return address was successfully destroyed."
   end
@@ -59,4 +59,4 @@ class ReturnAddressesController < ApplicationController
   def return_address_params
     params.require(:return_address).permit(:name, :line_1, :line_2, :city, :state, :postal_code, :country, :shared, :user_id)
   end
-end 
+end

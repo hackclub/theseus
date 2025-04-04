@@ -5,10 +5,10 @@ class LettersController < ApplicationController
   def index
     # Get all letters with their associations
     @all_letters = Letter.includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
-    
+
     # Get unbatched letters with pagination
     @unbatched_letters = @all_letters.not_in_batch.page(params[:page]).per(20)
-    
+
     # Get batched letters grouped by batch
     @batched_letters = @all_letters.in_batch.group_by(&:batch)
   end
@@ -61,7 +61,7 @@ class LettersController < ApplicationController
   def generate_label
     template = params[:template]
     include_qr_code = params[:qr].present?
-    
+
     # Generate label with specified template
     begin
       # Let the model method handle saving itself
@@ -82,11 +82,11 @@ class LettersController < ApplicationController
   end
 
   def preview_template
-    template = params['template']
-    include_qr_code = params['qr'].present?
-    send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code:  }).render, type: 'application/pdf', disposition: 'inline'
+    template = params["template"]
+    include_qr_code = params["qr"].present?
+    send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code:  }).render, type: "application/pdf", disposition: "inline"
   end
-  
+
   # POST /letters/1/mark_printed
   def mark_printed
     if @letter.mark_printed!
@@ -95,7 +95,7 @@ class LettersController < ApplicationController
       redirect_to @letter, alert: "Could not mark letter as printed: #{@letter.errors.full_messages.join(', ')}"
     end
   end
-  
+
   # POST /letters/1/mark_mailed
   def mark_mailed
     if @letter.mark_mailed!
@@ -104,7 +104,7 @@ class LettersController < ApplicationController
       redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(', ')}"
     end
   end
-  
+
   # POST /letters/1/mark_received
   def mark_received
     if @letter.mark_received!

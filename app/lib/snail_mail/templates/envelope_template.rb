@@ -1,4 +1,4 @@
-require_relative '../base_template'
+require_relative "../base_template"
 
 module SnailMail
   module Templates
@@ -6,11 +6,11 @@ module SnailMail
       def self.template_name
         "envelope"
       end
-      
+
       def self.template_size
         :envelope # Use the envelope size from BaseTemplate::SIZES
       end
-      
+
       def self.template_description
         "Standard #10 business envelope template"
       end
@@ -18,28 +18,28 @@ module SnailMail
       def render(pdf, letter)
         # Render return address in top left
         render_return_address(pdf, letter, 15, 4 * 72 - 30, 250, 60)
-        
+
         # Render destination address centered
         render_destination_address(
-          pdf, 
-          letter, 
+          pdf,
+          letter,
           4.5 * 72 - 150, # Centered horizontally
-          2.5 * 72, # Centered vertically 
+          2.5 * 72, # Centered vertically
           300,  # Width
           120,  # Height
-          { 
-            size: 12, 
+          {
+            size: 12,
             valign: :center,
-            align: :center 
+            align: :center
           }
         )
-        
+
         # Render IMb barcode at bottom
         render_imb(pdf, letter, 72, 30, 7 * 72, 30)
-        
+
         # Render QR code in bottom left
         render_qr_code(pdf, letter, 15, 70, 60)
       end
     end
   end
-end 
+end
