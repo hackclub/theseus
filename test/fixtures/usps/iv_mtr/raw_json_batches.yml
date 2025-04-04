@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  events: 
+  processed: false
+  message_group_id: MyString
+
+two:
+  events: 
+  processed: false
+  message_group_id: MyString

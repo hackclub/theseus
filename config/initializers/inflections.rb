@@ -23,4 +23,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "HCB"
   inflect.acronym "IV"
   inflect.acronym "MTR"
+  inflect.acronym "JSON"
 end
