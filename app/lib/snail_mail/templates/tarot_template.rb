@@ -56,6 +56,7 @@ module SnailMail
         render_imb(pdf, letter, 216, 25, 207)
         render_letter_id(pdf, letter, 3, 15, 8, rotate: 90)
         render_qr_code(pdf, letter, 7, 72 + 7, 72)
+        render_postage(pdf, letter)
       end
     end
   end

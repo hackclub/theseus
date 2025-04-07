@@ -39,6 +39,7 @@ module SnailMail
 
         # Render QR code for tracking
         render_qr_code(pdf, letter, 7, 67, 60)
+        render_postage(pdf, letter)
       end
     end
   end
