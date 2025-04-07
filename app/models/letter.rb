@@ -187,7 +187,8 @@ class Letter < ApplicationRecord
         USPS::PricingEngine.fcmi_price(
           processing_category,
           weight,
-          address.country
+          address.country,
+          non_machinable
         )
       end
     end
