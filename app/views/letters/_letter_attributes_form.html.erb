@@ -27,6 +27,24 @@
                            value: 1,
                            class: "form-control" %>
       </div>
+
+      <div class="form-group">
+        <%= form.label is_batch ? :letter_processing_category : :processing_category, "Processing Category", class: "form-label" %>
+        <%= form.select is_batch ? :letter_processing_category : :processing_category, 
+          Letter.processing_categories.keys.map { |k| [k.humanize, k.to_sym] },
+          { selected: :letter },
+          { class: "form-control", required: true } %>
+      </div>
+
+      <% unless local_assigns[:is_batch] %>
+        <div class="form-group">
+          <%= form.label :mailing_date, class: "form-label" %>
+          <%= form.date_field :mailing_date, 
+            value: form.object.mailing_date || form.object.default_mailing_date,
+            min: Date.current,
+            class: "form-control" %>
+        </div>
+      <% end %>
     </div>
     
     <div class="preset-buttons mt-2 mb-4">

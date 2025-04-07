@@ -583,6 +583,7 @@ DEPENDENCIES
   kaminari (~> 1.2)
   letter_opener_web (~> 3.0)
   net-http (~> 0.6.0)
+  nokogiri (~> 1.18)
   norairrecord (~> 0.3.0)
   oauth2 (~> 2.0)
   pg (~> 1.1)

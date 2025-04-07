@@ -27,6 +27,10 @@ Rails.application.configure do
     sync_orders: {
       cron: "*/8 * * * *",
       class: "TableSync::OrderSyncJob"
+    },
+    usps_pocketwatch: {
+      cron: "0 5 * * *",  # 5:00 UTC = midnight EST
+      class: "USPS::PaymentAccount::PocketWatchJob"
     }
   }
 end

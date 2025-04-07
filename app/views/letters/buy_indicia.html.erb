@@ -1,0 +1,46 @@
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">Buy Indicia for Letter #<%= @letter.id %></h1>
+
+  <div class="card mb-6">
+    <div class="card-body">
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <span class="text-gray-500">Recipient:</span>
+          <div class="font-medium"><%= @letter.address.display_name %></div>
+          <div><%= @letter.address.line_1 %></div>
+          <% if @letter.address.line_2.present? %>
+            <div><%= @letter.address.line_2 %></div>
+          <% end %>
+          <div><%= @letter.address.city %>, <%= @letter.address.state %> <%= @letter.address.postal_code %></div>
+          <div><%= @letter.address.country %></div>
+        </div>
+        <div>
+          <span class="text-gray-500">Dimensions:</span>
+          <div><%= @letter.height %> × <%= @letter.width %> in</div>
+          <span class="text-gray-500">Weight:</span>
+          <div><%= @letter.weight %> oz</div>
+          <% if @letter.non_machinable? %>
+            <div class="text-yellow-600">Non-machinable</div>
+          <% end %>
+        </div>
+      </div>
+
+      <%= form_with(url: buy_indicia_letter_path(@letter), method: :post, class: "form-container") do |form| %>
+        <div class="form-group">
+          <%= form.label :usps_payment_account_id, "USPS Payment Account", class: "form-label" %>
+          <%= form.collection_select :usps_payment_account_id, 
+            USPS::PaymentAccount.all, 
+            :id, 
+            :name, 
+            { prompt: "Select a payment account", selected: USPS::PaymentAccount.first&.id },
+            { class: "form-control", required: true } %>
+        </div>
+
+        <div class="form-actions mt-6">
+          <%= form.submit "Buy Indicia", class: "btn btn-primary" %>
+          <%= link_to "Cancel", @letter, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div> 

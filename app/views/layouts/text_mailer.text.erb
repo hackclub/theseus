@@ -1,0 +1,8 @@
+<%= {
+      transactionalId: "cm97n3xyr01pwo99pr66jkx4v",
+      email: @recipient,
+      dataVariables: {
+        subject: @subject,
+        body: yield.html_safe
+      }
+    }.to_json %>

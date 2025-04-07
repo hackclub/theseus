@@ -130,3 +130,5 @@ gem "rqrcode", "~> 2.2"
 gem "kaminari", "~> 1.2"
 
 gem "aws-sdk-s3", require: false
+
+gem "nokogiri", "~> 1.18"

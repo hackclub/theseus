@@ -52,6 +52,7 @@ module SnailMail
 
         # Render QR code in bottom left with smaller size
         render_qr_code(pdf, letter, 25, 70, 50)
+        render_postage(pdf, letter)
       end
     end
   end

@@ -58,21 +58,67 @@
         </div>
         
         <h3 class="text-sm font-medium mb-2">Specifications</h3>
-        <div class="grid md:grid-cols-3 gap-3 mb-4 text-sm">
-          <div>
-            <span class="text-gray-500">Dimensions:</span>
-            <%= @letter.height %> × <%= @letter.width %> in
+        <%= render 'shared/letter_attributes', record: @letter %>
+        
+        <h3 class="text-sm font-medium mb-2">Postage Information</h3>
+        <div class="card mb-4">
+          <div class="card-body p-3">
+            <% if @letter.postage_type == "indicia" %>
+              <% if @letter.usps_indicium.present? %>
+                <%= render 'admin_inspector', record: @letter.usps_indicium %>
+                <div class="grid md:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span class="text-gray-500">Postage Type:</span>
+                    Indicia (Metered)
+                  </div>
+                  <div>
+                    <span class="text-gray-500">Cost:</span>
+                    <%= number_to_currency(@letter.usps_indicium.cost) %>
+                   (<%= number_to_currency(@letter.usps_indicium.postage) %> postage + <%= number_to_currency(@letter.usps_indicium.fees || 0) %> fees)
+
+                  </div>
+                  <div>
+                    <span class="text-gray-500">Mailing Date:</span>
+                    <%= @letter.usps_indicium.mailing_date %>
+                  </div>
+                  <div>
+                    <span class="text-gray-500">USPS SKU:</span>
+                    <%= @letter.usps_indicium.usps_sku %>
+                  </div>
+                </div>
+              <% else %>
+                <div class="text-sm mb-3">
+                  <span class="text-gray-500">Postage Type:</span>
+                  Indicia (Metered) - Not Purchased Yet
+                </div>
+                <% if @letter.batch_id.nil? %>
+                  <div class="flex items-center gap-4">
+                    <%= form_with(url: buy_indicia_letter_path(@letter), method: :post, class: "flex items-center gap-4") do |form| %>
+                      <div class="form-group">
+                        <%= form.collection_select :usps_payment_account_id, 
+                          USPS::PaymentAccount.all, 
+                          :id, 
+                          :name, 
+                          { prompt: "Select a payment account", selected: USPS::PaymentAccount.first&.id },
+                          { class: "form-control", required: true } %>
+                      </div>
+                      <%= form.submit "Buy Indicia", class: "button primary" %>
+                    <% end %>
+                  </div>
+                <% end %>
+              <% end %>
+            <% else %>
+              <div class="text-sm mb-3">
+                <span class="text-gray-500">Postage Type:</span>
+                Stamps
+                <% if @letter.batch_id.nil? %>
+                  <div class="mt-2">
+                    <%= button_to "Switch to Indicia", letter_path(@letter), method: :patch, params: { letter: { postage_type: "indicia" } }, class: "button primary" %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
           </div>
-          <div>
-            <span class="text-gray-500">Weight:</span>
-            <%= @letter.weight %> oz
-          </div>
-          <% if @letter.batch_id? %>
-            <div>
-              <span class="text-gray-500">Batch:</span>
-              #<%= @letter.batch_id %>
-            </div>
-          <% end %>
         </div>
         
         <% if @letter.batch.present? %>
