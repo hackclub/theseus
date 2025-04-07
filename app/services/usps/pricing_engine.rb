@@ -75,7 +75,7 @@ module USPS
             ca: 8.27,
             mx: 14.10,
             other: 17.53
-          },
+          }
         }
       }
       FCMI_NON_MACHINABLE_SURCHARGE = 0.46
@@ -129,44 +129,44 @@ module USPS
       def metered_price(processing_category, weight, non_machinable = false)
         type = processing_category.to_sym
         rates = case type
-                when :letter
+        when :letter
                   US_LETTER_RATES
-                when :flat
+        when :flat
                   US_FLAT_RATES
-                else
+        else
                   raise ArgumentError, "type must be :letter or :flat"
-                end
+        end
 
         rate = rates.find { |k, v| weight <= k }&.last
         raise ArgumentError, "#{weight} oz is too heavy for a #{type}" unless rate
-        
+
         if non_machinable
           raise ArgumentError, "only letters can be non-machinable!" unless type == :letter
           rate += FCMI_NON_MACHINABLE_SURCHARGE
         end
-        
+
         rate
       end
 
       def domestic_stamp_price(processing_category, weight, non_machinable = false)
         type = processing_category.to_sym
         rates = case type
-                when :letter
+        when :letter
                   US_STAMP_LETTER_RATES
-                when :flat
+        when :flat
                   US_STAMP_FLAT_RATES
-                else
+        else
                   raise ArgumentError, "type must be :letter or :flat"
-                end
+        end
 
         rate = rates.find { |k, v| weight <= k }&.last
         raise ArgumentError, "#{weight} oz is too heavy for a #{type}" unless rate
-        
+
         if non_machinable
           raise ArgumentError, "only letters can be non-machinable!" unless type == :letter
           rate += FCMI_NON_MACHINABLE_SURCHARGE
         end
-        
+
         rate
       end
 
@@ -176,13 +176,13 @@ module USPS
 
         raise ArgumentError, "idk the rates for #{type}..." unless rates
         country = case country
-                  when "CA"
+        when "CA"
                     :ca
-                  when "MX"
+        when "MX"
                     :mx
-                  else
+        else
                     :other
-                  end
+        end
 
         rate = rates.find { |k, v| weight <= k }&.dig(1)
         raise "#{weight} oz is too heavy for an FCMI #{type}" unless rate
@@ -203,4 +203,4 @@ module USPS
       end
     end
   end
-end 
+end

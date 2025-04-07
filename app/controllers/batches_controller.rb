@@ -86,7 +86,7 @@ class BatchesController < ApplicationController
 
   def process_batch
     @batch = Batch.find(params[:id])
-    
+
     if request.post?
       Rails.logger.debug "Batch params: #{batch_params.inspect}"
       if @batch.is_a?(Letter::Batch)
@@ -99,11 +99,11 @@ class BatchesController < ApplicationController
         @batch.letter_mailing_date = batch_params[:letter_mailing_date]
         Rails.logger.debug "Setting mailing date to: #{@batch.letter_mailing_date}"
         @batch.save! # Save the mailing date before processing
-        
+
         # Only require payment account if indicia is selected
         if batch_params[:us_postage_type] == "indicia" || batch_params[:intl_postage_type] == "indicia"
           payment_account = USPS::PaymentAccount.find_by(id: batch_params[:usps_payment_account_id])
-          
+
           if payment_account.nil?
             redirect_to process_batch_path(@batch), alert: "Please select a valid payment account when using indicia"
             return

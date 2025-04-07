@@ -75,7 +75,7 @@ class Letter::Batch < Batch
 
   def process!(options = {})
     return false unless fields_mapped?
-    
+
     # Set postage types for all letters based on options
     if options[:us_postage_type].present? || options[:intl_postage_type].present?
       letters.each do |letter|
@@ -90,7 +90,7 @@ class Letter::Batch < Batch
     end
 
     # Purchase indicia for all letters if needed
-    if options[:payment_account].present? && 
+    if options[:payment_account].present? &&
        (options[:us_postage_type] == "indicia" || options[:intl_postage_type] == "indicia")
       # Check if there are sufficient funds before processing
       indicia_cost = letters.includes(:address).sum do |letter|
@@ -113,11 +113,11 @@ class Letter::Batch < Batch
           0
         end
       end
-      
+
       unless options[:payment_account].check_funds_available(indicia_cost)
         raise "...we're out of money (ask Nora to put at least #{ActiveSupport::NumberHelper.number_to_currency(indicia_cost)} in the #{options[:payment_account].display_name} account!)"
       end
-      
+
       purchase_batch_indicia(options[:payment_account])
     end
 
@@ -213,7 +213,7 @@ class Letter::Batch < Batch
           letter.weight,
           letter.non_machinable
         )
-        
+
         # Indicia price is metered_price
         indicia_price = if letter.usps_indicium.present?
           letter.usps_indicium.postage
@@ -224,7 +224,7 @@ class Letter::Batch < Batch
             letter.non_machinable
           )
         end
-        
+
         # Difference should be negative (savings)
         differences[:us] += indicia_price - retail_price
       else
@@ -235,7 +235,7 @@ class Letter::Batch < Batch
           letter.weight,
           letter.address.country
         )
-        
+
         # Indicia price is flirted price (higher than retail)
         indicia_price = if letter.usps_indicium.present?
           letter.usps_indicium.postage
@@ -248,7 +248,7 @@ class Letter::Batch < Batch
             flirted[:non_machinable]
           )
         end
-        
+
         # Difference should be positive (additional cost)
         differences[:intl] += indicia_price - retail_price
       end
@@ -262,9 +262,9 @@ class Letter::Batch < Batch
   end
 
   def default_mailing_date
-    now = Time.current.in_time_zone('Eastern Time (US & Canada)')
+    now = Time.current.in_time_zone("Eastern Time (US & Canada)")
     today = now.to_date
-    
+
     # If it's before 4PM EST on a business day, default to today
     if now.hour < 16 && today.on_weekday?
       today

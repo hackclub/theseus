@@ -221,7 +221,7 @@ class USPS::APIService
         },
         {
           "X-Payment-Authorization-Token" => payment_token,
-          "Accept" => "application/vnd.usps.labels+json",
+          "Accept" => "application/vnd.usps.labels+json"
         },
       ).body
     end

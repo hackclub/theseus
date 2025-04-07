@@ -28,12 +28,12 @@ module USPS
                 # Special case: if amount is a whole dollar, prefer $1 stamps
                 if remaining == remaining.floor
                     count = remaining.floor
-                    return [{ name: "$1 stamp", count: count, value: 1.00 }] if count > 0
+                    return [ { name: "$1 stamp", count: count, value: 1.00 } ] if count > 0
                 end
 
                 # First try to use the largest possible stamp
                 all_stamps = (COMMON_STAMPS + UNCOMMON_STAMPS).sort_by { |s| -s[:value] }
-                
+
                 all_stamps.each do |stamp|
                     next if stamp[:value] > remaining
                     count = (remaining / stamp[:value]).floor
@@ -58,50 +58,50 @@ module USPS
             def find_optimal_stamp_combination(amount)
                 remaining = amount.round(2)
                 all_stamps = (COMMON_STAMPS + UNCOMMON_STAMPS).sort_by { |s| -s[:value] }
-                
+
                 # Initialize memoization table
                 memo = {}
-                
+
                 def self.min_stamps(amount, stamps, memo)
                     return [] if amount == 0
                     return nil if amount < 0
-                    
+
                     # Check if we've already computed this amount
                     return memo[amount] if memo.key?(amount)
-                    
+
                     best_combination = nil
                     min_count = Float::INFINITY
-                    
+
                     stamps.each do |stamp|
                         next if stamp[:value] > amount
-                        
+
                         # Try using this stamp
                         remaining = (amount - stamp[:value]).round(2)
                         sub_combination = min_stamps(remaining, stamps, memo)
-                        
+
                         if sub_combination
-                            current_combination = [stamp] + sub_combination
+                            current_combination = [ stamp ] + sub_combination
                             if current_combination.size < min_count
                                 min_count = current_combination.size
                                 best_combination = current_combination
                             end
                         end
                     end
-                    
+
                     memo[amount] = best_combination
                     best_combination
                 end
-                
+
                 combination = min_stamps(remaining, all_stamps, memo)
-                
+
                 return nil if combination.nil?
-                
+
                 # Group and count the stamps, then sort by count (descending)
                 grouped = combination.group_by { |s| s[:name] }
                 result = grouped.map do |name, stamps|
                     { name: "#{name} stamp", count: stamps.count, value: stamps.first[:value] }
                 end.sort_by { |s| -s[:count] }
-                
+
                 result
             end
         end

@@ -2,7 +2,7 @@ module SnailMail
   module FIM
     class << self
       FIM_D = [
-        1,1,1,0,1,0,1,1,1
+        1, 1, 1, 0, 1, 0, 1, 1, 1
       ]
 
       FIM_HEIGHT = 45
@@ -16,7 +16,7 @@ module SnailMail
         pdf.fill do
           lx = 0
           fim.each do |e|
-            pdf.rectangle([x + lx, pdf.bounds.height], FIM_ELEMENT_WIDTH, FIM_HEIGHT) if e == 1
+            pdf.rectangle([ x + lx, pdf.bounds.height ], FIM_ELEMENT_WIDTH, FIM_HEIGHT) if e == 1
             lx += FIM_ELEMENT_WIDTH * 2 # 1 for bar, 1 for spacer
           end
         end

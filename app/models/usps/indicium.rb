@@ -50,7 +50,7 @@ class USPS::Indicium < ApplicationRecord
                         thickness: 0.1,
                         non_machinable_indicators: letter.non_machinable? ? { isRigid: true } : nil
                       }
-                    else
+    else
                       flirted = true
                       attrs = letter.flirt
 
@@ -60,9 +60,9 @@ class USPS::Indicium < ApplicationRecord
                         non_machinable_indicators: attrs[:non_machinable] ? { isRigid: true } : nil,
                         length: 7,
                         height: 5,
-                        thickness: 0.1,
+                        thickness: 0.1
                       }
-                    end.compact
+    end.compact
 
     response = USPS::APIService.create_fcm_indicia(
       payment_token:,

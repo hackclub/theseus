@@ -1,6 +1,5 @@
 module SnailMail
   class BaseTemplate
-
     include SnailMail::Helpers
 
     # Template sizes in points [width, height]
@@ -155,7 +154,7 @@ module SnailMail
       else
         postage_amount = letter.postage
         stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
-        
+
         requested_stamps = if stamps.size == 1
           stamp = stamps.first
           "#{stamp[:count]} #{stamp[:name]}"
@@ -168,18 +167,18 @@ module SnailMail
             else
               "#{stamp[:count]} #{stamp[:name]}"
             end
-          end.join(', ')
+          end.join(", ")
         end
 
         postage_info = <<~EOT
           i take #{ActiveSupport::NumberHelper.number_to_currency(postage_amount)} in postage, so #{requested_stamps}
         EOT
 
-        pdf.bounding_box([pdf.bounds.right - 55, pdf.bounds.top - 5], width: 50, height: 50) do
+        pdf.bounding_box([ pdf.bounds.right - 55, pdf.bounds.top - 5 ], width: 50, height: 50) do
           pdf.font("f25") do
           pdf.text_box(
             postage_info,
-            at: [1, 48],
+            at: [ 1, 48 ],
             width: 48,
             height: 45,
             size: 8,
@@ -191,7 +190,5 @@ module SnailMail
         end
       end
     end
-
-
   end
 end

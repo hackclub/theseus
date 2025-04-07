@@ -1,7 +1,6 @@
 module SnailMail
   class IMI
     class << self
-
       include SnailMail::Helpers
 
       def render_indicium(pdf, letter, indicium, x = 294, options = {})
@@ -14,19 +13,19 @@ module SnailMail
         raise "failed to decode imi png -_-" unless imi_png.present?
         pdf.image(
           StringIO.new(imi_png),
-          at: [x+79, 280],
+          at: [ x+79, 280 ],
           width: 51
         )
-        pdf.bounding_box([x, 277], width: 90, height: 45) do
+        pdf.bounding_box([ x, 277 ], width: 90, height: 45) do
           pdf.font_size(8)
           pdf.text("U.S. POSTAGE IMI", style: :bold)
           pdf.text(letter.mailing_date.strftime("%m/%d/%Y")) unless options[:no_indicia_date]
           pdf.text(ActiveSupport::NumberHelper.number_to_currency(indicium.cost))
           pdf.text("LFP", style: :bold)
-          pdf.font('f25') { pdf.text("#{Rails.env.production? ? "hackapost" : "DEV"}!/#{indicium.hashid}", size: 6.2) }
+          pdf.font("f25") { pdf.text("#{Rails.env.production? ? "hackapost" : "DEV"}!/#{indicium.hashid}", size: 6.2) }
         end
 
-        pdf.image(StringIO.new(WATERMARK), at: [300, 283], width: 121) unless Rails.env.production?
+        pdf.image(StringIO.new(WATERMARK), at: [ 300, 283 ], width: 121) unless Rails.env.production?
       rescue StandardError => e
         render_no_indicium(pdf, letter, e.class == StandardError ? e.message : "#{e.class}: #{e.message}")
       end
@@ -43,9 +42,9 @@ module SnailMail
         pdf.image(
           image_path("no_indicium.png"),
           width: 144,
-          at: [432 - 144, 288],
+          at: [ 432 - 144, 288 ],
         )
-        pdf.text_box(error_text, at: [256, 280], width: 90, height: 65, overflow: :shrink_to_fit, size: 8)
+        pdf.text_box(error_text, at: [ 256, 280 ], width: 90, height: 65, overflow: :shrink_to_fit, size: 8)
       end
 
       WATERMARK = Base64.decode64 <<~EOI

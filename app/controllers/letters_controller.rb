@@ -151,7 +151,7 @@ class LettersController < ApplicationController
       redirect_to @letter, alert: "Please select a valid payment account."
       return
     end
-    
+
     indicium = USPS::Indicium.new(letter: @letter, payment_account: payment_account)
     begin
       indicium.buy!

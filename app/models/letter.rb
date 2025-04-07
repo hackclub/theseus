@@ -118,8 +118,8 @@ class Letter < ApplicationRecord
     indicia: 1
   }, instance_methods: false
 
-  has_one :usps_indicium, class_name: 'USPS::Indicium'
-  
+  has_one :usps_indicium, class_name: "USPS::Indicium"
+
   attribute :mailing_date, :date
   validates :mailing_date, presence: true, if: -> { postage_type == "indicia" }
   validate :mailing_date_not_in_past, if: -> { mailing_date.present? }
@@ -136,7 +136,7 @@ class Letter < ApplicationRecord
   def default_mailing_date
     now = Time.current
     today = now.to_date
-    
+
     # If it's before 4PM on a business day, default to today
     if now.hour < 16 && today.on_weekday?
       today
@@ -150,7 +150,7 @@ class Letter < ApplicationRecord
       next_business_day
     end
   end
-  
+
   private
 
   def set_postage
