@@ -92,6 +92,32 @@ class Letter::Batch < Batch
     # Purchase indicia for all letters if needed
     if options[:payment_account].present? && 
        (options[:us_postage_type] == "indicia" || options[:intl_postage_type] == "indicia")
+      # Check if there are sufficient funds before processing
+      indicia_cost = letters.includes(:address).sum do |letter|
+        if letter.postage_type == "indicia"
+          if letter.address.us?
+            USPS::PricingEngine.metered_price(
+              letter.processing_category,
+              letter.weight,
+              letter.non_machinable
+            )
+          else
+            flirted = letter.flirt
+            USPS::PricingEngine.metered_price(
+              flirted[:processing_category],
+              flirted[:weight],
+              flirted[:non_machinable]
+            )
+          end
+        else
+          0
+        end
+      end
+      
+      unless options[:payment_account].check_funds_available(indicia_cost)
+        raise "...we're out of money (ask Nora to put at least #{ActiveSupport::NumberHelper.number_to_currency(indicia_cost)} in the #{options[:payment_account].display_name} account!)"
+      end
+      
       purchase_batch_indicia(options[:payment_account])
     end
 
