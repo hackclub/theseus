@@ -92,7 +92,7 @@ gem "easypost", "~> 6.4"
 
 gem "pundit", "~> 2.5"
 
-gem "tailwindcss-ruby", "~> 4.0"
+gem "tailwindcss-ruby", "~> 4.1"
 
 gem "tailwindcss-rails", "~> 4.2"
 
