@@ -1,7 +1,10 @@
 module USPS
   class USPSError < StandardError; end
+
   class NotFound < USPSError; end
+
   class NxAddress < NotFound; end
+
   class NxZIP < NotFound; end
 end
 
@@ -228,6 +231,10 @@ class USPS::APIService
     # @return [String] USPS v3 payment account token
     def create_payment_token(roles:)
       conn.post("/payments/v3/payment-authorization", { roles: }).body.dig(:paymentAuthorizationToken)
+    end
+
+    def payment_account_inquiry(account_number:, account_type:, permit_zip: nil, amount: nil)
+      conn.get("/payments/v3/payment-account/#{account_number}", { accountType: account_type, permitZip: permit_zip, amount: }.compact_blank).body
     end
 
     private

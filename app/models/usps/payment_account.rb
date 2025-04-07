@@ -30,6 +30,7 @@ class USPS::PaymentAccount < ApplicationRecord
     # METER: 2 # someday.... someday i will be a PC Postage vendor..,,,..,
   }
 
+
   def display_name
     case account_type
     when "EPS"
@@ -40,6 +41,8 @@ class USPS::PaymentAccount < ApplicationRecord
       name
     end
   end
+
+  alias_method :to_s, :display_name
 
   def obscured_last_4(text)
     last_4 = text.to_s[-4..]
@@ -78,5 +81,14 @@ class USPS::PaymentAccount < ApplicationRecord
       }
     ]
     USPS::APIService.create_payment_token(roles:)
+  end
+
+  def check_funds_available(amount)
+    USPS::APIService.payment_account_inquiry(
+      account_number:,
+      account_type: account_type.to_s,
+      permit_zip:,
+      amount:
+    )[:sufficientFunds]
   end
 end
