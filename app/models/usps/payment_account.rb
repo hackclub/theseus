@@ -77,7 +77,6 @@ class USPS::PaymentAccount < ApplicationRecord
         manifestMID: manifest_mid || usps_mailer_id.mid
       }
     ]
-    pp roles
     USPS::APIService.create_payment_token(roles:)
   end
 end

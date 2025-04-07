@@ -1,0 +1,12 @@
+  <div class="form-group">
+    <%= form.label :letter_weight, "Weight (oz)", class: "form-label" %>
+    <%= form.number_field :letter_weight, step: 0.1, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :mailing_date, class: "form-label" %>
+    <%= form.date_field :mailing_date, 
+      value: @batch.mailing_date || @batch.default_mailing_date,
+      min: Date.current,
+      class: "form-control" %>
+  </div> 

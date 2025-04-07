@@ -47,11 +47,16 @@ class Letter::Batch < Batch
   attribute :letter_height, :decimal
   attribute :letter_width, :decimal
   attribute :letter_weight, :decimal
+  attribute :letter_processing_category, :integer
   attr_accessor :template, :template_cycle
+  attribute :letter_mailing_date, :date
 
   validates :letter_height, :letter_width, :letter_weight, presence: true, numericality: { greater_than: 0 }
   validates :mailer_id, presence: true
   validates :letter_return_address, presence: true, on: :process
+  validates :letter_mailing_date, presence: true, on: :process
+  validate :mailing_date_not_in_past, if: -> { letter_mailing_date.present? }
+  validates :letter_processing_category, presence: true
 
   def self.model_name
     Batch.model_name
@@ -70,14 +75,182 @@ class Letter::Batch < Batch
 
   def process!(options = {})
     return false unless fields_mapped?
+    
+    # Set postage types for all letters based on options
+    if options[:us_postage_type].present? || options[:intl_postage_type].present?
+      letters.each do |letter|
+        letter.mailing_date = letter_mailing_date
+        if letter.address.us?
+          letter.postage_type = options[:us_postage_type] == "indicia" ? :indicia : :stamps
+        else
+          letter.postage_type = options[:intl_postage_type] == "indicia" ? :indicia : :stamps
+        end
+        letter.save!
+      end
+    end
+
+    # Purchase indicia for all letters if needed
+    if options[:payment_account].present? && 
+       (options[:us_postage_type] == "indicia" || options[:intl_postage_type] == "indicia")
+      purchase_batch_indicia(options[:payment_account])
+    end
+
     # Generate PDF labels with the provided options
     generate_labels(options)
 
     mark_processed!
   end
 
+  # Purchase indicia for all letters in the batch using a single payment token
+  def purchase_batch_indicia(payment_account)
+    # Create a single payment token for the entire batch
+    payment_token = payment_account.create_payment_token
+
+    # Preload associations to avoid N+1 queries
+    letters.includes(:address).each do |letter|
+      next unless letter.postage_type == "indicia" && letter.usps_indicium.nil?
+
+      # Create and purchase indicia for each letter using the same payment token
+      indicium = USPS::Indicium.new(
+        letter: letter,
+        payment_account: payment_account,
+        mailing_date: letter_mailing_date
+      )
+      indicium.buy!(payment_token)
+    end
+  end
+
   def total_cost
-    0 # TODO: Implement letter cost calculation
+    postage_cost
+  end
+
+  def postage_cost
+    # Preload associations to avoid N+1 queries
+    letters.includes(:address, :usps_indicium).sum do |letter|
+      if letter.postage_type == "indicia"
+        if letter.usps_indicium.present?
+          # Use actual indicia price if indicia are bought
+          letter.usps_indicium.postage + letter.usps_indicium.fees
+        elsif letter.address.us?
+          # For US mail without bought indicia, use metered price
+          USPS::PricingEngine.metered_price(
+            letter.processing_category,
+            letter.weight,
+            letter.non_machinable
+          )
+        else
+          # For international mail without bought indicia, use FLIRT-ed price
+          flirted = letter.flirt
+          USPS::PricingEngine.metered_price(
+            flirted[:processing_category],
+            flirted[:weight],
+            flirted[:non_machinable]
+          )
+        end
+      else
+        # For stamps, use stamp price for US and desired price for international
+        if letter.address.us?
+          USPS::PricingEngine.domestic_stamp_price(
+            letter.processing_category,
+            letter.weight,
+            letter.non_machinable
+          )
+        else
+          USPS::PricingEngine.fcmi_price(
+            letter.processing_category,
+            letter.weight,
+            letter.address.country
+          )
+        end
+      end
+    end
+  end
+
+  def postage_cost_difference(us_postage_type: nil, intl_postage_type: nil)
+    # Preload associations to avoid N+1 queries
+    letters.includes(:address, :usps_indicium).each_with_object({ us: 0, intl: 0 }) do |letter, differences|
+      # Determine what postage type this letter would use
+      effective_postage_type = if letter.address.us?
+        us_postage_type || letter.postage_type
+      else
+        intl_postage_type || letter.postage_type
+      end
+
+      # Skip if not switching to indicia
+      next unless effective_postage_type == "indicia"
+
+      if letter.address.us?
+        # For US mail:
+        # Retail price is stamp_price
+        retail_price = USPS::PricingEngine.domestic_stamp_price(
+          letter.processing_category,
+          letter.weight,
+          letter.non_machinable
+        )
+        
+        # Indicia price is metered_price
+        indicia_price = if letter.usps_indicium.present?
+          letter.usps_indicium.postage
+        else
+          USPS::PricingEngine.metered_price(
+            letter.processing_category,
+            letter.weight,
+            letter.non_machinable
+          )
+        end
+        
+        # Difference should be negative (savings)
+        differences[:us] += indicia_price - retail_price
+      else
+        # For international mail:
+        # Retail price is desired_price
+        retail_price = USPS::PricingEngine.fcmi_price(
+          letter.processing_category,
+          letter.weight,
+          letter.address.country
+        )
+        
+        # Indicia price is flirted price (higher than retail)
+        indicia_price = if letter.usps_indicium.present?
+          letter.usps_indicium.postage
+        else
+          # Use flirt to get the closest US price that's higher than the FCMI rate
+          flirted = letter.flirt
+          USPS::PricingEngine.metered_price(
+            flirted[:processing_category],
+            flirted[:weight],
+            flirted[:non_machinable]
+          )
+        end
+        
+        # Difference should be positive (additional cost)
+        differences[:intl] += indicia_price - retail_price
+      end
+    end
+  end
+
+  def mailing_date_not_in_past
+    if letter_mailing_date < Date.current
+      errors.add(:letter_mailing_date, "cannot be in the past")
+    end
+  end
+
+  def default_mailing_date
+    now = Time.current.in_time_zone('Eastern Time (US & Canada)')
+    today = now.to_date
+    
+    # If it's before 4PM EST on a business day, default to today
+    if now.hour < 16 && today.on_weekday?
+      today
+    else
+      # Otherwise, default to next business day
+      next_business_day = today
+      loop do
+        next_business_day += 1
+        break if next_business_day.on_weekday?
+      end
+      next_business_day
+    end
   end
 
   private
@@ -95,6 +268,7 @@ class Letter::Batch < Batch
       height: letter_height,
       width: letter_width,
       weight: letter_weight,
+      processing_category: letter_processing_category,
       recipient_email: row[field_mapping["email"]],
       address: address,
       usps_mailer_id: mailer_id,

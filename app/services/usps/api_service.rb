@@ -217,16 +217,17 @@ class USPS::APIService
           }
         },
         {
-          "X-Payment-Authorization-Token" => payment_token
-        }
-      )
+          "X-Payment-Authorization-Token" => payment_token,
+          "Accept" => "application/vnd.usps.labels+json",
+        },
+      ).body
     end
 
     # ugh i can't document this rn
     # see https://developers.usps.com/paymentsv3#tag/Resources/operation/post-payments-payment-authorization
     # @return [String] USPS v3 payment account token
     def create_payment_token(roles:)
-      conn.post("/payments/v3/payment-authorization", { roles: }).body.dig("paymentAuthorizationToken")
+      conn.post("/payments/v3/payment-authorization", { roles: }).body.dig(:paymentAuthorizationToken)
     end
 
     private

@@ -1,5 +1,8 @@
 module SnailMail
   class BaseTemplate
+
+    include SnailMail::Helpers
+
     # Template sizes in points [width, height]
     SIZES = {
       standard: [ 6 * 72, 4 * 72 ], # 4x6 inches (432 x 288 points)
@@ -130,10 +133,7 @@ module SnailMail
       return if options[:include_qr_code]
       pdf.font(opts.delete(:font) || "f25") { pdf.text_box(letter.public_id, at: [ x, y ], size:, overflow: :shrink_to_fit, valign: :top, **opts) }
     end
-    # Helper for path to image assets
-    def image_path(image_name)
-      File.join(Rails.root, "app", "lib", "snail_mail", "assets", "images", image_name)
-    end
+
 
     private
 
@@ -147,5 +147,58 @@ module SnailMail
       # Use the IMb module to generate the barcode
       IMb.new(letter).generate
     end
+
+    def render_postage(pdf, letter, x = 294)
+      if letter.postage_type == "indicia"
+        IMI.render_indicium(pdf, letter, letter.usps_indicium, x)
+        FIM.render_fim_d(pdf)
+      else
+        # For stamp letters, show postage amount in top right
+        # postage_amount = USPS::PricingEngine.stamp_price(
+        #     letter.processing_category,
+        #     letter.weight,
+        #     letter.address.country,
+        #     letter.non_machinable
+        #   )
+        postage_amount = 3.2
+        stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
+        
+        requested_stamps = if stamps.size == 1
+          stamp = stamps.first
+          "#{stamp[:count]} #{stamp[:name]}"
+        elsif stamps.size == 2
+          "#{stamps[0][:count]} #{stamps[0][:name]} and #{stamps[1][:count]} #{stamps[1][:name]}"
+        else
+          stamps.map.with_index do |stamp, index|
+            if index == stamps.size - 1
+              "and #{stamp[:count]} #{stamp[:name]}"
+            else
+              "#{stamp[:count]} #{stamp[:name]}"
+            end
+          end.join(', ')
+        end
+
+        postage_info = <<~EOT
+          i take #{ActiveSupport::NumberHelper.number_to_currency(postage_amount)} in postage, so #{requested_stamps}
+        EOT
+
+        pdf.bounding_box([pdf.bounds.right - 55, pdf.bounds.top - 5], width: 50, height: 50) do
+          pdf.font("f25") do
+          pdf.text_box(
+            postage_info,
+            at: [1, 48],
+            width: 48,
+            height: 45,
+            size: 8,
+            align: :center,
+            min_font_size: 4,
+            overflow: :shrink_to_fit,
+          )
+        end
+        end
+      end
+    end
+
+
   end
 end
