@@ -23,10 +23,10 @@ module SnailMail
           pdf.text(letter.mailing_date.strftime("%m/%d/%Y")) unless options[:no_indicia_date]
           pdf.text(ActiveSupport::NumberHelper.number_to_currency(indicium.cost))
           pdf.text("LFP", style: :bold)
-          pdf.font('f25') { pdf.text("hackapost!/#{indicium.hashid}", size: 6.2) }
+          pdf.font('f25') { pdf.text("#{Rails.env.production? ? "hackapost" : "DEV"}!/#{indicium.hashid}", size: 6.2) }
         end
 
-        # pdf.image(StringIO.new(WATERMARK), at: [300, 283], width: 121) unless Rails.env.production?
+        pdf.image(StringIO.new(WATERMARK), at: [300, 283], width: 121) unless Rails.env.production?
       rescue StandardError => e
         render_no_indicium(pdf, letter, e.class == StandardError ? e.message : "#{e.class}: #{e.message}")
       end
