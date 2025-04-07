@@ -153,14 +153,7 @@ module SnailMail
         IMI.render_indicium(pdf, letter, letter.usps_indicium, x)
         FIM.render_fim_d(pdf)
       else
-        # For stamp letters, show postage amount in top right
-        # postage_amount = USPS::PricingEngine.stamp_price(
-        #     letter.processing_category,
-        #     letter.weight,
-        #     letter.address.country,
-        #     letter.non_machinable
-        #   )
-        postage_amount = 3.2
+        postage_amount = letter.postage
         stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
         
         requested_stamps = if stamps.size == 1
