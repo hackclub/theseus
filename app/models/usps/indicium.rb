@@ -75,7 +75,7 @@ class USPS::Indicium < ApplicationRecord
 
     meta = response[:indiciaMetadata]
     self.postage = meta[:postage]
-    self.fees = meta[:fees]
+    self.fees = meta[:fees]&.sum { |fee| fee[:price] }
     self.usps_sku = meta[:SKU]
 
     save
