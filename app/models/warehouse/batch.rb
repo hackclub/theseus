@@ -71,7 +71,7 @@ class Warehouse::Batch < Batch
   end
 
   def postage_cost
-    0
+    orders.sum(:postage_cost)
   end
 
   def total_cost
