@@ -122,7 +122,7 @@ class Letter < ApplicationRecord
 
   attribute :mailing_date, :date
   validates :mailing_date, presence: true, if: -> { postage_type == "indicia" }
-  validate :mailing_date_not_in_past, if: -> { mailing_date.present? }
+  validate :mailing_date_not_in_past, if: -> { mailing_date.present? }, on: :create
   validates :processing_category, presence: true
 
   before_save :set_postage
