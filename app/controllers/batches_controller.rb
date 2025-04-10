@@ -114,7 +114,8 @@ class BatchesController < ApplicationController
           @batch.process!(
             payment_account: payment_account,
             us_postage_type: batch_params[:us_postage_type],
-            intl_postage_type: batch_params[:intl_postage_type]
+            intl_postage_type: batch_params[:intl_postage_type],
+            template_cycle: batch_params[:template_cycle]
           )
           redirect_to @batch, notice: "Batch processed successfully"
         rescue => e
