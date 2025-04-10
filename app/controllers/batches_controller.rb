@@ -88,8 +88,8 @@ class BatchesController < ApplicationController
     @batch = Batch.find(params[:id])
 
     if request.post?
-      Rails.logger.debug "Batch params: #{batch_params.inspect}"
       if @batch.is_a?(Letter::Batch)
+        Rails.logger.debug "Batch params: #{batch_params.inspect}"
         if batch_params[:letter_mailing_date].blank?
           Rails.logger.debug "Mailing date is blank"
           redirect_to process_batch_path(@batch), alert: "Mailing date is required"
@@ -121,15 +121,15 @@ class BatchesController < ApplicationController
           raise
           redirect_to process_batch_path(@batch), alert: "Failed to process batch: #{e.message}"
         end
-      else
-        # Handle non-letter batch processing
-        if @batch.process!(include_qr_code: batch_params[:include_qr_code] == "1",
-                          us_postage_type: batch_params[:us_postage_type],
-                          intl_postage_type: batch_params[:intl_postage_type])
-          redirect_to @batch, notice: "Batch was successfully processed."
-        else
-          render :process_confirm, status: :unprocessable_entity
+      elsif @batch.is_a?(Warehouse::Batch)
+        begin
+          @batch.process!
+          redirect_to @batch, notice: "Batch processed successfully"
+        rescue => e
+          redirect_to process_batch_path(@batch), alert: "Failed to process batch: #{e.message}"
         end
+      else
+        redirect_to @batch, alert: "Unsupported batch type"
       end
     end
   end
