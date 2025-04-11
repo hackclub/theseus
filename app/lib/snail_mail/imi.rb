@@ -4,7 +4,7 @@ module SnailMail
       include SnailMail::Helpers
 
       def render_indicium(pdf, letter, indicium, x = 294, options = {})
-        svg = Nokogiri::XML(indicium.svg)
+        svg = Nokogiri::XML(indicium&.svg || (raise "no indicium?"))
         imi_el = svg % "image#imi-barcode"
         raise "no imi element?" unless imi_el.present?
         imi_href = imi_el["xlink:href"]
@@ -18,7 +18,7 @@ module SnailMail
         )
         pdf.bounding_box([ x, 277 ], width: 90, height: 45) do
           pdf.font_size(8)
-          pdf.text("U.S. POSTAGE IMI", style: :bold)
+          pdf.text("U.S. POSTAGE", style: :bold)
           pdf.text(letter.mailing_date.strftime("%m/%d/%Y")) unless options[:no_indicia_date]
           pdf.text(ActiveSupport::NumberHelper.number_to_currency(indicium.cost))
           pdf.text("LFP", style: :bold)
@@ -35,7 +35,7 @@ module SnailMail
       def render_no_indicium(pdf, letter, reason)
         error_text = <<~EOT
           this shouldn't happen.
-          please tell nora about #{letter.public_id} and #{letter.usps_indicium.public_id} :-(
+          please tell nora about #{letter.public_id} and #{letter.usps_indicium&.public_id || 'nonexistent indicium!'} :-(
           "#{reason}"
         EOT
 
