@@ -25,7 +25,7 @@ module SnailMail
           pdf.font("f25") { pdf.text("#{Rails.env.production? ? "hackapost" : "DEV"}!/#{indicium.hashid}", size: 6.2) }
         end
 
-        pdf.image(StringIO.new(WATERMARK), at: [ 300, 283 ], width: 121) if svg % "#watermark"
+        pdf.image(StringIO.new(WATERMARK), at: [ 300, 283 ], width: 121) if (wm = svg % "#watermark") && wm["visibility"] != "hidden"
       rescue StandardError => e
         render_no_indicium(pdf, letter, e.class == StandardError ? e.message : "#{e.class}: #{e.message}")
       end
