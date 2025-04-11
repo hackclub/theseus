@@ -1,11 +1,5 @@
 <h1>Map CSV Fields to Address Fields</h1>
 
-<% if flash[:error] %>
-  <div class="alert alert-danger">
-    <%= flash[:error] %>
-  </div>
-<% end %>
-
 <div class="mapping-form">
   <%= form_with(model: @batch, url: set_mapping_batch_path(@batch), method: :post) do |f| %>
     <%# Define default_mapping outside of the loop %>
