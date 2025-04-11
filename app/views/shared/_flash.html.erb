@@ -1,6 +1,12 @@
 <% flash.each do |type, message| %>
   <% if message.present? %>
-    <div class="alert <%= type == 'notice' ? 'alert-success' : 'alert-danger' %> mb-4">
+    <% alert_class = case type.to_sym
+       when :notice, :success then 'alert-success'
+       when :alert, :error, :danger then 'alert-danger'
+       when :info then 'alert-info'
+       else 'alert-info'
+       end %>
+    <div class="alert <%= alert_class %> mb-4">
       <%= message %>
     </div>
   <% end %>
