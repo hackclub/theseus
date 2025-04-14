@@ -22,6 +22,8 @@ module USPS
             ].freeze
 
             def find_stamp_combination(amount)
+                return {} unless amount
+
                 remaining = amount.round(2)
                 combination = []
 
@@ -56,6 +58,8 @@ module USPS
             end
 
             def find_optimal_stamp_combination(amount)
+                return {} unless amount
+
                 remaining = amount.round(2)
                 all_stamps = (COMMON_STAMPS + UNCOMMON_STAMPS).sort_by { |s| -s[:value] }
 
