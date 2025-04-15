@@ -131,4 +131,8 @@ gem "kaminari", "~> 1.2"
 
 gem "aws-sdk-s3", require: false
 
+gem "ivymeter", "~> 0.1.0"
+
+gem "slack-notifier", "~> 2.4"
+
 gem "nokogiri", "~> 1.18"

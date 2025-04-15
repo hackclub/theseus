@@ -208,6 +208,7 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    ivymeter (0.1.0)
     jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -447,6 +448,7 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    slack-notifier (2.4.0)
     slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
@@ -576,6 +578,7 @@ DEPENDENCIES
   good_job (~> 4.9)
   hashid-rails (~> 1.4)
   http (~> 5.2)
+  ivymeter (~> 0.1.0)
   jbuilder (~> 2.13)
   jquery-rails (~> 4.6)
   jsbundling-rails
@@ -597,6 +600,7 @@ DEPENDENCIES
   sassc-rails (~> 2.1)
   select2-rails (~> 4.0)
   selenium-webdriver
+  slack-notifier (~> 2.4)
   slim-rails (~> 3.7)
   snail (~> 2.3)
   solid_cable

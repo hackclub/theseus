@@ -1,0 +1,22 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# == Schema Information
+#
+# Table name: usps_iv_mtr_raw_json_batches
+#
+#  id               :bigint           not null, primary key
+#  payload          :jsonb
+#  processed        :boolean
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  message_group_id :string
+#
+one:
+  events: 
+  processed: false
+  message_group_id: MyString
+
+two:
+  events: 
+  processed: false
+  message_group_id: MyString
