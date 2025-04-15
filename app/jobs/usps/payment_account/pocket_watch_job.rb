@@ -6,7 +6,7 @@ class USPS::PaymentAccount::PocketWatchJob < ApplicationJob
   def perform(*args)
     broke_accounts = []
 
-    USPS::PaymentAccount.each do |acct|
+    USPS::PaymentAccount.all.each do |acct|
       broke_accounts << acct unless acct.check_funds_available(THRESHOLD)
     end
 
