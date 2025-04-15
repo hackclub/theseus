@@ -32,4 +32,4 @@ class ReturnAddressPolicy < ApplicationPolicy
   def record_belongs_to_user
     user && record.user == user
   end
-end 
+end

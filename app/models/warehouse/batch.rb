@@ -41,10 +41,10 @@
 #  fk_rails_...  (warehouse_template_id => warehouse_templates.id)
 #
 class Warehouse::Batch < Batch
-  belongs_to :warehouse_template, class_name: 'Warehouse::Template'
-  belongs_to :warehouse_purpose_code, class_name: 'Warehouse::PurposeCode'
+  belongs_to :warehouse_template, class_name: "Warehouse::Template"
+  belongs_to :warehouse_purpose_code, class_name: "Warehouse::PurposeCode"
 
-  has_many :orders, :class_name => 'Warehouse::Order'
+  has_many :orders, class_name: "Warehouse::Order"
 
   def self.model_name
     Batch.model_name
@@ -78,10 +78,10 @@ class Warehouse::Batch < Batch
   end
 
   def postage_cost
-    0
+    orders.sum(:postage_cost)
   end
 
   def total_cost
     contents_cost + labor_cost + postage_cost
   end
-end 
+end

@@ -10,7 +10,7 @@ module SnailMail
             stid          = "310" # no address corrections – no printed endorsements, but! IV-MTR!
             mailer_id     = letter.usps_mailer_id.mid
             serial_number = letter.imb_serial_number
-            routing_code  = letter.address.postal_code.gsub(/[^0-9]/, '') # zip(+dpc?) but no dash
+            routing_code  = letter.address.postal_code.gsub(/[^0-9]/, "") # zip(+dpc?) but no dash
 
             begin
                 Imb::Barcode.new(

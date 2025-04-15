@@ -24,4 +24,10 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "IV"
   inflect.acronym "MTR"
   inflect.acronym "JSON"
+  inflect.acronym "FLIRT"
+  inflect.acronym "IMI"
+  inflect.acronym "FIM"
+  inflect.acronym "EPS"
+  inflect.irregular "is", "are"
+  inflect.irregular "this", "these"
 end

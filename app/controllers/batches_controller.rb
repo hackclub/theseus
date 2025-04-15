@@ -7,8 +7,8 @@ class BatchesController < ApplicationController
   PREVIEW_ROWS = 3
 
   BATCH_TYPES = [
-    ['Warehouse', 'Warehouse::Batch'],
-    ['Letter', 'Letter::Batch']
+    [ "Warehouse", "Warehouse::Batch" ],
+    [ "Letter", "Letter::Batch" ]
   ].freeze
 
   # GET /batches or /batches.json
@@ -33,7 +33,7 @@ class BatchesController < ApplicationController
   def create
     @batch_types = BATCH_TYPES
     batch_type = batch_params[:type]
-    
+
     # Validate that the type is one of our allowed types
     unless BATCH_TYPES.map(&:last).include?(batch_type)
       @batch = Batch.new(batch_params.merge(user: current_user))
@@ -56,13 +56,13 @@ class BatchesController < ApplicationController
 
   def set_mapping
     mapping = mapping_params.to_h
-    
+
     # Invert the mapping to get from CSV columns to address fields
     inverted_mapping = mapping.invert
     # ap inverted_mapping
     # Validate required fields
     missing_fields = REQUIRED_FIELDS.reject { |field| inverted_mapping[field].present? }
-    
+
     if missing_fields.any?
       flash.now[:error] = "Please map the following required fields: #{missing_fields.join(', ')}"
       render :map_fields, status: :unprocessable_entity
@@ -84,51 +84,63 @@ class BatchesController < ApplicationController
     end
   end
 
+  def process_batch
+    @batch = Batch.find(params[:id])
+
+    if request.post?
+      if @batch.is_a?(Letter::Batch)
+        Rails.logger.debug "Batch params: #{batch_params.inspect}"
+        if batch_params[:letter_mailing_date].blank?
+          Rails.logger.debug "Mailing date is blank"
+          redirect_to process_batch_path(@batch), alert: "Mailing date is required"
+          return
+        end
+
+        @batch.letter_mailing_date = batch_params[:letter_mailing_date]
+        Rails.logger.debug "Setting mailing date to: #{@batch.letter_mailing_date}"
+        @batch.save! # Save the mailing date before processing
+
+        # Only require payment account if indicia is selected
+        if batch_params[:us_postage_type] == "indicia" || batch_params[:intl_postage_type] == "indicia"
+          payment_account = USPS::PaymentAccount.find_by(id: batch_params[:usps_payment_account_id])
+
+          if payment_account.nil?
+            redirect_to process_batch_path(@batch), alert: "Please select a valid payment account when using indicia"
+            return
+          end
+        end
+
+        begin
+          @batch.process!(
+            payment_account: payment_account,
+            us_postage_type: batch_params[:us_postage_type],
+            intl_postage_type: batch_params[:intl_postage_type],
+            template_cycle: batch_params[:template_cycle]
+          )
+          redirect_to @batch, notice: "Batch processed successfully"
+        rescue => e
+          raise
+          redirect_to process_batch_path(@batch), alert: "Failed to process batch: #{e.message}"
+        end
+      elsif @batch.is_a?(Warehouse::Batch)
+        begin
+          @batch.process!
+          redirect_to @batch, notice: "Batch processed successfully"
+        rescue => e
+          redirect_to process_batch_path(@batch), alert: "Failed to process batch: #{e.message}"
+        end
+      else
+        redirect_to @batch, alert: "Unsupported batch type"
+      end
+    end
+  end
+
   def process_form
     case @batch.type
     when "Warehouse::Batch"
       render :process_warehouse
     when "Letter::Batch"
       render :process_letter
-    end
-  end
-
-  def process_batch
-    unless @batch.may_mark_processed?
-      redirect_to process_form_batch_path(@batch), alert: "huh?"
-      return
-    end
-
-    if @batch.is_a?(Warehouse::Batch) && @batch.warehouse_template.nil?
-      redirect_to process_form_batch_path(@batch), alert: "Please select a warehouse template before processing."
-      return
-    end
-
-    if @batch.is_a?(Letter::Batch)
-      if @batch.mailer_id.nil?
-        redirect_to process_form_batch_path(@batch), alert: "Please select a USPS Mailer ID before processing."
-        return
-      end
-      if @batch.letter_return_address.nil?
-        redirect_to process_form_batch_path(@batch), alert: "Please select a return address before processing."
-        return
-      end
-
-      selected_templates = params[:batch][:template_cycle]
-      if selected_templates.blank?
-        redirect_to process_form_batch_path(@batch), alert: "Please select at least one template."
-        return
-      end
-      @batch.template_cycle = selected_templates
-      include_qr_code = params[:batch][:include_qr_code] == "1"
-    end
-
-    # Process the batch with the QR code option if specified
-
-    if @batch.process!(include_qr_code: include_qr_code)
-      redirect_to @batch, notice: "Batch processed successfully."
-    else
-      redirect_to @batch, alert: "Failed to process batch."
     end
   end
 
@@ -142,7 +154,7 @@ class BatchesController < ApplicationController
       redirect_to @batch, alert: "Cannot mark letters as printed. Batch must be a processed letter batch."
     end
   end
-  
+
   def mark_mailed
     if @batch.is_a?(Letter::Batch) && @batch.processed?
       @batch.letters.each do |letter|
@@ -151,6 +163,31 @@ class BatchesController < ApplicationController
       redirect_to @batch, notice: "All letters have been marked as mailed."
     else
       redirect_to @batch, alert: "Cannot mark letters as mailed. Batch must be a processed letter batch."
+    end
+  end
+
+  def update_costs
+    if @batch.is_a?(Letter::Batch)
+      # Calculate counts without saving
+      us_letters = @batch.letters.joins(:address).where(addresses: { country: "US" })
+      intl_letters = @batch.letters.joins(:address).where.not(addresses: { country: "US" })
+
+      cost_differences = @batch.postage_cost_difference(
+        us_postage_type: params[:us_postage_type],
+        intl_postage_type: params[:intl_postage_type]
+      )
+
+      render json: {
+        total_cost: @batch.postage_cost,
+        cost_difference: {
+          us: cost_differences[:us],
+          intl: cost_differences[:intl]
+        },
+        us_count: us_letters.count,
+        intl_count: intl_letters.count
+      }
+    else
+      render json: { error: "Not a letter batch" }, status: :unprocessable_entity
     end
   end
 
@@ -188,33 +225,45 @@ class BatchesController < ApplicationController
       csv_rows = CSV.parse(csv_content)
       @csv_headers = csv_rows.first
       @csv_preview = csv_rows[1..PREVIEW_ROWS] || []
-      
+
       # Get fields based on batch type
       @address_fields = if @batch.is_a?(Letter::Batch)
         # For letter batches, include address fields and rubber_stamps
-        (Address.column_names - ['id', 'created_at', 'updated_at', 'batch_id']) +
-        ['rubber_stamps']
+        (Address.column_names - [ "id", "created_at", "updated_at", "batch_id" ]) +
+        [ "rubber_stamps" ]
       else
         # For other batches, just include address fields
-        (Address.column_names - ['id', 'created_at', 'updated_at'])
+        (Address.column_names - [ "id", "created_at", "updated_at" ])
       end
     end
 
     # Only allow a list of trusted parameters through.
     def batch_params
       params.require(:batch).permit(
-        :csv, 
-        :warehouse_template_id, 
-        :type, 
-        :warehouse_purpose_code_id, 
+        :csv,
+        :warehouse_template_id,
+        :type,
+        :warehouse_purpose_code_id,
         :warehouse_user_facing_title,
         :letter_height,
         :letter_width,
         :letter_weight,
+        :letter_processing_category,
         :letter_mailer_id_id,
         :letter_return_address_id,
         :include_qr_code,
+        :letter_mailing_date,
+        :usps_payment_account_id,
+        :us_postage_type,
+        :intl_postage_type,
         template_cycle: []
+      )
+    end
+
+    def letter_batch_params
+      params.require(:letter_batch).permit(
+        :letter_mailing_date,
+        :usps_payment_account_id
       )
     end
 

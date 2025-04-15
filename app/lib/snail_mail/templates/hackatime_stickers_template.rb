@@ -16,9 +16,9 @@ module SnailMail
       def render(pdf, letter)
         super
         render_letter_id(pdf, letter, 360, 13, 12)
-        pdf.image(image_path('hackatime/badge.png'), at: [10, 92], width: 117)
-        pdf.font('gohu') do
-          pdf.text_box(MSG, at: [162, 278], size: 8)
+        pdf.image(image_path("hackatime/badge.png"), at: [ 10, 92 ], width: 117)
+        pdf.font("gohu") do
+          pdf.text_box(MSG, at: [ 162, 278 ], size: 8)
         end
       end
     end

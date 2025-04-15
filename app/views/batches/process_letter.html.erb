@@ -28,6 +28,34 @@
   </div>
 
   <div class="field">
+    <%= form.label :letter_mailing_date, "Mailing Date" %>
+    <div class="help-text">Select the date you plan to mail these letters.</div>
+    <%= form.date_field :letter_mailing_date, 
+      value: @batch.letter_mailing_date || @batch.default_mailing_date,
+      min: Date.current,
+      class: "form-control",
+      required: true,
+      name: "batch[letter_mailing_date]" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :usps_payment_account_id, "USPS Payment Account" %>
+    <div class="help-text">Select the USPS payment account to use for purchasing postage. Required only when using indicia.</div>
+    <%= form.collection_select :usps_payment_account_id,
+      USPS::PaymentAccount.all,
+      :id,
+      :display_name,
+      { prompt: "Select a payment account" },
+      { class: "form-control",
+        required: false,
+        data: { 
+          required_when: "indicia",
+          us_postage_type: "batch[us_postage_type]",
+          intl_postage_type: "batch[intl_postage_type]"
+        } } %>
+  </div>
+
+  <div class="field">
     <div class="form-check">
       <%= form.check_box :include_qr_code, id: "batch_include_qr_code" %>
       <%= form.label :include_qr_code, "Include QR Code on Labels", for: "batch_include_qr_code" %>
@@ -35,10 +63,205 @@
     <div class="help-text">Add a QR code to each label for tracking purposes.</div>
   </div>
 
+  <div class="field">
+    <h3 class="text-sm font-medium mb-2">Postage Options</h3>
+    <div class="card mb-4">
+      <div class="card-body p-3">
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <h4 class="text-sm font-medium mb-2">US Mail</h4>
+            <div class="space-y-2">
+              <div class="form-check">
+                <%= form.radio_button :us_postage_type, "stamps", class: "form-check-input", checked: true %>
+                <%= form.label :us_postage_type_stamps, "Stamps", class: "form-check-label" %>
+              </div>
+              <div class="form-check">
+                <%= form.radio_button :us_postage_type, "indicia", class: "form-check-input" %>
+                <%= form.label :us_postage_type_indicia, "Indicia (Metered)", class: "form-check-label" %>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-sm font-medium mb-2">International Mail</h4>
+            <div class="space-y-2">
+              <div class="form-check">
+                <%= form.radio_button :intl_postage_type, "stamps", class: "form-check-input", checked: true %>
+                <%= form.label :intl_postage_type_stamps, "Stamps", class: "form-check-label" %>
+              </div>
+              <div class="form-check">
+                <%= form.radio_button :intl_postage_type, "indicia", class: "form-check-input" %>
+                <%= form.label :intl_postage_type_indicia, "Indicia (Metered)", class: "form-check-label" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <h3 class="text-sm font-medium mb-2">Cost Information</h3>
+    <div class="card mb-4">
+      <div class="card-body p-3">
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <div class="text-sm mb-2">
+              <span class="text-gray-500">Total Postage Cost:</span>
+              <span id="total_postage_cost" class="font-medium">$<%= sprintf('%.2f', @batch.postage_cost) %></span>
+            </div>
+            <div class="text-sm mb-2">
+              <span class="text-gray-500">US Cost Difference:</span>
+              <span id="us_cost_difference" class="font-medium text-green-600">
+                $<%= sprintf('%.2f', @batch.postage_cost_difference[:us]) %>
+              </span>
+            </div>
+            <div class="text-sm mb-2">
+              <span class="text-gray-500">International Cost Difference:</span>
+              <span id="intl_cost_difference" class="font-medium text-red-600">
+                $<%= sprintf('%.2f', @batch.postage_cost_difference[:intl]) %>
+              </span>
+            </div>
+            <div class="text-sm text-gray-500">
+              <span id="cost_explanation">
+                <% 
+                  us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count
+                  intl_count = @batch.letters.joins(:address).where.not(addresses: { country: "US" }).count
+                  us_stamps = us_count # Default to stamps for US
+                  intl_stamps = intl_count # Default to stamps for international
+                  total_stamps = us_stamps + intl_stamps
+                %>
+                <% if total_stamps > 0 %>
+                  You'll have to put stamps on <%= total_stamps %> envelope<%= total_stamps == 1 ? '' : 's' %>
+                <% end %>
+                <% if @batch.postage_cost_difference[:us] < 0 %>
+                  <% if total_stamps > 0 %>; <% end %>Savings from using metered postage for US mail
+                <% end %>
+                <% if @batch.postage_cost_difference[:intl] > 0 %>
+                  <% if total_stamps > 0 || @batch.postage_cost_difference[:us] < 0 %>; <% end %>Additional cost for international metered postage
+                <% end %>
+                <% if total_stamps == 0 && @batch.postage_cost_difference[:us] == 0 && @batch.postage_cost_difference[:intl] == 0 %>
+                  No cost difference
+                <% end %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="actions">
     <%= form.submit "Generate Labels", class: "button primary" %>
     <%= link_to "Back to batch", @batch, class: "button secondary" %>
   </div>
+<% end %>
+
+<%= javascript_tag do %>
+  document.addEventListener('DOMContentLoaded', function() {
+    const usPostageType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;
+    const intlPostageType = document.querySelector('input[name="batch[intl_postage_type]"]:checked').value;
+    const paymentAccountSelect = document.querySelector('select[name="batch[usps_payment_account_id]"]');
+
+    function updatePaymentAccountRequired() {
+      const usPostageType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;
+      const intlPostageType = document.querySelector('input[name="batch[intl_postage_type]"]:checked').value;
+      
+      const isIndiciaSelected = usPostageType === "indicia" || intlPostageType === "indicia";
+      paymentAccountSelect.required = isIndiciaSelected;
+    }
+
+    function updatePostageCosts() {
+      const usPostageType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;
+      const intlPostageType = document.querySelector('input[name="batch[intl_postage_type]"]:checked').value;
+
+      fetch(`/batches/<%= @batch.id %>/update_costs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          us_postage_type: usPostageType,
+          intl_postage_type: intlPostageType
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('total_postage_cost').textContent = `$${data.total_cost.toFixed(2)}`;
+        document.getElementById('us_cost_difference').textContent = `$${data.cost_difference.us.toFixed(2)}`;
+        document.getElementById('intl_cost_difference').textContent = `$${data.cost_difference.intl.toFixed(2)}`;
+        
+        const usDiffElement = document.getElementById('us_cost_difference');
+        const intlDiffElement = document.getElementById('intl_cost_difference');
+        const explanationElement = document.getElementById('cost_explanation');
+        
+        // Update US cost difference styling
+        if (data.cost_difference.us < 0) {
+          usDiffElement.classList.remove('text-red-600');
+          usDiffElement.classList.add('text-green-600');
+        } else {
+          usDiffElement.classList.remove('text-green-600');
+          usDiffElement.classList.add('text-red-600');
+        }
+        
+        // Update international cost difference styling
+        if (data.cost_difference.intl < 0) {
+          intlDiffElement.classList.remove('text-red-600');
+          intlDiffElement.classList.add('text-green-600');
+        } else {
+          intlDiffElement.classList.remove('text-green-600');
+          intlDiffElement.classList.add('text-red-600');
+        }
+        
+        // Update explanation text
+        let explanation = [];
+        
+        // Add stamp information if either option is stamps
+        const usPostageType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;
+        const intlPostageType = document.querySelector('input[name="batch[intl_postage_type]"]:checked').value;
+        
+        if (usPostageType === "stamps" || intlPostageType === "stamps") {
+          const usCount = usPostageType === "stamps" ? data.us_count || 0 : 0;
+          const intlCount = intlPostageType === "stamps" ? data.intl_count || 0 : 0;
+          const totalStamps = usCount + intlCount;
+          
+          if (totalStamps > 0) {
+            explanation.push(`You'll have to put stamps on ${totalStamps} envelope${totalStamps === 1 ? '' : 's'}`);
+          }
+        }
+        
+        // Add cost difference information
+        if (data.cost_difference.us < 0) {
+          explanation.push('Savings from using metered postage for US mail');
+        }
+        if (data.cost_difference.intl > 0) {
+          explanation.push('Additional cost for international metered postage');
+        }
+        if (explanation.length === 0) {
+          explanation.push('No cost difference');
+        }
+        
+        explanationElement.textContent = explanation.join('; ');
+      });
+    }
+
+    document.querySelectorAll('input[name="batch[us_postage_type]"]').forEach(input => {
+      input.addEventListener('change', () => {
+        updatePaymentAccountRequired();
+        updatePostageCosts();
+      });
+    });
+
+    document.querySelectorAll('input[name="batch[intl_postage_type]"]').forEach(input => {
+      input.addEventListener('change', () => {
+        updatePaymentAccountRequired();
+        updatePostageCosts();
+      });
+    });
+
+    // Initial check
+    updatePaymentAccountRequired();
+  });
 <% end %>
 
 <!--<ul>-->

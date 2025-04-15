@@ -112,6 +112,7 @@ Rails.application.routes.draw do
   resources :letters do
     member do
       post :generate_label
+      post :buy_indicia
       post :mark_printed
       post :mark_mailed
       post :mark_received
@@ -173,6 +174,7 @@ Rails.application.routes.draw do
       post "/process", to: "batches#process_batch", as: :process
       post :mark_printed
       post :mark_mailed
+      post :update_costs
     end
   end
   root "static_pages#index"

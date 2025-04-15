@@ -8,7 +8,9 @@ module SnailMail
       MailOrpheusTemplate,
       HCBStickersTemplate,
       KestrelHeidiTemplate,
-      HackatimeStickersTemplate
+      HackatimeStickersTemplate,
+      TarotTemplate,
+      DinoWavingTemplate
     ].freeze
 
     # Default template to use when none is specified
@@ -36,7 +38,7 @@ module SnailMail
         if template_class = options[:template_class]
           return template_class.new(options)
         end
-        
+
         # Next check if template name is specified in options
         template_name = options[:template]&.to_sym
 
@@ -47,7 +49,7 @@ module SnailMail
           # Use default
           DEFAULT_TEMPLATE
         end
-        
+
         # Create a new instance of the template
         template_class ? template_class.new(options) : DEFAULT_TEMPLATE.new(options)
       end
@@ -62,12 +64,11 @@ module SnailMail
       def available_templates
         TEMPLATES.map { |t| t.template_name.to_sym }
       end
-      
+
       # Check if a template exists
       def template_exists?(name)
         TEMPLATES.any? { |t| t.template_name.to_sym == name.to_sym }
       end
-
     end
   end
-end 
+end

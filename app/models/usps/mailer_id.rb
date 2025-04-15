@@ -36,6 +36,6 @@ class USPS::MailerId < ApplicationRecord
       end
       save!
     end
-    [sequence_number, rollover_count]
+    [ sequence_number, rollover_count ]
   end
 end

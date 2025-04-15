@@ -5,10 +5,10 @@ class LettersController < ApplicationController
   def index
     # Get all letters with their associations
     @all_letters = Letter.includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
-    
+
     # Get unbatched letters with pagination
     @unbatched_letters = @all_letters.not_in_batch.page(params[:page]).per(20)
-    
+
     # Get batched letters grouped by batch
     @batched_letters = @all_letters.in_batch.group_by(&:batch)
   end
@@ -44,6 +44,11 @@ class LettersController < ApplicationController
 
   # PATCH/PUT /letters/1
   def update
+    if @letter.batch_id.present? && params[:letter][:postage_type].present?
+      redirect_to @letter, alert: "Cannot change postage type for a letter that is part of a batch."
+      return
+    end
+
     if @letter.update(letter_params)
       redirect_to @letter, notice: "Letter was successfully updated."
     else
@@ -61,7 +66,7 @@ class LettersController < ApplicationController
   def generate_label
     template = params[:template]
     include_qr_code = params[:qr].present?
-    
+
     # Generate label with specified template
     begin
       # Let the model method handle saving itself
@@ -82,32 +87,32 @@ class LettersController < ApplicationController
   end
 
   def preview_template
-    template = params['template']
-    include_qr_code = params['qr'].present?
-    send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code:  }).render, type: 'application/pdf', disposition: 'inline'
+    template = params["template"]
+    include_qr_code = params["qr"].present?
+    send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code:  }).render, type: "application/pdf", disposition: "inline"
   end
-  
+
   # POST /letters/1/mark_printed
   def mark_printed
-    if @letter.mark_printed
+    if @letter.mark_printed!
       redirect_to @letter, notice: "Letter has been marked as printed."
     else
       redirect_to @letter, alert: "Could not mark letter as printed: #{@letter.errors.full_messages.join(', ')}"
     end
   end
-  
+
   # POST /letters/1/mark_mailed
   def mark_mailed
-    if @letter.mark_mailed
+    if @letter.mark_mailed!
       redirect_to @letter, notice: "Letter has been marked as mailed."
     else
       redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(', ')}"
     end
   end
-  
+
   # POST /letters/1/mark_received
   def mark_received
-    if @letter.mark_received
+    if @letter.mark_received!
       redirect_to @letter, notice: "Letter has been marked as received."
     else
       redirect_to @letter, alert: "Could not mark letter as received: #{@letter.errors.full_messages.join(', ')}"
@@ -124,6 +129,38 @@ class LettersController < ApplicationController
     end
   end
 
+  # POST /letters/1/buy_indicia
+  def buy_indicia
+    if @letter.batch_id.present?
+      redirect_to @letter, alert: "Cannot buy indicia for a letter that is part of a batch."
+      return
+    end
+
+    if @letter.postage_type != "indicia"
+      redirect_to @letter, alert: "Letter must be set to indicia postage type first."
+      return
+    end
+
+    if @letter.usps_indicium.present?
+      redirect_to @letter, alert: "Indicia already purchased for this letter."
+      return
+    end
+
+    payment_account = USPS::PaymentAccount.find_by(id: params[:usps_payment_account_id])
+    if payment_account.nil?
+      redirect_to @letter, alert: "Please select a valid payment account."
+      return
+    end
+
+    indicium = USPS::Indicium.new(letter: @letter, payment_account: payment_account)
+    begin
+      indicium.buy!
+      redirect_to @letter, notice: "Indicia purchased successfully."
+    rescue => e
+      redirect_to @letter, alert: "Failed to purchase indicia: #{e.message}"
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_letter
@@ -133,13 +170,19 @@ class LettersController < ApplicationController
     # Only allow a list of trusted parameters through.
     def letter_params
       params.require(:letter).permit(
+        :body,
         :height,
         :width,
         :weight,
+        :non_machinable,
+        :processing_category,
+        :postage_type,
+        :mailing_date,
         :rubber_stamps,
         :usps_mailer_id_id,
         :return_address_id,
         address_attributes: [
+          :id,
           :first_name,
           :last_name,
           :line_1,
@@ -147,21 +190,17 @@ class LettersController < ApplicationController
           :city,
           :state,
           :postal_code,
-          :country,
-          :phone_number,
-          :email
+          :country
         ],
         return_address_attributes: [
+          :id,
           :name,
           :line_1,
           :line_2,
           :city,
           :state,
           :postal_code,
-          :country,
-          :shared,
-          :user_id,
-          :from_letter
+          :country
         ]
       )
     end

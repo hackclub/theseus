@@ -1,0 +1,14 @@
+what up nora
+
+<%= "this".pluralize(@count) %> <%= "account".pluralize(@count) %> <%= "is".pluralize(@count) %> under <%= number_to_currency(USPS::PaymentAccount::PocketWatchJob::THRESHOLD) %>:
+<ul>
+  <% @accounts.each do |account| %>
+    <li>
+      <%= link_to account %>
+    </li>
+  <% end %>
+</ul>
+
+maybe throw some cash in there idk
+
+k cya
