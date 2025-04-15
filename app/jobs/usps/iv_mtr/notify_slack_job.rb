@@ -23,7 +23,7 @@ class USPS::IVMTR::NotifySlackJob < ApplicationJob
                             "text": if event.bogon?
                               ":neocat_laptop_notice: hey <@U06QK6AG3RD>! we got a bogon! #{event.imb_serial_number} on #{event.mailer_id.id} @ <!date^#{event.happened_at.to_i}^{date_num} {time_secs}|#{event.happened_at.iso8601}>??"
                             else
-                              ":mailbox_with_mail: new IV event for *Letter #{event.letter.imb_serial_number}/#{event.letter.imb_rollover_count}@#{event.letter.usps_mailer_id.id}* @ <!date^#{event.happened_at.to_i}^{date_num} {time_secs}|#{event.happened_at.iso8601}>!"
+                              ":mailbox_with_mail: new IV event for *Letter #{event.letter.imb_serial_number}/#{event.letter.imb_rollover_count} on #{event.letter.usps_mailer_id.id}* @ <!date^#{event.happened_at.to_i}^{date_num} {time_secs}|#{event.happened_at.iso8601}>!"
                             end
                         }
                     ]
