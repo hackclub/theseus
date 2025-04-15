@@ -17,7 +17,7 @@ module USPS
       def ingest
         data = JSON.parse(request.raw_post)
         batch = USPS::IVMTR::RawJSONBatch.create(
-          events: data["events"],
+          payload: data["events"],
           message_group_id: data["msgGrpId"],
           processed: false
         )
