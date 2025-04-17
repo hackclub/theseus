@@ -93,6 +93,8 @@ class Warehouse::Order < ApplicationRecord
 
   has_zenventory_url "https://app.zenventory.com/orders/edit-order/%s", :zenventory_id
 
+  taggable_array :tags
+
   def shipping_address_attributes
     {
       name: address.name_line,

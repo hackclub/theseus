@@ -35,6 +35,7 @@
 #
 class Batch < ApplicationRecord
   include AASM
+  taggable_array :tags
 
   aasm timestamps: true do
     state :awaiting_field_mapping, initial: true
