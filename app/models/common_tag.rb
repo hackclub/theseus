@@ -1,0 +1,2 @@
+class CommonTag < ApplicationRecord
+end
