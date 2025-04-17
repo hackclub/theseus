@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_04_020752) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_17_153840) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -88,6 +88,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_04_020752) do
     t.bigint "letter_mailer_id_id"
     t.bigint "letter_return_address_id"
     t.citext "tags", default: [], array: true
+    t.integer "letter_processing_category"
+    t.date "letter_mailing_date"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
     t.index ["letter_return_address_id"], name: "index_batches_on_letter_return_address_id"
     t.index ["tags"], name: "index_batches_on_tags", using: :gin
@@ -95,6 +97,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_04_020752) do
     t.index ["user_id"], name: "index_batches_on_user_id"
     t.index ["warehouse_purpose_code_id"], name: "index_batches_on_warehouse_purpose_code_id"
     t.index ["warehouse_template_id"], name: "index_batches_on_warehouse_template_id"
+  end
+
+  create_table "common_tags", force: :cascade do |t|
+    t.string "tag"
+    t.boolean "implies_ysws"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -208,6 +217,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_04_020752) do
     t.bigint "return_address_id", null: false
     t.jsonb "metadata"
     t.citext "tags", default: [], array: true
+    t.integer "postage_type"
+    t.date "mailing_date"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
     t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
@@ -254,18 +265,42 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_04_020752) do
   create_table "usps_indicia", force: :cascade do |t|
     t.integer "processing_category"
     t.float "postage_weight"
-    t.float "postage_length"
-    t.float "postage_height"
-    t.float "postage_thickness"
     t.boolean "nonmachinable"
     t.string "usps_sku"
-    t.text "raw_usps_response"
     t.decimal "postage"
     t.date "mailing_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "usps_payment_account_id", null: false
+    t.bigint "letter_id"
+    t.jsonb "raw_json_response"
+    t.boolean "flirted"
+    t.decimal "fees"
+    t.index ["letter_id"], name: "index_usps_indicia_on_letter_id"
     t.index ["usps_payment_account_id"], name: "index_usps_indicia_on_usps_payment_account_id"
+  end
+
+  create_table "usps_iv_mtr_events", force: :cascade do |t|
+    t.datetime "happened_at"
+    t.bigint "letter_id"
+    t.bigint "batch_id", null: false
+    t.jsonb "payload"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "opcode"
+    t.string "zip_code"
+    t.bigint "mailer_id_id", null: false
+    t.index ["batch_id"], name: "index_usps_iv_mtr_events_on_batch_id"
+    t.index ["letter_id"], name: "index_usps_iv_mtr_events_on_letter_id"
+    t.index ["mailer_id_id"], name: "index_usps_iv_mtr_events_on_mailer_id_id"
+  end
+
+  create_table "usps_iv_mtr_raw_json_batches", force: :cascade do |t|
+    t.jsonb "payload"
+    t.boolean "processed"
+    t.string "message_group_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "usps_mailer_ids", force: :cascade do |t|
@@ -397,7 +432,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_04_020752) do
   add_foreign_key "letters", "return_addresses"
   add_foreign_key "letters", "usps_mailer_ids"
   add_foreign_key "return_addresses", "users"
+  add_foreign_key "usps_indicia", "letters"
   add_foreign_key "usps_indicia", "usps_payment_accounts"
+  add_foreign_key "usps_iv_mtr_events", "letters", on_delete: :nullify
+  add_foreign_key "usps_iv_mtr_events", "usps_iv_mtr_raw_json_batches", column: "batch_id"
+  add_foreign_key "usps_iv_mtr_events", "usps_mailer_ids", column: "mailer_id_id"
   add_foreign_key "usps_payment_accounts", "usps_mailer_ids"
   add_foreign_key "warehouse_line_items", "warehouse_orders", column: "order_id"
   add_foreign_key "warehouse_line_items", "warehouse_skus", column: "sku_id"

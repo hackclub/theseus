@@ -599,6 +599,7 @@ DEPENDENCIES
   rubocop-rails-omakase
   sassc-rails (~> 2.1)
   select2-rails (~> 4.0)
+  selectize-rails (~> 0.12.6)
   selenium-webdriver
   slim-rails (~> 3.7)
   snail (~> 2.3)

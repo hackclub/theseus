@@ -1,0 +1,31 @@
+<%# Tag picker partial that can be used for any taggable model %>
+<%# Usage: render 'shared/tag_picker', form: form, field_name: :tags %>
+<% field_name ||= :tags %>
+<% selected_tags = form.object.tags || [] %>
+<% common_tags = CommonTag.pluck(:tag) %>
+
+<div class="form-group">
+  <%= form.label field_name, "Tags", class: "form-label" %>
+  <%= form.select field_name, 
+                  common_tags, 
+                  { selected: selected_tags, include_blank: false }, 
+                  { multiple: true, 
+                    class: "form-control selectize-tags",
+                    data: { 
+                      selectize: {
+                        plugins: ['remove_button'],
+                        delimiter: ',',
+                        persist: false,
+                        create: true,
+                        maxItems: nil
+                      }
+                    } 
+                  } %>
+  <div class="form-hint">Select from common tags or create your own</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  $('.selectize-tags').selectize();
+});
+</script> 

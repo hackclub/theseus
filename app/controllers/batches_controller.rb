@@ -213,6 +213,7 @@ class BatchesController < ApplicationController
         :letter_mailer_id_id,
         :letter_return_address_id,
         :include_qr_code,
+        :tags,
         template_cycle: []
       )
     end

@@ -139,6 +139,7 @@ class LettersController < ApplicationController
         :rubber_stamps,
         :usps_mailer_id_id,
         :return_address_id,
+        :tags,
         address_attributes: [
           :first_name,
           :last_name,

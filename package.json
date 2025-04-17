@@ -12,9 +12,11 @@
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.13",
     "@nathanvda/cocoon": "^1.2.14",
+    "@selectize/selectize": "^0.15.2",
     "autoprefixer": "^10.4.21",
     "jquery": "^3.7.1",
     "select2": "^4.1.0-rc.0",
+    "selectize": "^0.12.6",
     "vanilla-nested": "^1.7.1"
   }
 }
