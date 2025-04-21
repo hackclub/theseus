@@ -6,7 +6,7 @@ module SnailMail
       end
 
       def render(pdf, letter)
-        render_return_address(pdf, letter, 10, 278, 190, 90, size: 12)
+        render_return_address(pdf, letter, 10, 278, 190, 90, size: 12, font: 'comic')
 
         if letter.rubber_stamps.present?
           pdf.font("gohu") do

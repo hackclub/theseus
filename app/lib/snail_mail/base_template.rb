@@ -45,7 +45,7 @@ module SnailMail
     # Render return address
     def render_return_address(pdf, letter, x, y, width, height, options = {})
       default_options = {
-        font: "comic",
+        font: "arial",
         size: 11,
         align: :left,
         valign: :top,
