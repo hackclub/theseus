@@ -1,12 +1,10 @@
 class ReturnAddressesController < ApplicationController
-  before_action :set_return_address, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_return_address, only: [ :edit, :update, :destroy ]
 
   def index
     @return_addresses = ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
   end
 
-  def show
-  end
 
   def new
     @return_address = ReturnAddress.new
@@ -37,7 +35,12 @@ class ReturnAddressesController < ApplicationController
     authorize @return_address
 
     if @return_address.update(return_address_params)
-      redirect_to @return_address, notice: "Return address was successfully updated."
+      # If this was updated from the letter form, redirect back to the letter
+      if params[:from_letter].present?
+        redirect_to new_letter_path, notice: "Return address was successfully updated. Please select it from the dropdown."
+      else
+        redirect_to @return_address, notice: "Return address was successfully updated."
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -57,6 +60,6 @@ class ReturnAddressesController < ApplicationController
   end
 
   def return_address_params
-    params.require(:return_address).permit(:name, :line_1, :line_2, :city, :state, :postal_code, :country, :shared, :user_id)
+    params.require(:return_address).permit(:name, :line_1, :line_2, :city, :state, :postal_code, :country, :shared, :user_id, :from_letter)
   end
 end

@@ -27,6 +27,7 @@
   <div class="new-address-form" data-return-address-target="newForm" style="display: none;">
     <%= form.fields_for :return_address, ReturnAddress.new do |ra| %>
       <%= ra.hidden_field :user_id, value: current_user.id %>
+      <%= ra.hidden_field :from_letter, value: true if params[:from_letter].present? %>
       
       <div class="grid md:grid-cols-2 gap-4">
         <div class="form-group">
@@ -87,11 +88,15 @@
     const returnAddressController = {
       toggleNewForm: function(event) {
         const newForm = document.querySelector('[data-return-address-target="newForm"]');
-        newForm.style.display = newForm.style.display === 'none' ? 'block' : 'none';
+        if (newForm) {
+          newForm.style.display = newForm.style.display === 'none' ? 'block' : 'none';
+        }
       }
     };
 
-    document.querySelector('[data-action="click->return-address#toggleNewForm"]')
-      .addEventListener('click', returnAddressController.toggleNewForm);
+    const toggleButton = document.querySelector('[data-action="click->return-address#toggleNewForm"]');
+    if (toggleButton) {
+      toggleButton.addEventListener('click', returnAddressController.toggleNewForm);
+    }
   });
 </script> 

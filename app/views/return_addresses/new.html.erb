@@ -1,0 +1,9 @@
+<% content_for :title, "New Return Address" %>
+
+<h1>New Return Address</h1>
+
+<%= render "form", return_address: @return_address %>
+
+<div class="mt-4">
+  <%= link_to "Back to Return Addresses", return_addresses_path, class: "btn btn-secondary" %>
+</div> 

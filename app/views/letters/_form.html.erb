@@ -43,7 +43,7 @@
                                  { prompt: "Select a return address...", selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id },
                                  { class: "form-control" } %>
         <p class="text-sm text-gray-500 mt-2">
-          <%= link_to "Manage Return Addresses", return_addresses_path, class: "text-blue-600 hover:text-blue-800" %>
+          <%= link_to "Manage Return Addresses", return_addresses_path(from_letter: true), class: "text-blue-600 hover:text-blue-800" %>
         </p>
       </div>
     </div>
