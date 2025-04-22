@@ -41,7 +41,7 @@
           <%= form.label :mailing_date, class: "form-label" %>
           <%= form.date_field :mailing_date, 
             value: form.object.mailing_date || form.object.default_mailing_date,
-            min: Date.current,
+            min: form.object.new_record? ? Date.current : nil,
             class: "form-control" %>
         </div>
       <% end %>
