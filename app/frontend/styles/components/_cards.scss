@@ -1,3 +1,7 @@
+@use "sass:color";
+@use "sass:map";
+@use "../colors";
+
 .card {
   background-color: var(--card-bg);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.125);
@@ -9,19 +13,19 @@
 
   &.card--sunken {
     box-shadow: none;
-    background-color: rgba(map-get($palette, smoke), 0.75);
+    background-color: rgba(map.get(colors.$palette, smoke), 0.75);
   }
 
   &.b--warning {
     box-shadow:
-      0 0 2px 0 rgba(map-get($palette, warning), 0.0625),
-      0 4px 8px 0 rgba(map-get($palette, warning), 0.125);
+      0 0 2px 0 rgba(map.get(colors.$palette, warning), 0.0625),
+      0 4px 8px 0 rgba(map.get(colors.$palette, warning), 0.125);
   }
 
   &.b--info {
     box-shadow:
-      0 0 2px 0 rgba(map-get($palette, info), 0.0625),
-      0 4px 8px 0 rgba(map-get($palette, info), 0.125);
+      0 0 2px 0 rgba(map.get(colors.$palette, info), 0.0625),
+      0 4px 8px 0 rgba(map.get(colors.$palette, info), 0.125);
   }
 
   :not(.draggable-source--is-dragging) > &.card--hover:hover,
@@ -73,7 +77,7 @@ a.card {
 }
 
 .card__darker {
-  background: map-get($palette, snow);
+  background: map.get(colors.$palette, snow);
 }
 
 .card__banner {
@@ -93,15 +97,15 @@ a.card {
 .error-card {
   @extend .card;
   max-width: 32rem;
-  border: 1px solid map-get($palette, error);
+  border: 1px solid map.get(colors.$palette, error);
   margin-bottom: 1.5rem;
   box-shadow:
-    0 0 2px 0 rgba(map-get($palette, error), 0.025),
-    0 4px 8px 0 rgba(map-get($palette, error), 0.125);
+    0 0 2px 0 rgba(map.get(colors.$palette, error), 0.025),
+    0 4px 8px 0 rgba(map.get(colors.$palette, error), 0.125);
 
   h2 {
-    color: map-get($palette, error);
-    border-bottom-color: map-get($palette, primary);
+    color: map.get(colors.$palette, error);
+    border-bottom-color: map.get(colors.$palette, primary);
     margin-top: 0;
     font-size: 1.25rem;
   }
@@ -144,16 +148,16 @@ a.card {
   padding: 0.5rem 0.75rem 0.5rem 1rem;
 
   &.success {
-    color: map-get($palette, success);
-    background-color: rgba(map-get($palette, success), 0.125);
+    color: map.get(colors.$palette, success);
+    background-color: rgba(map.get(colors.$palette, success), 0.125);
   }
   &.info {
-    color: map-get($palette, info);
-    background-color: rgba(map-get($palette, info), 0.125);
+    color: map.get(colors.$palette, info);
+    background-color: rgba(map.get(colors.$palette, info), 0.125);
   }
   &.error {
-    color: map-get($palette, error);
-    background-color: rgba(map-get($palette, error), 0.125);
+    color: map.get(colors.$palette, error);
+    background-color: rgba(map.get(colors.$palette, error), 0.125);
   }
 }
 
@@ -169,14 +173,14 @@ a.card {
 
 .card--breakdown {
   @extend .card;
-  @extend .border;
+  // @extend .border;
   padding: 20px;
   padding-top: 0px;
   padding-bottom: 24px;
-  border: 1px solid map-get($palette, smoke);
+  border: 1px solid map.get(colors.$palette, smoke);
 
   & .error {
-    color: saturate(lighten(map-get($palette, error), 40%), 60%);
+    color: color.adjust(color.adjust(map.get(colors.$palette, error), $lightness: 40%), $saturation: 60%);
   }
 }
 

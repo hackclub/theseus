@@ -1,9 +1,19 @@
-@import 'components/banners';
-@import 'colors';
+@use 'colors' as *;
+@use "design_system";
+@use "components/base";
+@use 'components/banners';
+
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
 
 html {
   color-scheme: light dark;
 }
+
 #treasure {
   image-rendering: optimizeSpeed;
   image-rendering: -moz-crisp-edges;
@@ -13,13 +23,16 @@ html {
   -ms-interpolation-mode: nearest-neighbor;
   width: 100%
 }
+
 @media (prefers-color-scheme: dark) {
   #treasure {
     filter: invert(1);
   }
 }
+
 body {
   max-width: 35em;
   width: 90%;
   margin: 2em auto;
 }
+

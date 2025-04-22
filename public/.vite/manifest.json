@@ -1,0 +1,22 @@
+{
+  "entrypoints/app_style.scss": {
+    "file": "assets/app_style-DayGOoOA.css",
+    "src": "entrypoints/app_style.scss",
+    "isEntry": true
+  },
+  "entrypoints/cocoon.js": {
+    "file": "assets/cocoon-D1uP02It.js",
+    "name": "entrypoints/cocoon.js",
+    "src": "entrypoints/cocoon.js",
+    "isEntry": true
+  },
+  "entrypoints/login_page.scss": {
+    "file": "assets/login_page-C8iuognS.css",
+    "src": "entrypoints/login_page.scss",
+    "isEntry": true
+  },
+  "treasure.png": {
+    "file": "assets/treasure-KPG0amXu.png",
+    "src": "treasure.png"
+  }
+}

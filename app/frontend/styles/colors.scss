@@ -1,3 +1,5 @@
+@use "sass:color";
+
 $black: #1f2d3d;
 $slate: #3c4858;
 $muted: #8492a6;
@@ -23,8 +25,7 @@ $palette: (
         accent: $cyan,
         info: $blue,
         success: $green,
-    //  'success-dark': $green-dark,
-        error: desaturate(darken($red, 25%), 15%),
+        error: color.adjust(color.adjust($red, $lightness: -25%, $space: hsl), $saturation: -15%, $space: hsl),
         ai: $purple,
         warning: $orange,
         pending: $yellow,
@@ -43,8 +44,8 @@ $palette: (
     background-color: map-get($palette, $color);
     background-image: radial-gradient(
                     ellipse farthest-corner at top left,
-                    lighten(saturate(map-get($palette, $color), 15%), 15%),
-                    saturate(map-get($palette, $color), 15%)
+                    color.adjust(color.adjust(map-get($palette, $color), $saturation: 15%, $space: hsl), $lightness: 15%, $space: hsl),
+                    color.adjust(map-get($palette, $color), $saturation: 15%, $space: hsl)
     );
 }
 

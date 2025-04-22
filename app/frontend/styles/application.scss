@@ -1,34 +1,32 @@
+@use "sass:meta";
+/* Design System */
+@use "colors" as *;
+@use "design_system" as *;
+@use "utilities" as *;
+
 /* Import Tailwind directives first */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Design System */
-@import "colors";
-@import "design_system";
-@import "utilities";
-
 /* Then import our own styles */
-@import "basscss";
-@import "dark";
+@use "basscss" as *;
+@use "dark" as *;
 
 /* Components */
-@import "components/base";
-@import "components/forms";
-@import "components/nav";
-@import "components/buttons";
-@import "components/badges";
-@import "components/cards";
-@import "components/tables";
-@import "components/return_address_picker";
-@import "components/return_addresses";
-@import "components/document";
-@import "components/letter";
-@import "components/batch";
-@import "components/warehouse";
-
-/* Third party */
-@import "select2";
+@use "components/base" as *;
+@use "components/forms" as *;
+@use "components/nav" as *;
+@use "components/buttons" as *;
+@use "components/badges" as *;
+@use "components/cards" as *;
+@use "components/tables" as *;
+@use "components/return_address_picker" as *;
+@use "components/return_addresses" as *;
+@use "components/document" as *;
+@use "components/letter" as *;
+@use "components/batch" as *;
+@use "components/warehouse" as *;
 
 @layer base {
   /* Base Styles */
