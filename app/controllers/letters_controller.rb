@@ -201,7 +201,8 @@ class LettersController < ApplicationController
           :state,
           :postal_code,
           :country
-        ]
+        ],
+        tags: []
       )
     end
 end

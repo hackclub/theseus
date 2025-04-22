@@ -1,7 +1,6 @@
 - content_for :head
   = vite_javascript_tag 'cocoon'
 
-
 = form_with(model: warehouse_order) do |form|
   - if warehouse_order.errors.any?
     = render layout: 'shared/banner', locals: {color: 'alert'} do
@@ -11,25 +10,21 @@
           li= error.full_message
   div
     = form.label :user_facing_title, "short title (shown to recipient):"
-    = form.text_field :user_facing_title
-
-  div
-    = form.label :purpose_code_id, "purpose:"
-    = form.collection_select :purpose_code_id, @allowed_purpose_codes, :id, :display_name, prompt: 'select one...', required: true
+    = form.text_field :user_facing_title, class: 'form-control'
 
   div
     = form.label :recipient_email, "recipient email:"
-    = form.email_field :recipient_email
+    = form.email_field :recipient_email, class: 'form-control'
 
   b address:
   = render 'addresses/nested_form', form: form
   .py-3
     = form.label :internal_notes, "internal notes:"
     .display-block
-      = form.text_area :internal_notes
+      = form.text_area :internal_notes, class: 'form-control'
     
     = form.label :notify_on_dispatch, 'send the recipient a "sent to warehouse" email? '
-    = form.check_box :notify_on_dispatch
+    = form.check_box :notify_on_dispatch, class: 'form-control'
     br
     small
       | (they'll get an email when it ships regardless)
@@ -40,5 +35,6 @@
 
     .links
       = link_to_add_association 'add item', form, :line_items
+  = render 'shared/tag_picker', form: form, field_name: :tags
   .pt-3
-    = form.submit "save"
+    = form.submit "save", class: 'form-control'

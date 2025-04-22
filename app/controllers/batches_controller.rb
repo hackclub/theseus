@@ -256,7 +256,8 @@ class BatchesController < ApplicationController
         :usps_payment_account_id,
         :us_postage_type,
         :intl_postage_type,
-        template_cycle: []
+        template_cycle: [],
+        tags: []
       )
     end
 

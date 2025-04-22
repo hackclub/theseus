@@ -61,7 +61,7 @@ class Warehouse::Order < ApplicationRecord
   set_public_id_prefix "pkg"
 
   belongs_to :template, class_name: "Warehouse::Template", optional: true
-  belongs_to :purpose_code
+  belongs_to :purpose_code, optional: true
   belongs_to :user
   belongs_to :source_tag
 
@@ -69,7 +69,7 @@ class Warehouse::Order < ApplicationRecord
   validates :recipient_email, presence: true
   validate :can_mail_parcels_to_country
 
-  before_create :set_hc_id
+  after_create :set_hc_id
 
   include HasWarehouseLineItems
   include HasTableSync
@@ -95,6 +95,8 @@ class Warehouse::Order < ApplicationRecord
                  }
 
   has_zenventory_url "https://app.zenventory.com/orders/edit-order/%s", :zenventory_id
+
+  taggable_array :tags
 
   def shipping_address_attributes
     {
@@ -129,7 +131,7 @@ class Warehouse::Order < ApplicationRecord
       raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
       order = Zenventory.create_customer_order(
         {
-          orderNumber: hc_id,
+          orderNumber: "hack.club/#{hc_id}",
           customer: customer_attributes,
           shippingAddress: shipping_address_attributes,
           billingAddress: { sameAsShipping: true },
@@ -321,13 +323,15 @@ class Warehouse::Order < ApplicationRecord
 
   private
   def set_hc_id
-    ActiveRecord::Base.transaction do
-      purpose_code.increment!(:sequence_number)
-      self.hc_id = "HC-#{purpose_code.code}-#{purpose_code.sequence_number.to_s.rjust(4, '0')}"
-    end
+    update_column(:hc_id, public_id)
   end
 
   def can_mail_parcels_to_country
     errors.add(:base, :cant_mail, message: "We can't currently ship to #{ISO3166::Country[address.country]&.common_name || address.country} from the warehouse.") if %i[IR PS CU KP RU].include? address.country&.to_sym
+  end
+
+  def inherit_batch_tags
+    return unless batch.present?
+    self.tags = (tags + batch.tags).uniq
   end
 end

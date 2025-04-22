@@ -1,0 +1,75 @@
+<%= form_with(model: return_address, local: true) do |form| %>
+  <% if return_address.errors.any? %>
+    <div class="alert alert-danger mb-6">
+      <h2 class="text-lg font-medium mb-2"><%= pluralize(return_address.errors.count, "error") %> prohibited this return address from being saved:</h2>
+
+      <ul class="list-disc list-inside">
+        <% return_address.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card mb-6">
+    <div class="card-body">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="form-group">
+          <%= form.label :name, class: "form-label" %>
+          <%= form.text_field :name, class: "form-control", placeholder: "Organization or Personal Name" %>
+        </div>
+        
+        <div class="form-group">
+          <%= form.label :line_1, "Address Line 1", class: "form-label" %>
+          <%= form.text_field :line_1, class: "form-control", placeholder: "Street address, P.O. box, etc." %>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :line_2, "Address Line 2", class: "form-label" %>
+        <%= form.text_field :line_2, class: "form-control", placeholder: "Apartment, suite, unit, etc. (optional)" %>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="form-group">
+          <%= form.label :city, class: "form-label" %>
+          <%= form.text_field :city, class: "form-control" %>
+        </div>
+        
+        <div class="form-group">
+          <%= form.label :state, class: "form-label" %>
+          <%= form.text_field :state, class: "form-control" %>
+        </div>
+        
+        <div class="form-group">
+          <%= form.label :postal_code, "Postal Code", class: "form-label" %>
+          <%= form.text_field :postal_code, class: "form-control" %>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <%= form.label :country, class: "form-label" %>
+        <%= form.collection_select :country,
+                                 ReturnAddress.countries_for_select,
+                                 :first,
+                                 :last,
+                                 { include_blank: "Select a country" },
+                                 { class: "form-control" } %>
+      </div>
+      
+      <div class="form-group">
+        <label class="checkbox-label">
+          <%= form.check_box :shared, class: "form-checkbox" %>
+          <span>Make this address available to everyone</span>
+        </label>
+      </div>
+
+      <%= form.hidden_field :user_id, value: current_user.id %>
+      <%= form.hidden_field :from_letter, value: true if params[:from_letter].present? %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "btn btn-primary" %>
+  </div>
+<% end %> 

@@ -42,6 +42,9 @@
 #
 class Batch < ApplicationRecord
   include AASM
+  include PublicIdentifiable
+  set_public_id_prefix "batch"
+  taggable_array :tags
 
   aasm timestamps: true do
     state :awaiting_field_mapping, initial: true
@@ -63,6 +66,8 @@ class Batch < ApplicationRecord
   has_one_attached :labels_pdf
   has_one_attached :pdf_document
   has_many :addresses, dependent: :destroy
+
+  after_save :update_associated_tags, if: :saved_change_to_tags?
 
   def attach_pdf(pdf_data)
     PdfAttachmentUtil.attach_pdf(pdf_data, self, :pdf_document)
@@ -119,5 +124,14 @@ class Batch < ApplicationRecord
   end
   def build_mapping(row)
     build_address(row)
+  end
+
+  def update_associated_tags
+    case type
+    when "Letter::Batch"
+      Letter.where(batch_id: id).update_all(tags: tags)
+    when "Warehouse::Batch"
+      Warehouse::Order.where(batch_id: id).update_all(tags: tags)
+    end
   end
 end

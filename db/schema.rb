@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_15_005519) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_17_153840) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -97,6 +97,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_15_005519) do
     t.index ["user_id"], name: "index_batches_on_user_id"
     t.index ["warehouse_purpose_code_id"], name: "index_batches_on_warehouse_purpose_code_id"
     t.index ["warehouse_template_id"], name: "index_batches_on_warehouse_template_id"
+  end
+
+  create_table "common_tags", force: :cascade do |t|
+    t.string "tag"
+    t.boolean "implies_ysws"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -333,7 +340,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_15_005519) do
 
   create_table "warehouse_orders", force: :cascade do |t|
     t.string "hc_id"
-    t.bigint "purpose_code_id", null: false
+    t.bigint "purpose_code_id"
     t.string "aasm_state"
     t.string "recipient_email"
     t.bigint "user_id", null: false
