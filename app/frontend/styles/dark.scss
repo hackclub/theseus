@@ -1,3 +1,5 @@
+@use "colors";
+
 /* we implement light mode by editing the color scheme of the page */
 
 @media (prefers-color-scheme: dark) {
@@ -106,7 +108,7 @@
     }
     .card {
         --card-bg: #252429;
-        background-color: $darkless;
+        background-color: colors.$darkless;
     }
 }
 

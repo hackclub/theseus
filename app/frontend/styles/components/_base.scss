@@ -1,3 +1,4 @@
+@use "sass:color";
 // Base Components
 
 // Card
@@ -220,7 +221,7 @@
     color: white;
     
     &:hover {
-      background-color: darken(#33d6a6, 10%);
+      background-color: color.adjust(#33d6a6, $lightness: -10%);
     }
   }
   
@@ -229,7 +230,7 @@
     color: white;
     
     &:hover {
-      background-color: darken(#dc3545, 10%);
+      background-color: color.adjust(#dc3545, $lightness: -10%);
     }
   }
   

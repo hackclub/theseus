@@ -1,10 +1,14 @@
+@use "sass:color";
+@use "sass:map";
+@use "../colors";
+
 // Numeric count badge, see the badge_for helper
 .badge {
   display: inline-flex;
   flex-shrink: none;
   align-items: center;
-  background-color: map-get($palette, primary);
-  color: $white;
+  background-color: map.get(colors.$palette, primary);
+  color: colors.$white;
   border-radius: 9999px;
   gap: 0.25rem;
   font-size: 0.75rem;
@@ -16,54 +20,54 @@
   padding: 0.25rem 0.625rem;
 
   &.success {
-    background-color: rgba(map-get($palette, success), 0.2);
-    color: darken(map-get($palette, success), 10%);
+    background-color: rgba(map.get(colors.$palette, success), 0.2);
+    color: color.adjust(map.get(colors.$palette, success), $lightness: -10%);
 
     @media (prefers-color-scheme: dark) {
-      background-color: rgba(map-get($palette, success), 0.125);
-      color: map-get($palette, success);
+      background-color: rgba(map.get(colors.$palette, success), 0.125);
+      color: map.get(colors.$palette, success);
     }
   }
   &.pending {
-    background-color: rgba(map-get($palette, pending), 0.125);
-    color: map-get($palette, pending);
+    background-color: rgba(map.get(colors.$palette, pending), 0.125);
+    color: map.get(colors.$palette, pending);
   }
   &.warning {
-    background-color: rgba(map-get($palette, warning), 0.125);
-    color: map-get($palette, warning);
+    background-color: rgba(map.get(colors.$palette, warning), 0.125);
+    color: map.get(colors.$palette, warning);
   }
   &.purple {
-    background-color: rgba(map-get($palette, purple), 0.125);
-    color: map-get($palette, purple);
+    background-color: rgba(map.get(colors.$palette, purple), 0.125);
+    color: map.get(colors.$palette, purple);
   }
   &.ai {
-    background-color: rgba(map-get($palette, ai), 0.125);
-    color: map-get($palette, ai);
+    background-color: rgba(map.get(colors.$palette, ai), 0.125);
+    color: map.get(colors.$palette, ai);
   }
   &.error {
-    background-color: rgba(map-get($palette, error), 0.125);
-    color: map-get($palette, error);
+    background-color: rgba(map.get(colors.$palette, error), 0.125);
+    color: map.get(colors.$palette, error);
 
     @media (prefers-color-scheme: dark) {
-      background-color: rgba(map-get($palette, error), 0.3);
-      color: lighten(saturate(map-get($palette, error), 20%), 40%);
+      background-color: rgba(map.get(colors.$palette, error), 0.3);
+      color: color.adjust(color.adjust(map.get(colors.$palette, error), $saturation: 20%), $lightness: 40%);
     }
   }
   &.info {
-    background-color: rgba(map-get($palette, info), 0.125);
-    color: map-get($palette, info);
+    background-color: rgba(map.get(colors.$palette, info), 0.125);
+    color: map.get(colors.$palette, info);
   }
   &.bg-accent {
-    background-color: rgba(map-get($palette, accent), 0.125);
-    color: map-get($palette, accent);
+    background-color: rgba(map.get(colors.$palette, accent), 0.125);
+    color: map.get(colors.$palette, accent);
   }
   &.bg-muted {
-    background-color: rgba(map-get($palette, muted), 0.125);
-    color: map-get($palette, slate);
+    background-color: rgba(map.get(colors.$palette, muted), 0.125);
+    color: map.get(colors.$palette, slate);
   }
   &.muted {
-    background-color: map-get($palette, muted);
-    color: $white;
+    background-color: map.get(colors.$palette, muted);
+    color: colors.$white;
   }
 
   &.badge-large {
@@ -74,7 +78,7 @@
   &.tx-tag {
     font-weight: normal;
     background-color: transparent;
-    color: map-get($palette, slate);
+    color: map.get(colors.$palette, slate);
     border: 1px solid;
     border-color: rgba(0, 0, 0, 0.125);
     border-width: 0.5px;
@@ -93,7 +97,7 @@
   display: inline-flex;
   flex-shrink: none;
   align-items: center;
-  color: map-get($palette, muted);
+  color: map.get(colors.$palette, muted);
   border: 1px solid;
   border-color: rgba(0, 0, 0, 0.125);
   border-width: 0.5px;
@@ -114,14 +118,14 @@
 }
 
 .list-badge.quick-action:hover {
-  color: map-get($palette, info);
+  color: map.get(colors.$palette, info);
 }
 
 // Circular button
 .pop {
   border-radius: 9999px;
-  color: map-get($palette, info);
-  background-color: rgba(map-get($palette, info), 0.125);
+  color: map.get(colors.$palette, info);
+  background-color: rgba(map.get(colors.$palette, info), 0.125);
   flex-shrink: 0;
   text-decoration: none;
   display: inline-flex;
@@ -150,29 +154,29 @@
   }
 
   &.success {
-    background-color: rgba(map-get($palette, success), 0.125);
+    background-color: rgba(map.get(colors.$palette, success), 0.125);
   }
 
   &.pending {
-    background-color: rgba(map-get($palette, pending), 0.125);
+    background-color: rgba(map.get(colors.$palette, pending), 0.125);
   }
   &.warning {
-    background-color: rgba(map-get($palette, warning), 0.125);
+    background-color: rgba(map.get(colors.$palette, warning), 0.125);
   }
   &.purple {
-    background-color: rgba(map-get($palette, purple), 0.125);
+    background-color: rgba(map.get(colors.$palette, purple), 0.125);
   }
   &.error {
-    background-color: rgba(map-get($palette, error), 0.125);
+    background-color: rgba(map.get(colors.$palette, error), 0.125);
   }
   &.purple {
-    background-color: rgba(map-get($palette, purple), 0.125);
+    background-color: rgba(map.get(colors.$palette, purple), 0.125);
   }
   &.ai {
-    background-color: rgba(map-get($palette, ai), 0.125);
+    background-color: rgba(map.get(colors.$palette, ai), 0.125);
   }
   &.muted {
-    background-color: rgba(map-get($palette, muted), 0.125);
+    background-color: rgba(map.get(colors.$palette, muted), 0.125);
   }
 }
 summary.pop::-webkit-details-marker {
@@ -191,11 +195,11 @@ summary.pop::-webkit-details-marker {
 }
 
 .timestamp {
-  color: map-get($palette, muted);
+  color: map.get(colors.$palette, muted);
 }
 // User mentions, use the user_mention helper
 .mention {
-  color: map-get($palette, muted);
+  color: map.get(colors.$palette, muted);
   display: inline-flex;
   align-items: center;
   font-weight: 500;
