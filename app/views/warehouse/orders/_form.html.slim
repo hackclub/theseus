@@ -13,10 +13,6 @@
     = form.text_field :user_facing_title, class: 'form-control'
 
   div
-    = form.label :purpose_code_id, "purpose:"
-    = form.collection_select :purpose_code_id, @allowed_purpose_codes, :id, :display_name, { prompt: 'select one...', required: true }, class: 'form-control'
-
-  div
     = form.label :recipient_email, "recipient email:"
     = form.email_field :recipient_email, class: 'form-control'
 

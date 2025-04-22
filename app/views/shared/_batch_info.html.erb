@@ -47,12 +47,6 @@
               <%= record.batch.warehouse_template.name %>
             </div>
           <% end %>
-          <% if record.batch.warehouse_purpose_code.present? %>
-            <div>
-              <span class="text-gray-500">Purpose Code:</span>
-              <%= record.batch.warehouse_purpose_code.display_name %>
-            </div>
-          <% end %>
         <% end %>
       </div>
     </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_15_005519) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_17_153840) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -340,7 +340,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_15_005519) do
 
   create_table "warehouse_orders", force: :cascade do |t|
     t.string "hc_id"
-    t.bigint "purpose_code_id", null: false
+    t.bigint "purpose_code_id"
     t.string "aasm_state"
     t.string "recipient_email"
     t.bigint "user_id", null: false
