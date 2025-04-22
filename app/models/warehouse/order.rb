@@ -10,11 +10,13 @@
 #  idempotency_key         :string
 #  internal_notes          :text
 #  mailed_at               :datetime
+#  metadata                :jsonb
 #  notify_on_dispatch      :boolean
 #  postage_cost            :decimal(, )
 #  recipient_email         :string
 #  service                 :string
 #  surprise                :boolean
+#  tags                    :citext           default([]), is an Array
 #  tracking_number         :string
 #  user_facing_description :string
 #  user_facing_title       :string
@@ -38,6 +40,7 @@
 #  index_warehouse_orders_on_idempotency_key  (idempotency_key) UNIQUE
 #  index_warehouse_orders_on_purpose_code_id  (purpose_code_id)
 #  index_warehouse_orders_on_source_tag_id    (source_tag_id)
+#  index_warehouse_orders_on_tags             (tags) USING gin
 #  index_warehouse_orders_on_template_id      (template_id)
 #  index_warehouse_orders_on_user_id          (user_id)
 #
@@ -55,9 +58,9 @@ class Warehouse::Order < ApplicationRecord
   include HasAddress
   include CanBeBatched
   include PublicIdentifiable
-  set_public_id_prefix 'pkg'
+  set_public_id_prefix "pkg"
 
-  belongs_to :template, class_name: 'Warehouse::Template', optional: true
+  belongs_to :template, class_name: "Warehouse::Template", optional: true
   belongs_to :purpose_code
   belongs_to :user
   belongs_to :source_tag

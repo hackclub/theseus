@@ -1,17 +1,15 @@
 module SnailMail
   module Templates
     class KestrelHeidiTemplate < BaseTemplate
-
       def self.template_name
         "kestrel's heidi template!"
       end
 
 
       def render(pdf, letter)
-
         pdf.image(
-          image_path('kestrel-mail-heidi.png'),
-          at: [107, 216],
+          image_path("kestrel-mail-heidi.png"),
+          at: [ 107, 216 ],
           width: 305
         )
 
@@ -30,6 +28,8 @@ module SnailMail
         render_imb(pdf, letter, 124, 128, 266)
 
         render_qr_code(pdf, letter, 7, 72+7, 72)
+
+        render_postage(pdf, letter)
       end
     end
   end

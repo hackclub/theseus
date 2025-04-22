@@ -1,3 +1,7 @@
+<% content_for :head do %>
+  <%= vite_javascript_tag 'cocoon' %>
+<% end %>
+
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
     <div style="color: red">

@@ -1,147 +1,194 @@
 module SnailMail
   class BaseTemplate
+    include SnailMail::Helpers
+
     # Template sizes in points [width, height]
     SIZES = {
-      standard: [6 * 72, 4 * 72], # 4x6 inches (432 x 288 points)
-      envelope: [9.5 * 72, 4.125 * 72] # #10 envelope (684 x 297 points)
+      standard: [ 6 * 72, 4 * 72 ], # 4x6 inches (432 x 288 points)
+      envelope: [ 9.5 * 72, 4.125 * 72 ] # #10 envelope (684 x 297 points)
     }.freeze
-    
+
     # Template metadata - override in subclasses
     def self.template_name
-      name.demodulize.underscore.sub(/_template$/, '')
+      name.demodulize.underscore.sub(/_template$/, "")
     end
-    
+
     def self.template_size
       :standard # default to 4x6 standard
     end
-    
+
     def self.template_description
       "A label template"
     end
-    
+
     # Instance methods
     attr_reader :options
-    
+
     def initialize(options = {})
       @options = options
     end
-    
+
     # Size in points [width, height]
     def size
       SIZES[self.class.template_size] || SIZES[:standard]
     end
-    
+
     # Main render method, to be implemented by subclasses
     def render(pdf, letter)
       raise NotImplementedError, "Subclasses must implement the render method"
     end
-    
+
     protected
-    
+
     # Helper methods for templates
-    
+
     # Render return address
     def render_return_address(pdf, letter, x, y, width, height, options = {})
       default_options = {
-        font: 'comic',
+        font: "arial",
         size: 11,
         align: :left,
         valign: :top,
         overflow: :shrink_to_fit,
         min_font_size: 6
       }
-      
+
       options = default_options.merge(options)
       font_name = options.delete(:font)
-      
+
       pdf.font(font_name) do
         pdf.text_box(
           letter.return_address.format_for_country(letter.address.country),
-          at: [x, y],
+          at: [ x, y ],
           width: width,
           height: height,
           **options
         )
       end
     end
-    
+
     # Render destination address
     def render_destination_address(pdf, letter, x, y, width, height, options = {})
       default_options = {
-        font: 'f25',
+        font: "f25",
         size: 11,
         align: :left,
         valign: :center,
         overflow: :shrink_to_fit,
-        min_font_size: 6
+        min_font_size: 6,
+        disable_wrap_by_char: true
       }
-      
+
       options = default_options.merge(options)
       font_name = options.delete(:font)
-      
+      stroke = options.delete(:dbg_stroke)
+
       pdf.font(font_name) do
         pdf.text_box(
           letter.address.snailify,
-          at: [x, y],
+          at: [ x, y ],
           width: width,
           height: height,
           **options
         )
       end
+      if stroke
+        pdf.stroke { pdf.rectangle([ x, y ], width, height) }
+      end
     end
-    
+
     # Render Intelligent Mail barcode
     def render_imb(pdf, letter, x, y, width, options = {})
       return unless letter.address.us?
-      
+
       default_options = {
-        font: 'imb',
+        font: "imb",
         size: 24,
         align: :center,
         overflow: :shrink_to_fit
       }
-      
+
       options = default_options.merge(options)
       font_name = options.delete(:font)
-      
+
       pdf.font(font_name) do
         pdf.text_box(
           generate_imb(letter),
-          at: [x, y],
+          at: [ x, y ],
           width: width,
           disable_wrap_by_char: true,
           **options
         )
       end
     end
-    
+
     # Render QR code
     def render_qr_code(pdf, letter, x, y, size = 80)
       return unless options[:include_qr_code]
       SnailMail::QRCodeGenerator.generate_qr_code(pdf, "https://mail.hack.club/#{letter.public_id}", x, y, size)
     end
 
-    def render_letter_id(pdf, letter, x, y, size, font = 'f25')
+    def render_letter_id(pdf, letter, x, y, size, opts = {})
       return if options[:include_qr_code]
-      pdf.font(font) { pdf.text_box(letter.public_id, at: [x, y], size:, overflow: :shrink_to_fit, valign: :top ) }
+      pdf.font(opts.delete(:font) || "f25") { pdf.text_box(letter.public_id, at: [ x, y ], size:, overflow: :shrink_to_fit, valign: :top, **opts) }
     end
-    # Helper for path to image assets
-    def image_path(image_name)
-      File.join(Rails.root, "app", "lib", "snail_mail", "assets", "images", image_name)
-    end
-    
+
+
     private
 
     # Format destination address
     def format_destination_address(letter)
       letter.address.snailify
     end
-    
+
     # Generate IMb barcode
     def generate_imb(letter)
       # Use the IMb module to generate the barcode
       IMb.new(letter).generate
     end
 
+    def render_postage(pdf, letter, x = 294)
+      if letter.postage_type == "indicia"
+        IMI.render_indicium(pdf, letter, letter.usps_indicium, x)
+        FIM.render_fim_d(pdf)
+      else
+        postage_amount = letter.postage
+        stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
+
+        requested_stamps = if stamps.size == 1
+          stamp = stamps.first
+          "#{stamp[:count]} #{stamp[:name]}"
+        elsif stamps.size == 2
+          "#{stamps[0][:count]} #{stamps[0][:name]} and #{stamps[1][:count]} #{stamps[1][:name]}"
+        else
+          stamps.map.with_index do |stamp, index|
+            if index == stamps.size - 1
+              "and #{stamp[:count]} #{stamp[:name]}"
+            else
+              "#{stamp[:count]} #{stamp[:name]}"
+            end
+          end.join(", ")
+        end
+
+        postage_info = <<~EOT
+          i take #{ActiveSupport::NumberHelper.number_to_currency(postage_amount)} in postage, so #{requested_stamps}
+        EOT
+
+        pdf.bounding_box([ pdf.bounds.right - 55, pdf.bounds.top - 5 ], width: 50, height: 50) do
+          pdf.font("f25") do
+          pdf.text_box(
+            postage_info,
+            at: [ 1, 48 ],
+            width: 48,
+            height: 45,
+            size: 8,
+            align: :center,
+            min_font_size: 4,
+            overflow: :shrink_to_fit,
+          )
+        end
+        end
+      end
+    end
   end
-end 
+end

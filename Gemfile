@@ -9,7 +9,6 @@ gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Bundle and transpile JavaScript [https://github.com/rails/jsbundling-rails]
-gem "jsbundling-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
@@ -92,16 +91,13 @@ gem "easypost", "~> 6.4"
 
 gem "pundit", "~> 2.5"
 
-gem "tailwindcss-ruby", "~> 4.0"
 
-gem "tailwindcss-rails", "~> 4.2"
 
 
 gem "select2-rails", "~> 4.0"
 
 gem "jquery-rails", "~> 4.6"
 
-gem "sassc-rails", "~> 2.1"
 
 gem "country-select", "~> 1.2"
 
@@ -134,3 +130,11 @@ gem "aws-sdk-s3", require: false
 gem "acts-as-taggable-array-on", "~> 0.7.0"
 
 gem "selectize-rails", "~> 0.12.6"
+
+gem "ivymeter", "~> 0.1.0"
+
+gem "slack-notifier", "~> 2.4"
+
+gem "nokogiri", "~> 1.18"
+
+gem "vite_rails"

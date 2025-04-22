@@ -1,22 +1,22 @@
 <%= form.fields_for :address do |a| %>
   <div class="grid md:grid-cols-2 gap-4">
     <div class="form-group">
-      <%= a.label :first_name, class: "form-label" %>
+      <%= a.label :first_name, "First Name", class: "form-label" %>
       <%= a.text_field :first_name, class: "form-control" %>
     </div>
     <div class="form-group">
-      <%= a.label :last_name, class: "form-label" %>
+      <%= a.label :last_name, "Last Name", class: "form-label" %>
       <%= a.text_field :last_name, class: "form-control" %>
     </div>
   </div>
   
   <div class="form-group">
-    <%= a.label :line_1, "Address Line 1", class: "form-label" %>
+    <%= a.label :line_1, "Street Address", class: "form-label" %>
     <%= a.text_field :line_1, class: "form-control" %>
   </div>
   
   <div class="form-group">
-    <%= a.label :line_2, "Address Line 2", class: "form-label" %>
+    <%= a.label :line_2, "Apartment, Suite, etc.", class: "form-label" %>
     <%= a.text_field :line_2, class: "form-control" %>
     <div class="form-hint">Optional</div>
   </div>

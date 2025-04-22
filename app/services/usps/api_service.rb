@@ -1,7 +1,10 @@
 module USPS
   class USPSError < StandardError; end
+
   class NotFound < USPSError; end
+
   class NxAddress < NotFound; end
+
   class NxZIP < NotFound; end
 end
 
@@ -49,7 +52,7 @@ Faraday::Request.register_middleware usps_refresh: FaradayMiddleware::USPSRefres
 Faraday::Response.register_middleware usps_error: FaradayMiddleware::USPSErrorMiddleware
 
 class USPS::APIService
-  ENVIRONMENT = Rails.env.production? ? :prod : :cat_no_s
+  ENVIRONMENT = Rails.env.production? ? :prod : :tem
 
   class << self
     # Returns the best standardized address for a given address
@@ -217,16 +220,21 @@ class USPS::APIService
           }
         },
         {
-          "X-Payment-Authorization-Token" => payment_token
-        }
-      )
+          "X-Payment-Authorization-Token" => payment_token,
+          "Accept" => "application/vnd.usps.labels+json"
+        },
+      ).body
     end
 
     # ugh i can't document this rn
     # see https://developers.usps.com/paymentsv3#tag/Resources/operation/post-payments-payment-authorization
     # @return [String] USPS v3 payment account token
     def create_payment_token(roles:)
-      conn.post("/payments/v3/payment-authorization", { roles: }).body.dig("paymentAuthorizationToken")
+      conn.post("/payments/v3/payment-authorization", { roles: }).body.dig(:paymentAuthorizationToken)
+    end
+
+    def payment_account_inquiry(account_number:, account_type:, permit_zip: nil, amount: nil)
+      conn.get("/payments/v3/payment-account/#{account_number}", { accountType: account_type, permitZip: permit_zip, amount: }.compact_blank).body
     end
 
     private

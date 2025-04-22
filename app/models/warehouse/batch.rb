@@ -7,13 +7,17 @@
 #  address_count               :integer
 #  field_mapping               :jsonb
 #  letter_height               :decimal(, )
+#  letter_mailing_date         :date
+#  letter_processing_category  :integer
 #  letter_weight               :decimal(, )
 #  letter_width                :decimal(, )
+#  tags                        :citext           default([]), is an Array
 #  type                        :string           not null
 #  warehouse_user_facing_title :string
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  letter_mailer_id_id         :bigint
+#  letter_return_address_id    :bigint
 #  user_id                     :bigint           not null
 #  warehouse_purpose_code_id   :bigint
 #  warehouse_template_id       :bigint
@@ -21,6 +25,8 @@
 # Indexes
 #
 #  index_batches_on_letter_mailer_id_id        (letter_mailer_id_id)
+#  index_batches_on_letter_return_address_id   (letter_return_address_id)
+#  index_batches_on_tags                       (tags) USING gin
 #  index_batches_on_type                       (type)
 #  index_batches_on_user_id                    (user_id)
 #  index_batches_on_warehouse_purpose_code_id  (warehouse_purpose_code_id)
@@ -29,21 +35,22 @@
 # Foreign Keys
 #
 #  fk_rails_...  (letter_mailer_id_id => usps_mailer_ids.id)
+#  fk_rails_...  (letter_return_address_id => return_addresses.id)
 #  fk_rails_...  (user_id => users.id)
 #  fk_rails_...  (warehouse_purpose_code_id => warehouse_purpose_codes.id)
 #  fk_rails_...  (warehouse_template_id => warehouse_templates.id)
 #
 class Warehouse::Batch < Batch
-  belongs_to :warehouse_template, class_name: 'Warehouse::Template'
-  belongs_to :warehouse_purpose_code, class_name: 'Warehouse::PurposeCode'
+  belongs_to :warehouse_template, class_name: "Warehouse::Template"
+  belongs_to :warehouse_purpose_code, class_name: "Warehouse::PurposeCode"
 
-  has_many :orders, :class_name => 'Warehouse::Order'
+  has_many :orders, class_name: "Warehouse::Order"
 
   def self.model_name
     Batch.model_name
   end
 
-  def process!
+  def process!(options = {})
     addresses.each do |address|
       Warehouse::Order.from_template(
         warehouse_template,
@@ -59,6 +66,7 @@ class Warehouse::Batch < Batch
     orders.each do |order|
       order.dispatch!
     end
+    mark_processed!
   end
 
   def contents_cost
@@ -70,10 +78,10 @@ class Warehouse::Batch < Batch
   end
 
   def postage_cost
-    0
+    orders.sum(:postage_cost)
   end
 
   def total_cost
     contents_cost + labor_cost + postage_cost
   end
-end 
+end

@@ -112,6 +112,7 @@ Rails.application.routes.draw do
   resources :letters do
     member do
       post :generate_label
+      post :buy_indicia
       post :mark_printed
       post :mark_mailed
       post :mark_received
@@ -167,12 +168,13 @@ Rails.application.routes.draw do
   resources :return_addresses
   resources :batches do
     member do
-      get '/map', to: "batches#map_fields", as: :map_fields
+      get "/map", to: "batches#map_fields", as: :map_fields
       post :set_mapping
-      get '/process', to: "batches#process_form", as: :process_confirm
-      post '/process', to: "batches#process_batch", as: :process
+      get "/process", to: "batches#process_form", as: :process_confirm
+      post "/process", to: "batches#process_batch", as: :process
       post :mark_printed
       post :mark_mailed
+      post :update_costs
     end
   end
   root "static_pages#index"
@@ -190,6 +192,13 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get "/login" => "static_pages#login"
 
+  scope :webhooks do
+    namespace :usps do
+      namespace :iv_mtr do
+        post "", to: "webhook#ingest"
+      end
+    end
+  end
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

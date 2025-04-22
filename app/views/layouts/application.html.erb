@@ -17,11 +17,11 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag "tailwind" %>
-    <%= stylesheet_link_tag "application" %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
-    <%# <%= javascript_include_tag "https://unpkg.com/alpinejs", defer: true %> %>
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag 'application' %>
+    <%= vite_stylesheet_tag 'app_style.scss' %>
+
+
   </head>
 
   <body<% if Rails.env.development? %> class="not_prod"<% end %>>
@@ -34,17 +34,7 @@
 
       <div class="content-wrapper">
         <main class="content-container">
-          <% if flash.any? %>
-            <div class="flash-messages mb-4">
-              <% flash.each do |type, message| %>
-                <% alert_class = type.to_s == 'notice' ? 'alert-success' : 'alert-danger' %>
-                <div class="alert <%= alert_class %>" role="alert">
-                  <%= message %>
-                </div>
-              <% end %>
-            </div>
-          <% end %>
-          
+          <%= render "shared/flash" %>
           <%= yield %>
         </main>
 

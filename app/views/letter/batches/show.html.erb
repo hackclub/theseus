@@ -1,0 +1,13 @@
+          <div class="text-sm mb-3">
+            <span class="text-gray-500">Weight:</span>
+            <%= @batch.letter_weight %> oz
+          </div>
+          <div class="text-sm mb-3">
+            <span class="text-gray-500">Mailing Date:</span>
+            <%= @batch.mailing_date %>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-medium mb-2">Specifications</h3>
+      <%= render 'shared/letter_attributes', record: @batch %> 

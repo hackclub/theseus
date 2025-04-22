@@ -49,7 +49,7 @@ module ISO3166
       end.values.first
     end
     def stupid_compare(arr, val)
-      arr.map { |s| tldc(s)}.include?(val)
+      arr.map { |s| tldc(s) }.include?(val)
     end
     def tldc(s)
       ActiveSupport::Inflector.transliterate(s.strip).downcase
