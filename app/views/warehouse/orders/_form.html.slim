@@ -1,3 +1,7 @@
+- content_for :head
+  = vite_javascript_tag 'cocoon'
+
+
 = form_with(model: warehouse_order) do |form|
   - if warehouse_order.errors.any?
     = render layout: 'shared/banner', locals: {color: 'alert'} do

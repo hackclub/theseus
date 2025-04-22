@@ -5,6 +5,7 @@ class StaticPagesController < ApplicationController
   end
 
   def login
+    flash[:warning] = "Welcome to the login page"
     render :login, layout: false
   end
 end
