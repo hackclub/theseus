@@ -306,7 +306,8 @@ class Letter::Batch < Batch
       address: address,
       usps_mailer_id: mailer_id,
       return_address: letter_return_address,
-      rubber_stamps: row[field_mapping["rubber_stamps"]]
+      rubber_stamps: row[field_mapping["rubber_stamps"]],
+      tags: tags
     )
   end
 

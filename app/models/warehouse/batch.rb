@@ -60,7 +60,8 @@ class Warehouse::Batch < Batch
         user: user,
         idempotency_key: "batch_#{id}_address_#{address.id}",
         purpose_code: warehouse_purpose_code,
-        user_facing_title: warehouse_user_facing_title
+        user_facing_title: warehouse_user_facing_title,
+        tags: tags
       ).save!
     end
     orders.each do |order|

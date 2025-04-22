@@ -332,4 +332,9 @@ class Warehouse::Order < ApplicationRecord
   def can_mail_parcels_to_country
     errors.add(:base, :cant_mail, message: "We can't currently ship to #{ISO3166::Country[address.country]&.common_name || address.country} from the warehouse.") if %i[IR PS CU KP RU].include? address.country&.to_sym
   end
+
+  def inherit_batch_tags
+    return unless batch.present?
+    self.tags = (tags + batch.tags).uniq
+  end
 end

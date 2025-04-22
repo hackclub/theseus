@@ -60,6 +60,8 @@
     <%= form.label :csv, "CSV File" %>
     <%= form.file_field :csv, accept: ".csv" %>
   </div>
+  <%= render 'shared/tag_picker', form: form, field_name: :tags %>
+
 
   <div class="actions">
     <%= form.submit "Create Batch" %>

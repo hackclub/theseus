@@ -1,2 +1,5 @@
 @use "../styles/colors" as *;
 @use "../styles/app" as *;
+
+@import "selectize/dist/css/selectize";
+@import "selectize/dist/css/selectize.default";

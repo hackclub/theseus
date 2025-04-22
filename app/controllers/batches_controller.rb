@@ -252,12 +252,12 @@ class BatchesController < ApplicationController
         :letter_mailer_id_id,
         :letter_return_address_id,
         :include_qr_code,
-        :tags,
         :letter_mailing_date,
         :usps_payment_account_id,
         :us_postage_type,
         :intl_postage_type,
-        template_cycle: []
+        template_cycle: [],
+        tags: []
       )
     end
 

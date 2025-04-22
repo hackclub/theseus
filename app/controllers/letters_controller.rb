@@ -181,7 +181,6 @@ class LettersController < ApplicationController
         :rubber_stamps,
         :usps_mailer_id_id,
         :return_address_id,
-        :tags,
         address_attributes: [
           :id,
           :first_name,
@@ -202,7 +201,8 @@ class LettersController < ApplicationController
           :state,
           :postal_code,
           :country
-        ]
+        ],
+        tags: []
       )
     end
 end

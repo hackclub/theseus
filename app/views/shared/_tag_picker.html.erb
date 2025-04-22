@@ -1,20 +1,24 @@
+<% content_for :head do %>
+  <%= vite_javascript_tag "taggable" %>
+<% end %>
 <%# Tag picker partial that can be used for any taggable model %>
 <%# Usage: render 'shared/tag_picker', form: form, field_name: :tags %>
 <% field_name ||= :tags %>
-<% selected_tags = form.object.tags || [] %>
+<% selected_tags = form.object.try(:tags) || [] %>
 <% common_tags = CommonTag.pluck(:tag) %>
+<%# Combine common tags with any selected tags that aren't in common tags %>
+<% all_tags = (common_tags + selected_tags).uniq %>
 
 <div class="form-group">
   <%= form.label field_name, "Tags", class: "form-label" %>
   <%= form.select field_name, 
-                  common_tags, 
+                  all_tags, 
                   { selected: selected_tags, include_blank: false }, 
                   { multiple: true, 
                     class: "form-control selectize-tags",
                     data: { 
                       selectize: {
                         plugins: ['remove_button'],
-                        delimiter: ',',
                         persist: false,
                         create: true,
                         maxItems: nil
@@ -26,6 +30,23 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  $('.selectize-tags').selectize();
+  $('.selectize-tags').selectize({
+    plugins: ['remove_button'],
+    persist: false,
+    create: true,
+    maxItems: null,
+    onItemAdd: function(value, $item) {
+      // Remove any empty values
+      if (!value || value.trim() === '') {
+        this.removeItem(value);
+      }
+    },
+    onItemRemove: function(value) {
+      // Clean up any empty values
+      if (!value || value.trim() === '') {
+        this.removeItem(value);
+      }
+    }
+  });
 });
-</script> 
+</script>
