@@ -16,7 +16,7 @@
         
         <div class="truncate">
           <span class="text-gray-400">Created:</span>
-          <%= time_ago_in_words(letter.created_at) %>
+          <%= time_ago_in_words(letter.created_at) %> ago
         </div>
         
         <div class="truncate">
@@ -24,6 +24,8 @@
           <%= letter.height %>" × <%= letter.width %>"
         </div>
       </div>
+      
+      <%= render 'shared/tags', tags: letter.tags %>
     </div>
   <% end %>
 </div> 

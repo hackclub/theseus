@@ -5,6 +5,8 @@
   <%= render 'status_badge', order: @warehouse_order %>
 </div>
 
+<%= render 'shared/tags', tags: @warehouse_order.tags %>
+
 <div class="my-2">
   <b>title:</b> <%= @warehouse_order.user_facing_title %><br>
   <b>recipient email:</b>
