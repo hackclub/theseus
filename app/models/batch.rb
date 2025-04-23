@@ -44,7 +44,8 @@ class Batch < ApplicationRecord
   include AASM
   include PublicIdentifiable
   set_public_id_prefix "batch"
-  taggable_array :tags
+
+  include Taggable
 
   aasm timestamps: true do
     state :awaiting_field_mapping, initial: true

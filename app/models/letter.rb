@@ -49,8 +49,7 @@ class Letter < ApplicationRecord
   include HasAddress
   include CanBeBatched
   include AASM
-  taggable_array :tags
-
+  include Taggable
   # Add ActiveStorage attachment for the label PDF
   has_one_attached :label
   belongs_to :return_address, optional: true
