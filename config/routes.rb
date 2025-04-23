@@ -140,6 +140,8 @@ Rails.application.routes.draw do
         resources :payment_accounts
       end
 
+      resources :common_tags
+
       root to: "users#index"
   end
 
