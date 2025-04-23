@@ -62,7 +62,7 @@ class Letter::Batch < Batch
   validates :mailer_id, presence: true
   validates :letter_return_address, presence: true, on: :process
   validates :letter_mailing_date, presence: true, on: :process
-  validate :mailing_date_not_in_past, if: -> { letter_mailing_date.present? }
+  validate :mailing_date_not_in_past, if: -> { letter_mailing_date.present? }, on: :create
   validates :letter_processing_category, presence: true
 
   def self.model_name
