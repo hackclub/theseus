@@ -147,6 +147,7 @@ Rails.application.routes.draw do
 
   constraints AdminConstraint do
     mount GoodJob::Engine => "good_job"
+    mount Blazer::Engine, at: "blazer"
   end
   namespace :usps do
     resources :indicia
