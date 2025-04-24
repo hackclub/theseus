@@ -140,3 +140,7 @@ gem "nokogiri", "~> 1.18"
 gem "vite_rails"
 
 gem "blazer", "~> 3.3"
+
+gem "sentry-ruby"
+
+gem "sentry-rails"
