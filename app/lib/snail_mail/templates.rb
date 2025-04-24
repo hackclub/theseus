@@ -10,7 +10,8 @@ module SnailMail
       KestrelHeidiTemplate,
       HackatimeStickersTemplate,
       TarotTemplate,
-      DinoWavingTemplate
+      DinoWavingTemplate,
+      HcpcxcTemplate
     ].freeze
 
     # Default template to use when none is specified
