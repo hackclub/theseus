@@ -37,16 +37,6 @@
           <%= render "shared/flash" %>
           <%= yield %>
         </main>
-
-        <footer>
-          <div class="container">
-            <p>
-              <% if session[:impersonater_user_id] %>
-                <%= link_to "Stop impersonating", stop_impersonating_path, class: "secondary" %>
-              <% end %>
-            </p>
-          </div>
-        </footer>
       </div>
     </div>
   </body>
