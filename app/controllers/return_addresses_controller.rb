@@ -49,8 +49,12 @@ class ReturnAddressesController < ApplicationController
   def destroy
     authorize @return_address
 
-    @return_address.destroy
-    redirect_to return_addresses_url, notice: "Return address was successfully destroyed."
+    if @return_address.letters.any?
+      redirect_to return_addresses_url, alert: "return address has letters associated with it, so it can't be deleted :-("
+    else
+      @return_address.destroy
+      redirect_to return_addresses_url, notice: "Return address was successfully destroyed."
+    end
   end
 
   private

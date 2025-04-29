@@ -1,79 +1,85 @@
 <aside class="nav">
-  <h1>Theseus<% if Rails.env.development? %> (dev)<% end %></h1>
-
-  <% if current_user %>
-    <div class="user-info mb-4">
-      <div class="flex items-center gap-2 mb-2">
-        <% if current_user.icon_url.present? %>
-          <img src="<%= current_user.icon_url %>" alt="<%= current_user.username %>" class="w-8 h-8 rounded-full">
+  <nav>
+    <ul>
+      <li>
+        <strong>
+          <%= copy_to_clipboard(Rails.application.config.git_version, label: "rev #{Rails.application.config.git_version}", tooltip_direction: "e") do %>
+            Theseus<% if Rails.env.development? %> (dev)<% end %>
+          <% end %>
+        </strong>
+      </li>
+      <li>
+        <% if current_user %>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <%= render "shared/user_mention", user: current_user %>
+            <%= button_to "log out", signout_path, {method: :delete, class: "btn outlined muted btn-tiny"} %>
+          </div>
         <% end %>
-        <div>
-          <div class="font-medium"><%= current_user&.username %></div>
-          <div class="text-xs text-muted"><%= current_user&.email %></div>
-        </div>
-      </div>
-      <%= button_to "Log out", signout_path, {method: :delete, class: "btn btn-sm btn-secondary"} %>
-    </div>
-  <% end %>
-
-  <hr />
-
-  <nav class="nav-menu">
+        <small>
+          <%= Flavor.greeting name: current_user&.username %>
+        </small>
+      </li>
+      <li>
+      </li>
+    </ul>
+    <hr />
     <ul>
       <%= nav_item(root_path, "Home") %>
       <%= nav_item(batches_path, "Batches") %>
-
       <li>
-        <div class="menu-heading">Warehouse</div>
-        <ul>
-          <%= nav_item(warehouse_skus_path, "SKUs") %>
-          <%= nav_item(warehouse_orders_path, "Orders") %>
-          <%= nav_item(warehouse_templates_path, "Order templates") %>
-        </ul>
+        <details <%= 'open' if request.path.start_with?('/warehouse') %>>
+          <summary>Warehouse</summary>
+          <ul>
+            <%= nav_item(warehouse_skus_path, "SKUs") %>
+            <%= nav_item(warehouse_orders_path, "Orders") %>
+            <%= nav_item(warehouse_templates_path, "Order templates") %>
+          </ul>
+        </details>
       </li>
-      
       <li>
-        <div class="menu-heading">Mail</div>
-        <ul>
-          <%= nav_item(letters_path, "Letters") %>
-          <%= nav_item(return_addresses_path, "Return Addresses") %>
-        </ul>
+        <details <%= 'open' if request.path.start_with?('/letters') || request.path.start_with?('/return_addresses') %>>
+          <summary>Mail</summary>
+          <ul>
+            <%= nav_item(letters_path, "Letters") %>
+            <%= nav_item(return_addresses_path, "Return Addresses") %>
+          </ul>
+        </details>
       </li>
-      
       <% admin_tool do %>
         <li>
-          <div class="menu-heading">admin:</div>
-          <ul>
-            <%= nav_item(good_job_path, "good job, #{current_user.username}!") %>
-            <%= nav_item(admin_root_path, "admin panel?") %>
-            <%= nav_item(blazer_path, "blaze it") %>
-          </ul>
+          <details <%= 'open' if request.path.start_with?('/admin') || request.path.start_with?('/blazer') || request.path.start_with?('/good_job') %>>
+            <summary>Admin</summary>
+            <ul>
+              <%= nav_item(good_job_path, "good job, #{current_user.username}!") %>
+              <%= nav_item(admin_root_path, "admin panel?") %>
+              <%= nav_item(blazer_path, "blaze it") %>
+            </ul>
+          </details>
         </li>
       <% end %>
-      
       <% dev_tool do %>
         <li>
-          <div class="menu-heading">secret developer stuff:</div>
-          <ul>
-            <%= nav_item(letter_opener_web_path, "mail (not the real kind)", target: "_blank") %>
-          </ul>
+          <details open>
+            <summary>Developer Tools</summary>
+            <ul>
+              <%= nav_item(letter_opener_web_path, "mail (not the real kind)", target: "_blank") %>
+            </ul>
+          </details>
         </li>
       <% end %>
     </ul>
   </nav>
 </aside>
-
-<button class="nav-toggle md:hidden">
+<button class="nav-toggle" aria-label="Toggle navigation">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 </button>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const navToggle = document.querySelector('.nav-toggle');
     const nav = document.querySelector('.nav');
-    
+
     if (navToggle && nav) {
       navToggle.addEventListener('click', function() {
         nav.classList.toggle('active');

@@ -14,6 +14,11 @@
         <%= order.address.name_line %> (<%= order.recipient_email %>)
       </div>
 
+      <div class="mb-2">
+        <span class="text-gray-400">Tags:</span>
+        <%= render 'shared/tags', tags: order.tags %>
+      </div>
+
       <b>contents:</b>
       <%= render 'warehouse/orders/line_items', order: order %>
     </div>

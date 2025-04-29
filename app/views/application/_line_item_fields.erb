@@ -1,19 +1,28 @@
-<div class="nested-fields">
+<div class="nested-fields grid">
   <% skus_by_category = Warehouse::SKU.in_inventory.order(:sku).group_by(&:category) %>
 
-  <%= f.grouped_collection_select :sku_id,
-                                   skus_by_category,
-                                   :last, # gets the array of products
-                                   lambda { |group| group.first.humanize }, # humanized category name
-                                   :id,
-                                   -> (sku) { "#{sku.sku} - #{sku.name} (#{sku.in_stock} in stock)"},
-                                   { include_blank: 'pick a SKU!' },
-                                   { class: 'needs-select2', disabled: f.object.persisted? } %>
-  
+  <div class="grid">
+    <div class="col-12 md:col-8">
+      <%= f.grouped_collection_select :sku_id,
+                                     skus_by_category,
+                                     :last,
+                                     lambda { |group| group.first.humanize },
+                                     :id,
+                                     -> (sku) { "#{sku.sku} - #{sku.name} (#{sku.in_stock} in stock)"},
+                                     { include_blank: 'Select a SKU' },
+                                     { class: 'needs-select2', disabled: f.object.persisted? } %>
+    </div>
+
+    <div class="col-12 md:col-2">
+      <%= f.number_field :quantity, class: 'form-control', min: 1, placeholder: 'Quantity' %>
+    </div>
+
+    <div class="col-12 md:col-2">
+      <%= link_to_remove_association "Remove", f, class: 'secondary outline' %>
+    </div>
+  </div>
+
   <% if f.object.persisted? %>
-    <%= f.hidden_field :sku_id %> <!-- Keep the original value when submitting -->
+    <%= f.hidden_field :sku_id %>
   <% end %>
-  
-  <%= f.number_field :quantity %>
-  <%= link_to_remove_association "remove", f %>
 </div>

@@ -1,48 +1,55 @@
 <% content_for :title, "Batches" %>
-
-<div class="content-container">
-  <div class="page-header mb-6 flex justify-between items-center">
-    <h1 class="page-title">Batches</h1>
-    <%= success_link_to "Create New Batch", new_batch_path do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-      Create New Batch
-    <% end %>
+<div class="container">
+  <div class="page-header">
+    <div class="flex justify-between align-items-center">
+      <h1>Batches</h1>
+      <%= success_link_to "Create New Batch", new_batch_path do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Create New Batch
+      <% end %>
+    </div>
   </div>
 
-  <div id="batches" class="grid md:grid-cols-1 gap-6">
+  <div id="batches" class="return-addresses-grid">
     <% @batches.each do |batch| %>
-      <div class="card">
-        <div class="flex flex-col sm:flex-row justify-between">
-          <div class="card-body">
-            <h3 class="text-lg font-medium"><%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %></h3>
-            <p class="text-sm text-muted mt-1">Created on <%= batch.created_at.strftime("%B %d, %Y") %></p>
-            <div class="mt-2">
-              <% case batch.aasm.current_state %>
-              <% when :awaiting_field_mapping %>
-                <span class="badge badge-warning">
-                  <%= batch.aasm.current_state.to_s.humanize(capitalize: false) %>
-                </span>
-              <% when :fields_mapped %>
-                <span class="badge badge-primary">
-                  <%= batch.aasm.current_state.to_s.humanize(capitalize: false) %>
-                </span>
-              <% when :processed %>
-                <span class="badge badge-success">
-                  <%= batch.aasm.current_state.to_s.humanize(capitalize: false) %>
-                </span>
-              <% end %>
+      <article class="card">
+        <header>
+          <div class="flex justify-between align-items-center">
+            <h3><%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %></h3>
+            <div class="flex gap">
+              <%= batch_status_badge(batch.aasm.current_state) %>
             </div>
           </div>
-          <div class="flex items-center mt-4 sm:mt-0">
-            <%= primary_outline_link_to "View Details", batch do %>
-              <%= eye_icon %>View Details
-            <% end %>
+        </header>
+
+        <div class="mb-2">
+          <span class="text-muted">Tags:</span>
+          <%= render 'shared/tags', tags: batch.tags %>
+        </div>
+
+        <div class="grid">
+          <div>
+            <span class="text-muted">Type:</span>
+            <%= batch.type.split('::').first.titleize %>
+          </div>
+          <div>
+            <span class="text-muted">Created:</span>
+            <%= time_ago_in_words(batch.created_at) %> ago
+          </div>
+          <div>
+            <span class="text-muted">Status:</span>
+            <%= batch.aasm.current_state.to_s.humanize(capitalize: false) %>
           </div>
         </div>
-      </div>
+
+        <footer>
+          <%= primary_outline_link_to "View Details", batch do %>
+            <%= eye_icon %>View Details
+          <% end %>
+        </footer>
+      </article>
     <% end %>
   </div>
 </div>
-

@@ -1,17 +1,18 @@
-<div id="<%= dom_id template %>">
-  <p>
-    <strong>User:</strong>
-    <%= template.user.username %>
-  </p>
+<article id="<%= dom_id template %>" class="card">
+  <header class="card-header">
+    <h3 class="mb-0"><%= link_to template.name, template, class: "text-decoration-none" %></h3>
+  </header>
+  <div class="card-body">
+    <div class="grid">
+      <div>
+        <small class="text-muted">User</small>
+        <%= render 'shared/user_mention', user: template.user %>
+      </div>
+    </div>
 
-  <p>
-    <strong>Name:</strong>
-    <%= template.name %>
-  </p>
-
-  <p>
-    <strong>Source tag:</strong>
-    <%= template.source_tag_id %>
-  </p>
-
-</div>
+    <div class="mt-4">
+      <small class="text-muted">Contents:</small>
+      <%= render 'warehouse/orders/line_items', order: template %>
+    </div>
+  </div>
+</article>

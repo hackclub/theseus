@@ -1,60 +1,51 @@
-<div id="<%= dom_id sku %>" class="card warehouse-sku-card">
+<article id="<%= dom_id sku %>" class="card warehouse-sku-card">
   <div class="sku-header">
     <div class="sku-id">
       <%= link_to sku.sku, sku %>
+        <% if sku.in_stock&.> 0 %>
+          <span class="badge success float-right">in stock</span>
+        <% elsif sku.in_stock&.< 0 %>
+          <% if sku.inbound&.>= sku.in_stock.abs %>
+            <span class="badge warning float-right">backordered (more otw)</span>
+          <% else %>
+            <span class="badge error float-right">backordered (!)</span>
+          <% end %>
+        <% else %>
+          <span class="badge pending float-right">not in inventory</span>
+        <% end %>
     </div>
 
-    <div class="sku-status">
-      <% if sku.in_stock&.> 0 %>
-        <span class="badge success">in stock</span>
-      <% elsif sku.in_stock&.< 0 %>
-        <% if sku.inbound&.>= sku.in_stock.abs %>
-          <span class="badge warning">backordered (more otw)</span>
-        <% else %>
-          <span class="badge error">backordered (!)</span>
-        <% end %>
-      <% else %>
-        <span class="badge pending">not in inventory</span>
-      <% end %>
-    </div>
   </div>
-  
   <div class="card-content">
     <p>
       <strong>Name:</strong>
       <%= sku.name %>
     </p>
-
     <p>
       <strong>In stock:</strong>
       <%= sku.in_stock %>
     </p>
-
     <% if sku.description.present? %>
-    <p>
-      <strong>Description:</strong>
-      <span class="sku-description"><%= sku.description %></span>
-    </p>
+      <p>
+        <strong>Description:</strong>
+        <span class="sku-description"><%= sku.description %></span>
+      </p>
     <% end %>
-
     <p>
       <strong>Unit cost:</strong>
       <%= number_to_currency sku.declared_unit_cost %>
     </p>
-
     <p>
       <strong>Customs description:</strong>
       <span class="sku-customs"><%= sku.customs_description %></span>
     </p>
-
     <p>
       <strong>AI enabled:</strong>
       <%= render_checkbox sku.ai_enabled %>
     </p>
-
     <p>
       <strong>Enabled:</strong>
       <%= render_checkbox sku.enabled  %>
     </p>
   </div>
-</div>
+</article>

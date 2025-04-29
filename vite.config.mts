@@ -1,11 +1,9 @@
 import { defineConfig } from 'vite'
-import RubyPlugin from 'vite-plugin-ruby'
-import tailwindcss from '@tailwindcss/vite'
+import ViteRails from 'vite-plugin-rails'
 
 export default defineConfig({
   plugins: [
-    RubyPlugin(),
-    tailwindcss()
+    ViteRails(),
   ],
   css: {
     // postcss: './postcss.config.js',

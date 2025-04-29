@@ -1,121 +1,101 @@
 <%= form_with(model: letter, class: "form-container") do |form| %>
-  <% if letter.errors.any? %>
-    <div class="alert alert-danger mb-6">
-      <h2 class="text-lg font-medium mb-2"><%= pluralize(letter.errors.count, "error") %> prohibited this letter from being saved:</h2>
+  <fieldset>
+    <legend>Letter Specs</legend>
+    <%= render partial: "letters/letter_attributes_form", locals: { form: form } %>
+  </fieldset>
 
-      <ul class="list-disc list-inside">
-        <% letter.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <fieldset>
+    <legend>Recipient Address</legend>
+    <%= render partial: "addresses/nested_form", locals: { form: form } %>
+  </fieldset>
 
-  <div class="card mb-6">
-    <div class="card-header">
-      <h3 class="text-lg font-medium">letter specs:</h3>
-    </div>
-    <div class="card-body">
-      <%= render partial: "letters/letter_attributes_form", locals: { form: form } %>
-    </div>
-  </div>
-
-  <div class="card mb-6">
-    <div class="card-header">
-      <h3 class="text-lg font-medium">Recipient Address</h3>
-    </div>
-    <div class="card-body">
-      <%= render partial: "addresses/nested_form", locals: { form: form } %>
-    </div>
-  </div>
-
-  <div class="card mb-6">
-    <div class="card-header">
-      <h3 class="text-lg font-medium">Return Address</h3>
-    </div>
-    <div class="card-body">
-      <div class="form-group">
-        <%= form.label :return_address_id, "Select Return Address", class: "form-label" %>
+  <fieldset>
+    <legend>Return Address</legend>
+    <div class="grid">
+      <div>
+        <%= form.label :return_address_id, "Select Return Address" %>
         <%= form.collection_select :return_address_id,
                                  ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
                                  :id,
                                  :display_name,
                                  { prompt: "Select a return address...", selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id },
                                  { class: "form-control" } %>
-        <p class="text-sm text-gray-500 mt-2">
-          <%= link_to "Manage Return Addresses", return_addresses_path(from_letter: true), class: "text-blue-600 hover:text-blue-800" %>
-        </p>
+        <small>
+          <%= link_to "Manage Return Addresses", return_addresses_path(from_letter: true) %>
+        </small>
       </div>
     </div>
-  </div>
+  </fieldset>
 
-  <div class="card mb-6">
-    <div class="card-header">
-      <h3 class="text-lg font-medium">USPS Mailer ID</h3>
-    </div>
-    <div class="card-body">
-      <div class="form-group">
-        <%= form.label :usps_mailer_id_id, "Mailer ID", class: "form-label" %>
+  <fieldset>
+    <legend>USPS Mailer ID</legend>
+    <div class="grid">
+      <div>
+        <%= form.label :usps_mailer_id_id, "Mailer ID" %>
         <%= form.collection_select :usps_mailer_id_id,
                                  USPS::MailerId.all,
-                               :id,
-                               :name,
-                               { prompt: "Select a mailer ID...", selected: USPS::MailerId.first&.id },
-                               { class: "form-control" } %>
+                                 :id,
+                                 :name,
+                                 { prompt: "Select a mailer ID...", selected: USPS::MailerId.first&.id },
+                                 { class: "form-control" } %>
       </div>
-      <p>leave this at the default if you're mailing from HQ – otherwise talk to nora ( )</p>
     </div>
-  </div>
+    <div class="banner banner-warning">
+      please leave this at the default if you're mailing from HQ – otherwise talk to nora (it has USPS implications)
+    </div>
+  </fieldset>
 
-  <div class="card mb-6">
-    <div class="card-header">
-      <h3 class="text-lg font-medium">Additional Data</h3>
-    </div>
-    <div class="card-body">
-      <div class="form-group">
-        <%= form.label :rubber_stamps, "Rubber Stamps", class: "form-label" %>
-        <%= form.text_area :rubber_stamps, rows: 5, class: "form-control" %>
-        <div class="form-hint">extra text to print on the label!</div>
+  <fieldset>
+    <legend>Additional Data</legend>
+    <div class="grid">
+      <div>
+        <%= form.label :rubber_stamps, "Rubber Stamps" %>
+        <%= form.text_area :rubber_stamps, rows: 5 %>
+        <small>Extra text to print on the label!</small>
       </div>
-
-      <%= render 'shared/tag_picker', form: form %>
     </div>
-  </div>
 
-  <div class="field">
-    <%= form.label :non_machinable %>
-    <%= form.check_box :non_machinable %>
-    <div class="help-text">Check this if the letter contains rigid items or is otherwise non-machinable.</div>
-  </div>
+    <%= render 'shared/tag_picker', form: form %>
+  </fieldset>
 
-  <div class="field">
-    <h3 class="text-sm font-medium mb-2">Postage Options</h3>
-    <div class="card mb-4">
-      <div class="card-body p-3">
-        <div class="space-y-2">
-          <div class="form-check">
-            <%= form.radio_button :postage_type, "stamps", class: "form-check-input", checked: true %>
-            <%= form.label :postage_type_stamps, "Stamps", class: "form-check-label" %>
-          </div>
-          <div class="form-check">
-            <%= form.radio_button :postage_type, "indicia", class: "form-check-input" %>
-            <%= form.label :postage_type_indicia, "Indicia (Metered)", class: "form-check-label" %>
-          </div>
-        </div>
-        <div class="text-sm text-gray-500 mt-2">
+  <fieldset>
+    <legend>Postage Options</legend>
+    <div class="grid">
+      <div>
+        <label>
+          <%= form.check_box :non_machinable %>
+          Non-machinable
+        </label>
+        <small>Check this if the letter contains rigid items or is otherwise non-machinable.</small>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>
+          <%= form.radio_button :postage_type, "stamps", checked: true %>
+          Stamps
+        </label>
+        <label>
+          <%= form.radio_button :postage_type, "indicia" %>
+          Indicia (Metered)
+        </label>
+        <small>
           <% if @letter.address&.us? %>
             Indicia costs 69¢ for a standard letter (vs 73¢ for stamps)
           <% else %>
             Indicia costs slightly more than stamps for international mail, but saves time on large batches
           <% end %>
-        </div>
+        </small>
       </div>
     </div>
-  </div>
+  </fieldset>
 
-  <div class="form-actions">
-    <%= form.submit class: "btn btn-primary" %>
-    <%= link_to "Cancel", letters_path, class: "btn btn-secondary" %>
+  <div class="grid">
+    <div>
+      <%= form.submit "do it!", class: "success" %>
+      <%= link_to "cancel", letters_path, class: "btn btn-tiny danger outlined" %>
+    </div>
   </div>
 <% end %>
 

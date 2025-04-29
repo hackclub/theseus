@@ -28,6 +28,7 @@ class ReturnAddress < ApplicationRecord
   has_country_enum
 
   belongs_to :user, optional: true
+  has_many :letters
 
   # Only validate if the record has at least some data (indicating user attempted to create one)
   with_options if: :partially_filled_out? do |address|

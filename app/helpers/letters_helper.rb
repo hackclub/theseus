@@ -1,17 +1,18 @@
 module LettersHelper
-  # Returns appropriate CSS classes for letter status badges based on the current state
-  def letter_status_class(status)
-    case status.to_s
-      # when 'pending'
-      # 'bg-warning-bg text-warning-fg border border-warning-border'
-    when "processing"
-      "bg-info-bg text-info-fg border border-info-border"
-    when "completed"
-      "bg-success-bg text-success-fg border border-success-border"
-    when "canceled", "failed"
-      "bg-error-bg text-error-fg border border-error-border"
-    else
-      "bg-smoke text-slate border border-muted"
-    end
+  def letter_status_badge(status, addtl_class='nil')
+
+    clazz, text = case status.to_s
+                  when 'pending'
+                    ['pending', 'ready to print']
+                  when "printed"
+                    ["info", "printed"]
+                  when "mailed"
+                    ["success", "mailed"]
+                  when "canceled", "failed"
+                    "bg-error-bg text-error-fg border border-error-border"
+                  else
+                    "bg-smoke text-slate border border-muted"
+                  end
+    content_tag('span', text, :class => "badge #{clazz} #{addtl_class}".strip)
   end
 end

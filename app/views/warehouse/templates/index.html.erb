@@ -2,6 +2,10 @@
 
 <h1>Order Templates</h1>
 
+<div class="actions">
+  <%= create_button new_warehouse_template_path, "create template" %>
+</div>
+
 <h2>Your templates:</h2>
 <div id="your_templates">
   <% current_user&.warehouse_templates&.each do |warehouse_template| %>

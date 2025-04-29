@@ -109,4 +109,23 @@ module ButtonHelper
       <circle cx="12" cy="12" r="3"></circle>
     </svg>'.html_safe
   end
+
+  def plus_icon
+    '<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>'.html_safe
+  end
+
+  def create_button(url, text = "Create", options = {}, &block)
+    options[:class] ||= ""
+    options[:class] += " btn success"
+
+    if block_given?
+      success_link_to(url, options) do
+        plus_icon + " #{text}"
+      end
+    else
+      success_link_to(plus_icon + " #{text}", url, options)
+    end
+  end
 end

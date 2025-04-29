@@ -1,73 +1,72 @@
 <% content_for :title, "Letters" %>
 
-<div class="page-header mb-8 flex justify-between items-center">
-  <h1 class="text-2xl font-bold">Letters</h1>
-  <div class="actions">
-    <%= success_link_to "Create New Letter", new_letter_path do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-      Create New Letter
-    <% end %>
+<header class="container">
+  <div class="grid">
+    <div>
+      <h1>Letters</h1>
+    </div>
+    <div class="text-right">
+      <%= create_button new_letter_path, "send a letter!" %>
+    </div>
   </div>
-</div>
+</header>
 
-<div class="mb-4 flex space-x-4">
-  <%= link_to "Unbatched Letters", letters_path, class: "btn #{params[:view] != 'batched' ? 'btn-primary' : 'btn-secondary'}" %>
-  <%= link_to "Batched Letters", letters_path(view: 'batched'), class: "btn #{params[:view] == 'batched' ? 'btn-primary' : 'btn-secondary'}" %>
-</div>
+<nav class="container">
+  <ul class="tabs">
+    <li class="tabs__item">
+      <%= link_to "Unbatched Letters", letters_path, class: "tabs__link #{params[:view] != 'batched' ? 'tabs__link--active' : ''}" %>
+    </li>
+    <li class="tabs__item">
+      <%= link_to "Batched Letters", letters_path(view: 'batched'), class: "tabs__link #{params[:view] == 'batched' ? 'tabs__link--active' : ''}" %>
+    </li>
+  </ul>
+</nav>
 
-<div class="letters-container">
+<main class="container">
   <% if params[:view] == 'batched' %>
-    <div class="bg-gray-100 rounded-lg border border-gray-200">
-      <div class="border-b border-gray-200 p-4">
-        <h2 class="text-xl font-medium">Batched Letters</h2>
-      </div>
-      <div class="p-6">
-        <% if @batched_letters.any? %>
-          <div class="divide-y divide-gray-200">
-            <% @batched_letters.each do |batch, letters| %>
-              <details class="py-4">
-                <summary class="flex justify-between items-center cursor-pointer">
-                  <div class="flex items-center">
-                    <span class="font-medium">Batch #<%= batch.id %></span>
-                    <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded ml-2"><%= pluralize(letters.size, 'letter') %></span>
+      <header>
+        <h2>Batched Letters</h2>
+      </header>
+      <% if @batched_letters.any? %>
+          <% @batched_letters.each do |batch, letters| %>
+          <article class="card">
+            <details>
+              <summary>
+                <div>
+                  <strong>Batch #<%= batch.id %></strong>
+                  <small><%= pluralize(letters.size, 'letter') %></small>
+                  <div class="text-muted">
+                    <small>Created <%= time_ago_in_words(batch.created_at) %> ago</small>
                   </div>
-                  <span class="text-gray-500 text-sm">Created <%= time_ago_in_words(batch.created_at) %> ago</span>
-                </summary>
-                <div class="mt-4">
-                  <%= render partial: 'batches/letters_collection', locals: { letters: letters } %>
+                  <div class="mt-2">
+                    <span class="text-gray-400">Tags:</span>
+                    <%= render 'shared/tags', tags: batch.tags %>
+                  </div>
                 </div>
-              </details>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="text-center py-8">
-            <p class="text-gray-500">No batched letters found.</p>
-          </div>
-        <% end %>
-      </div>
-    </div>
+              </summary>
+              <div class="content">
+                <%= render partial: 'batches/letters_collection', locals: { letters: letters } %>
+              </div>
+            </details>
+          </article>
+          <% end %>
+      <% else %>
+        <p class="text-center">No batched letters found.</p>
+      <% end %>
   <% else %>
-    <div class="bg-gray-100 rounded-lg border border-gray-200">
-      <div class="border-b border-gray-200 p-4">
-        <h2 class="text-xl font-medium">Unbatched Letters</h2>
-      </div>
-      <div class="p-6">
-        <% if @unbatched_letters.any? %>
+      <header>
+        <h2>Unbatched Letters</h2>
+      </header>
+      <% if @unbatched_letters.any? %>
           <%= render partial: 'batches/letters_collection', locals: { letters: @unbatched_letters } %>
-        <% else %>
-          <div class="text-center py-8">
-            <p class="text-gray-500">No unbatched letters found.</p>
-          </div>
-        <% end %>
-      </div>
-    </div>
+      <% else %>
+        <p class="text-center">No unbatched letters found.</p>
+      <% end %>
   <% end %>
-</div>
+</main>
 
 <% if params[:view] != 'batched' %>
-  <div class="mt-8">
+  <footer class="container">
     <%= paginate @unbatched_letters %>
-  </div>
+  </footer>
 <% end %>

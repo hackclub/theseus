@@ -1,6 +1,14 @@
 .banner {
     border: 1px solid;
     border-radius: 8px;
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    font-weight: var(--font-weight-medium);
+}
+
+.banner > svg {
+    height: 1.25rem;
+    width: 1.25rem;
 }
 
 .banner-warning {
@@ -9,13 +17,13 @@
     color: var(--warning-fg-strong);
 }
 
-.banner-alert {
+.banner-danger {
     background: var(--error-bg);
     border-color: var(--error-border);
     color: var(--error-fg-strong);
 }
 
-.banner-notice {
+.banner-info {
     background: var(--info-bg);
     border-color: var(--info-border);
     color: var(--info-fg-strong);

@@ -1,13 +1,6 @@
 @use 'colors' as *;
-@use "design_system";
-@use "components/base";
+// @use "components/base";
 @use 'components/banners';
-
-
-@layer theme, base, components, utilities;
-
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
 
 
 html {
