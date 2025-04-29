@@ -113,20 +113,21 @@ Rails.application.routes.draw do
   get "/tags/:id", to: "tags#show", as: :tag_stats
   post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
 
-  resources :letters do
-    member do
-      post :generate_label
-      post :buy_indicia
-      post :mark_printed
-      post :mark_mailed
-      post :mark_received
-      post :clear_label
-      get :preview_template if Rails.env.development?
+  scope :back_office do
+    resources :letters do
+      member do
+        post :generate_label
+        post :buy_indicia
+        post :mark_printed
+        post :mark_mailed
+        post :mark_received
+        post :clear_label
+        get :preview_template if Rails.env.development?
+      end
     end
-  end
-  get "batches/new"
-  get "batches/import"
-  namespace :admin do
+    get "batches/new"
+    get "batches/import"
+    namespace :admin do
       resources :addresses
       resources :return_addresses
       resources :source_tags
@@ -147,52 +148,56 @@ Rails.application.routes.draw do
       resources :common_tags
 
       root to: "users#index"
-  end
+    end
 
-  constraints AdminConstraint do
-    mount GoodJob::Engine => "good_job"
-    mount Blazer::Engine, at: "blazer"
-    get "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
-  end
-  get "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
-  
-  namespace :usps do
-    resources :indicia
-    resources :payment_accounts
-    resources :mailer_ids
-  end
-  resources :source_tags
-  namespace :warehouse do
-    resources :templates
-    resources :orders do
+    constraints AdminConstraint do
+      mount GoodJob::Engine => "good_job"
+      mount Blazer::Engine, at: "blazer"
+      get "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
+    end
+    get "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
+
+    namespace :usps do
+      resources :indicia
+      resources :payment_accounts
+      resources :mailer_ids
+    end
+    resources :source_tags
+    namespace :warehouse do
+      resources :templates
+      resources :orders do
+        member do
+          get :cancel
+          post :cancel, to: "orders#confirm_cancel"
+          post "send_to_warehouse"
+        end
+      end
+      resources :purpose_codes
+      resources :skus, except: [ :destroy ]
+    end
+    resources :users
+    resources :return_addresses
+    resources :batches do
       member do
-        get :cancel
-        post :cancel, to: "orders#confirm_cancel"
-        post "send_to_warehouse"
+        get "/map", to: "batches#map_fields", as: :map_fields
+        post :set_mapping
+        get "/process", to: "batches#process_form", as: :process_confirm
+        post "/process", to: "batches#process_batch", as: :process
+        post :mark_printed
+        post :mark_mailed
+        post :update_costs
       end
     end
-    resources :purpose_codes
-    resources :skus, except: [ :destroy ]
+    root "static_pages#index"
+
+
+
+    delete "signout", to: "sessions#destroy", as: :signout
+
   end
-  resources :users
-  resources :return_addresses
-  resources :batches do
-    member do
-      get "/map", to: "batches#map_fields", as: :map_fields
-      post :set_mapping
-      get "/process", to: "batches#process_form", as: :process_confirm
-      post "/process", to: "batches#process_batch", as: :process
-      post :mark_printed
-      post :mark_mailed
-      post :update_costs
-    end
-  end
-  root "static_pages#index"
 
   get "/auth/slack", to: "sessions#new", as: :slack_auth
   get "/auth/slack/callback", to: "sessions#create"
-
-  delete "signout", to: "sessions#destroy", as: :signout
 
   # Route for publicly identifiable objects
   get "/j/:public_id", to: "public_identifiable#show", as: :public_id
