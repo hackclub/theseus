@@ -109,6 +109,10 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
+  get "/tags", to: "tags#index"
+  get "/tags/:id", to: "tags#show", as: :tag_stats
+  post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
+
   resources :letters do
     member do
       post :generate_label

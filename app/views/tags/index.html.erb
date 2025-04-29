@@ -1,0 +1,15 @@
+<% content_for :title, "Tags" %>
+
+<h1>Tags</h1>
+<div class="banner banner-info">
+  this page is kinda expensive so it's cached – if you want, click the refresh button
+</div>
+<%= button_to "↻", refresh_tags_path %>
+<h4>Common tags:</h4>
+<% @common_tags.each do |tag| %>
+  <%= render 'tag', tag: tag.tag %>
+<% end %>
+<h4>Other tags:</h4>
+<% @tags.each do |tag| %>
+  <%= render 'tag', tag: %>
+<% end %>

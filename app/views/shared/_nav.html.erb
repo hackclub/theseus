@@ -48,6 +48,14 @@
           </ul>
         </details>
       </li>
+      <li>
+        <details <%= 'open' if request.path.start_with?('/tags') %>>
+          <summary>Accounting</summary>
+          <ul>
+            <%= nav_item(tags_path, "Tags") %>
+          </ul>
+        </details>
+      </li>
       <% admin_tool do %>
         <li>
           <details <%= 'open' if request.path.start_with?('/admin') || request.path.start_with?('/blazer') || request.path.start_with?('/good_job') %>>

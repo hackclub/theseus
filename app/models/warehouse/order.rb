@@ -70,6 +70,7 @@ class Warehouse::Order < ApplicationRecord
   validate :can_mail_parcels_to_country
 
   after_create :set_hc_id
+  before_save :update_costs
 
   include HasWarehouseLineItems
   include HasTableSync
@@ -323,6 +324,13 @@ class Warehouse::Order < ApplicationRecord
   private
   def set_hc_id
     update_column(:hc_id, public_id)
+  end
+
+  def update_costs
+    # Ensure line items are loaded and include their SKUs
+    line_items.includes(:sku).load
+    self.labor_cost = labor_cost
+    self.contents_cost = contents_actual_cost_to_hc
   end
 
   def can_mail_parcels_to_country

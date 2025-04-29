@@ -1,0 +1,81 @@
+<h1>Tag: "<%= @tag %>"</h1>
+<div class="time-period-selector" style="margin-bottom: var(--spacing);">
+  <span>currently showing:</span>
+  <select id="time_period">
+    <option value="all_time" <%= 'selected' if @time_period == 'all_time' %>>all-time</option>
+        <option value="ytd" <%= 'selected' if @time_period == 'ytd' %>>year-to-date</option>
+        <option value="month" <%= 'selected' if @time_period == 'month' %>>specific month</option>
+        <option value="last_week" <%= 'selected' if @time_period == 'last_week' %>>last week</option>
+        <option value="last_month" <%= 'selected' if @time_period == 'last_month' %>>last month</option>
+        <option value="last_year" <%= 'selected' if @time_period == 'last_year' %>>last year</option>
+      </select>
+
+      <span id="year_selector" style="display: <%= @time_period.in?(%w[ytd month]) ? 'inline' : 'none' %>">
+      <select id="year">
+        <% @years.each do |y| %>
+          <option value="<%= y %>" <%= 'selected' if y == @year %>><%= y %></option>
+          <% end %>
+        </select>
+      </span>
+      <span id="month_selector" style="display: <%= @time_period == 'month' ? 'inline' : 'none' %>">
+        <select id="month">
+          <% @months.each do |name, num| %>
+            <option value="<%= num %>" <%= 'selected' if num == @month %>><%= name %></option>
+            <% end %>
+          </select>
+        </span>
+        <button onclick="updateTimePeriod()">go!</button>
+      </div>
+      <br/>
+      <p>
+        <%= pluralize(@warehouse_order_count, 'warehouse order') %>, <%= pluralize(@letter_count, 'letter') %>
+      </p>
+      <p>
+        <b>Letter postage spent:</b>
+        <%= number_to_currency(@letter_postage_cost) %>
+      </p>
+      <br/>
+      <p>
+        <b>Warehouse costs:</b> <br/>
+        <br/>
+        <b>Postage:</b> <%= number_to_currency(@warehouse_order_postage_cost) %> <br/>
+        <b>Labor:</b> <%= number_to_currency(@warehouse_order_labor_cost) %> <br/>
+        <b>Contents:</b> <%= number_to_currency(@warehouse_order_contents_cost) %> <br/>
+        <b>Total:</b> <%= number_to_currency(@warehouse_order_total_cost) %>
+      </p>
+      <div>
+        <%= link_to "< back to tags", tags_path %>
+      </div>
+      <script>
+        function updateTimePeriod() {
+          const timePeriod = document.getElementById('time_period').value;
+          const year = document.getElementById('year').value;
+          const month = document.getElementById('month').value;
+
+          // Show/hide year and month selectors
+          document.getElementById('year_selector').style.display =
+            timePeriod === 'ytd' || timePeriod === 'month' ? 'inline' : 'none';
+          document.getElementById('month_selector').style.display =
+            timePeriod === 'month' ? 'inline' : 'none';
+
+          // Build URL
+          let url = '<%= tag_stats_path(@tag) %>?time_period=' + timePeriod;
+          if (timePeriod === 'ytd' || timePeriod === 'month') {
+            url += '&year=' + year;
+          }
+          if (timePeriod === 'month') {
+            url += '&month=' + month;
+          }
+
+          window.location.href = url;
+        }
+
+        // Update selectors visibility when time period changes
+        document.getElementById('time_period').addEventListener('change', function() {
+          const timePeriod = this.value;
+          document.getElementById('year_selector').style.display =
+            timePeriod === 'ytd' || timePeriod === 'month' ? 'inline' : 'none';
+          document.getElementById('month_selector').style.display =
+            timePeriod === 'month' ? 'inline' : 'none';
+        });
+      </script>

@@ -2,10 +2,8 @@
 <%# Usage: render 'shared/tags', tags: model.tags %>
 <% if tags.present? %>
   <div class="tags">
-    <% tags.each do |tag| %>
-      <span class="tag">
-        <%= tag %>
-      </span>
+    <% tags.compact_blank.each do |tag| %>
+    <%= render 'tags/tag', tag: %>
     <% end %>
   </div>
 <% end %> 

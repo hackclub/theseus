@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_23_001451) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_29_203027) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -423,6 +423,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_23_001451) do
     t.bigint "template_id"
     t.jsonb "metadata"
     t.citext "tags", default: [], array: true
+    t.decimal "labor_cost", precision: 10, scale: 2
+    t.decimal "contents_cost", precision: 10, scale: 2
     t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
     t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
