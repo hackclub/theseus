@@ -2,7 +2,11 @@
   <nav>
     <ul>
       <li>
-        <strong>Theseus<% if Rails.env.development? %> (dev)<% end %></strong>
+        <strong>
+          <%= copy_to_clipboard(Rails.application.config.git_version, label: "rev #{Rails.application.config.git_version}", tooltip_direction: "e") do %>
+            Theseus<% if Rails.env.development? %> (dev)<% end %>
+          <% end %>
+        </strong>
       </li>
       <li>
         <% if current_user %>

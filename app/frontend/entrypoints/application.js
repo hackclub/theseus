@@ -1,1 +1,1 @@
-console.log("nya?");
+import '~/js/click-to-copy.js'

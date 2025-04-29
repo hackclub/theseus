@@ -48,4 +48,13 @@ module ApplicationHelper
   def render_checkbox(value)
     content_tag(:span, style: "color: var(--checkbox-#{value ? 'true' : 'false' })") { value ? "☑" : "☒" }
   end
+
+  def copy_to_clipboard(clipboard_value, tooltip_direction: "n", **options, &block)
+    # If block is not given, use clipboard_value as the rendered content
+    block ||= ->(_) { clipboard_value }
+    return yield if options.delete(:if) == false
+
+    css_classes = "pointer tooltipped tooltipped--#{tooltip_direction} #{options.delete(:class)}"
+    tag.span "data-copy-to-clipboard": clipboard_value, class: css_classes, "aria-label": options.delete(:label) || "click to copy...", **options, &block
+  end
 end
