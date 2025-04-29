@@ -19,7 +19,7 @@ module ButtonHelper
 
   def primary_outline_link_to(name, url, options = {}, &block)
     options[:class] ||= ""
-    options[:class] += " btn btn-md btn-primary-outline"
+    options[:class] += " btn btn-small outlined"
 
     if block_given?
       link_to(url, options, &block)

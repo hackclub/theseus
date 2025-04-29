@@ -3,32 +3,26 @@
   <div class="page-header">
     <div class="flex justify-between align-items-center">
       <h1>Batches</h1>
-      <%= success_link_to "Create New Batch", new_batch_path do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        Create New Batch
-      <% end %>
+      <div class="actions">
+        <%= create_button new_batch_path, "upload some CSV!" %>
+      </div>
     </div>
   </div>
-
   <div id="batches" class="return-addresses-grid">
     <% @batches.each do |batch| %>
       <article class="card">
         <header>
           <div class="flex justify-between align-items-center">
-            <h3><%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %></h3>
-            <div class="flex gap">
-              <%= batch_status_badge(batch.aasm.current_state) %>
-            </div>
+            <h3>
+            <%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %>
+              <%= batch_status_badge(batch.aasm.current_state, "float-right") %>
+            </h3>
           </div>
         </header>
-
         <div class="mb-2">
           <span class="text-muted">Tags:</span>
           <%= render 'shared/tags', tags: batch.tags %>
         </div>
-
         <div class="grid">
           <div>
             <span class="text-muted">Type:</span>
@@ -43,7 +37,6 @@
             <%= batch.aasm.current_state.to_s.humanize(capitalize: false) %>
           </div>
         </div>
-
         <footer>
           <%= primary_outline_link_to "View Details", batch do %>
             <%= eye_icon %>View Details
