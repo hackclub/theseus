@@ -1,0 +1,15 @@
+.return-addresses-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  column-gap: var(--pico-spacing);
+  width: 100%;
+
+  .card {
+      min-width: 0;
+  }
+
+  @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: var(--pico-spacing);
+  }
+}

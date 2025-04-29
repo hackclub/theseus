@@ -1,31 +1,28 @@
-<div class="grid gap-4">
-  <% letters.each do |letter| %>
-    <div class="letter-item p-3 bg-white border rounded shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-base font-medium"><%= link_to letter.public_id, letter %> to <%= letter.address.name_line %></h3>
-        <span class="badge <%= letter_status_class(letter.aasm_state) %>">
-          <%= letter.aasm_state.humanize(capitalize: false) %>
-        </span>
-      </div>
-      
-      <div class="grid grid-cols-3 gap-1 text-sm text-gray-600">
-        <div class="truncate">
-          <span class="text-gray-400">From:</span>
-          <%= letter.return_address.present? ? letter.return_address.name : 'N/A' %>
-        </div>
-        
-        <div class="truncate">
-          <span class="text-gray-400">Created:</span>
-          <%= time_ago_in_words(letter.created_at) %> ago
-        </div>
-        
-        <div class="truncate">
-          <span class="text-gray-400">Size:</span>
-          <%= letter.height %>" × <%= letter.width %>"
-        </div>
-      </div>
-      
-      <%= render 'shared/tags', tags: letter.tags %>
+<% letters.each do |letter| %>
+  <article class="card">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-base font-medium"><%= link_to letter.public_id, letter %> to <%= letter.address.name_line %>
+        <%= letter_status_badge(letter.aasm_state, 'float-right') %>
+      </h3>
     </div>
-  <% end %>
-</div> 
+
+    <div class="grid grid-cols-3 gap-1 text-sm text-gray-600">
+      <div class="truncate">
+        <span class="text-gray-400">From:</span>
+        <%= letter.return_address.present? ? letter.return_address.name : 'N/A' %>
+      </div>
+
+      <div class="truncate">
+        <span class="text-gray-400">Created:</span>
+        <%= time_ago_in_words(letter.created_at) %> ago
+      </div>
+
+      <div class="truncate">
+        <span class="text-gray-400">Size:</span>
+        <%= letter.height %>" × <%= letter.width %>"
+      </div>
+    </div>
+
+    <%= render 'shared/tags', tags: letter.tags %>
+  </article>
+<% end %>

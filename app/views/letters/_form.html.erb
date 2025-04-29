@@ -1,16 +1,4 @@
 <%= form_with(model: letter, class: "form-container") do |form| %>
-  <% if letter.errors.any? %>
-    <div class="alert alert-danger mb-6">
-      <h2 class="text-lg font-medium mb-2"><%= pluralize(letter.errors.count, "error") %> prohibited this letter from being saved:</h2>
-
-      <ul class="list-disc list-inside">
-        <% letter.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
   <div class="card mb-6">
     <div class="card-header">
       <h3 class="text-lg font-medium">letter specs:</h3>

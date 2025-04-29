@@ -1,13 +1,13 @@
 <% flash.each do |type, message| %>
   <% if message.present? %>
     <% alert_class = case type.to_sym
-       when :success then 'alert-success'
-       when :notice, :info then 'alert-info'
-       when :warning then 'alert-warning'
-       when :alert, :error, :danger then 'alert-danger'
+       when :success then 'banner-success'
+       when :notice, :info then 'banner-info'
+       when :warning then 'banner-warning'
+       when :alert, :error, :danger then 'banner-danger'
        else 'alert-info'
        end %>
-    <div class="alert <%= alert_class %> mb-4 flex items-center ">
+    <div class="banner <%= alert_class %> mb-4 flex items-center ">
       <% case type.to_sym %>
       <% when :success %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

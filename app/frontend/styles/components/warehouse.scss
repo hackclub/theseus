@@ -1,0 +1,16 @@
+.warehouse-sku-card {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+// Grid container for SKU cards
+.warehouse-skus-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}

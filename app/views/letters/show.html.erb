@@ -13,9 +13,7 @@
     <div class="card mb-4">
       <div class="card-header flex items-center justify-between py-2">
         <h2 class="text-base font-medium">Details</h2>
-        <div class="badge <%= letter_status_class(@letter.aasm_state) %>">
-          <%= @letter.aasm_state.humanize %>
-        </div>
+        <%= letter_status_badge(@letter.aasm_state, 'float-right') %>
       </div>
       
       <div class="card-body p-3">

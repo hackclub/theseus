@@ -1,9 +1,7 @@
 <div id="<%= dom_id letter %>" class="letter-item p-3 bg-white border rounded shadow-sm hover:shadow-md transition-shadow">
   <div class="flex justify-between items-center mb-2">
     <h3 class="text-base font-medium"><%= link_to letter.public_id, letter %> to <%= letter.address.name_line %></h3>
-    <span class="badge <%= letter_status_class(letter.aasm_state) %>">
-      <%= letter.aasm_state.humanize(capitalize: false) %>
-    </span>
+    <%= letter_status_badge(letter.aasm_state, 'float-right') %>
   </div>
   
   <div class="grid grid-cols-3 gap-1 text-sm text-gray-600">

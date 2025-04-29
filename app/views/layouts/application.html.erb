@@ -38,17 +38,13 @@
           <%= yield %>
         </main>
 
-        <footer class="footer mt-8 py-4 border-t">
+        <footer>
           <div class="container">
-            <p class="text-muted text-sm">
-<!--        Build <%#= Rails.application.config.git_version %> from <%#= time_ago_in_words(Rails.application.config.server_start_time) %> ago.-->
-<!--        <%#= pluralize(Heartbeat.cached_recent_count, 'heartbeat') %> in the last 24 hours.-->
-<!--        (DB: <%#= pluralize(QueryCount::Counter.counter, "query") %>, <%#= QueryCount::Counter.counter_cache %> cached)-->
-<!--        (CACHE: <%#= cache_stats[:hits] %> hits, <%#= cache_stats[:misses] %> misses)-->
+            <p>
+              <% if session[:impersonater_user_id] %>
+                <%= link_to "Stop impersonating", stop_impersonating_path, class: "secondary" %>
+              <% end %>
             </p>
-            <% if session[:impersonater_user_id] %>
-              <%= link_to "Stop impersonating", stop_impersonating_path, class: "btn btn-sm btn-danger mt-2" %>
-            <% end %>
           </div>
         </footer>
       </div>
