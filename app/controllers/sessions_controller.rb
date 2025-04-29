@@ -1,6 +1,8 @@
 class SessionsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :new, :create ]
 
+  skip_after_action :verify_authorized
+
   def new
     redirect_uri = url_for(action: :create, only_path: false)
     Rails.logger.info "Starting Slack OAuth flow with redirect URI: #{redirect_uri}"
