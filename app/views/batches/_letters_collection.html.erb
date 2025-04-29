@@ -23,6 +23,9 @@
       </div>
     </div>
 
-    <%= render 'shared/tags', tags: letter.tags %>
+    <div class="mt-2 flex items-center gap-2">
+      <span class="text-gray-400">Tags:</span>
+      <%= render 'shared/tags', tags: letter.tags %>
+    </div>
   </article>
 <% end %>

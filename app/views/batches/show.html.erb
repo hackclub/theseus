@@ -1,15 +1,4 @@
 <div class="container">
-  <% if notice.present? %>
-    <div class="flash success">
-      <div class="flash-content">
-        <svg xmlns="http://www.w3.org/2000/svg" class="flash-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <%= notice %>
-      </div>
-    </div>
-  <% end %>
-
   <div class="page-header">
     <h1 class="page-title"><%= @batch.type.split('::').first.titleize %> Batch #<%= @batch.id %></h1>
     <div class="actions">

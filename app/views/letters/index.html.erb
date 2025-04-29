@@ -38,6 +38,10 @@
                   <div class="text-muted">
                     <small>Created <%= time_ago_in_words(batch.created_at) %> ago</small>
                   </div>
+                  <div class="mt-2">
+                    <span class="text-gray-400">Tags:</span>
+                    <%= render 'shared/tags', tags: batch.tags %>
+                  </div>
                 </div>
               </summary>
               <div class="content">
@@ -66,37 +70,3 @@
     <%= paginate @unbatched_letters %>
   </footer>
 <% end %>
-
-<!-- Add this to your CSS -->
-<style>
-[data-theme="dark"] {
-  --primary: #00b894;
-  --primary-hover: #00a884;
-}
-
-.letters-grid .card {
-  background: var(--card-background-color);
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--card-border-color);
-}
-
-.nav-tabs {
-  border-bottom: 1px solid var(--card-border-color);
-  padding: 0;
-  list-style: none;
-  display: flex;
-  gap: 1rem;
-}
-
-.nav-tabs li a {
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: var(--color);
-}
-
-.nav-tabs li a.contrast {
-  border-bottom: 2px solid var(--primary);
-  color: var(--primary);
-}
-</style>
