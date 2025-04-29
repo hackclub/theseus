@@ -295,3 +295,12 @@ html {
 .text-danger {
   color: var(--color-danger);
 } 
+
+@mixin gradient($color) {
+  background-color: map-get($palette, $color);
+  background-image: radial-gradient(
+    ellipse farthest-corner at top left,
+    lighten(saturate(map-get($palette, $color), 15%), 15%),
+    saturate(map-get($palette, $color), 15%)
+  );
+}

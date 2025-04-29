@@ -12,10 +12,14 @@
   </div>
 </div>
 
-<div class="mb-4 flex space-x-4">
-  <%= link_to "Unbatched Orders", warehouse_orders_path, class: "btn #{params[:view] != 'batched' ? 'btn-primary' : 'btn-secondary'}" %>
-  <%= link_to "Batched Orders", warehouse_orders_path(view: 'batched'), class: "btn #{params[:view] == 'batched' ? 'btn-primary' : 'btn-secondary'}" %>
-</div>
+<ul class="tabs">
+  <li class="tabs__item">
+    <%= link_to "Unbatched Orders", warehouse_orders_path, class: "tabs__link #{params[:view] != 'batched' ? 'tabs__link--active' : ''}" %>
+  </li>
+  <li class="tabs__item">
+    <%= link_to "Batched Orders", warehouse_orders_path(view: 'batched'), class: "tabs__link #{params[:view] == 'batched' ? 'tabs__link--active' : ''}" %>
+  </li>
+</ul>
 
 <div class="orders-container">
   <div class="bg-gray-100 rounded-lg border border-gray-200">

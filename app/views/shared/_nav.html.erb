@@ -6,27 +6,24 @@
       </li>
       <li>
         <% if current_user %>
-          <%= render "shared/user_mention", user: current_user %>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <%= render "shared/user_mention", user: current_user %>
+            <%= button_to "log out", signout_path, {method: :delete, class: "btn outlined muted btn-tiny"} %>
+          </div>
         <% end %>
         <small>
           <%= Flavor.greeting name: current_user&.username %>
         </small>
       </li>
       <li>
-      <%= button_to "log out", signout_path, {method: :delete, class: "btn btn-sm btn-secondary"} %>
       </li>
     </ul>
-
-
-
     <hr />
-
     <ul>
       <%= nav_item(root_path, "Home") %>
       <%= nav_item(batches_path, "Batches") %>
-
       <li>
-        <details>
+        <details <%= 'open' if request.path.start_with?('/warehouse') %>>
           <summary>Warehouse</summary>
           <ul>
             <%= nav_item(warehouse_skus_path, "SKUs") %>
@@ -35,9 +32,8 @@
           </ul>
         </details>
       </li>
-      
       <li>
-        <details>
+        <details <%= 'open' if request.path.start_with?('/letters') || request.path.start_with?('/return_addresses') %>>
           <summary>Mail</summary>
           <ul>
             <%= nav_item(letters_path, "Letters") %>
@@ -45,10 +41,9 @@
           </ul>
         </details>
       </li>
-      
       <% admin_tool do %>
         <li>
-          <details>
+          <details <%= 'open' if request.path.start_with?('/admin') || request.path.start_with?('/blazer') || request.path.start_with?('/good_job') %>>
             <summary>Admin</summary>
             <ul>
               <%= nav_item(good_job_path, "good job, #{current_user.username}!") %>
@@ -58,10 +53,9 @@
           </details>
         </li>
       <% end %>
-      
       <% dev_tool do %>
         <li>
-          <details>
+          <details open>
             <summary>Developer Tools</summary>
             <ul>
               <%= nav_item(letter_opener_web_path, "mail (not the real kind)", target: "_blank") %>
@@ -72,18 +66,16 @@
     </ul>
   </nav>
 </aside>
-
 <button class="nav-toggle" aria-label="Toggle navigation">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 </button>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const navToggle = document.querySelector('.nav-toggle');
     const nav = document.querySelector('.nav');
-    
+
     if (navToggle && nav) {
       navToggle.addEventListener('click', function() {
         nav.classList.toggle('active');

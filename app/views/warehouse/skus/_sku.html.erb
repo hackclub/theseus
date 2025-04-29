@@ -3,15 +3,15 @@
     <div class="sku-id">
       <%= link_to sku.sku, sku %>
         <% if sku.in_stock&.> 0 %>
-          <span class="badge badge-success">in stock</span>
+          <span class="badge success float-right">in stock</span>
         <% elsif sku.in_stock&.< 0 %>
           <% if sku.inbound&.>= sku.in_stock.abs %>
-            <span class="badge badge-warning">backordered (more otw)</span>
+            <span class="badge warning float-right">backordered (more otw)</span>
           <% else %>
-            <span class="badge badge-danger">backordered (!)</span>
+            <span class="badge error float-right">backordered (!)</span>
           <% end %>
         <% else %>
-          <span class="badge badge-warning">not in inventory</span>
+          <span class="badge pending float-right">not in inventory</span>
         <% end %>
     </div>
 

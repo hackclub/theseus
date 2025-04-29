@@ -1,6 +1,6 @@
 <h1>Return Addresses</h1>
 <div class="actions">
-  <%= link_to "new!", new_return_address_path, class: "btn btn-success btn-sm" %>
+  <%= create_button new_return_address_path, "new!" %>
 </div>
 <% if @return_addresses.any? %>
   <div class="return-addresses-list">
@@ -9,7 +9,7 @@
         <header>
           <h3><%= address.name %>
             <% if address.shared %>
-              <span class="badge muted float-right">Shared</span>
+              <span class="badge success float-right">Shared</span>
             <% end %>
             <% if address.user == current_user %>
               <span class="badge info float-right">Mine</span>
@@ -28,8 +28,8 @@
         <footer>
           <% if address.user == current_user || current_user.admin? %>
             <div class="actions">
-              <%= link_to "Edit", edit_return_address_path(address), class: "btn btn-sm" %>
-              <%= button_to "Delete", address, method: :delete, data: { confirm: "Are you sure you want to delete this return address?" }, class: "btn btn-sm btn-danger" %>
+              <%= link_to "Edit", edit_return_address_path(address), class: "btn btn-small" %>
+              <%= button_to "delete", address, method: :delete, data: { confirm: "Are you sure you want to delete this return address?" }, class: "btn btn-small danger" %>
             </div>
           <% end %>
         </footer>

@@ -1,34 +1,31 @@
 <% content_for :title, "Skus" %>
-
 <div class="container">
   <h1>SKUs</h1>
-  
+  <div class="actions">
+    <button class="btn btn-small" onclick="document.querySelectorAll('details.sku-category').forEach(d => d.open = true)">expand all</button>
+  </div>
   <div class="grid">
-    <div>
-      <button onclick="document.querySelectorAll('details.sku-category').forEach(d => d.open = true)">Expand All</button>
+  </div>
+  <div class="grid">
+    <div id="warehouse_skus">
+      <% @warehouse_skus.group_by(&:category).each do |cat, skus| %>
+        <details class="sku-category">
+          <summary>
+            <%= cat.humanize %>
+          </summary>
+          <div class="warehouse-skus-grid">
+            <% skus.each do |warehouse_sku| %>
+              <%= render warehouse_sku %>
+            <% end %>
+          </div>
+        </details>
+      <% end %>
     </div>
   </div>
   <div class="grid">
-  <div id="warehouse_skus">
-    <% @warehouse_skus.group_by(&:category).each do |cat, skus| %>
-      <details class="sku-category">
-        <summary>
-          <h2><%= cat.humanize %></h2>
-        </summary>
-        <div class="warehouse-skus-grid">
-          <% skus.each do |warehouse_sku| %>
-            <%= render warehouse_sku %>
-          <% end %>
-        </div>
-      </details>
-    <% end %>
-  </div>
-  </div>
-
-  <div class="grid">
     <div>
       <% admin_tool(element: 'span') do %>
-        <%= link_to "Create SKU", new_admin_warehouse_sku_path, role: "button" %>
+        <%= link_to "Create SKU", new_admin_warehouse_sku_path %>
       <% end %>
     </div>
   </div>

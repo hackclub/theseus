@@ -6,20 +6,19 @@
       <h1>Letters</h1>
     </div>
     <div class="text-right">
-      <%= success_link_to new_letter_path, class: "button outline contrast" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        Create New Letter
-      <% end %>
+      <%= create_button new_letter_path, "send a letter!" %>
     </div>
   </div>
 </header>
 
 <nav class="container">
-  <ul class="nav-tabs">
-    <li><%= link_to "Unbatched Letters", letters_path, class: "#{params[:view] != 'batched' ? 'contrast' : ''}" %></li>
-    <li><%= link_to "Batched Letters", letters_path(view: 'batched'), class: "#{params[:view] == 'batched' ? 'contrast' : ''}" %></li>
+  <ul class="tabs">
+    <li class="tabs__item">
+      <%= link_to "Unbatched Letters", letters_path, class: "tabs__link #{params[:view] != 'batched' ? 'tabs__link--active' : ''}" %>
+    </li>
+    <li class="tabs__item">
+      <%= link_to "Batched Letters", letters_path(view: 'batched'), class: "tabs__link #{params[:view] == 'batched' ? 'tabs__link--active' : ''}" %>
+    </li>
   </ul>
 </nav>
 
