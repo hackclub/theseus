@@ -148,7 +148,10 @@ Rails.application.routes.draw do
   constraints AdminConstraint do
     mount GoodJob::Engine => "good_job"
     mount Blazer::Engine, at: "blazer"
+    get "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
   end
+  get "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
+  
   namespace :usps do
     resources :indicia
     resources :payment_accounts

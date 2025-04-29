@@ -38,20 +38,22 @@ class SessionsController < ApplicationController
 
   def impersonate
     unless current_user.admin?
-      redirect_to root_path, alert: "You are not authorized to impersonate users"
+      redirect_to root_path, alert: "you are not authorized to impersonate users. this incident has been reported :-P"
+      Sentry.capture_message("#{current_user.username} tried to impersonate #{params[:id]}??")
       return
     end
 
     session[:impersonater_user_id] ||= current_user.id
     user = User.find(params[:id])
     session[:user_id] = user.id
-    redirect_to root_path, notice: "Impersonating #{user.username}"
+    flash[:success] = "hey #{user.username}! how's it going? nice 'stache and glasses!"
+    redirect_to root_path
   end
 
   def stop_impersonating
     session[:user_id] = session[:impersonater_user_id]
     session[:impersonater_user_id] = nil
-    redirect_to root_path, notice: "Stopped impersonating"
+    redirect_to root_path, notice: "welcome back, 007!"
   end
 
   def destroy
