@@ -1,6 +1,6 @@
 class StaticPagesController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :login ]
-  # skip_after_action :verify_authorized
+  skip_after_action :verify_authorized
   def index
   end
 

@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   include Pundit::Authorization
-  # after_action :verify_authorized
+  after_action :verify_authorized
 
   helper_method :current_user, :user_signed_in?
 

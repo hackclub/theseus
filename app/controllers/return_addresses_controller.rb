@@ -2,11 +2,13 @@ class ReturnAddressesController < ApplicationController
   before_action :set_return_address, only: [ :edit, :update, :destroy ]
 
   def index
+    authorize ReturnAddress
     @return_addresses = ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
   end
 
 
   def new
+    authorize ReturnAddress
     @return_address = ReturnAddress.new
     @return_address.user = current_user if user_signed_in?
   end
@@ -18,6 +20,7 @@ class ReturnAddressesController < ApplicationController
   def create
     @return_address = ReturnAddress.new(return_address_params)
     @return_address.user = current_user if user_signed_in?
+    authorize @return_address
 
     if @return_address.save
       # If this was created from the letter form, redirect back to the letter

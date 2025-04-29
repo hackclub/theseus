@@ -3,6 +3,7 @@ class LettersController < ApplicationController
 
   # GET /letters
   def index
+    authorize Letter
     # Get all letters with their associations
     @all_letters = Letter.includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
 
@@ -15,11 +16,13 @@ class LettersController < ApplicationController
 
   # GET /letters/1
   def show
+    authorize @letter
     @available_templates = SnailMail::Service.available_templates
   end
 
   # GET /letters/new
   def new
+    authorize Letter
     @letter = Letter.new
     @letter.build_address
     # Don't build a return address by default - let the user select one
@@ -27,6 +30,7 @@ class LettersController < ApplicationController
 
   # GET /letters/1/edit
   def edit
+    authorize @letter
     # If letter doesn't have a return address already, don't build one
     # Let the user select one from the dropdown
   end
@@ -34,6 +38,7 @@ class LettersController < ApplicationController
   # POST /letters
   def create
     @letter = Letter.new(letter_params)
+    authorize @letter
 
     if @letter.save
       redirect_to @letter, notice: "Letter was successfully created."
@@ -44,6 +49,8 @@ class LettersController < ApplicationController
 
   # PATCH/PUT /letters/1
   def update
+    authorize @letter
+
     if @letter.batch_id.present? && params[:letter][:postage_type].present?
       redirect_to @letter, alert: "Cannot change postage type for a letter that is part of a batch."
       return
@@ -58,12 +65,14 @@ class LettersController < ApplicationController
 
   # DELETE /letters/1
   def destroy
+    authorize @letter
     @letter.destroy!
     redirect_to letters_path, status: :see_other, notice: "Letter was successfully destroyed."
   end
 
   # POST /letters/1/generate_label
   def generate_label
+    authorize @letter, :generate_label?
     template = params[:template]
     include_qr_code = params[:qr].present?
 
@@ -87,6 +96,7 @@ class LettersController < ApplicationController
   end
 
   def preview_template
+    authorize @letter, :preview_template?
     template = params["template"]
     include_qr_code = params["qr"].present?
     send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code:  }).render, type: "application/pdf", disposition: "inline"
@@ -94,6 +104,7 @@ class LettersController < ApplicationController
 
   # POST /letters/1/mark_printed
   def mark_printed
+    authorize @letter, :mark_printed?
     if @letter.mark_printed!
       redirect_to @letter, notice: "Letter has been marked as printed."
     else
@@ -103,6 +114,7 @@ class LettersController < ApplicationController
 
   # POST /letters/1/mark_mailed
   def mark_mailed
+    authorize @letter, :mark_mailed?
     if @letter.mark_mailed!
       redirect_to @letter, notice: "Letter has been marked as mailed."
     else
@@ -112,6 +124,7 @@ class LettersController < ApplicationController
 
   # POST /letters/1/mark_received
   def mark_received
+    authorize @letter, :mark_received?
     if @letter.mark_received!
       redirect_to @letter, notice: "Letter has been marked as received."
     else
@@ -121,6 +134,7 @@ class LettersController < ApplicationController
 
   # POST /letters/1/clear_label
   def clear_label
+    authorize @letter, :clear_label?
     if @letter.pending? && @letter.label.attached?
       @letter.label.purge
       redirect_to @letter, notice: "Label has been cleared."
@@ -131,6 +145,7 @@ class LettersController < ApplicationController
 
   # POST /letters/1/buy_indicia
   def buy_indicia
+    authorize @letter, :buy_indicia?
     if @letter.batch_id.present?
       redirect_to @letter, alert: "Cannot buy indicia for a letter that is part of a batch."
       return
