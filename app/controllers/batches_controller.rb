@@ -13,24 +13,29 @@ class BatchesController < ApplicationController
 
   # GET /batches or /batches.json
   def index
+    authorize Batch
     @batches = Batch.all.order(created_at: :desc)
   end
 
   # GET /batches/1 or /batches/1.json
   def show
+    authorize @batch
   end
 
   # GET /batches/new
   def new
+    authorize Batch
     @batch_types = BATCH_TYPES
   end
 
   # GET /batches/1/edit
   def edit
+    authorize @batch
   end
 
   # POST /batches or /batches.json
   def create
+    authorize Batch
     @batch_types = BATCH_TYPES
     batch_type = batch_params[:type]
 
@@ -52,9 +57,11 @@ class BatchesController < ApplicationController
   end
 
   def map_fields
+    authorize @batch, :map_fields?
   end
 
   def set_mapping
+    authorize @batch, :set_mapping?
     mapping = mapping_params.to_h
 
     # Invert the mapping to get from CSV columns to address fields
@@ -85,6 +92,7 @@ class BatchesController < ApplicationController
   end
 
   def process_batch
+    authorize @batch, :process_batch?
     @batch = Batch.find(params[:id])
 
     if request.post?
@@ -136,6 +144,7 @@ class BatchesController < ApplicationController
   end
 
   def process_form
+    authorize @batch, :process_form?
     case @batch.type
     when "Warehouse::Batch"
       render :process_warehouse
@@ -145,6 +154,7 @@ class BatchesController < ApplicationController
   end
 
   def mark_printed
+    authorize @batch, :mark_printed?
     if @batch.is_a?(Letter::Batch) && @batch.processed?
       @batch.letters.each do |letter|
         letter.mark_printed! if letter.may_mark_printed?
@@ -156,6 +166,7 @@ class BatchesController < ApplicationController
   end
 
   def mark_mailed
+    authorize @batch, :mark_mailed?
     if @batch.is_a?(Letter::Batch) && @batch.processed?
       @batch.letters.each do |letter|
         letter.mark_mailed! if letter.may_mark_mailed?
@@ -167,6 +178,7 @@ class BatchesController < ApplicationController
   end
 
   def update_costs
+    authorize @batch, :update_costs?
     if @batch.is_a?(Letter::Batch)
       # Calculate counts without saving
       us_letters = @batch.letters.joins(:address).where(addresses: { country: "US" })
@@ -193,6 +205,7 @@ class BatchesController < ApplicationController
 
   # PATCH/PUT /batches/1 or /batches/1.json
   def update
+    authorize @batch
     respond_to do |format|
       if @batch.update(batch_params)
         format.html { redirect_to @batch, notice: "Batch was successfully updated." }
@@ -206,6 +219,7 @@ class BatchesController < ApplicationController
 
   # DELETE /batches/1 or /batches/1.json
   def destroy
+    authorize @batch
     @batch.destroy!
 
     respond_to do |format|
@@ -248,29 +262,38 @@ class BatchesController < ApplicationController
         :letter_height,
         :letter_width,
         :letter_weight,
+        :letter_mailing_date,
         :letter_processing_category,
         :letter_mailer_id_id,
         :letter_return_address_id,
-        :include_qr_code,
-        :letter_mailing_date,
-        :usps_payment_account_id,
         :us_postage_type,
         :intl_postage_type,
-        template_cycle: [],
+        :usps_payment_account_id,
+        :template_cycle,
         tags: []
       )
     end
 
     def letter_batch_params
       params.require(:letter_batch).permit(
+        :letter_height,
+        :letter_width,
+        :letter_weight,
         :letter_mailing_date,
-        :usps_payment_account_id
+        :letter_processing_category,
+        :letter_mailer_id_id,
+        :letter_return_address_id,
+        :us_postage_type,
+        :intl_postage_type,
+        :usps_payment_account_id,
+        :template_cycle
       )
     end
 
     def mapping_params
       params.require(:mapping).permit!
     end
+
     def set_allowed_templates
       @allowed_templates = Warehouse::Template.where(public: true).or(Warehouse::Template.where(user: current_user))
     end

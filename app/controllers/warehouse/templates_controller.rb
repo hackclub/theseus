@@ -3,25 +3,30 @@ class Warehouse::TemplatesController < ApplicationController
 
   # GET /warehouse/templates or /warehouse/templates.json
   def index
+    authorize Warehouse::Template
     @warehouse_templates = Warehouse::Template.all
   end
 
   # GET /warehouse/templates/1 or /warehouse/templates/1.json
   def show
+    authorize @warehouse_template
   end
 
   # GET /warehouse/templates/new
   def new
+    authorize Warehouse::Template
     @warehouse_template = Warehouse::Template.new
   end
 
   # GET /warehouse/templates/1/edit
   def edit
+    authorize @warehouse_template
   end
 
   # POST /warehouse/templates or /warehouse/templates.json
   def create
     @warehouse_template = Warehouse::Template.new(warehouse_template_params.merge(user: current_user, source_tag: SourceTag.web_tag))
+    authorize @warehouse_template
 
     respond_to do |format|
       if @warehouse_template.save
@@ -36,6 +41,7 @@ class Warehouse::TemplatesController < ApplicationController
 
   # PATCH/PUT /warehouse/templates/1 or /warehouse/templates/1.json
   def update
+    authorize @warehouse_template
     respond_to do |format|
       if @warehouse_template.update(warehouse_template_params)
         format.html { redirect_to @warehouse_template, notice: "Template was successfully updated." }
@@ -49,6 +55,7 @@ class Warehouse::TemplatesController < ApplicationController
 
   # DELETE /warehouse/templates/1 or /warehouse/templates/1.json
   def destroy
+    authorize @warehouse_template
     @warehouse_template.destroy!
 
     respond_to do |format|
