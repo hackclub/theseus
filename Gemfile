@@ -144,3 +144,4 @@ gem "blazer", "~> 3.3"
 gem "sentry-ruby"
 
 gem "sentry-rails"
+gem "redis", "~> 5.4"
