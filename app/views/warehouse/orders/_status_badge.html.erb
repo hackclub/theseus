@@ -6,7 +6,7 @@
 <%
   color, text = case order.aasm.current_state
   when :draft
-    %w[muted draft]
+    %w[bg-muted draft]
   when :dispatched
     ["info", "sent to warehouse"]
   when :mailed
@@ -20,6 +20,6 @@
   end
 %>
 
-<span class="badge <%= color %> float-end">
+<span class="badge <%= color %> float-right">
   <%= text %>
 </span>

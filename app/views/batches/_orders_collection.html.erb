@@ -1,26 +1,23 @@
-<div class="grid gap-4">
-  <% orders.each do |order| %>
-    <div class="card">
-      <div>
-        <b>
-          <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
-        </b>
-
-        <%= render 'warehouse/orders/status_badge', order: order %>
-      </div>
-
-      <div class="my-2">
-        <b>going to: </b>
-        <%= order.address.name_line %> (<%= order.recipient_email %>)
-      </div>
-
-      <div class="mb-2">
-        <span class="text-gray-400">Tags:</span>
-        <%= render 'shared/tags', tags: order.tags %>
-      </div>
-
-      <b>contents:</b>
-      <%= render 'warehouse/orders/line_items', order: order %>
+<% orders.each do |order| %>
+  <article class="card">
+    <div>
+      <b>
+        <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
+      </b>
+      <%= render 'warehouse/orders/status_badge', order: order %>
     </div>
-  <% end %>
-</div> 
+
+    <div class="my-2">
+      <b>going to: </b>
+      <%= order.address.name_line %> (<%= order.recipient_email %>)
+    </div>
+
+    <div class="mb-2">
+      <span class="text-gray-400">Tags:</span>
+      <%= render 'shared/tags', tags: order.tags %>
+    </div>
+
+    <b>contents:</b>
+    <%= render 'warehouse/orders/line_items', order: order %>
+  </article>
+<% end %>
