@@ -1,5 +1,16 @@
 <% if @mail.any? %>
   <%= render @mail %>
 <% else %>
-  <%= vite_image_tag 'images/no_mail.png', id: "no_mail" %>
+  <div class="window" style="width: 300px; background-color: blue; color: white">
+    <div class="title-bar">
+      <div class="title-bar-text">NO MAIL</div>
+      <div class="title-bar-controls">
+        <%= w95_title_button_to("Close", public_root_path) %>
+      </div>
+    </div>
+    <div class="window-body" style=" border-color: blue;">
+      <%= vite_image_tag 'images/no_mail.png', id: "no_mail" %>
+      <p>we don't have any mail for you in the new system...<br/>check back later?</p>
+    </div>
+  </div>
 <% end %>
