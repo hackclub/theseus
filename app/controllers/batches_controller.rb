@@ -123,7 +123,8 @@ class BatchesController < ApplicationController
             payment_account: payment_account,
             us_postage_type: batch_params[:us_postage_type],
             intl_postage_type: batch_params[:intl_postage_type],
-            template_cycle: batch_params[:template_cycle]
+            template_cycle: batch_params[:template_cycle],
+            user_facing_title: batch_params[:user_facing_title]
           )
           redirect_to @batch, notice: "Batch processed successfully"
         rescue => e
@@ -259,6 +260,7 @@ class BatchesController < ApplicationController
         :type,
         :warehouse_purpose_code_id,
         :warehouse_user_facing_title,
+        :user_facing_title,
         :letter_height,
         :letter_width,
         :letter_weight,

@@ -194,6 +194,7 @@ class LettersController < ApplicationController
         :postage_type,
         :mailing_date,
         :rubber_stamps,
+        :user_facing_title,
         :usps_mailer_id_id,
         :return_address_id,
         address_attributes: [

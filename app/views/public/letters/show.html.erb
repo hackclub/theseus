@@ -1,7 +1,7 @@
 <% content_for :back_office_link do %>
   <%= link_to "view this letter", letter_path(@letter) %> in the backend?
 <% end %>
-<div class="window" style="max-width: 900px">
+<div class="window" style="min-width: 516px; max-width: fit-content">
   <div class="title-bar">
     <div class="title-bar-text">Letter <%= @letter.public_id %></div>
     <div class="title-bar-controls">
@@ -22,7 +22,7 @@
     <p>
       <details>
         <summary>details for nerds</summary>
-        <div class="sunken-panel" style="height: 200px;">
+        <div class="sunken-panel" style="height: 200px; min-width: 500px;">
           <table class="interactive">
             <thead>
               <tr>

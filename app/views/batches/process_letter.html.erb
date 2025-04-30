@@ -4,6 +4,12 @@
 
 <%= form_with(model: @batch, url: process_batch_path(@batch), method: :post) do |form| %>
   <div class="field">
+    <%= form.label :user_facing_title, "Letter Title", class: "form-label" %>
+    <div class="help-text">This title will be visible to recipients on their letters. For example: "Monthly Newsletter" or "Important Update".</div>
+    <%= form.text_field :user_facing_title, class: "form-control", placeholder: "e.g. Monthly Newsletter" %>
+  </div>
+
+  <div class="field">
     <%= form.label :template_cycle, "Label Templates" %>
     <div class="help-text">Select multiple templates to cycle through them, or just one for all labels.</div>
     <select name="batch[template_cycle][]" id="batch_template_cycle" multiple="multiple" size="8" class="template-select">
@@ -57,7 +63,7 @@
 
   <div class="field">
     <div class="form-check">
-      <%= form.check_box :include_qr_code, id: "batch_include_qr_code" %>
+      <%= form.check_box :include_qr_code, id: "batch_include_qr_code", checked: true %>
       <%= form.label :include_qr_code, "Include QR Code on Labels", for: "batch_include_qr_code" %>
     </div>
     <div class="help-text">Add a QR code to each label for tracking purposes.</div>

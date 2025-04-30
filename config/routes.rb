@@ -109,11 +109,12 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
-  get "/tags", to: "tags#index"
-  get "/tags/:id", to: "tags#show", as: :tag_stats
-  post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
+
 
   scope path: 'back_office' do
+    get "/tags", to: "tags#index"
+    get "/tags/:id", to: "tags#show", as: :tag_stats
+    post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
     resources :letters do
       member do
         post :generate_label
@@ -198,9 +199,6 @@ Rails.application.routes.draw do
   get "/auth/slack", to: "sessions#new", as: :slack_auth
   get "/auth/slack/callback", to: "sessions#create"
 
-  # Route for publicly identifiable objects
-  get "/j/:public_id", to: "public_identifiable#show", as: :public_id
-
   root "public/static_pages#root", as: :public_root
 
   get '/login' => "public/static_pages#login", as: :public_login
@@ -221,6 +219,9 @@ Rails.application.routes.draw do
   get "/impersonate", to: "public/impersonations#new", as: :public_impersonate_form
   post "/impersonate", to: "public/impersonations#create", as: :public_impersonate
   get "/stop_impersonating", to: "public/impersonations#stop_impersonating", as: :public_stop_impersonating
+
+
+  get '/:public_id', to: 'public/public_identifiable#show', constraints: { public_id: /(pkg|ltr)![^\/]+/ }
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

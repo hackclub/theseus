@@ -1,6 +1,14 @@
 <div id="<%= dom_id letter %>" class="letter-item p-3 bg-white border rounded shadow-sm hover:shadow-md transition-shadow">
   <div class="flex justify-between items-center mb-2">
-    <h3 class="text-base font-medium"><%= link_to letter.public_id, letter %> to <%= letter.address.name_line %></h3>
+    <h3 class="text-base font-medium">
+      <%= link_to letter do %>
+        <% if letter.user_facing_title.present? %>
+          <%= letter.user_facing_title %>
+        <% else %>
+          <%= letter.public_id %> to <%= letter.address.name_line %>
+        <% end %>
+      <% end %>
+    </h3>
     <%= letter_status_badge(letter.aasm_state, 'float-right') %>
   </div>
   

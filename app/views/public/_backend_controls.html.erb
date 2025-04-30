@@ -9,13 +9,18 @@
       <% if policy(Public::Impersonation).new? %>
         <p class="status-bar-field">
           <% if impersonating? %>
-            currently impersonating <%= current_public_user.email %>. <%= link_to "stop", public_stop_impersonating_path %>?
+            currently impersonating <%= current_public_user.email %>
+            . <%= link_to "stop", public_stop_impersonating_path %>?
           <% else %>
             <%= link_to "impersonate", public_impersonate_form_path %> somebody else?
           <% end %>
         </p>
       <% end %>
-      <p class="status-bar-field">CPU Usage: 14%</p>
+      <p class="status-bar-field">
+        <%= copy_to_clipboard(Rails.application.config.git_version, label: "running rev #{Rails.application.config.git_version}", tooltip_direction: "e") do %>
+        <%= Rails.env.humanize %> mode
+      <% end %>
+      </p>
     </div>
   </div>
 </div>
