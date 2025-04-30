@@ -1,0 +1,30 @@
+<div class="window" style="width: fit-content">
+  <div class="title-bar iconed">
+    <%= vite_image_tag 'images/icons/impersonate.png', id: "treasure", class: 'title-icon' %>
+
+    <div class="title-bar-text">Impersonate user</div>
+  </div>
+  <div class="window-body">
+    <%= vite_image_tag 'images/icons/break-the-glass.png', id: "treasure", class: 'dialog-icon' %>
+
+    <p>
+      With great power comes great responsibility. <br/>
+      Privacy is important when it comes to mail. <br/>
+      Please use this tool responsibly. <br/>
+    </p>
+
+      <%= form_with url: public_impersonate_path, model: @impersonation do |f| %>
+        <div class="field-row">
+          <%= f.label :target_email, "What's the user's email?" %>
+          <%= f.text_field :target_email %>
+        </div>
+      <div class="field-row">
+        <%= f.label :justification, "Why are you accessing their data today?" %>
+        <%= f.text_field :justification %>
+      </div>
+      <p>(doesn't need to be anything fancy, just not "for the hell of it" :-P)</p>
+
+      <%= f.submit "go undercover" %>
+      <% end %>
+  </div>
+</div>

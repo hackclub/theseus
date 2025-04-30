@@ -1,1 +1,25 @@
 @import "98.css/dist/98.css";
+
+.window details {
+    margin-left: 8px;
+}
+
+.dialog-icon {
+    width: 32px;
+    display: inline;
+    float: left;
+    margin-right: 8px;
+    image-rendering: pixelated;
+}
+
+.title-icon {
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    margin-right: 8px;
+    image-rendering: pixelated;
+}
+
+.title-bar.iconed>.title-bar-text{
+    margin-left: 24px;
+}

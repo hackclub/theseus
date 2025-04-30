@@ -109,16 +109,11 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
-  namespace :public do
-    resources :mails
-    get "sessions/send_email"
-    resources :static_pages
-  end
   get "/tags", to: "tags#index"
   get "/tags/:id", to: "tags#show", as: :tag_stats
   post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
 
-  scope :back_office do
+  scope path: 'back_office' do
     resources :letters do
       member do
         post :generate_label
@@ -212,6 +207,20 @@ Rails.application.routes.draw do
   post '/login' => "public/sessions#send_email", as: :send_email
   get "/login/:token", to: "public/sessions#login_code", as: :login_code
   delete "logout", to: "public/sessions#destroy", as: :public_logout
+  get "/my_mail", to: "public/mail#index", as: :my_mail
+
+  resources "letters", module: :public_, only: [:show] do
+    member do
+      post :mark_received, as: :public_mark_received
+    end
+  end
+
+  get "/letters/:id", to: "public/letters#show", as: :public_letter
+  get "/packages/:id", to: "public/packages#show", as: :public_package
+
+  get "/impersonate", to: "public/impersonations#new", as: :public_impersonate_form
+  post "/impersonate", to: "public/impersonations#create", as: :public_impersonate
+  get "/stop_impersonating", to: "public/impersonations#stop_impersonating", as: :public_stop_impersonating
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

@@ -55,6 +55,10 @@ class ReturnAddress < ApplicationRecord
     .strip
   end
 
+  def location
+    "#{city}, #{state} #{postal_code} #{country}"
+  end
+
 
   private
 

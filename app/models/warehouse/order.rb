@@ -203,6 +203,18 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
+  HUMANIZED_STATES = {
+    draft: "Draft",
+    dispatched: "Sent to warehouse",
+    mailed: "Shipped!",
+    errored: "Errored?",
+    canceled: "Canceled"
+  }
+
+  def humanized_state
+    HUMANIZED_STATES[aasm_state.to_sym]
+  end
+
   aasm timestamps: true do
     state :draft, initial: true
     state :dispatched

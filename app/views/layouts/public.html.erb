@@ -30,6 +30,10 @@
   <div class="dev-border-overlay"></div>
 <% end %>
 
+<% if current_user %>
+<%= render 'public/backend_controls' %>
+<% end %>
+
       <%= render "shared/flash" %>
       <%= yield %>
 

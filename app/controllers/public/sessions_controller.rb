@@ -41,10 +41,9 @@ module Public
       end
     end
 
-
     def destroy
       session[:public_user_id] = nil
-      session[:impersonater_user_id] = nil
+      session[:public_impersonator_user_id] = nil
       redirect_to public_root_path, notice: "signed out!"
     end
   end

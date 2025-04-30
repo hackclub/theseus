@@ -1,0 +1,76 @@
+<% content_for :back_office_link do %>
+  <%= link_to "view this letter", letter_path(@letter) %> in the backend?
+<% end %>
+<div class="window" style="max-width: 900px">
+  <div class="title-bar">
+    <div class="title-bar-text">Letter <%= @letter.public_id %></div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to('Close', my_mail_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <p>
+      <b>Status:</b>
+      <%= @letter.aasm_state.humanize %>
+    </p>
+    <% tags = @letter.tags.compact_blank %>
+    <% if tags.any? %>
+    <p>
+      <b>Tagged:</b> <%= tags.join(', ') %>
+    </p>
+    <% end %>
+    <p>
+      <details>
+        <summary>details for nerds</summary>
+        <div class="sunken-panel" style="height: 200px;">
+          <table class="interactive">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Facility</th>
+                <th>Source</th>
+                <th>Extra info</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @events.each do |event| %>
+                <tr>
+                  <td>
+                    <%= event[:happened_at].strftime("%Y-%m-%d %H:%M EST") %>
+                  </td>
+                  <td>
+                    <%= event[:location] %>
+                  </td>
+                  <td>
+                    <%= event[:description] %>
+                  </td>
+                  <td>
+                    <%= event[:facility] %>
+                  </td>
+                  <td>
+                    <%= event[:source] %>
+                  </td>
+                  <td>
+                    <%= event[:extra_info] %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </p>
+    <% if @letter.mailed_at && !@letter.received_at %>
+      <section class="field-row" style="justify-content: flex-end">
+        <%= button_to "i got this letter!", public_mark_received_letter_path(@letter), data: { turbo: false, turbo_confirm: "are you sure you received this letter?" } %>
+      </section>
+    <% end %>
+  </div>
+</div>
+<% if @received %>
+  <script>
+    setTimeout(()=>{window.fire_confetti()}, 500)
+  </script>
+<% end %>

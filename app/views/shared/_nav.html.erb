@@ -13,7 +13,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <%= render "shared/user_mention", user: current_user %>
             <%= button_to "log out", signout_path, {method: :delete, class: "btn outlined muted btn-tiny"} %>
-            <% if session[:impersonater_user_id] %>
+            <% if session[:impersonator_user_id] %>
               <%= button_to "stop impersonating", stop_impersonating_path, {method: :get, class: "btn outlined info btn-tiny"} %>
             <% end %>
           </div>

@@ -179,7 +179,7 @@ class LettersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_letter
-      @letter = Letter.find_by_hashid!(params[:id])
+      @letter = Letter.find_by_public_id!(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

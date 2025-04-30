@@ -6,6 +6,7 @@
     <p> there's not a whole lot here yet?</p>
     <% if current_public_user %>
       <p>you're currently signed in as <b><%= current_public_user.email %></b></p>
+      <p>view <%= link_to "your mail", my_mail_path %>?</p>
       <%= button_to "log out?", public_logout_path, {method: :delete} %>
     <% else %>
       <p>if you're interested in <b>your</b> mail in particular, you can always...</p>
