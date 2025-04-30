@@ -12,42 +12,6 @@
     /* Original: 0.25rem */
 }
 
-
-// @media (min-width: 576px) {
-//     :root {
-//         --pico-font-size: 87.5%;
-//         /* Original: 106.25% */
-//     }
-// }
-
-// @media (min-width: 768px) {
-//     :root {
-//         --pico-font-size: 87.5%;
-//         /* Original: 112.5% */
-//     }
-// }
-
-// @media (min-width: 1024px) {
-//     :root {
-//         --pico-font-size: 87.5%;
-//         /* Original: 118.75% */
-//     }
-// }
-
-// @media (min-width: 1280px) {
-//     :root {
-//         --pico-font-size: 87.5%;
-//         /* Original: 125% */
-//     }
-// }
-
-// @media (min-width: 1536px) {
-//     :root {
-//         --pico-font-size: 87.5%;
-//         /* Original: 131.25% */
-//     }
-// }
-
 h1,
 h2,
 h3,
@@ -73,4 +37,7 @@ article>footer {
 $theme-color: "amber";
 // orange, pink, pumpkin, purple, red, sand, slate, violet, yellow, zinc
 
+pre.debug_dump kbd {
+    background-color: unset !important;
+}
 @import "@picocss/pico/scss/pico";
