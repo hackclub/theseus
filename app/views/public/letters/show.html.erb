@@ -62,6 +62,12 @@
         </div>
       </details>
     </p>
+    <% if @letter.may_mark_mailed? %>
+      <section class="field-row" style="justify-content: flex-end">
+        <%= button_to "MARK MAILED", public_mark_mailed_letter_path(@letter), style: "font-size: 24px; padding: 20px 40px; font-weight: bold;", data: { turbo: false } %>
+      </section>
+    <% end %>
+    
     <% if @letter.mailed_at && !@letter.received_at %>
       <section class="field-row" style="justify-content: flex-end">
         <%= button_to "i got this letter!", public_mark_received_letter_path(@letter), data: { turbo: false, turbo_confirm: "are you sure you received this letter?" } %>

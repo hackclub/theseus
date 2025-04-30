@@ -1,1 +1,5 @@
-<%= render @mail %>
+<% if @mail.any? %>
+  <%= render @mail %>
+<% else %>
+  <%= vite_image_tag 'images/no_mail.png', id: "no_mail" %>
+<% end %>

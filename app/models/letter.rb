@@ -66,7 +66,7 @@ class Letter < ApplicationRecord
     end
 
     event :mark_mailed do
-      transitions from: :printed, to: :mailed
+      transitions from: [:pending, :printed], to: :mailed
     end
 
     event :mark_received do
@@ -188,14 +188,14 @@ class Letter < ApplicationRecord
       happened_at: printed_at.in_time_zone("America/New_York"),
       source: "Hack Club",
       facility: "Mailer",
-      description: "Letter marked printed.",
+      description: "Letter printed.",
       location:
     } if printed_at
     timestamps << {
       happened_at: mailed_at.in_time_zone("America/New_York"),
       source: "Hack Club",
       facility: "Mailer",
-      description: "Letter marked mailed!",
+      description: "Letter mailed!",
       location:
     } if mailed_at
     timestamps << {

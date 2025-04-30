@@ -210,6 +210,7 @@ Rails.application.routes.draw do
   resources "letters", module: :public_, only: [:show] do
     member do
       post :mark_received, as: :public_mark_received
+      post :mark_mailed, as: :public_mark_mailed
     end
   end
 
