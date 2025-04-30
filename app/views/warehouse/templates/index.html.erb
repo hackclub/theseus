@@ -18,7 +18,7 @@
 
 <h2>Public templates:</h2>
 <div id="public_templates">
-  <%= Warehouse::Template.shared.each do |warehouse_template| %>
+  <% Warehouse::Template.shared.each do |warehouse_template| %>
     <%= render warehouse_template %>
     <p>
       <%= link_to "view this template", warehouse_template %>

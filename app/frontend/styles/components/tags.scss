@@ -33,6 +33,16 @@
   padding: 0.25rem 0.625rem;
   transition: background-color 0.2s ease;
 
+  a {
+    color: var(--pico-color-azure-600);
+    text-decoration: none;
+    
+    &:hover {
+      color: var(--pico-color-azure-700);
+      text-decoration: underline;
+    }
+  }
+
   &:hover {
     background-color: rgba(map.get(colors.$palette, info), 0.15);
   }

@@ -1,20 +1,42 @@
-<div class="card mb-3">
-  <div>
-
-    <b>
+<article class="card" id="<%= dom_id order %>">
+  <header class="flex items-center justify-between">
+    <h1>
       <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
-    </b>
+      <%= render 'status_badge', order: order %>
+    </h1>
+  </header>
 
-    <%= render 'status_badge', order: %>
+  <div class="p-3">
+    <%= render 'shared/tags', tags: order.tags %>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+      <div class="order-info-panel">
+        <h3>Order Information</h3>
+        <div class="p-2 border rounded">
+          <p><span class="field-label">Recipient:</span> <%= order.address.name_line %></p>
+          <p><span class="field-label">Email:</span> <%= order.recipient_email %></p>
+        </div>
+      </div>
+
+      <div class="order-info-panel">
+        <h3>Cost Information</h3>
+        <div class="p-2 border rounded">
+          <p><span class="field-label">Labor Cost:</span> <%= number_to_currency(order.labor_cost) %></p>
+          <p><span class="field-label">Contents Cost:</span> <%= number_to_currency(order.contents_actual_cost_to_hc) %>
+          </p>
+          <p>
+            <span class="field-label">Postage Cost:</span> <%= order.postage_cost.present? ? number_to_currency(order.postage_cost) : "$?.??" %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-contents-section">
+      <h3>Contents</h3>
+      <div class="p-2 border rounded">
+        <%= render 'warehouse/orders/line_items', order: order %>
+      </div>
+    </div>
   </div>
+</article>
 
-  <div class="my-2">
-    <b>going to: </b>
-    <%= order.address.name_line %> (<%= order.recipient_email %>)
-  </div>
-
-
-  <b>contents:</b>
-  <%= render 'warehouse/orders/line_items', order: %>
-
-</div>
