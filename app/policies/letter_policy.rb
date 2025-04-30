@@ -58,6 +58,6 @@ class LetterPolicy < ApplicationPolicy
   private
 
   def record_belongs_to_user
-    user && record.batch&.user == user
+    user && (record.user == user || record.batch&.user == user)
   end
 end 
