@@ -1,0 +1,86 @@
+<div class="window" style="width: 300px; margin-bottom: 1rem;">
+  <div class="title-bar">
+    <div class="title-bar-text">
+      <% if @package.user_facing_title %>
+        Warehouse: <%= @package.user_facing_title %>
+      <% else %>
+        Warehouse shipment <%= @package.public_id %>
+      <% end %>
+    </div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Close", my_mail_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <div>
+      <b>Status:</b>
+      <%= @package.humanized_state %>
+    </div>
+
+    <% if @package.tracking_number %>
+      <div style="margin-top: 1rem;">
+        <b>Tracking:</b>
+        <div>
+          <%= @package.pretty_via %> 
+          <%= link_to @package.tracking_number, @package.tracking_url, target: "_blank" %>
+        </div>
+        <% if @package.might_be_slow? %>
+          <div class="status-bar-field">
+            <i>Note: This carrier may have slower tracking updates</i>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  
+    <div style="margin-top: 1rem; margin-bottom: 1rem;">
+      <b>Contents:</b>
+      <div class="field-row">
+        <table style="width: 100%;">
+          <% @package.line_items.includes(:sku).each do |item| %>
+            <tr>
+              <td><%= item.sku.name %></td>
+              <td style="text-align: right;">× <%= item.quantity %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+
+    <% back_office_tool do %>
+    <div>
+      <b>Costs:</b>
+      <div class="field-row">
+        <table style="width: 100%;">
+          <tr>
+            <td>Contents:</td>
+            <td style="text-align: right;"><%= number_to_currency(@package.contents_actual_cost_to_hc) %></td>
+          </tr>
+          <tr>
+            <td>Labor:</td>
+            <td style="text-align: right;"><%= number_to_currency(@package.labor_cost) %></td>
+          </tr>
+          <tr>
+            <td>Total:</td>
+            <td style="text-align: right;"><%= number_to_currency(@package.total_cost) %></td>
+          </tr>
+          <% if @package.postage_cost %>
+            <tr>
+              <td>Postage:</td>
+              <td style="text-align: right;"><%= number_to_currency(@package.postage_cost) %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      </div>
+    <% end %>
+
+    <% if @package.tags.any? %>
+      <div style="margin-top: 1rem;">
+        <b>Tags:</b>
+        <div class="field-row">
+          <%= @package.tags.join(", ") %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

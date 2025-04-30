@@ -3,6 +3,9 @@ module Public
     before_action :set_package
 
     def show
+      if @package.is_a? Warehouse::Order
+        render "public/warehouse/orders/show"
+      end
     end
 
     private

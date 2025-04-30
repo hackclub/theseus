@@ -331,6 +331,9 @@ class Warehouse::Order < ApplicationRecord
     item_hash
   end
 
+  def total_cost
+    [contents_cost, labor_cost, postage_cost].compact_blank.sum
+  end
   def to_param
     hc_id
   end
