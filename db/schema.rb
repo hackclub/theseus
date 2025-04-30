@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_30_214307) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -279,11 +279,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_214307) do
     t.datetime "mailed_at"
     t.datetime "received_at"
     t.string "user_facing_title"
+    t.bigint "user_id", null: false
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
     t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
     t.index ["return_address_id"], name: "index_letters_on_return_address_id"
     t.index ["tags"], name: "index_letters_on_tags", using: :gin
+    t.index ["user_id"], name: "index_letters_on_user_id"
     t.index ["usps_mailer_id_id"], name: "index_letters_on_usps_mailer_id_id"
   end
 
@@ -518,6 +520,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_214307) do
   add_foreign_key "letters", "addresses"
   add_foreign_key "letters", "batches"
   add_foreign_key "letters", "return_addresses"
+  add_foreign_key "letters", "users"
   add_foreign_key "letters", "usps_mailer_ids"
   add_foreign_key "public_impersonations", "users"
   add_foreign_key "public_login_codes", "public_users", column: "user_id"
