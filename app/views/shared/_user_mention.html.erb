@@ -11,8 +11,8 @@
   <% unless current_user == user %>
     <% admin_tool(element: 'span') do %>
       <%= link_to impersonate_user_path(user), class: "impersonate-link" do %>
-        🥸
-      <% end %>
+        <%= vite_image_tag 'images/icons/impersonate.png', id: "treasure", width: '16px', height: '16px' %>
+    <% end %>
     <% end %>
   <% end %>
 </div>

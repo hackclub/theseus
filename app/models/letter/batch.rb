@@ -55,6 +55,7 @@ class Letter::Batch < Batch
   attribute :letter_width, :decimal
   attribute :letter_weight, :decimal
   attribute :letter_processing_category, :integer
+  attribute :user_facing_title, :string
   attr_accessor :template, :template_cycle
   attribute :letter_mailing_date, :date
 
@@ -83,8 +84,8 @@ class Letter::Batch < Batch
   def process!(options = {})
     return false unless fields_mapped?
 
-    # Set postage types for all letters based on options
-    if options[:us_postage_type].present? || options[:intl_postage_type].present?
+    # Set postage types and user_facing_title for all letters based on options
+    if options[:us_postage_type].present? || options[:intl_postage_type].present? || options[:user_facing_title].present?
       letters.each do |letter|
         letter.mailing_date = letter_mailing_date
         if letter.address.us?
@@ -92,6 +93,7 @@ class Letter::Batch < Batch
         else
           letter.postage_type = options[:intl_postage_type] == "indicia" ? :indicia : :stamps
         end
+        letter.user_facing_title = options[:user_facing_title] if options[:user_facing_title].present?
         letter.save!
       end
     end

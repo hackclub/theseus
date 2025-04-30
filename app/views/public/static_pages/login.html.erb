@@ -1,0 +1,20 @@
+<div class="window" style="width: 320px">
+  <div class="title-bar">
+    <div class="title-bar-text">Log in</div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Close", public_root_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <%= form_with url: send_email_path do |form| %>
+      <div class="field-row">
+        <%= form.label :email, "What's your email? " %>
+        <%= form.text_field :email %>
+      </div>
+      <% if @error %>
+        <br/><a style="color: #ac0808"><%= @error %></a> <br/><br/>
+      <% end %>
+      <%= form.submit "log in!" %>
+    <% end %>
+  </div>
+</div>

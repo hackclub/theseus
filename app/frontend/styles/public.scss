@@ -1,0 +1,12 @@
+@use "components/tooltips" as *;
+@use "components/banners" as *;
+@use "utils" as *;
+html {
+  color-scheme: light dark;
+}
+input {
+  color: black;
+}
+body {
+  margin: 2em;
+}

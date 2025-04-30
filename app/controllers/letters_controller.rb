@@ -179,7 +179,7 @@ class LettersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_letter
-      @letter = Letter.find_by_hashid!(params[:id])
+      @letter = Letter.find_by_public_id!(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
@@ -194,8 +194,10 @@ class LettersController < ApplicationController
         :postage_type,
         :mailing_date,
         :rubber_stamps,
+        :user_facing_title,
         :usps_mailer_id_id,
         :return_address_id,
+        :recipient_email,
         address_attributes: [
           :id,
           :first_name,

@@ -1,0 +1,15 @@
+<div class="window" style="width: 320px">
+  <div class="title-bar">
+    <div class="title-bar-text">Logging in...</div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Close", public_root_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <p>Email sent to <%= @email %>!</p>
+    <p>Click the link in it to log in...</p>
+    <% dev_tool do %>
+      <span style="color: lime !important">you're in dev! go check <%= link_to "letter opener", letter_opener_web_path %>!</span>
+    <% end %>
+  </div>
+</div>

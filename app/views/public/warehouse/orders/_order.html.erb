@@ -1,0 +1,24 @@
+<div class="window" style="width: 300px; margin-bottom: 1rem;">
+  <div class="title-bar">
+    <div class="title-bar-text">
+      <% if order.user_facing_title %>
+        Warehouse: <%= order.user_facing_title %>
+      <% else %>
+        Warehouse shipment <%= order.public_id %>
+      <% end %>
+    </div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Maximize", public_package_path(order)) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <div>
+      <b>Status:</b>
+      <%= order.humanized_state %>
+    </div>
+
+    <div>
+
+    </div>
+  </div>
+</div>

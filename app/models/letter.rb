@@ -53,6 +53,7 @@ class Letter < ApplicationRecord
   # Add ActiveStorage attachment for the label PDF
   has_one_attached :label
   belongs_to :return_address, optional: true
+  has_many :iv_mtr_events, class_name: "USPS::IVMTR::Event"
 
   aasm timestamps: true do
     state :pending, initial: true
@@ -70,6 +71,10 @@ class Letter < ApplicationRecord
 
     event :mark_received do
       transitions from: :mailed, to: :received
+    end
+
+    event :unreceive do
+      transitions from: :received, to: :mailed
     end
   end
 
@@ -159,6 +164,48 @@ class Letter < ApplicationRecord
       end
       next_business_day
     end
+  end
+
+  def to_param
+    self.public_id
+  end
+
+  def events
+    iv = iv_mtr_events.map do |event|
+      e = event.hydrated
+    {
+      happened_at: event.happened_at.in_time_zone("America/New_York"),
+      source: "USPS IV-MTR",
+      location: "#{e.scan_facility_city}, #{e.scan_facility_state} #{e.scan_facility_zip}",
+      facility: "#{e.scan_facility_name} (#{e.scan_locale_key})",
+      description: "[OP#{e.opcode.code}] #{e.opcode.process_description}",
+      extra_info: "#{e.handling_event_type_description} – #{e.mail_phase} – #{e.machine_name} (#{event.payload.dig("machineId") || "no ID"})"
+    }
+    end
+    timestamps = []
+    location = return_address.location
+    timestamps << {
+      happened_at: printed_at.in_time_zone("America/New_York"),
+      source: "Hack Club",
+      facility: "Mailer",
+      description: "Letter marked printed.",
+      location:
+    } if printed_at
+    timestamps << {
+      happened_at: mailed_at.in_time_zone("America/New_York"),
+      source: "Hack Club",
+      facility: "Mailer",
+      description: "Letter marked mailed!",
+      location:
+    } if mailed_at
+    timestamps << {
+      happened_at: received_at.in_time_zone("America/New_York"),
+      source: "You!",
+      facility: "Your mailbox",
+      description: "You received this letter!",
+      location: "wherever you live"
+    } if received_at
+    iv + timestamps
   end
 
   private

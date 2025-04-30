@@ -1,4 +1,21 @@
 <%= form_with(model: letter, class: "form-container") do |form| %>
+  <% if letter.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(letter.errors.count, "error") %> prohibited this letter from being saved:</h2>
+
+      <ul>
+        <% letter.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :user_facing_title, "Title", class: "form-label" %>
+    <%= form.text_field :user_facing_title, class: "form-control", placeholder: "e.g. Monthly Newsletter" %>
+  </div>
+
   <fieldset>
     <legend>Letter Specs</legend>
     <%= render partial: "letters/letter_attributes_form", locals: { form: form } %>
@@ -48,6 +65,11 @@
   <fieldset>
     <legend>Additional Data</legend>
     <div class="grid">
+      <div>
+        <%= form.label :recipient_email, "Recipient Email", class: "form-label" %>
+        <%= form.email_field :recipient_email, class: "form-control", placeholder: "recipient@example.com" %>
+        <small>Optional email address for the recipient</small>
+      </div>
       <div>
         <%= form.label :rubber_stamps, "Rubber Stamps" %>
         <%= form.text_area :rubber_stamps, rows: 5 %>

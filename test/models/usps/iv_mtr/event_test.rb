@@ -10,7 +10,7 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  batch_id     :bigint           not null
-#  letter_id    :bigint           not null
+#  letter_id    :bigint
 #  mailer_id_id :bigint           not null
 #
 # Indexes
@@ -22,7 +22,7 @@
 # Foreign Keys
 #
 #  fk_rails_...  (batch_id => usps_iv_mtr_raw_json_batches.id)
-#  fk_rails_...  (letter_id => letters.id)
+#  fk_rails_...  (letter_id => letters.id) ON DELETE => nullify
 #  fk_rails_...  (mailer_id_id => usps_mailer_ids.id)
 #
 require "test_helper"

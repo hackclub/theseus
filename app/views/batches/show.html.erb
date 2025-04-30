@@ -1,6 +1,8 @@
+<% content_for :title, "#{@batch.type.split('::').first.titleize} Batch ##{@batch.id} - #{@batch.addresses.count} #{@batch.type.split('::').first.downcase.pluralize}" %>
+
 <div class="container">
   <div class="page-header">
-    <h1 class="page-title"><%= @batch.type.split('::').first.titleize %> Batch #<%= @batch.id %></h1>
+    <h1 class="page-title"><%= @batch.type.split('::').first.titleize %> Batch #<%= @batch.id %> <small>(<%= pluralize(@batch.addresses.count, @batch.type.split('::').first.downcase) %>)</small></h1>
     <div class="actions">
       <%= secondary_link_to "Back to batches", batches_path do %>
         <%= back_icon %>Back to batches

@@ -109,24 +109,26 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
-  get "/tags", to: "tags#index"
-  get "/tags/:id", to: "tags#show", as: :tag_stats
-  post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
 
-  resources :letters do
-    member do
-      post :generate_label
-      post :buy_indicia
-      post :mark_printed
-      post :mark_mailed
-      post :mark_received
-      post :clear_label
-      get :preview_template if Rails.env.development?
+
+  scope path: 'back_office' do
+    get "/tags", to: "tags#index"
+    get "/tags/:id", to: "tags#show", as: :tag_stats
+    post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
+    resources :letters do
+      member do
+        post :generate_label
+        post :buy_indicia
+        post :mark_printed
+        post :mark_mailed
+        post :mark_received
+        post :clear_label
+        get :preview_template if Rails.env.development?
+      end
     end
-  end
-  get "batches/new"
-  get "batches/import"
-  namespace :admin do
+    get "batches/new"
+    get "batches/import"
+    namespace :admin do
       resources :addresses
       resources :return_addresses
       resources :source_tags
@@ -147,60 +149,83 @@ Rails.application.routes.draw do
       resources :common_tags
 
       root to: "users#index"
-  end
+    end
 
-  constraints AdminConstraint do
-    mount GoodJob::Engine => "good_job"
-    mount Blazer::Engine, at: "blazer"
-    get "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
-  end
-  get "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
-  
-  namespace :usps do
-    resources :indicia
-    resources :payment_accounts
-    resources :mailer_ids
-  end
-  resources :source_tags
-  namespace :warehouse do
-    resources :templates
-    resources :orders do
+    constraints AdminConstraint do
+      mount GoodJob::Engine => "good_job"
+      mount Blazer::Engine, at: "blazer"
+      get "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
+    end
+    get "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
+
+    namespace :usps do
+      resources :indicia
+      resources :payment_accounts
+      resources :mailer_ids
+    end
+    resources :source_tags
+    namespace :warehouse do
+      resources :templates
+      resources :orders do
+        member do
+          get :cancel
+          post :cancel, to: "orders#confirm_cancel"
+          post "send_to_warehouse"
+        end
+      end
+      resources :purpose_codes
+      resources :skus, except: [ :destroy ]
+    end
+    resources :users
+    resources :return_addresses
+    resources :batches do
       member do
-        get :cancel
-        post :cancel, to: "orders#confirm_cancel"
-        post "send_to_warehouse"
+        get "/map", to: "batches#map_fields", as: :map_fields
+        post :set_mapping
+        get "/process", to: "batches#process_form", as: :process_confirm
+        post "/process", to: "batches#process_batch", as: :process
+        post :mark_printed
+        post :mark_mailed
+        post :update_costs
       end
     end
-    resources :purpose_codes
-    resources :skus, except: [ :destroy ]
+    root "static_pages#index"
+
+    delete "signout", to: "sessions#destroy", as: :signout
+    get "/login" => "static_pages#login"
+
   end
-  resources :users
-  resources :return_addresses
-  resources :batches do
-    member do
-      get "/map", to: "batches#map_fields", as: :map_fields
-      post :set_mapping
-      get "/process", to: "batches#process_form", as: :process_confirm
-      post "/process", to: "batches#process_batch", as: :process
-      post :mark_printed
-      post :mark_mailed
-      post :update_costs
-    end
-  end
-  root "static_pages#index"
 
   get "/auth/slack", to: "sessions#new", as: :slack_auth
   get "/auth/slack/callback", to: "sessions#create"
 
-  delete "signout", to: "sessions#destroy", as: :signout
+  root "public/static_pages#root", as: :public_root
 
-  # Route for publicly identifiable objects
-  get "/j/:public_id", to: "public_identifiable#show", as: :public_id
+  get '/login' => "public/static_pages#login", as: :public_login
+  post '/login' => "public/sessions#send_email", as: :send_email
+  get "/login/:token", to: "public/sessions#login_code", as: :login_code
+  delete "logout", to: "public/sessions#destroy", as: :public_logout
+  get "/my_mail", to: "public/mail#index", as: :my_mail
+
+  resources "letters", module: :public_, only: [:show] do
+    member do
+      post :mark_received, as: :public_mark_received
+    end
+  end
+
+  get "/letters/:id", to: "public/letters#show", as: :public_letter
+  get "/packages/:id", to: "public/packages#show", as: :public_package
+
+  get "/impersonate", to: "public/impersonations#new", as: :public_impersonate_form
+  post "/impersonate", to: "public/impersonations#create", as: :public_impersonate
+  get "/stop_impersonating", to: "public/impersonations#stop_impersonating", as: :public_stop_impersonating
+
+
+  get '/:public_id', to: 'public/public_identifiable#show', constraints: { public_id: /(pkg|ltr)![^\/]+/ }
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
-  get "/login" => "static_pages#login"
 
   scope :webhooks do
     namespace :usps do

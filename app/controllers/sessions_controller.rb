@@ -45,7 +45,7 @@ class SessionsController < ApplicationController
       return
     end
 
-    session[:impersonater_user_id] ||= current_user.id
+    session[:impersonator_user_id] ||= current_user.id
     user = User.find(params[:id])
     session[:user_id] = user.id
     flash[:success] = "hey #{user.username}! how's it going? nice 'stache and glasses!"
@@ -53,8 +53,8 @@ class SessionsController < ApplicationController
   end
 
   def stop_impersonating
-    session[:user_id] = session[:impersonater_user_id]
-    session[:impersonater_user_id] = nil
+    session[:user_id] = session[:impersonator_user_id]
+    session[:impersonator_user_id] = nil
     redirect_to root_path, notice: "welcome back, 007!"
   end
 

@@ -6,9 +6,11 @@
 #  aasm_state              :string
 #  canceled_at             :datetime
 #  carrier                 :string
+#  contents_cost           :decimal(10, 2)
 #  dispatched_at           :datetime
 #  idempotency_key         :string
 #  internal_notes          :text
+#  labor_cost              :decimal(10, 2)
 #  mailed_at               :datetime
 #  metadata                :jsonb
 #  notify_on_dispatch      :boolean
@@ -26,7 +28,7 @@
 #  address_id              :bigint           not null
 #  batch_id                :bigint
 #  hc_id                   :string
-#  purpose_code_id         :bigint           not null
+#  purpose_code_id         :bigint
 #  source_tag_id           :bigint           not null
 #  template_id             :bigint
 #  user_id                 :bigint           not null
@@ -201,6 +203,18 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
+  HUMANIZED_STATES = {
+    draft: "Draft",
+    dispatched: "Sent to warehouse",
+    mailed: "Shipped!",
+    errored: "Errored?",
+    canceled: "Canceled"
+  }
+
+  def humanized_state
+    HUMANIZED_STATES[aasm_state.to_sym]
+  end
+
   aasm timestamps: true do
     state :draft, initial: true
     state :dispatched
@@ -317,6 +331,9 @@ class Warehouse::Order < ApplicationRecord
     item_hash
   end
 
+  def total_cost
+    [contents_cost, labor_cost, postage_cost].compact_blank.sum
+  end
   def to_param
     hc_id
   end
