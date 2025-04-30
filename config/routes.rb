@@ -109,6 +109,10 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
+  namespace :public do
+    get "sessions/send_email"
+    resources :static_pages
+  end
   get "/tags", to: "tags#index"
   get "/tags/:id", to: "tags#show", as: :tag_stats
   post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
@@ -193,6 +197,7 @@ Rails.application.routes.draw do
 
 
     delete "signout", to: "sessions#destroy", as: :signout
+    get "/login" => "static_pages#login"
 
   end
 
@@ -202,10 +207,14 @@ Rails.application.routes.draw do
   # Route for publicly identifiable objects
   get "/j/:public_id", to: "public_identifiable#show", as: :public_id
 
+  root "public/static_pages#root", as: :public_root
+
+  get '/login' => "public/static_pages#login", as: :public_login
+  post '/login' => "public/sessions#send_email", as: :send_email
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
-  get "/login" => "static_pages#login"
 
   scope :webhooks do
     namespace :usps do

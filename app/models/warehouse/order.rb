@@ -6,9 +6,11 @@
 #  aasm_state              :string
 #  canceled_at             :datetime
 #  carrier                 :string
+#  contents_cost           :decimal(10, 2)
 #  dispatched_at           :datetime
 #  idempotency_key         :string
 #  internal_notes          :text
+#  labor_cost              :decimal(10, 2)
 #  mailed_at               :datetime
 #  metadata                :jsonb
 #  notify_on_dispatch      :boolean
@@ -26,7 +28,7 @@
 #  address_id              :bigint           not null
 #  batch_id                :bigint
 #  hc_id                   :string
-#  purpose_code_id         :bigint           not null
+#  purpose_code_id         :bigint
 #  source_tag_id           :bigint           not null
 #  template_id             :bigint
 #  user_id                 :bigint           not null

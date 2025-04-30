@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_29_203027) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_30_031540) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -283,6 +283,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_29_203027) do
     t.index ["usps_mailer_id_id"], name: "index_letters_on_usps_mailer_id_id"
   end
 
+  create_table "public_login_codes", force: :cascade do |t|
+    t.string "token"
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_public_login_codes_on_user_id"
+  end
+
+  create_table "public_users", force: :cascade do |t|
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "return_addresses", force: :cascade do |t|
     t.string "name"
     t.string "line_1"
@@ -489,6 +504,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_29_203027) do
   add_foreign_key "letters", "batches"
   add_foreign_key "letters", "return_addresses"
   add_foreign_key "letters", "usps_mailer_ids"
+  add_foreign_key "public_login_codes", "public_users", column: "user_id"
   add_foreign_key "return_addresses", "users"
   add_foreign_key "usps_indicia", "letters"
   add_foreign_key "usps_indicia", "usps_payment_accounts"

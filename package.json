@@ -9,6 +9,7 @@
     "vite-plugin-ruby": "^5.1.0"
   },
   "dependencies": {
+    "98.css": "^0.1.21",
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.13",
     "@nathanvda/cocoon": "^1.2.14",
@@ -18,7 +19,6 @@
     "jquery": "^3.7.1",
     "select2": "^4.1.0-rc.0",
     "selectize": "^0.12.6",
-    "tailwindcss-vite-plugin": "^0.0.7",
     "vanilla-nested": "^1.7.1",
     "vite-plugin-rails": "^0.5.0"
   }
