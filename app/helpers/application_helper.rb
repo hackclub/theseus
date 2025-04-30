@@ -64,7 +64,7 @@ module ApplicationHelper
       warehouse_order_tags = Warehouse::Order.all_tags
       letter_tags = Letter.all_tags
       
-      (common_tags + (warehouse_order_tags + letter_tags).compact_blank).uniq
+      (common_tags + (warehouse_order_tags + letter_tags).compact_blank.sort).uniq
     end
   end
 end
