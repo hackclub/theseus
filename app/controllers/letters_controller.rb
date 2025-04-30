@@ -37,7 +37,7 @@ class LettersController < ApplicationController
 
   # POST /letters
   def create
-    @letter = Letter.new(letter_params)
+    @letter = Letter.new(letter_params.merge(user: current_user))
     authorize @letter
 
     if @letter.save
