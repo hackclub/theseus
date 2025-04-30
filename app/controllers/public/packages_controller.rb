@@ -10,7 +10,7 @@ module Public
 
     private
     def set_package
-      @package = Warehouse::Order.find_by_public_id!(params[:id])
+      @package = Warehouse::Order.find_by!(hc_id: params[:id])
     end
   end
 end
