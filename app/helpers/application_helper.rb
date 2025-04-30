@@ -57,4 +57,14 @@ module ApplicationHelper
     css_classes = "pointer tooltipped tooltipped--#{tooltip_direction} #{options.delete(:class)}"
     tag.span "data-copy-to-clipboard": clipboard_value, class: css_classes, "aria-label": options.delete(:label) || "click to copy...", **options, &block
   end
+
+  def available_tags(selected_tags = [])
+    Rails.cache.fetch("available_tags", expires_in: 1.day) do
+      common_tags = CommonTag.pluck(:tag)
+      warehouse_order_tags = Warehouse::Order.all_tags
+      letter_tags = Letter.all_tags
+      
+      (common_tags + (warehouse_order_tags + letter_tags).compact_blank).uniq
+    end
+  end
 end
