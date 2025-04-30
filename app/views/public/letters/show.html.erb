@@ -3,7 +3,7 @@
 <% end %>
 <div class="window" style="min-width: 516px; max-width: fit-content">
   <div class="title-bar">
-    <div class="title-bar-text">Letter <%= @letter.public_id %></div>
+    <div class="title-bar-text">Letter <%= @letter.public_id %><% if @letter.user_facing_title.present? %> - <%= @letter.user_facing_title %><% end %></div>
     <div class="title-bar-controls">
       <%= w95_title_button_to('Close', my_mail_path) %>
     </div>

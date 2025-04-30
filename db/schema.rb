@@ -278,6 +278,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_214307) do
     t.datetime "printed_at"
     t.datetime "mailed_at"
     t.datetime "received_at"
+    t.string "user_facing_title"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
     t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"

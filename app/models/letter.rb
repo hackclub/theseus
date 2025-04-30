@@ -199,12 +199,12 @@ class Letter < ApplicationRecord
       location:
     } if mailed_at
     timestamps << {
-      happened_at: mailed_at,
+      happened_at: received_at.in_time_zone("America/New_York"),
       source: "You!",
       facility: "Your mailbox",
       description: "You received this letter!",
       location: "wherever you live"
-    } if mailed_at
+    } if received_at
     iv + timestamps
   end
 

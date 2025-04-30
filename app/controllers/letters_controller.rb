@@ -197,6 +197,7 @@ class LettersController < ApplicationController
         :user_facing_title,
         :usps_mailer_id_id,
         :return_address_id,
+        :recipient_email,
         address_attributes: [
           :id,
           :first_name,

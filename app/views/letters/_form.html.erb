@@ -66,6 +66,11 @@
     <legend>Additional Data</legend>
     <div class="grid">
       <div>
+        <%= form.label :recipient_email, "Recipient Email", class: "form-label" %>
+        <%= form.email_field :recipient_email, class: "form-control", placeholder: "recipient@example.com" %>
+        <small>Optional email address for the recipient</small>
+      </div>
+      <div>
         <%= form.label :rubber_stamps, "Rubber Stamps" %>
         <%= form.text_area :rubber_stamps, rows: 5 %>
         <small>Extra text to print on the label!</small>

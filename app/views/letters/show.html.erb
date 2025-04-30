@@ -3,7 +3,7 @@
 <div class="container">
   <div class="page-header">
     <h1 class="page-title">
-      <% if @letter.user_facing_title.present? %>
+     <%= @letter.public_id %> – <% if @letter.user_facing_title.present? %>
         <%= @letter.user_facing_title %>
       <% else %>
         Letter to <%= @letter.address.name_line %>
