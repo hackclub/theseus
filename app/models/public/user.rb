@@ -9,4 +9,8 @@
 #
 class Public::User < ApplicationRecord
   has_many :login_codes
+
+  def create_login_code
+    login_codes.create!
+  end
 end

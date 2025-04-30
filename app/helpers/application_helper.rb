@@ -57,4 +57,6 @@ module ApplicationHelper
     css_classes = "pointer tooltipped tooltipped--#{tooltip_direction} #{options.delete(:class)}"
     tag.span "data-copy-to-clipboard": clipboard_value, class: css_classes, "aria-label": options.delete(:label) || "click to copy...", **options, &block
   end
+
+
 end

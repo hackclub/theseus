@@ -8,5 +8,8 @@
   <div class="window-body">
     <p>Email sent to <%= @email %>!</p>
     <p>Click the link in it to log in...</p>
+    <% dev_tool do %>
+      <span style="color: lime !important">you're in dev! go check <%= link_to "letter opener", letter_opener_web_path %>!</span>
+    <% end %>
   </div>
 </div>

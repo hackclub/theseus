@@ -110,6 +110,7 @@ end
 
 Rails.application.routes.draw do
   namespace :public do
+    resources :mails
     get "sessions/send_email"
     resources :static_pages
   end
@@ -194,8 +195,6 @@ Rails.application.routes.draw do
     end
     root "static_pages#index"
 
-
-
     delete "signout", to: "sessions#destroy", as: :signout
     get "/login" => "static_pages#login"
 
@@ -211,6 +210,8 @@ Rails.application.routes.draw do
 
   get '/login' => "public/static_pages#login", as: :public_login
   post '/login' => "public/sessions#send_email", as: :send_email
+  get "/login/:token", to: "public/sessions#login_code", as: :login_code
+  delete "logout", to: "public/sessions#destroy", as: :public_logout
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

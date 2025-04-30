@@ -147,3 +147,5 @@ gem "sentry-rails"
 gem "redis", "~> 5.4"
 
 gem "valid_email2", "~> 7.0"
+
+gem "sssecrets", "~> 1.0"

@@ -4,11 +4,16 @@
   </div>
   <div class="window-body">
     <p> there's not a whole lot here yet?</p>
-    <p>if you're interested in <b>your</b> mail in particular, you can always...</p>
-    <%= link_to public_login_path do %>
-      <button>
-        log in!
-      </button>
+    <% if current_public_user %>
+      <p>you're currently signed in as <b><%= current_public_user.email %></b></p>
+      <%= button_to "log out?", public_logout_path, {method: :delete} %>
+    <% else %>
+      <p>if you're interested in <b>your</b> mail in particular, you can always...</p>
+      <%= link_to public_login_path do %>
+        <button>
+          log in!
+        </button>
+      <% end %>
     <% end %>
   </div>
 </div>

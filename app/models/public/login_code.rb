@@ -19,14 +19,20 @@ class Public::LoginCode < ApplicationRecord
 
   scope :valid, -> { where("expires_at > ? AND used_at IS NULL", Time.current) }
 
+  TOKEN = ExternalToken.new("lc")
+
   def mark_used!
     update!(used_at: Time.current)
+  end
+
+  def to_param
+    token
   end
 
   private
 
   def generate_token
-    self.token ||= SecureRandom.urlsafe_base64(32)
+    self.token ||= TOKEN.generate
   end
 
   def set_expiration
