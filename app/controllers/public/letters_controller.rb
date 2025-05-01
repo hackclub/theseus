@@ -1,8 +1,10 @@
 module Public
   class LettersController < ApplicationController
+    layout "public/frameable"
     before_action :set_letter
 
     def show
+      @framed = params[:framed]
       render "public/letters/show"
     end
 
@@ -13,7 +15,7 @@ module Public
         redirect_to public_letter_path(@letter)
       else
         flash[:alert] = "huh?"
-        return render :show
+        return redirect_to public_letter_path(@letter)
       end
     end
 
@@ -23,7 +25,7 @@ module Public
         redirect_to public_letter_path(@letter)
       else
         flash[:alert] = "huh?"
-        return render :show
+        return redirect_to public_letter_path(@letter)
       end
     end
 

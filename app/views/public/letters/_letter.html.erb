@@ -1,3 +1,4 @@
+<% if false %>
 <div class="window" style="width: 300px; margin-bottom: 1rem;">
   <div class="title-bar">
     <div class="title-bar-text">Letter <%= letter.public_id %></div>
@@ -12,3 +13,16 @@
     </div>
   </div>
 </div>
+<% end %>
+
+<tr>
+  <td><%= letter.created_at.strftime("%Y-%m-%d") %></td>
+  <td>
+    Letter:  <%= letter.user_facing_title || letter.public_id %>
+  </td>
+  <td><%= letter.aasm_state.humanize %></td>
+  <td>
+    <%= link_to "Open", public_letter_path(letter), 
+        onclick: "openIframeWindow(this.href, 'Letter: #{letter.user_facing_title || letter.public_id}'); return false;" %>
+  </td>
+</tr>

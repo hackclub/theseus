@@ -1,92 +1,87 @@
-<% content_for :back_office_link do %>
-  <%= link_to "view this order", warehouse_order_path(@package) %> in the backend?
+<% content_for :window_title do %>
+  <% if @package.user_facing_title %>
+    Warehouse: <%= @package.user_facing_title %>
+  <% else %>
+    Warehouse shipment <%= @package.public_id %>
+  <% end %>
 <% end %>
-<div class="window" style="width: 300px; margin-bottom: 1rem;">
-  <div class="title-bar">
-    <div class="title-bar-text">
-      <% if @package.user_facing_title %>
-        Warehouse: <%= @package.user_facing_title %>
-      <% else %>
-        Warehouse shipment <%= @package.public_id %>
-      <% end %>
+
+<% content_for :back_office_link do %>
+  <%= link_to "view this package", warehouse_order_path(@package) %> in the backend?
+<% end %>
+
+<div>
+  <b>Status:</b>
+  <%= @package.humanized_state %>
+</div>
+
+<% if @package.tracking_number %>
+  <div style="margin-top: 1rem;">
+    <b>Tracking:</b>
+    <div>
+      <%= @package.pretty_via %>
+      <%= link_to @package.tracking_number, @package.tracking_url, target: "_blank" %>
     </div>
-    <div class="title-bar-controls">
-      <%= w95_title_button_to("Close", my_mail_path) %>
-    </div>
+    <% if @package.might_be_slow? %>
+      <div class="status-bar-field">
+        <i>Note: This carrier may have slower tracking updates</i>
+      </div>
+    <% end %>
   </div>
-  <div class="window-body">
-    <div>
-      <b>Status:</b>
-      <%= @package.humanized_state %>
-    </div>
+<% end %>
 
-    <% if @package.tracking_number %>
-      <div style="margin-top: 1rem;">
-        <b>Tracking:</b>
-        <div>
-          <%= @package.pretty_via %> 
-          <%= link_to @package.tracking_number, @package.tracking_url, target: "_blank" %>
-        </div>
-        <% if @package.might_be_slow? %>
-          <div class="status-bar-field">
-            <i>Note: This carrier may have slower tracking updates</i>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
-  
-    <div style="margin-top: 1rem; margin-bottom: 1rem;">
-      <b>Contents:</b>
-      <div class="field-row">
-        <table style="width: 100%;">
-          <% @package.line_items.includes(:sku).each do |item| %>
-            <tr>
-              <td><%= item.sku.name %></td>
-              <td style="text-align: right;">× <%= item.quantity %></td>
-            </tr>
-          <% end %>
-        </table>
-      </div>
-    </div>
-
-    <% back_office_tool do %>
-    <div>
-      <b>Created by:</b> <%= @package.user&.username || "who knows?" %> <br/>
-      <b>Costs:</b>
-      <div class="field-row">
-        <table style="width: 100%;">
-          <tr>
-            <td>Contents:</td>
-            <td style="text-align: right;"><%= number_to_currency(@package.contents_actual_cost_to_hc) %></td>
-          </tr>
-          <tr>
-            <td>Labor:</td>
-            <td style="text-align: right;"><%= number_to_currency(@package.labor_cost) %></td>
-          </tr>
-          <tr>
-            <td>Total:</td>
-            <td style="text-align: right;"><%= number_to_currency(@package.total_cost) %></td>
-          </tr>
-          <% if @package.postage_cost %>
-            <tr>
-              <td>Postage:</td>
-              <td style="text-align: right;"><%= number_to_currency(@package.postage_cost) %></td>
-            </tr>
-          <% end %>
-        </table>
-      </div>
-      </div>
-    <% end %>
-
-    <% if @package.tags.any? %>
-      <div style="margin-top: 1rem;">
-        <b>Tags:</b>
-        <div class="field-row">
-          <%= @package.tags.join(", ") %>
-        </div>
-      </div>
-    <% end %>
-
-    <%= render partial: 'application/admin_inspector', locals: { record: @package } %>
+<div style="margin-top: 1rem; margin-bottom: 1rem;">
+  <b>Contents:</b>
+  <div class="field-row">
+    <table style="width: 100%;">
+      <% @package.line_items.includes(:sku).each do |item| %>
+        <tr>
+          <td><%= item.sku.name %></td>
+          <td style="text-align: right;">× <%= item.quantity %></td>
+        </tr>
+      <% end %>
+    </table>
   </div>
 </div>
+
+<% back_office_tool do %>
+  <div>
+    <b>Created by:</b> <%= @package.user&.username || "who knows?" %> <br/>
+    <b>Costs:</b>
+    <div class="field-row">
+      <table style="width: 100%;">
+        <tr>
+          <td>Contents:</td>
+          <td style="text-align: right;"><%= number_to_currency(@package.contents_actual_cost_to_hc) %></td>
+        </tr>
+        <tr>
+          <td>Labor:</td>
+          <td style="text-align: right;"><%= number_to_currency(@package.labor_cost) %></td>
+        </tr>
+        <tr>
+          <td>Total:</td>
+          <td style="text-align: right;"><%= number_to_currency(@package.total_cost) %></td>
+        </tr>
+        <% if @package.postage_cost %>
+          <tr>
+            <td>Postage:</td>
+            <td style="text-align: right;"><%= number_to_currency(@package.postage_cost) %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+<% end %>
+
+<% if @package.tags.any? %>
+  <div style="margin-top: 1rem;">
+    <b>Tags:</b>
+    <div class="field-row">
+      <%= @package.tags.join(", ") %>
+    </div>
+  </div>
+<% end %>
+
+
+
+<%= render partial: 'application/admin_inspector', locals: { record: @package } %>
