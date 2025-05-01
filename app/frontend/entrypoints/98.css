@@ -5,7 +5,11 @@
     display: inline;
     float: left;
     margin-right: 8px;
+}
+
+img {
     image-rendering: pixelated;
+
 }
 
 .title-icon {
@@ -13,7 +17,6 @@
     height: 14px;
     position: absolute;
     margin-right: 8px;
-    image-rendering: pixelated;
 }
 
 .title-bar.iconed>.title-bar-text{
