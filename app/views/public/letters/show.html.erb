@@ -23,8 +23,8 @@
             <thead>
               <tr>
                 <th>Time</th>
-                <th>Location</th>
                 <th>Description</th>
+                <th>Location</th>
                 <th>Facility</th>
                 <th>Source</th>
                 <th>Extra info</th>
@@ -37,10 +37,10 @@
                     <%= event[:happened_at].strftime("%Y-%m-%d %H:%M EST") %>
                   </td>
                   <td>
-                    <%= event[:location] %>
+                    <%= event[:description] %>
                   </td>
                   <td>
-                    <%= event[:description] %>
+                    <%= event[:location] %>
                   </td>
                   <td>
                     <%= event[:facility] %>
