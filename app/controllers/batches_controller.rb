@@ -7,8 +7,8 @@ class BatchesController < ApplicationController
   PREVIEW_ROWS = 3
 
   BATCH_TYPES = [
-    [ "Warehouse", "Warehouse::Batch" ],
-    [ "Letter", "Letter::Batch" ]
+    ["Warehouse", "Warehouse::Batch"],
+    ["Letter", "Letter::Batch"]
   ].freeze
 
   # GET /batches or /batches.json
@@ -97,20 +97,19 @@ class BatchesController < ApplicationController
 
     if request.post?
       if @batch.is_a?(Letter::Batch)
-        Rails.logger.debug "Batch params: #{batch_params.inspect}"
-        if batch_params[:letter_mailing_date].blank?
+        if letter_batch_params[:letter_mailing_date].blank?
           Rails.logger.debug "Mailing date is blank"
           redirect_to process_batch_path(@batch), alert: "Mailing date is required"
           return
         end
 
-        @batch.letter_mailing_date = batch_params[:letter_mailing_date]
+        @batch.letter_mailing_date = letter_batch_params[:letter_mailing_date]
         Rails.logger.debug "Setting mailing date to: #{@batch.letter_mailing_date}"
         @batch.save! # Save the mailing date before processing
 
         # Only require payment account if indicia is selected
-        if batch_params[:us_postage_type] == "indicia" || batch_params[:intl_postage_type] == "indicia"
-          payment_account = USPS::PaymentAccount.find_by(id: batch_params[:usps_payment_account_id])
+        if batch_params[:us_postage_type] == "indicia" || letter_batch_params[:intl_postage_type] == "indicia"
+          payment_account = USPS::PaymentAccount.find_by(id: letter_batch_params[:usps_payment_account_id])
 
           if payment_account.nil?
             redirect_to process_batch_path(@batch), alert: "Please select a valid payment account when using indicia"
@@ -121,14 +120,14 @@ class BatchesController < ApplicationController
         begin
           @batch.process!(
             payment_account: payment_account,
-            us_postage_type: batch_params[:us_postage_type],
-            intl_postage_type: batch_params[:intl_postage_type],
-            template_cycle: batch_params[:template_cycle],
-            user_facing_title: batch_params[:user_facing_title]
+            us_postage_type: letter_batch_params[:us_postage_type],
+            intl_postage_type: letter_batch_params[:intl_postage_type],
+            template_cycle: letter_batch_params[:template_cycle],
+            user_facing_title: letter_batch_params[:user_facing_title],
+            include_qr_code: letter_batch_params[:include_qr_code]
           )
           redirect_to @batch, notice: "Batch processed successfully"
         rescue => e
-          raise
           redirect_to process_batch_path(@batch), alert: "Failed to process batch: #{e.message}"
         end
       elsif @batch.is_a?(Warehouse::Batch)
@@ -230,73 +229,71 @@ class BatchesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_batch
-      @batch = Batch.find(params[:id])
-    end
 
-    def setup_csv_fields
-      csv_content = @batch.csv.download
-      csv_rows = CSV.parse(csv_content)
-      @csv_headers = csv_rows.first
-      @csv_preview = csv_rows[1..PREVIEW_ROWS] || []
+  # Use callbacks to share common setup or constraints between actions.
+  def set_batch
+    @batch = Batch.find(params[:id])
+  end
 
-      # Get fields based on batch type
-      @address_fields = if @batch.is_a?(Letter::Batch)
-        # For letter batches, include address fields and rubber_stamps
-        (Address.column_names - [ "id", "created_at", "updated_at", "batch_id" ]) +
-        [ "rubber_stamps" ]
-      else
-        # For other batches, just include address fields
-        (Address.column_names - [ "id", "created_at", "updated_at" ])
-      end
-    end
+  def setup_csv_fields
+    csv_content = @batch.csv.download
+    csv_rows = CSV.parse(csv_content)
+    @csv_headers = csv_rows.first
+    @csv_preview = csv_rows[1..PREVIEW_ROWS] || []
 
-    # Only allow a list of trusted parameters through.
-    def batch_params
-      params.require(:batch).permit(
-        :csv,
-        :warehouse_template_id,
-        :type,
-        :warehouse_purpose_code_id,
-        :warehouse_user_facing_title,
-        :user_facing_title,
-        :letter_height,
-        :letter_width,
-        :letter_weight,
-        :letter_mailing_date,
-        :letter_processing_category,
-        :letter_mailer_id_id,
-        :letter_return_address_id,
-        :us_postage_type,
-        :intl_postage_type,
-        :usps_payment_account_id,
-        :template_cycle,
-        tags: []
-      )
-    end
+    # Get fields based on batch type
+    @address_fields = if @batch.is_a?(Letter::Batch)
+                        # For letter batches, include address fields and rubber_stamps
+                        (Address.column_names - ["id", "created_at", "updated_at", "batch_id"]) +
+                          ["rubber_stamps"]
+                      else
+                        # For other batches, just include address fields
+                        (Address.column_names - ["id", "created_at", "updated_at"])
+                      end
+  end
 
-    def letter_batch_params
-      params.require(:letter_batch).permit(
-        :letter_height,
-        :letter_width,
-        :letter_weight,
-        :letter_mailing_date,
-        :letter_processing_category,
-        :letter_mailer_id_id,
-        :letter_return_address_id,
-        :us_postage_type,
-        :intl_postage_type,
-        :usps_payment_account_id,
-        :template_cycle
-      )
-    end
+  # Only allow a list of trusted parameters through.
+  def batch_params
+    params.require(:batch).permit(
+      :csv,
+      :warehouse_template_id,
+      :type,
+      :warehouse_purpose_code_id,
+      :warehouse_user_facing_title,
+      :user_facing_title,
+      tags: []
+    )
+  end
 
-    def mapping_params
-      params.require(:mapping).permit!
-    end
+  def letter_batch_params
+    params.require(:batch).permit(
+      :csv,
+      :warehouse_template_id,
+      :type,
+      :warehouse_purpose_code_id,
+      :warehouse_user_facing_title,
+      :user_facing_title,
+      :letter_height,
+      :letter_width,
+      :letter_weight,
+      :letter_mailing_date,
+      :letter_processing_category,
+      :letter_mailer_id_id,
+      :letter_return_address_id,
+      :us_postage_type,
+      :intl_postage_type,
+      :usps_payment_account_id,
+      :include_qr_code,
+      template_cycle: [],
+      tags: []
+    )
+  end
 
-    def set_allowed_templates
-      @allowed_templates = Warehouse::Template.where(public: true).or(Warehouse::Template.where(user: current_user))
-    end
+  def mapping_params
+    params.require(:mapping).permit!
+  end
+
+  def set_allowed_templates
+    @allowed_templates = Warehouse::Template.where(public: true).or(Warehouse::Template.where(user: current_user))
+  end
 end
