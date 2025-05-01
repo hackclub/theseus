@@ -4,8 +4,8 @@ module Public
 
     def index
       @mail =
-        Warehouse::Order.where(recipient_email: current_public_user.email).includes(:line_items) +
-          Letter.where(recipient_email: current_public_user.email).includes(:iv_mtr_events)
+        Warehouse::Order.where(recipient_email: current_public_user.email) +
+          Letter.where(recipient_email: current_public_user.email)
     end
   end
 end
