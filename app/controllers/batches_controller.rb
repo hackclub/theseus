@@ -47,7 +47,9 @@ class BatchesController < ApplicationController
       return
     end
 
-    @batch = batch_type.constantize.new(batch_params.merge(user: current_user))
+    # Use letter_batch_params for letter batches, batch_params for others
+    params_to_use = batch_type == "Letter::Batch" ? letter_batch_params : batch_params
+    @batch = batch_type.constantize.new(params_to_use.merge(user: current_user))
 
     if @batch.save!
       redirect_to map_fields_batch_path(@batch), notice: "Please map your CSV fields to address fields."
