@@ -51,6 +51,7 @@
 
     <% back_office_tool do %>
     <div>
+      <b>Created by:</b> <%= @package.user&.username || "who knows?" %> <br/>
       <b>Costs:</b>
       <div class="field-row">
         <table style="width: 100%;">

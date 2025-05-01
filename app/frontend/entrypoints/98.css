@@ -33,3 +33,7 @@ span.admin-tool {
     border-radius: 0;
     padding: 3px 2px;
 }
+
+.window {
+    position: absolute;
+}
