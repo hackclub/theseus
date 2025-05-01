@@ -3,6 +3,7 @@
     Order <%= @warehouse_order.hc_id %>:
   </h2>
   <%= render 'status_badge', order: @warehouse_order %>
+  <%= link_to "Show on public page", public_package_path(@warehouse_order), target: "_blank" %>
 </div>
 
 <%= render 'shared/tags', tags: @warehouse_order.tags %>
