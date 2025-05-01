@@ -2,7 +2,7 @@ import $ from "jquery";
 import { initialize } from "@open-iframe-resizer/core";
 let cumulativeHeight = 0;
 let currentZIndex = 1000;
-const WINDOW_GAP = 10; // pixels between windows
+const WINDOW_GAP = 32; // pixels between windows
 let windowCount = 0; // Track number of open windows
 
 $('.window').each(function(index) {

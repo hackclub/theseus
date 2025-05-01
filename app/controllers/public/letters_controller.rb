@@ -1,31 +1,34 @@
 module Public
   class LettersController < ApplicationController
-    layout "public/frameable"
+    include Frameable
+
     before_action :set_letter
 
     def show
-      @framed = params[:framed]
+      @framed = params[:framed].present? ? params[:framed] == 'true' : request.headers["Sec-Fetch-Dest"] == "iframe"
       render "public/letters/show"
     end
 
     def mark_received
+      @framed = params[:framed]
+
       if @letter.may_mark_received?
         @letter.mark_received!
         @received = true
-        redirect_to public_letter_path(@letter)
+        frame_aware_redirect_to public_letter_path(@letter)
       else
         flash[:alert] = "huh?"
-        return redirect_to public_letter_path(@letter)
+        return frame_aware_redirect_to public_letter_path(@letter)
       end
     end
 
     def mark_mailed
       if @letter.may_mark_mailed?
         @letter.mark_mailed!
-        redirect_to public_letter_path(@letter)
+        frame_aware_redirect_to public_letter_path(@letter)
       else
         flash[:alert] = "huh?"
-        return redirect_to public_letter_path(@letter)
+        return frame_aware_redirect_to public_letter_path(@letter)
       end
     end
 
