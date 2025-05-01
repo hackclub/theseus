@@ -123,9 +123,12 @@ module SnailMail
     end
 
     # Render QR code
-    def render_qr_code(pdf, letter, x, y, size = 80)
+    def render_qr_code(pdf, letter, x, y, size = 70)
       return unless options[:include_qr_code]
       SnailMail::QRCodeGenerator.generate_qr_code(pdf, "https://mail.hack.club/#{letter.public_id}", x, y, size)
+      pdf.font("f25") do
+        pdf.text_box("scan this so we know you got it!", at: [x+3, y+22], width: 54, size: 6.4)
+      end
     end
 
     def render_letter_id(pdf, letter, x, y, size, opts = {})
