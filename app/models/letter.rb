@@ -54,6 +54,7 @@ class Letter < ApplicationRecord
   has_one_attached :label
   belongs_to :return_address, optional: true
   has_many :iv_mtr_events, class_name: "USPS::IVMTR::Event"
+  belongs_to :user
 
   aasm timestamps: true do
     state :pending, initial: true
