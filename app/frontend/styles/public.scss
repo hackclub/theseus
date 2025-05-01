@@ -7,6 +7,6 @@ html {
 input {
   color: black;
 }
-body {
+body:not(.framed) {
   margin: 2em;
 }

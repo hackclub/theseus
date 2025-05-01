@@ -37,3 +37,7 @@ span.admin-tool {
 .window {
     position: absolute;
 }
+
+.framed {
+    font-family: "Pixelated MS Sans Serif",Arial;
+}

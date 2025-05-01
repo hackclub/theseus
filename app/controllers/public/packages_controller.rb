@@ -1,5 +1,6 @@
 module Public
   class PackagesController < ApplicationController
+    include Frameable
     before_action :set_package
 
     def show
