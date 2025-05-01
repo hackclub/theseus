@@ -33,14 +33,16 @@
 <div style="margin-top: 1rem; margin-bottom: 1rem;">
   <b>Contents:</b>
   <div class="field-row">
-    <table style="width: 100%;">
-      <% @package.line_items.includes(:sku).each do |item| %>
-        <tr>
+    <div class="sunken-panel w-100">
+      <table class="w-100">
+        <% @package.line_items.includes(:sku).each do |item| %>
+          <tr>
           <td><%= item.sku.name %></td>
           <td style="text-align: right;">× <%= item.quantity %></td>
         </tr>
       <% end %>
     </table>
+    </div>
   </div>
 </div>
 
@@ -49,7 +51,8 @@
     <b>Created by:</b> <%= @package.user&.username || "who knows?" %> <br/>
     <b>Costs:</b>
     <div class="field-row">
-      <table style="width: 100%;">
+    <div class="sunken-panel w-100">
+      <table>
         <tr>
           <td>Contents:</td>
           <td style="text-align: right;"><%= number_to_currency(@package.contents_actual_cost_to_hc) %></td>
@@ -58,17 +61,18 @@
           <td>Labor:</td>
           <td style="text-align: right;"><%= number_to_currency(@package.labor_cost) %></td>
         </tr>
-        <tr>
-          <td>Total:</td>
-          <td style="text-align: right;"><%= number_to_currency(@package.total_cost) %></td>
-        </tr>
         <% if @package.postage_cost %>
           <tr>
             <td>Postage:</td>
             <td style="text-align: right;"><%= number_to_currency(@package.postage_cost) %></td>
           </tr>
         <% end %>
+        <tr>
+          <td>Total:</td>
+          <td style="text-align: right;"><%= number_to_currency(@package.total_cost) %></td>
+        </tr>
       </table>
+      </div>
     </div>
   </div>
 <% end %>
