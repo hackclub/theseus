@@ -5,6 +5,6 @@ module Public::ApplicationHelper
 
   def back_office_tool(class_name: "", element: "div", **options, &block)
     return unless current_user
-    concat content_tag(element, class: "admin-tool #{class_name}", **options, &block)
+    concat content_tag(element, class: "back-office-tool #{class_name}", **options, &block)
   end
 end
