@@ -79,6 +79,10 @@ class Letter < ApplicationRecord
     end
   end
 
+  def display_name
+    user_facing_title || tags.compact_blank.join(', ') || public_id
+  end
+
   def been_mailed?
     mailed? || received?
   end

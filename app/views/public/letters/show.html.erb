@@ -2,75 +2,79 @@
   <%= link_to "view this letter", letter_path(@letter) %> in the backend?
 <% end %>
 <% content_for :window_title do %>
-  Letter: <%= @letter.user_facing_title || @letter.public_id %>
+  Letter: <%= @letter.display_name %>
 <% end %>
-
-    <p>
-      <b>Status:</b>
-      <%= @letter.aasm_state.humanize %>
-    </p>
-    <% tags = @letter.tags.compact_blank %>
-    <% if tags.any? %>
-      <p>
-        <b>Tagged:</b> <%= tags.join(', ') %>
-      </p>
-    <% end %>
-    <p>
-      <details>
-        <summary>details for nerds</summary>
-        <div class="sunken-panel" style="height: 200px; width: 100%">
-          <table class="interactive">
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Description</th>
-                <th>Location</th>
-                <th>Facility</th>
-                <th>Source</th>
-                <th>Extra info</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @events.each do |event| %>
-                <tr>
-                  <td>
-                    <%= event[:happened_at].strftime("%Y-%m-%d %H:%M EST") %>
-                  </td>
-                  <td>
-                    <%= event[:description] %>
-                  </td>
-                  <td>
-                    <%= event[:location] %>
-                  </td>
-                  <td>
-                    <%= event[:facility] %>
-                  </td>
-                  <td>
-                    <%= event[:source] %>
-                  </td>
-                  <td>
-                    <%= event[:extra_info] %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </details>
-    </p>
-    <%= render partial: 'application/admin_inspector', locals: { record: @letter } %>
-    <% if @letter.may_mark_mailed? %>
-      <section class="field-row" style="justify-content: flex-end">
-        <%= button_to "MARK MAILED", public_mark_mailed_letter_path(@letter), style: "font-size: 24px; padding: 20px 40px; font-weight: bold;" %>
-      </section>
-    <% end %>
-    <% if @letter.mailed_at && !@letter.received_at %>
-      <section class="field-row" style="justify-content: flex-end">
-        <%= button_to "i got this letter!", public_mark_received_letter_path(@letter), method: :post, form: { data: { turbo_confirm: "are you sure you received this letter?" } } %>
-      </section>
-    <% end %>
+<%= copy_to_clipboard(@letter.public_id, tooltip_direction: 'e', label: "#{@letter.public_id} (click to copy)") do %>
+  <b>(click here to copy letter ID)</b>
+<% end %>
+<p>
+  <b>Status:</b>
+  <%= @letter.aasm_state.humanize %>
+</p>
+<% tags = @letter.tags.compact_blank %>
+<% if tags.any? %>
+  <p>
+    <b>Tagged:</b> <%= tags.join(', ') %>
+  </p>
+<% end %>
+<p>
+<details>
+  <summary>details for nerds</summary>
+  <div class="sunken-panel" style="height: 200px; width: 100%">
+    <table class="interactive">
+      <thead>
+      <tr>
+        <th>Time</th>
+        <th>Description</th>
+        <th>Location</th>
+        <th>Facility</th>
+        <th>Source</th>
+        <th>Extra info</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @events.each do |event| %>
+        <tr>
+          <td>
+            <%= event[:happened_at].strftime("%Y-%m-%d %H:%M EST") %>
+          </td>
+          <td>
+            <%= event[:description] %>
+          </td>
+          <td>
+            <%= event[:location] %>
+          </td>
+          <td>
+            <%= event[:facility] %>
+          </td>
+          <td>
+            <%= event[:source] %>
+          </td>
+          <td>
+            <%= event[:extra_info] %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</details>
+</p>
+<%= render partial: 'application/admin_inspector', locals: { record: @letter } %>
+<% if @letter.may_mark_mailed? %>
+  <section class="field-row" style="justify-content: flex-end">
+    <%= button_to "MARK MAILED", public_mark_mailed_letter_path(@letter), style: "font-size: 24px; padding: 20px 40px; font-weight: bold;" %>
+  </section>
+<% end %>
+<% if @letter.mailed_at && !@letter.received_at %>
+  <section class="field-row" style="justify-content: flex-end">
+    <%= button_to "i got this letter!", public_mark_received_letter_path(@letter), method: :post, form: { data: { turbo_confirm: "are you sure you received this letter?" } } %>
+  </section>
+<% end %>
 <% if @received %>
   <script>
-    setTimeout(()=>{window.fire_confetti()}, 500)
+      setTimeout(() => {
+          window.fire_confetti()
+      }, 500)
   </script>
 <% end %>

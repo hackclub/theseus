@@ -18,11 +18,11 @@
 <tr>
   <td><%= letter.created_at.strftime("%Y-%m-%d") %></td>
   <td>
-    Letter:  <%= letter.user_facing_title || letter.public_id %>
+    Letter:  <%= letter.display_name %>
   </td>
   <td><%= letter.aasm_state.humanize %></td>
   <td>
     <%= link_to "Open", public_letter_path(letter), 
-        onclick: "openIframeWindow(this.href, 'Letter: #{letter.user_facing_title || letter.public_id}'); return false;", class: 'open-link' %>
+        onclick: "openIframeWindow(this.href, 'Letter: #{letter.display_name}'); return false;", class: 'open-link' %>
   </td>
 </tr>
