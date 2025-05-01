@@ -29,6 +29,6 @@
   <td><%= order.humanized_state %></td>
   <td>
     <%= link_to "Open", public_package_path(order), 
-        onclick: "openIframeWindow(this.href, 'Warehouse: #{order.user_facing_title || order.public_id}'); return false;" %>
+        onclick: "openIframeWindow(this.href, 'Warehouse: #{order.user_facing_title || order.public_id}'); return false;", class: 'open-link' %>
   </td>
 </tr>
