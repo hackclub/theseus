@@ -16,7 +16,9 @@
   <% if @framed %>class="framed"
   <% end %>>
 <% unless @framed %>
-  <div class="window" style="min-width: 516px; max-width: fit-content">
+    <%= render 'public/backend_controls' %>
+
+    <div class="window" style="min-width: 516px; max-width: fit-content">
     <div class="title-bar">
       <div class="title-bar-text"><%= yield :window_title %></div>
       <div class="title-bar-controls">

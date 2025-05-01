@@ -25,17 +25,17 @@
 
 </head>
 
-<body<% if Rails.env.development? %> class="not_prod"<% end %> data-turbo="false">
+<body
+<% if Rails.env.development? %> class="not_prod"
+<% end %> data-turbo="false">
 <% if Rails.env.development? %>
   <div class="dev-border-overlay"></div>
 <% end %>
 
-<% if current_user %>
 <%= render 'public/backend_controls' %>
-<% end %>
 
-      <%= render "shared/flash" %>
-      <%= yield %>
+<%= render "shared/flash" %>
+<%= yield %>
 
 </body>
 </html>

@@ -1,29 +1,31 @@
-<div class="window" style="margin-bottom: 1rem">
-  <div class="title-bar">
-    <div class="title-bar-text">backend controls >:3</div>
-  </div>
-  <div class="window-body">
-    <p><b>backend</b>: you're logged in as <%= current_user.username %></p>
-    <div class="status-bar">
-      <p class="status-bar-field">Go to <%= link_to "back office", root_path %>?</p>
-      <% if content_for? :back_office_link %>
-        <p class="status-bar-field"><%= yield :back_office_link %></p>
-      <% end %>
-      <% if policy(Public::Impersonation).new? %>
+<% if current_user %>
+  <div class="window" style="margin-bottom: 1rem">
+    <div class="title-bar">
+      <div class="title-bar-text">backend controls >:3</div>
+    </div>
+    <div class="window-body">
+      <p><b>backend</b>: you're logged in as <%= current_user.username %></p>
+      <div class="status-bar">
+        <p class="status-bar-field">Go to <%= link_to "back office", root_path %>?</p>
+        <% if content_for? :back_office_link %>
+          <p class="status-bar-field"><%= yield :back_office_link %></p>
+        <% end %>
+        <% if policy(Public::Impersonation).new? %>
+          <p class="status-bar-field">
+            <% if impersonating? %>
+              currently impersonating <%= current_public_user.email %>
+              . <%= link_to "stop", public_stop_impersonating_path %>?
+            <% else %>
+              <%= link_to "impersonate", public_impersonate_form_path %> somebody else?
+            <% end %>
+          </p>
+        <% end %>
         <p class="status-bar-field">
-          <% if impersonating? %>
-            currently impersonating <%= current_public_user.email %>
-            . <%= link_to "stop", public_stop_impersonating_path %>?
-          <% else %>
-            <%= link_to "impersonate", public_impersonate_form_path %> somebody else?
+          <%= copy_to_clipboard(Rails.application.config.git_version, label: "running rev #{Rails.application.config.git_version}", tooltip_direction: "e") do %>
+            <%= Rails.env.humanize %> mode
           <% end %>
         </p>
-      <% end %>
-      <p class="status-bar-field">
-        <%= copy_to_clipboard(Rails.application.config.git_version, label: "running rev #{Rails.application.config.git_version}", tooltip_direction: "e") do %>
-        <%= Rails.env.humanize %> mode
-      <% end %>
-      </p>
+      </div>
     </div>
   </div>
-</div>
+<% end %>
