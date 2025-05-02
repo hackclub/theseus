@@ -44,8 +44,8 @@ $('.window').each(function(index) {
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
-        initialLeft = $window.offset().left;
-        initialTop = $window.offset().top;
+        initialLeft = parseInt($window.css('left'));
+        initialTop = parseInt($window.css('top'));
         
         $(document).on('mousemove', drag);
         $(document).on('mouseup', stopDrag);
@@ -54,8 +54,9 @@ $('.window').each(function(index) {
     function drag(e) {
         if (!isDragging) return;
         
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
+        const zoom = 1.6; // 160% zoom
+        const deltaX = (e.clientX - startX) / zoom;
+        const deltaY = (e.clientY - startY) / zoom;
         
         $window.css({
             left: initialLeft + deltaX,
@@ -142,8 +143,8 @@ function makeWindowDraggable($window) {
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
-        initialLeft = $window.offset().left;
-        initialTop = $window.offset().top;
+        initialLeft = parseInt($window.css('left'));
+        initialTop = parseInt($window.css('top'));
         
         $(document).on('mousemove', drag);
         $(document).on('mouseup', stopDrag);
@@ -152,8 +153,9 @@ function makeWindowDraggable($window) {
     function drag(e) {
         if (!isDragging) return;
         
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
+        const zoom = 1.6; // 160% zoom
+        const deltaX = (e.clientX - startX) / zoom;
+        const deltaY = (e.clientY - startY) / zoom;
         
         $window.css({
             left: initialLeft + deltaX,
