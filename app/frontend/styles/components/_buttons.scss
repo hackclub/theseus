@@ -102,6 +102,7 @@ input[type='submit'],
     background: transparent;
     box-shadow: none;
     border: 2px solid map-get($palette, info);
+    color: map-get($palette, info);
 
     &:hover,
     &:focus,
