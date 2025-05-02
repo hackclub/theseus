@@ -35,7 +35,7 @@
                                USPS::MailerId.all,
                                :id,
                                :display_name,
-                               { prompt: "Select a mailer ID..." } %>
+                               { selected: USPS::MailerId.first&.id } %>
     </div>
     <div class="field">
       <%= form.label :letter_return_address_id, "Return Address" %>
@@ -44,7 +44,7 @@
                                ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
                                :id,
                                :display_name,
-                               { prompt: "Select a return address..." } %>
+                               { selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id } %>
     </div>
   </div>
 
