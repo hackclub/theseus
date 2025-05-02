@@ -31,7 +31,7 @@ module Public
 
     rescue_from Pundit::NotAuthorizedError do
       flash[:error] = "hey, you can't do that!"
-      redirect_to root_path
+      redirect_to public_root_path
     end
   end
 end
