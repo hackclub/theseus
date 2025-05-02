@@ -1,0 +1,14 @@
+<% { this_week: "Letters this week", this_month: "Letters this month", all_time: "Letters all-time" }.map do |k, v| %>
+  <% if @tab == k %>
+    <b><%= v %></b>
+  <% else %>
+    <%= link_to(v, url_for(controller: 'public/leaderboards', action: k)) %>
+  <% end %>
+<% end %>
+  <% @lb.each_with_index do |u, i| %>
+    <p>
+      #<%= i+1 %>:
+      <img src="<%= u.icon_url %>" width="16" height="16" style="position: relative; top: 50%; transform: translateY(15%);">
+      <%= u.username %> – <%= u.letter_count %>
+    </p>
+  <% end %>
