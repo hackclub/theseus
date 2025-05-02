@@ -19,4 +19,9 @@ class ApplicationController < ActionController::Base
       redirect_to login_path, alert: ("you need to be logged in!" unless request.env["PATH_INFO"] == "/back_office")
     end
   end
+
+  rescue_from Pundit::NotAuthorizedError do
+    flash[:error] = "you don't seem to be authorized – ask nora?"
+    redirect_to root_path
+  end
 end

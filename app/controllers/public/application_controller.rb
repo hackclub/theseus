@@ -28,5 +28,10 @@ module Public
     def impersonating?
       !!session[:public_impersonator_user_id]
     end
+
+    rescue_from Pundit::NotAuthorizedError do
+      flash[:error] = "hey, you can't do that!"
+      redirect_to root_path
+    end
   end
 end
