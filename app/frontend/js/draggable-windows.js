@@ -12,11 +12,8 @@ $('.window').each(function(index) {
     let startX, startY, initialLeft, initialTop;
 
     // Set initial position for each window
-    const windowHeight = $window.outerHeight();
-    console.log(`Window ${index} height:`, windowHeight);
-    
-    // Offset by cumulative height of all previous windows plus gap
-    const top = 50 + cumulativeHeight + (index * WINDOW_GAP);
+    const windowHeight = $window.outerHeight();    
+    const top = 90 + cumulativeHeight + (index * WINDOW_GAP);
     
     $window.css({
         position: 'absolute',
