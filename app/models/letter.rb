@@ -210,7 +210,7 @@ class Letter < ApplicationRecord
       description: "You received this letter!",
       location: "wherever you live"
     } if received_at
-    iv + timestamps
+    (iv + timestamps).sort_by { |event| event[:happened_at] }
   end
 
   private
