@@ -1,6 +1,7 @@
 module Admin
   module Warehouse
     class OrdersController < Admin::ApplicationController
+      include Administrate::ArrayParameterHandler
     # Overwrite any of the RESTful controller actions to implement custom behavior
     # For example, you may want to send an email after a foo is updated.
     #

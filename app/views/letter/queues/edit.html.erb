@@ -1,0 +1,12 @@
+<% content_for :title, "Editing queue" %>
+
+<h1>Editing queue</h1>
+
+<%= render "form", letter_queue: @letter_queue %>
+
+<br>
+
+<div>
+  <%= link_to "Show this queue", @letter_queue %> |
+  <%= link_to "Back to queues", letter_queues_path %>
+</div>

@@ -1,7 +1,7 @@
   <div class="form-group">
-    <%= form.label :mailing_date, class: "form-label" %>
-    <%= form.date_field :mailing_date, 
-      value: @batch.mailing_date || @batch.default_mailing_date,
+    <%= form.label :letter_mailing_date, "Mailing Date", class: "form-label" %>
+    <%= form.date_field :letter_mailing_date, 
+      value: @batch.letter_mailing_date || @batch.default_mailing_date,
       min: Date.current,
       class: "form-control",
       required: true %>

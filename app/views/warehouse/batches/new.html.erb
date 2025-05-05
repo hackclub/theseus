@@ -1,0 +1,14 @@
+<% content_for :title, "New Warehouse Batch" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">New Warehouse Batch</h1>
+    <div class="actions">
+      <%= secondary_link_to "Back to batches", warehouse_batches_path do %>
+        <%= back_icon %>Back to batches
+      <% end %>
+    </div>
+  </div>
+
+  <%= render "form", batch: @batch %>
+</div> 

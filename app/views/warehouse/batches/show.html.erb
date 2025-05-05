@@ -1,0 +1,34 @@
+<% content_for :title, "Warehouse Batch ##{@batch.id} - #{@batch.addresses.count} addresses" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Warehouse Batch #<%= @batch.id %> <small>(<%= pluralize(@batch.addresses.count, "address") %>)</small></h1>
+    <div class="actions">
+      <%= secondary_link_to "Back to batches", warehouse_batches_path do %>
+        <%= back_icon %>Back to batches
+      <% end %>
+      
+      <%= secondary_link_to "Edit this batch", edit_warehouse_batch_path(@batch) do %>
+        <%= edit_icon %>Edit this batch
+      <% end %>
+    </div>
+  </div>
+
+  <%= render @batch %>
+  
+  <% if @batch.orders.any? %>
+    <div class="card">
+      <details class="orders-details">
+        <summary class="card-header">
+          <h2 class="section-title mb-0">Orders (<%= @batch.orders.count %>)</h2>
+          <div class="caret-icon">▼</div>
+        </summary>
+        <div class="card-body">
+          <%= render partial: 'orders_collection', locals: { orders: @batch.orders } %>
+        </div>
+      </details>
+    </div>
+  <% end %>
+  
+  <%= render partial: 'admin_inspector', locals: { record: @batch } %>
+</div> 

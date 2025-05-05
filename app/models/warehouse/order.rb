@@ -63,7 +63,6 @@ class Warehouse::Order < ApplicationRecord
   set_public_id_prefix "pkg"
 
   belongs_to :template, class_name: "Warehouse::Template", optional: true
-  belongs_to :purpose_code, optional: true
   belongs_to :user
   belongs_to :source_tag
 

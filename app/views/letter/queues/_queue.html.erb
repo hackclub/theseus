@@ -1,0 +1,17 @@
+<div id="<%= dom_id queue %>">
+  <p>
+    <strong>Name:</strong>
+    <%= queue.name %>
+  </p>
+
+  <p>
+    <strong>Slug:</strong>
+    <%= queue.slug %>
+  </p>
+
+  <p>
+    <strong>Owner:</strong>
+    <%= render "shared/user_mention", user: queue.user %>
+  </p>
+
+</div>

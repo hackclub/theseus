@@ -12,6 +12,7 @@
 #  letter_weight               :decimal(, )
 #  letter_width                :decimal(, )
 #  tags                        :citext           default([]), is an Array
+#  template_cycle              :string           default([]), is an Array
 #  type                        :string           not null
 #  warehouse_user_facing_title :string
 #  created_at                  :datetime         not null
@@ -42,7 +43,6 @@
 #
 class Warehouse::Batch < Batch
   belongs_to :warehouse_template, class_name: "Warehouse::Template"
-  belongs_to :warehouse_purpose_code, class_name: "Warehouse::PurposeCode"
 
   has_many :orders, class_name: "Warehouse::Order"
 
@@ -51,6 +51,9 @@ class Warehouse::Batch < Batch
   end
 
   def process!(options = {})
+    return false unless fields_mapped?
+
+    # Create orders for each address
     addresses.each do |address|
       Warehouse::Order.from_template(
         warehouse_template,
@@ -59,15 +62,23 @@ class Warehouse::Batch < Batch
         address: address,
         user: user,
         idempotency_key: "batch_#{id}_address_#{address.id}",
-        purpose_code: warehouse_purpose_code,
         user_facing_title: warehouse_user_facing_title,
-        tags: tags
+        tags: tags,
       ).save!
     end
+
+    # Dispatch all orders
     orders.each do |order|
       order.dispatch!
     end
+
     mark_processed!
+  end
+
+  def build_mapping(row, address)
+    # For warehouse batches, we just return the address
+    # Orders will be created during processing
+    address
   end
 
   def contents_cost
@@ -84,5 +95,9 @@ class Warehouse::Batch < Batch
 
   def total_cost
     contents_cost + labor_cost + postage_cost
+  end
+
+  def update_associated_tags
+    orders.update_all(tags: tags)
   end
 end

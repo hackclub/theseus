@@ -6,6 +6,7 @@ class LettersController < ApplicationController
     authorize Letter
     # Get all letters with their associations
     @all_letters = Letter.includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
+      .where.not(aasm_state: "queued")
 
     # Get unbatched letters with pagination
     @unbatched_letters = @all_letters.not_in_batch.page(params[:page]).per(20)
@@ -87,7 +88,7 @@ class LettersController < ApplicationController
           redirect_to @letter, alert: "Failed to generate label."
         end
       else
-        redirect_to @letter, alert: "Failed to generate label: #{@letter.errors.full_messages.join(', ')}"
+        redirect_to @letter, alert: "Failed to generate label: #{@letter.errors.full_messages.join(", ")}"
       end
     rescue => e
       raise
@@ -99,7 +100,7 @@ class LettersController < ApplicationController
     authorize @letter, :preview_template?
     template = params["template"]
     include_qr_code = params["qr"].present?
-    send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code:  }).render, type: "application/pdf", disposition: "inline"
+    send_data SnailMail::Service.generate_label(@letter, { template:, include_qr_code: }).render, type: "application/pdf", disposition: "inline"
   end
 
   # POST /letters/1/mark_printed
@@ -108,7 +109,7 @@ class LettersController < ApplicationController
     if @letter.mark_printed!
       redirect_to @letter, notice: "Letter has been marked as printed."
     else
-      redirect_to @letter, alert: "Could not mark letter as printed: #{@letter.errors.full_messages.join(', ')}"
+      redirect_to @letter, alert: "Could not mark letter as printed: #{@letter.errors.full_messages.join(", ")}"
     end
   end
 
@@ -118,7 +119,7 @@ class LettersController < ApplicationController
     if @letter.mark_mailed!
       redirect_to @letter, notice: "Letter has been marked as mailed."
     else
-      redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(', ')}"
+      redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(", ")}"
     end
   end
 
@@ -128,7 +129,7 @@ class LettersController < ApplicationController
     if @letter.mark_received!
       redirect_to @letter, notice: "Letter has been marked as received."
     else
-      redirect_to @letter, alert: "Could not mark letter as received: #{@letter.errors.full_messages.join(', ')}"
+      redirect_to @letter, alert: "Could not mark letter as received: #{@letter.errors.full_messages.join(", ")}"
     end
   end
 
@@ -177,49 +178,51 @@ class LettersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_letter
-      @letter = Letter.find_by_public_id!(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def letter_params
-      params.require(:letter).permit(
-        :body,
-        :height,
-        :width,
-        :weight,
-        :non_machinable,
-        :processing_category,
-        :postage_type,
-        :mailing_date,
-        :rubber_stamps,
-        :user_facing_title,
-        :usps_mailer_id_id,
-        :return_address_id,
-        :recipient_email,
-        address_attributes: [
-          :id,
-          :first_name,
-          :last_name,
-          :line_1,
-          :line_2,
-          :city,
-          :state,
-          :postal_code,
-          :country
-        ],
-        return_address_attributes: [
-          :id,
-          :name,
-          :line_1,
-          :line_2,
-          :city,
-          :state,
-          :postal_code,
-          :country
-        ],
-        tags: []
-      )
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_letter
+    @letter = Letter.find_by_public_id!(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def letter_params
+    params.require(:letter).permit(
+      :body,
+      :height,
+      :width,
+      :weight,
+      :non_machinable,
+      :processing_category,
+      :postage_type,
+      :mailing_date,
+      :rubber_stamps,
+      :user_facing_title,
+      :usps_mailer_id_id,
+      :return_address_id,
+      :return_address_name,
+      :recipient_email,
+      address_attributes: [
+        :id,
+        :first_name,
+        :last_name,
+        :line_1,
+        :line_2,
+        :city,
+        :state,
+        :postal_code,
+        :country,
+      ],
+      return_address_attributes: [
+        :id,
+        :name,
+        :line_1,
+        :line_2,
+        :city,
+        :state,
+        :postal_code,
+        :country,
+      ],
+      tags: [],
+    )
+  end
 end

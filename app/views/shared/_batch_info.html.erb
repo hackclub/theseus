@@ -3,7 +3,7 @@
   <div class="card mb-4">
     <div class="card-header flex items-center justify-between py-2">
       <h2 class="text-base font-medium">Part of Batch</h2>
-      <%= link_to batch_path(record.batch), class: "text-sm text-blue-600 hover:text-blue-800" do %>
+      <%= link_to letter_batch_path(record.batch), class: "text-sm text-blue-600 hover:text-blue-800" do %>
         View Batch #<%= record.batch.id %>
       <% end %>
     </div>

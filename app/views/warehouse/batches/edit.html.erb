@@ -1,0 +1,63 @@
+<% content_for :title, "Edit Warehouse Batch ##{@batch.id}" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Edit Warehouse Batch #<%= @batch.id %></h1>
+    <div class="actions">
+      <%= secondary_link_to "Back to batch", warehouse_batch_path(@batch) do %>
+        <%= back_icon %>Back to batch
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with(model: [:warehouse, @batch], url: warehouse_batch_path(@batch), method: :patch) do |form| %>
+    <% if @batch.errors.any? %>
+      <div class="alert alert-danger">
+        <h2><%= pluralize(@batch.errors.count, "error") %> prohibited this batch from being saved:</h2>
+        <ul>
+          <% @batch.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="text-sm font-medium mb-0">Always Editable</h2>
+      </div>
+      <div class="card-body">
+        <div class="field mb-3">
+          <%= form.label :warehouse_user_facing_title, "Title", class: "form-label" %>
+          <%= form.text_field :warehouse_user_facing_title, class: "form-control" %>
+        </div>
+
+        <%= render 'shared/tag_picker', form: form, field_name: :tags %>
+      </div>
+    </div>
+
+    <% if @batch.may_mark_processed? %>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="text-sm font-medium mb-0">Editable Before Processing</h2>
+        </div>
+        <div class="card-body">
+          <div class="field mb-3">
+            <%= form.label :warehouse_template_id, "Template", class: "form-label" %>
+            <%= form.collection_select :warehouse_template_id,
+                                     Warehouse::Template.all,
+                                     :id,
+                                     :name,
+                                     { selected: @batch.warehouse_template_id },
+                                     class: "form-select" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="actions">
+      <%= form.submit "Update Batch", class: "btn btn-primary" %>
+      <%= link_to "Cancel", warehouse_batch_path(@batch), class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div> 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_06_011956) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -71,6 +71,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
     t.index ["batch_id"], name: "index_addresses_on_batch_id"
   end
 
+  create_table "api_keys", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.datetime "revoked_at"
+    t.boolean "pii"
+    t.text "token_ciphertext"
+    t.string "token_bidx"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token_bidx"], name: "index_api_keys_on_token_bidx", unique: true
+    t.index ["user_id"], name: "index_api_keys_on_user_id"
+  end
+
   create_table "batches", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.jsonb "field_mapping"
@@ -79,7 +92,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
     t.string "type", null: false
     t.bigint "warehouse_template_id"
     t.integer "address_count"
-    t.bigint "warehouse_purpose_code_id"
     t.string "warehouse_user_facing_title"
     t.string "aasm_state"
     t.decimal "letter_height"
@@ -90,12 +102,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
     t.citext "tags", default: [], array: true
     t.integer "letter_processing_category"
     t.date "letter_mailing_date"
+    t.string "template_cycle", default: [], array: true
+    t.string "letter_return_address_name"
+    t.bigint "letter_queue_id"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
+    t.index ["letter_queue_id"], name: "index_batches_on_letter_queue_id"
     t.index ["letter_return_address_id"], name: "index_batches_on_letter_return_address_id"
     t.index ["tags"], name: "index_batches_on_tags", using: :gin
     t.index ["type"], name: "index_batches_on_type"
     t.index ["user_id"], name: "index_batches_on_user_id"
-    t.index ["warehouse_purpose_code_id"], name: "index_batches_on_warehouse_purpose_code_id"
     t.index ["warehouse_template_id"], name: "index_batches_on_warehouse_template_id"
   end
 
@@ -252,6 +267,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
+  create_table "letter_queues", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "letter_height"
+    t.decimal "letter_width"
+    t.decimal "letter_weight"
+    t.integer "letter_processing_category"
+    t.bigint "letter_mailer_id_id"
+    t.bigint "letter_return_address_id"
+    t.string "letter_return_address_name"
+    t.string "user_facing_title"
+    t.citext "tags", default: [], array: true
+    t.index ["letter_mailer_id_id"], name: "index_letter_queues_on_letter_mailer_id_id"
+    t.index ["letter_return_address_id"], name: "index_letter_queues_on_letter_return_address_id"
+    t.index ["user_id"], name: "index_letter_queues_on_user_id"
+  end
+
   create_table "letters", force: :cascade do |t|
     t.integer "processing_category"
     t.text "body"
@@ -280,9 +315,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
     t.datetime "received_at"
     t.string "user_facing_title"
     t.bigint "user_id", null: false
+    t.string "return_address_name"
+    t.bigint "letter_queue_id"
+    t.string "idempotency_key"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
+    t.index ["idempotency_key"], name: "index_letters_on_idempotency_key", unique: true
     t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
+    t.index ["letter_queue_id"], name: "index_letters_on_letter_queue_id"
     t.index ["return_address_id"], name: "index_letters_on_return_address_id"
     t.index ["tags"], name: "index_letters_on_tags", using: :gin
     t.index ["user_id"], name: "index_letters_on_user_id"
@@ -428,7 +468,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
 
   create_table "warehouse_orders", force: :cascade do |t|
     t.string "hc_id"
-    t.bigint "purpose_code_id"
     t.string "aasm_state"
     t.string "recipient_email"
     t.bigint "user_id", null: false
@@ -461,7 +500,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
     t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
     t.index ["idempotency_key"], name: "index_warehouse_orders_on_idempotency_key", unique: true
-    t.index ["purpose_code_id"], name: "index_warehouse_orders_on_purpose_code_id"
     t.index ["source_tag_id"], name: "index_warehouse_orders_on_source_tag_id"
     t.index ["tags"], name: "index_warehouse_orders_on_tags", using: :gin
     t.index ["template_id"], name: "index_warehouse_orders_on_template_id"
@@ -512,13 +550,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "batches"
+  add_foreign_key "api_keys", "users"
+  add_foreign_key "batches", "letter_queues"
   add_foreign_key "batches", "return_addresses", column: "letter_return_address_id"
   add_foreign_key "batches", "users"
   add_foreign_key "batches", "usps_mailer_ids", column: "letter_mailer_id_id"
-  add_foreign_key "batches", "warehouse_purpose_codes"
   add_foreign_key "batches", "warehouse_templates"
+  add_foreign_key "letter_queues", "return_addresses", column: "letter_return_address_id"
+  add_foreign_key "letter_queues", "users"
+  add_foreign_key "letter_queues", "usps_mailer_ids", column: "letter_mailer_id_id"
   add_foreign_key "letters", "addresses"
   add_foreign_key "letters", "batches"
+  add_foreign_key "letters", "letter_queues"
   add_foreign_key "letters", "return_addresses"
   add_foreign_key "letters", "users"
   add_foreign_key "letters", "usps_mailer_ids"
@@ -538,7 +581,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_30_231233) do
   add_foreign_key "warehouse_orders", "batches"
   add_foreign_key "warehouse_orders", "source_tags"
   add_foreign_key "warehouse_orders", "users"
-  add_foreign_key "warehouse_orders", "warehouse_purpose_codes", column: "purpose_code_id"
   add_foreign_key "warehouse_orders", "warehouse_templates", column: "template_id"
   add_foreign_key "warehouse_templates", "source_tags"
   add_foreign_key "warehouse_templates", "users"

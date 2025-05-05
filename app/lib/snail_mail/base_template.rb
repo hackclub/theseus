@@ -58,7 +58,7 @@ module SnailMail
 
       pdf.font(font_name) do
         pdf.text_box(
-          letter.return_address.format_for_country(letter.address.country),
+          format_return_address(letter),
           at: [ x, y ],
           width: width,
           height: height,
@@ -192,6 +192,19 @@ module SnailMail
         end
         end
       end
+    end
+
+    def format_return_address(letter)
+      return_address = letter.return_address
+      return "No return address" unless return_address
+
+      <<~EOA
+      #{letter.return_address_name_line}
+      #{[ return_address.line_1, return_address.line_2 ].compact_blank.join("\n")}
+      #{return_address.city}, #{return_address.state} #{return_address.postal_code}
+      #{return_address.country if return_address.country != letter.address.country}
+      EOA
+      .strip
     end
   end
 end

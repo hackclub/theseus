@@ -30,4 +30,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "EPS"
   inflect.irregular "is", "are"
   inflect.irregular "this", "these"
+  inflect.acronym "AI"
 end

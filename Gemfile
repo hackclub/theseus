@@ -149,3 +149,11 @@ gem "redis", "~> 5.4"
 gem "valid_email2", "~> 7.0"
 
 gem "sssecrets", "~> 1.0"
+
+gem "lockbox", "~> 2.0"
+
+gem "blind_index", "~> 2.7"
+
+gem "ruby-openai", "~> 8.1"
+
+gem "parallel", "~> 1.26"

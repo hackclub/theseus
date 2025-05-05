@@ -28,11 +28,11 @@
     <hr />
     <ul>
       <%= nav_item(root_path, "Home") %>
-      <%= nav_item(batches_path, "Batches") %>
       <li>
         <details <%= 'open' if request.path.start_with?('/warehouse') %>>
           <summary>Warehouse</summary>
           <ul>
+            <%= nav_item(warehouse_batches_path, "Batches") %>
             <%= nav_item(warehouse_skus_path, "SKUs") %>
             <%= nav_item(warehouse_orders_path, "Orders") %>
             <%= nav_item(warehouse_templates_path, "Order templates") %>
@@ -44,6 +44,7 @@
           <summary>Mail</summary>
           <ul>
             <%= nav_item(letters_path, "Letters") %>
+            <%= nav_item(letter_batches_path, "Letter batches") %>
             <%= nav_item(return_addresses_path, "Return Addresses") %>
           </ul>
         </details>
@@ -53,6 +54,15 @@
           <summary>Accounting</summary>
           <ul>
             <%= nav_item(tags_path, "Tags") %>
+          </ul>
+        </details>
+      </li>
+      <li>
+        <details>
+          <summary>API</summary>
+          <ul>
+            <%= nav_item api_keys_path, "API keys" %>
+            <%= nav_item letter_queues_path, "letter queues" %>
           </ul>
         </details>
       </li>

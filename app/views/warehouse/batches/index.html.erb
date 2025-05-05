@@ -1,0 +1,50 @@
+<% content_for :title, "Warehouse Batches" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Warehouse Batches</h1>
+    <div class="actions">
+      <%= primary_link_to "New Warehouse Batch", new_warehouse_batch_path do %>
+        <%= plus_icon %>New Warehouse Batch
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @batches.any? %>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Created</th>
+                <th>Addresses</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @batches.each do |batch| %>
+                <tr>
+                  <td><%= link_to "##{batch.id}", warehouse_batch_path(batch) %></td>
+                  <td><%= batch.created_at.strftime("%B %d, %Y") %></td>
+                  <td><%= batch.addresses.count %></td>
+                  <td><%= batch_status_badge(batch.aasm.current_state) %></td>
+                  <td>
+                    <div class="btn-group">
+                      <%= link_to "View", warehouse_batch_path(batch), class: "btn btn-sm btn-outline-primary" %>
+                      <%= link_to "Edit", edit_warehouse_batch_path(batch), class: "btn btn-sm btn-outline-secondary" %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-muted">No warehouse batches found.</p>
+      <% end %>
+    </div>
+  </div>
+</div> 

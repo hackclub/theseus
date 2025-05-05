@@ -1,0 +1,16 @@
+<article>
+  <h3>
+    <%= link_to api_key do %><%= api_key.pretty_name %> <% end %>
+    <% if api_key.active? %>
+      <div class="badge success float-right">
+        active
+      </div>
+    <% else %>
+      <div class="badge error float-right">
+        revoked
+      </div>
+    <% end %>
+  </h3>
+  <%= render 'shared/user_mention', user: api_key.user %>
+  <b>PII:</b> <%= render_checkbox api_key.pii %>
+</article>

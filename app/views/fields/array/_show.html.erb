@@ -1,0 +1,7 @@
+<% if field.data.present? %>
+  <div class="array-field">
+    <% field.data.each do |item| %>
+      <span class="array-item"><%= item %></span>
+    <% end %>
+  </div>
+<% end %> 

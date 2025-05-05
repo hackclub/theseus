@@ -1,0 +1,81 @@
+<% content_for :title, "Edit Letter Batch ##{@batch.id}" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Edit Letter Batch #<%= @batch.id %></h1>
+    <div class="actions">
+      <%= secondary_link_to "Back to batch", letter_batch_path(@batch) do %>
+        <%= back_icon %>Back to batch
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with(model: [:letter, @batch], url: letter_batch_path(@batch), method: :patch) do |form| %>
+    <% if @batch.errors.any? %>
+      <div class="alert alert-danger">
+        <h2><%= pluralize(@batch.errors.count, "error") %> prohibited this batch from being saved:</h2>
+        <ul>
+          <% @batch.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="text-sm font-medium mb-0">Always Editable</h2>
+      </div>
+      <div class="card-body">
+        <div class="field mb-3">
+          <%= form.label :user_facing_title, "Title", class: "form-label" %>
+          <%= form.text_field :user_facing_title, class: "form-control" %>
+        </div>
+
+        <%= render 'shared/tag_picker', form: form, field_name: :tags %>
+      </div>
+    </div>
+
+    <% if @batch.may_mark_processed? %>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="text-sm font-medium mb-0">Editable Before Processing</h2>
+        </div>
+        <div class="card-body">
+          <%= render partial: "letters/letter_attributes_form", locals: { form: form, is_batch: true } %>
+
+          <div class="field mb-3">
+            <%= form.label :letter_mailer_id_id, "USPS Mailer ID", class: "form-label" %>
+            <%= form.collection_select :letter_mailer_id_id,
+                                     USPS::MailerId.all,
+                                     :id,
+                                     :display_name,
+                                     { selected: @batch.letter_mailer_id_id },
+                                     class: "form-select" %>
+          </div>
+
+          <div class="field mb-3">
+            <%= form.label :letter_return_address_id, "Return Address", class: "form-label" %>
+            <%= link_to "(manage)", return_addresses_path, class: "text-sm" %>
+            <%= form.collection_select :letter_return_address_id,
+                                     ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
+                                     :id,
+                                     :display_name,
+                                     { selected: @batch.letter_return_address_id },
+                                     class: "form-select" %>
+          </div>
+
+          <div class="field mb-3">
+            <%= form.label :letter_return_address_name, "Custom Return Address Name (optional)", class: "form-label" %>
+            <%= form.text_field :letter_return_address_name, class: "form-control", placeholder: "Leave blank to use the return address name" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="actions">
+      <%= form.submit "Update Batch", class: "btn btn-primary" %>
+      <%= link_to "Cancel", letter_batch_path(@batch), class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div> 

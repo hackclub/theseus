@@ -2,6 +2,8 @@ module LettersHelper
   def letter_status_badge(status, addtl_class='nil')
 
     clazz, text = case status.to_s
+                  when 'queued'
+                    ['bg-muted', 'queued']
                   when 'pending'
                     ['pending', 'ready to print']
                   when "printed"

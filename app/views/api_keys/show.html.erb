@@ -1,0 +1,45 @@
+<h1>API key <%= @api_key.pretty_name %>:</h1>
+<div class="actions">
+
+</div>
+<div>
+  <b>key (click to copy):</b>
+  <%= copy_to_clipboard(@api_key.token, tooltip_direction: 'e') do %>
+    <code><%= @api_key.abbreviated %></code>
+  <% end %>
+
+</div>
+<% unless @api_key.revoked? %>
+  <%= link_to "revoke", revoke_confirm_api_key_path(@api_key), class: "btn danger btn-small" %>
+<% end %>
+<hr/>
+<div>
+  <b>status:</b>
+  <% if @api_key.active? %>
+    <div class="badge success">
+      active
+    </div>
+  <% else %>
+    <div class="badge error">
+      revoked
+    </div>
+  <% end %>
+</div>
+<hr/>
+<div>
+  <b>acts as:</b>
+  <%= render 'shared/user_mention', user: @api_key.user %>
+</div>
+<hr/>
+<div>
+  <b>sees PII?</b> <%= render_checkbox @api_key.pii %>
+</div>
+<hr/>
+<div>
+  <b>created: </b> <%= @api_key.created_at.in_time_zone("America/New_York") %>
+  <% if @api_key.revoked? %>
+    <br/>
+    <b>revoked: </b> <%= @api_key.revoked_at.in_time_zone("America/New_York") %>
+
+  <% end %>
+</div>

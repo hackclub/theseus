@@ -13,7 +13,7 @@
       <div class="address-title">From</div>
       <div class="address-content">
         <% if letter.return_address.present? %>
-          <strong><%= letter.return_address.name %></strong><br>
+          <strong><%= letter.return_address_name_line %></strong><br>
           <%= letter.return_address.line_1 %><br>
           <% if letter.return_address.line_2.present? %>
             <%= letter.return_address.line_2 %><br>

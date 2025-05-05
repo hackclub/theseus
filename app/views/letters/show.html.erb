@@ -38,7 +38,7 @@
                 <h3>From</h3>
                 <% if @letter.return_address.present? %>
                   <address class="p-2 border rounded">
-                    <div><%= @letter.return_address.name %></div>
+                    <div><%= @letter.return_address_name_line %></div>
                     <div><%= @letter.return_address.line_1 %></div>
                     <% if @letter.return_address.line_2.present? %>
                       <div><%= @letter.return_address.line_2 %></div>

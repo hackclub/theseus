@@ -1,9 +1,0 @@
-<%= render @warehouse_purpose_code %>
-<%= render partial: "admin_inspector", locals: { record: @warehouse_purpose_code } %>
-
-<div>
-  <%= link_to "Edit this purpose code", edit_warehouse_purpose_code_path(@warehouse_purpose_code) %> |
-  <%= link_to "Back to purpose codes", warehouse_purpose_codes_path %>
-
-  <%= button_to "Destroy this purpose code", @warehouse_purpose_code, method: :delete %>
-</div>

@@ -21,9 +21,6 @@
               <% end %>
               <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
                 <p><span class="field-label">Warehouse Template:</span> <%= batch.warehouse_template.name %></p>
-                <% if batch.warehouse_purpose_code.present? %>
-                  <p><span class="field-label">Purpose Code:</span> <%= batch.warehouse_purpose_code.display_name %></p>
-                <% end %>
               <% end %>
             </div>
           </div>
@@ -63,15 +60,15 @@
       </header>
       
       <div class="p-3">
-        <% case batch.aasm.current_state %>
-        <% when :awaiting_field_mapping %>
+        <% case batch.aasm_state %>
+        <% when "awaiting_field_mapping" %>
           <%= warning_link_to "Map Fields", map_fields_batch_path(batch), class: "w-full mb-2" do %>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             Map Fields
           <% end %>
-        <% when :fields_mapped %>
+        <% when "fields_mapped" %>
           <%= success_link_to "Process Batch", process_confirm_batch_path(batch), class: "w-full" do %>
             <%= check_icon %>Process Batch
           <% end %>

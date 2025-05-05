@@ -15,7 +15,7 @@
   <div class="grid grid-cols-3 gap-1 text-sm text-gray-600">
     <div class="truncate">
       <span class="text-gray-400">From:</span>
-      <%= letter.return_address.present? ? letter.return_address.name : 'N/A' %>
+      <%= letter.return_address.present? ? letter.return_address_name_line : 'N/A' %>
     </div>
     
     <div class="truncate">

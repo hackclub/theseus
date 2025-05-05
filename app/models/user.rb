@@ -2,21 +2,26 @@
 #
 # Table name: users
 #
-#  id            :bigint           not null, primary key
-#  back_office   :boolean          default(FALSE)
-#  can_warehouse :boolean
-#  email         :string
-#  icon_url      :string
-#  is_admin      :boolean
-#  username      :string
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  slack_id      :string
+#  id                     :bigint           not null, primary key
+#  back_office            :boolean          default(FALSE)
+#  can_impersonate_public :boolean
+#  can_warehouse          :boolean
+#  email                  :string
+#  icon_url               :string
+#  is_admin               :boolean
+#  username               :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  slack_id               :string
 #
 class User < ApplicationRecord
   has_many :warehouse_templates, class_name: "Warehouse::Template", inverse_of: :user
   has_many :return_addresses, dependent: :destroy
   has_many :letters
+
+  include PublicIdentifiable
+
+  set_public_id_prefix "usr"
 
   def admin?
     is_admin

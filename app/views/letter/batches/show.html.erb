@@ -1,10 +1,102 @@
+<% content_for :title, "Letter Batch ##{@batch.id} - #{@batch.addresses.count} letters" %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Letter Batch #<%= @batch.id %></h1>
+  <div class="flex gap-2">
+    <%= link_to "Back to batches", letter_batches_path, class: "btn btn-secondary" %>
+    <%= link_to "Edit batch", edit_letter_batch_path(@batch), class: "btn btn-primary" %>
+  </div>
+</div>
+
+<%= render partial: "batch", locals: { batch: @batch } %>
+
+<% if @batch.processed? %>
+  <% if @batch.pdf_label.attached? %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="text-xl font-semibold">Generated Labels</h2>
+      </div>
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium">Labels PDF</p>
+            <p class="text-xs text-gray-500">Generated on <%= @batch.pdf_label.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+          </div>
+          <div class="flex gap-2">
+            <%= link_to rails_blob_path(@batch.pdf_label, disposition: "attachment"), class: "btn btn-sm btn-primary" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download PDF
+            <% end %>
+            
+            <% if @batch.letters.any? && @batch.letters.all?(&:pending?) %>
+              <%= button_to mark_printed_letter_batch_path(@batch), method: :post, class: "btn btn-sm btn-success", data: { confirm: "Are you sure you want to mark all letters as printed?" } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Mark All Printed
+              <% end %>
+            <% end %>
+            
+            <% if @batch.letters.any? && @batch.letters.all?(&:printed?) %>
+              <%= button_to mark_mailed_letter_batch_path(@batch), method: :post, class: "btn btn-sm btn-info", data: { confirm: "Are you sure you want to mark all letters as mailed?" } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Mark All Mailed
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @batch.letters.any? %>
+    <div class="card">
+      <div class="card-header">
+        <h2 class="text-xl font-semibold">Letters</h2>
+      </div>
+      <div class="card-body">
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @batch.letters.each do |letter| %>
+                <tr>
+                  <td><%= letter.public_id %></td>
+                  <td><%= letter.address.snailify %></td>
+                  <td><%= letter.aasm.current_state %></td>
+                  <td>
+                    <%= link_to "View", letter_path(letter), class: "btn btn-sm btn-secondary" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render partial: 'admin_inspector', locals: { record: @batch } %>
+
           <div class="text-sm mb-3">
             <span class="text-gray-500">Weight:</span>
             <%= @batch.letter_weight %> oz
           </div>
           <div class="text-sm mb-3">
             <span class="text-gray-500">Mailing Date:</span>
-            <%= @batch.mailing_date %>
+            <%= @batch.letter_mailing_date %>
           </div>
         </div>
       </div>

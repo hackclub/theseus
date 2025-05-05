@@ -1,14 +1,16 @@
 <div class="grid md:grid-cols-3 gap-3 mb-4 text-sm">
   <div>
     <span class="text-gray-500">Dimensions:</span>
-    <%= record.height %> × <%= record.width %> in
+    <%= record.is_a?(Letter) ? record.height : record.letter_height %> × <%= record.is_a?(Letter) ? record.width : record.letter_width %> in
   </div>
   <div>
     <span class="text-gray-500">Weight:</span>
-    <%= record.weight %> oz
+    <%= record.is_a?(Letter) ? record.weight : record.letter_weight %> oz
   </div>
-  <div>
-    <span class="text-gray-500">Mailing Date:</span>
-    <%= record.mailing_date %>
-  </div>
+  <% if record.is_a?(Letter) %>
+    <div>
+      <span class="text-gray-500">Mailing Date:</span>
+      <%= record.mailing_date&.strftime("%B %d, %Y") || "Not set" %>
+    </div>
+  <% end %>
 </div> 
