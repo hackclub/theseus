@@ -1,4 +1,5 @@
-<% { this_week: "Letters sent this week", this_month: "Letters sent this month", all_time: "Letters sent all-time" }.map do |k, v| %>
+<% map = { this_week: "Letters sent this week", this_month: "Letters sent this month", all_time: "Letters sent all-time" } %>
+<% map.map do |k, v| %>
   <% if @tab == k %>
     <b><%= v %></b>
   <% else %>
@@ -12,3 +13,6 @@
       <%= u.username %> – <%= u.letter_count %>
     </p>
   <% end %>
+<% unless @lb.any? %>
+  <p>no <%= map[@tab].downcase %>? for shame, HQ!</p>
+<% end %>
