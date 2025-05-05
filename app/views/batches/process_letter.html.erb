@@ -180,7 +180,7 @@
       const usPostageType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;
       const intlPostageType = document.querySelector('input[name="batch[intl_postage_type]"]:checked').value;
 
-      fetch(`/batches/<%= @batch.id %>/update_costs`, {
+      fetch(`<%= update_costs_batch_path(@batch) %>`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
