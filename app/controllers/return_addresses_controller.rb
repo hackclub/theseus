@@ -1,11 +1,10 @@
 class ReturnAddressesController < ApplicationController
-  before_action :set_return_address, only: [ :edit, :update, :destroy ]
+  before_action :set_return_address, only: [:edit, :update, :destroy]
 
   def index
     authorize ReturnAddress
     @return_addresses = ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
   end
-
 
   def new
     authorize ReturnAddress
@@ -58,6 +57,16 @@ class ReturnAddressesController < ApplicationController
       @return_address.destroy
       redirect_to return_addresses_url, notice: "Return address was successfully destroyed."
     end
+  end
+
+  def set_as_home
+    @return_address = ReturnAddress.find(params[:id])
+    authorize @return_address
+
+    current_user.update!(home_return_address: @return_address)
+    flash[:success] = "#{@return_address.display_name} is now your default return address."
+
+    redirect_to return_addresses_url
   end
 
   private

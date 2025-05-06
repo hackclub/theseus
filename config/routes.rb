@@ -204,7 +204,11 @@ Rails.application.routes.draw do
       resources :skus
     end
     resources :users
-    resources :return_addresses
+    resources :return_addresses do
+      member do
+        post :set_as_home
+      end
+    end
     root "static_pages#index"
 
     delete "signout", to: "sessions#destroy", as: :signout

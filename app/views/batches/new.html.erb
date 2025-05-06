@@ -35,7 +35,7 @@
                                USPS::MailerId.all,
                                :id,
                                :display_name,
-                               { selected: USPS::MailerId.first&.id } %>
+                               { selected: current_user.home_mid_id } %>
     </div>
     <div class="field">
       <%= form.label :letter_return_address_id, "Return Address" %>
@@ -44,7 +44,7 @@
                                ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
                                :id,
                                :display_name,
-                               { selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id } %>
+                               { selected: current_user.home_return_address_id } %>
     </div>
     <div class="field">
       <%= form.label :letter_return_address_name, "Custom Return Address Name (optional)", class: "form-label" %>
