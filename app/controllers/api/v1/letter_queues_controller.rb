@@ -9,7 +9,17 @@ module API
 
       def create_letter
         authorize @letter_queue
-        addy = Address.new(letter_params[:address])
+
+        # Normalize country name using FrickinCountryNames
+        country = FrickinCountryNames.find_country(letter_params[:address][:country])
+        if country.nil?
+          render json: { error: "couldn't figure out country name #{letter_params[:address][:country]}" }, status: :unprocessable_entity
+          return
+        end
+
+        # Create address with normalized country
+        address_params = letter_params[:address].merge(country: country.alpha2)
+        addy = Address.new(address_params)
 
         @letter = @letter_queue.create_letter!(
           addy,
