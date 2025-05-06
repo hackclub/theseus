@@ -7,6 +7,7 @@ class LettersController < ApplicationController
     # Get all letters with their associations
     @all_letters = Letter.includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
       .where.not(aasm_state: "queued")
+      .order(created_at: :desc)
 
     # Get unbatched letters with pagination
     @unbatched_letters = @all_letters.not_in_batch.page(params[:page]).per(20)
