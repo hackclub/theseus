@@ -21,6 +21,9 @@
     <div>
       <%= @package.pretty_via %>
       <%= link_to @package.tracking_number, @package.tracking_url, target: "_blank" %>
+      <%= copy_to_clipboard(@package.tracking_number) do %>
+        📋
+      <% end %>
     </div>
     <% if @package.might_be_slow? %>
       <div class="status-bar-field">
