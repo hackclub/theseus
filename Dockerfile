@@ -11,12 +11,14 @@
 ARG RUBY_VERSION=3.3.6
 FROM docker.io/library/ruby:$RUBY_VERSION-slim
 
-# Rails app lives here
-WORKDIR /rails
+# Set production environment
+ENV RAILS_ENV="production" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_WITHOUT="development"
 
 # Install base packages and build dependencies
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
+RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     curl \
     libjemalloc2 \
     libvips \
@@ -27,16 +29,9 @@ RUN apt-get update -qq && \
     libpq-dev \
     node-gyp \
     pkg-config \
-    python-is-python3 && \
-    rm -fr /var/lib/apt/lists /var/cache/apt/archives
+    python-is-python3
 
-# Set production environment
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
-
-# Install JavaScript dependencies
+# Install Node.js and Yarn
 ARG NODE_VERSION=23.6.0
 ARG YARN_VERSION=1.22.22
 ENV PATH=/usr/local/node/bin:$PATH
@@ -44,6 +39,9 @@ RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
     npm install -g yarn@$YARN_VERSION && \
     rm -rf /tmp/node-build-master
+
+# Rails app lives here
+WORKDIR /rails
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -58,14 +56,10 @@ RUN yarn install --frozen-lockfile
 # Copy application code
 COPY . .
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
-
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
-
-# Clean up node modules after asset compilation
-RUN rm -rf node_modules
+# Precompile bootsnap code and assets
+RUN bundle exec bootsnap precompile app/ lib/ && \
+    SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && \
+    rm -rf node_modules
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
