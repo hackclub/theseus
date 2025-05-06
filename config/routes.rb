@@ -109,7 +109,6 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
-
   scope path: "back_office" do
     get "/tags", to: "tags#index"
     get "/tags/:id", to: "tags#show", as: :tag_stats
@@ -210,7 +209,6 @@ Rails.application.routes.draw do
 
     delete "signout", to: "sessions#destroy", as: :signout
     get "/login" => "static_pages#login"
-
   end
 
   get "/auth/slack", to: "sessions#new", as: :slack_auth
@@ -262,13 +260,12 @@ Rails.application.routes.draw do
 
   namespace :api do
     defaults format: :json do
-
       namespace :v1 do
         resource :user
         resources :letters
         resources :letter_queues do
           member do
-            post '', to: 'letter_queues#create_letter', as: :create_letter
+            post "", to: "letter_queues#create_letter", as: :create_letter
           end
         end
       end

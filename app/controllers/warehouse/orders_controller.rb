@@ -1,11 +1,11 @@
 class Warehouse::OrdersController < ApplicationController
-  before_action :set_warehouse_order, except: [ :new, :create, :index ]
+  before_action :set_warehouse_order, except: [:new, :create, :index]
   # GET /warehouse/orders or /warehouse/orders.json
   def index
     authorize Warehouse::Order
 
     # Get all orders with their associations
-    @all_orders = Warehouse::Order.includes(:batch, :address, :purpose_code, :source_tag, :user)
+    @all_orders = Warehouse::Order.includes(:batch, :address, :source_tag, :user)
 
     # Filter by batched/unbatched based on view parameter
     if params[:view] == "batched"
@@ -50,7 +50,7 @@ class Warehouse::OrdersController < ApplicationController
     @warehouse_order = Warehouse::Order.new(
       warehouse_order_params.merge(
         user: current_user,
-        source_tag: SourceTag.web_tag
+        source_tag: SourceTag.web_tag,
       )
     )
 
@@ -113,23 +113,23 @@ class Warehouse::OrdersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_warehouse_order
-      @warehouse_order = Warehouse::Order.find_by!(hc_id: params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def warehouse_order_params
-      params.require(:warehouse_order).permit(
-        :purpose_code_id,
-        :user_facing_title,
-        :user_facing_description,
-        :internal_notes,
-        :recipient_email,
-        :notify_on_dispatch,
-        tags: [],
-        line_items_attributes: [ :id, :sku_id, :quantity, :_destroy ],
-        address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email]
-      ).compact_blank
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_warehouse_order
+    @warehouse_order = Warehouse::Order.find_by!(hc_id: params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def warehouse_order_params
+    params.require(:warehouse_order).permit(
+      :user_facing_title,
+      :user_facing_description,
+      :internal_notes,
+      :recipient_email,
+      :notify_on_dispatch,
+      tags: [],
+      line_items_attributes: [:id, :sku_id, :quantity, :_destroy],
+      address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email],
+    ).compact_blank
+  end
 end

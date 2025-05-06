@@ -21,7 +21,6 @@ module Warehouse
       line_items: Field::HasMany,
       mailed_at: Field::DateTime,
       postage_cost: Field::String.with_options(searchable: false),
-      purpose_code: Field::BelongsTo,
       recipient_email: Field::String,
       service: Field::String,
       skus: Field::HasMany,
@@ -34,7 +33,7 @@ module Warehouse
       weight: Field::String.with_options(searchable: false),
       zenventory_id: Field::Number,
       created_at: Field::DateTime,
-      updated_at: Field::DateTime
+      updated_at: Field::DateTime,
     }.freeze
 
     # COLLECTION_ATTRIBUTES
@@ -43,71 +42,69 @@ module Warehouse
     # By default, it's limited to four items to reduce clutter on index pages.
     # Feel free to add, remove, or rearrange items.
     COLLECTION_ATTRIBUTES = %i[
-    hc_id
-    aasm_state
-    user
-    source_tag
-  ].freeze
+      hc_id
+      aasm_state
+      user
+      source_tag
+    ].freeze
 
     # SHOW_PAGE_ATTRIBUTES
     # an array of attributes that will be displayed on the model's show page.
     SHOW_PAGE_ATTRIBUTES = %i[
-    id
-    aasm_state
-    address
-    canceled_at
-    carrier
-    dispatched_at
-    hc_id
-    idempotency_key
-    internal_notes
-    line_items
-    mailed_at
-    postage_cost
-    purpose_code
-    recipient_email
-    service
-    skus
-    source_tag
-    surprise
-    tracking_number
-    user
-    user_facing_description
-    user_facing_title
-    weight
-    zenventory_id
-    created_at
-    updated_at
-  ].freeze
+      id
+      aasm_state
+      address
+      canceled_at
+      carrier
+      dispatched_at
+      hc_id
+      idempotency_key
+      internal_notes
+      line_items
+      mailed_at
+      postage_cost
+      recipient_email
+      service
+      skus
+      source_tag
+      surprise
+      tracking_number
+      user
+      user_facing_description
+      user_facing_title
+      weight
+      zenventory_id
+      created_at
+      updated_at
+    ].freeze
 
     # FORM_ATTRIBUTES
     # an array of attributes that will be displayed
     # on the model's form (`new` and `edit`) pages.
     FORM_ATTRIBUTES = %i[
-    aasm_state
-    address
-    canceled_at
-    carrier
-    dispatched_at
-    hc_id
-    idempotency_key
-    internal_notes
-    line_items
-    mailed_at
-    postage_cost
-    purpose_code
-    recipient_email
-    service
-    skus
-    source_tag
-    surprise
-    tracking_number
-    user
-    user_facing_description
-    user_facing_title
-    weight
-    zenventory_id
-  ].freeze
+      aasm_state
+      address
+      canceled_at
+      carrier
+      dispatched_at
+      hc_id
+      idempotency_key
+      internal_notes
+      line_items
+      mailed_at
+      postage_cost
+      recipient_email
+      service
+      skus
+      source_tag
+      surprise
+      tracking_number
+      user
+      user_facing_description
+      user_facing_title
+      weight
+      zenventory_id
+    ].freeze
 
     # COLLECTION_FILTERS
     # a hash that defines filters that can be used while searching via the search
