@@ -106,7 +106,7 @@ class Letter < ApplicationRecord
 
   belongs_to :usps_mailer_id, class_name: "USPS::MailerId"
 
-  after_create :set_imb_sequence, if: -> { address.us? }
+  after_create :set_imb_sequence
 
   # Generate a label for this letter
   def generate_label(options = {})

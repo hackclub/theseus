@@ -35,7 +35,7 @@ module SnailMail
         )
 
         # Render IMb barcode
-        render_imb(pdf, letter, 191, 87, 226)
+        render_imb(pdf, letter, 216, 25, 207)
 
         render_letter_id(pdf, letter, 341, 19, 10)
         render_qr_code(pdf, letter, 5, 196, 50)

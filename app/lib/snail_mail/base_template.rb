@@ -99,7 +99,7 @@ module SnailMail
 
     # Render Intelligent Mail barcode
     def render_imb(pdf, letter, x, y, width, options = {})
-      return unless letter.address.us?
+      # return unless letter.address.us?
 
       default_options = {
         font: "imb",

@@ -21,11 +21,11 @@ module SnailMail
           126,
           201,
           266,
-          letter.address.us? ? 67 : 90,
+          67,
           { size: 16, valign: :center, align: :left }
         )
 
-        render_imb(pdf, letter, 124, 128, 266)
+        render_imb(pdf, letter, 124, 120, 200)
 
         render_qr_code(pdf, letter, 7, 72+7, 72)
 

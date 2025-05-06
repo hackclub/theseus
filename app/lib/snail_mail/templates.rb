@@ -8,10 +8,11 @@ module SnailMail
       MailOrpheusTemplate,
       HCBStickersTemplate,
       KestrelHeidiTemplate,
-      HackatimeStickersTemplate,
+      # HackatimeStickersTemplate,
       TarotTemplate,
       DinoWavingTemplate,
-      HcpcxcTemplate
+      HcpcxcTemplate,
+      HackatimeTemplate
     ].freeze
 
     # Default template to use when none is specified
