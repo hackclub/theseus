@@ -74,6 +74,16 @@ module ApplicationHelper
     end
   end
 
+  def available_tags(selected_tags = [])
+    Rails.cache.fetch("available_tags", expires_in: 1.day) do
+      common_tags = CommonTag.pluck(:tag)
+      warehouse_order_tags = Warehouse::Order.all_tags
+      letter_tags = Letter.all_tags
+
+      (common_tags + (warehouse_order_tags + letter_tags).compact_blank.sort).uniq
+    end
+  end
+
   private
 
   def recursively_transform_values(obj, &block)
@@ -86,16 +96,6 @@ module ApplicationHelper
       block.call(obj)
     else
       obj
-    end
-  end
-
-  def available_tags(selected_tags = [])
-    Rails.cache.fetch("available_tags", expires_in: 1.day) do
-      common_tags = CommonTag.pluck(:tag)
-      warehouse_order_tags = Warehouse::Order.all_tags
-      letter_tags = Letter.all_tags
-
-      (common_tags + (warehouse_order_tags + letter_tags).compact_blank.sort).uniq
     end
   end
 end
