@@ -1,7 +1,5 @@
 class Warehouse::OrdersController < ApplicationController
   before_action :set_warehouse_order, except: [ :new, :create, :index ]
-  before_action :set_allowed_purpose_codes
-
   # GET /warehouse/orders or /warehouse/orders.json
   def index
     authorize Warehouse::Order
@@ -133,9 +131,5 @@ class Warehouse::OrdersController < ApplicationController
         line_items_attributes: [ :id, :sku_id, :quantity, :_destroy ],
         address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email]
       ).compact_blank
-    end
-
-    def set_allowed_purpose_codes
-      @allowed_purpose_codes = Warehouse::PurposeCode.all
     end
 end
