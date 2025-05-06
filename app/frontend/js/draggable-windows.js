@@ -6,6 +6,9 @@ const WINDOW_GAP = 32; // pixels between windows
 let windowCount = 0; // Track number of open windows
 
 $('.window').each(function(index) {
+    if (window.innerWidth <= 768) {
+        return;
+    }
     const $window = $(this);
     const $titleBar = $window.find('.title-bar');
     let isDragging = false;
@@ -121,6 +124,9 @@ function closeWindow(windowId) {
 }
 
 function makeWindowDraggable($window) {
+    if (window.innerWidth <= 768) {
+        return;
+    }
     const $titleBar = $window.find('.title-bar');
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;

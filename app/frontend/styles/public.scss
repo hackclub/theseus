@@ -72,6 +72,20 @@ img {
   position: absolute;
 }
 
+@media (max-width: 768px) {
+  .window {
+    position: static !important;
+    transform: none !important;
+    left: auto !important;
+    top: auto !important;
+    margin-bottom: $spacing-lg;
+    margin-right: 5px;
+  }
+  html:not(.hframed) {
+    zoom: 100%;
+  }
+}
+
 .framed {
   font-family: "Pixelated MS Sans Serif", Arial;
   zoom: 62.5%;
