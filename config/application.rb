@@ -38,5 +38,12 @@ module Theseus
     config.generators do |g|
       g.template_engine :erb
     end
+
+    # Configure session cookie to expire in 30 days for all environments
+    config.session_store :cookie_store,
+      key: "_theseus_session",
+      expire_after: 30.days,
+      secure: Rails.env.production?,
+      httponly: true
   end
 end
