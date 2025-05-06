@@ -8,6 +8,9 @@
       <article class="card">
         <header>
           <h3><%= address.name %>
+            <% if address == current_user&.home_return_address %>
+              <abbr title="this is your default return address"><span class="badge success float-right">🏠</span></abbr>
+            <% end %>
             <% if address.shared %>
               <span class="badge success float-right">Shared</span>
             <% end %>
@@ -30,6 +33,9 @@
             <div class="actions">
               <%= link_to "Edit", edit_return_address_path(address), class: "btn btn-small" %>
               <%= button_to "delete", address, method: :delete, data: { confirm: "Are you sure you want to delete this return address?" }, class: "btn btn-small danger" %>
+              <% unless address == current_user&.home_return_address %>
+                <%= button_to "set as your default", set_as_home_return_address_path(address), method: :post, class: "btn btn-small success" %>
+              <% end %>
             </div>
           <% end %>
         </footer>
