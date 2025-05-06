@@ -28,5 +28,23 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  activerecord:
+    attributes:
+      user:
+        home_mid: "Home Mailer ID"
+        home_return_address: "Home Return Address"
+  helpers:
+    label:
+      user:
+        home_mid_id: "Home Mailer ID"
+        home_return_address_id: "Home Return Address"
+        slack_id: "Slack ID"
+        icon_url: "Avatar URL"
+        can_warehouse: "Can use warehouse?"
+        is_admin: "Is admin?"
+        can_impersonate_public: "Can impersonate public users?"
+      warehouse_sku:
+        sku: "SKU"
+        zenventory_id: "Zenventory internal ID"
+
 # TODO: localize models so stuff is more obvious

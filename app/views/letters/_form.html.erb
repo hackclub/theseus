@@ -35,7 +35,7 @@
                                  ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
                                  :id,
                                  :display_name,
-                                 { prompt: "Select a return address...", selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id },
+                                 { prompt: "Select a return address...", selected: current_user.home_return_address_id },
                                  { class: "form-control" } %>
         <small>
           <%= link_to "Manage Return Addresses", return_addresses_path(from_letter: true) %>
