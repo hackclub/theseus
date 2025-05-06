@@ -61,7 +61,7 @@ class BaseBatchesController < ApplicationController
     missing_fields = REQUIRED_FIELDS.reject { |field| inverted_mapping[field].present? }
 
     if missing_fields.any?
-      flash.now[:error] = "Please map the following required fields: #{missing_fields.join(', ')}"
+      flash.now[:error] = "Please map the following required fields: #{missing_fields.join(", ")}"
       render :map_fields, status: :unprocessable_entity
       return
     end
@@ -72,12 +72,12 @@ class BaseBatchesController < ApplicationController
       rescue StandardError => e
         raise
         Rails.logger.warn(e)
-        redirect_to send("#{@batch.class.name.split('::').first.downcase}_batch_path", @batch), flash: { alert: "error mapping fields! #{e.message}" }
+        redirect_to send("#{@batch.class.name.split("::").first.downcase}_batch_path", @batch), flash: { alert: "error mapping fields! #{e.message}" }
         return
       end
-      redirect_to send("process_confirm_#{@batch.class.name.split('::').first.downcase}_batch_path", @batch), notice: "Field mapping saved. Please review and process your batch."
+      redirect_to send("process_confirm_#{@batch.class.name.split("::").first.downcase}_batch_path", @batch), notice: "Field mapping saved. Please review and process your batch."
     else
-      flash.now[:error] = "failed to save field mapping. #{@batch.errors.full_messages.join(', ')}"
+      flash.now[:error] = "failed to save field mapping. #{@batch.errors.full_messages.join(", ")}"
       render :map_fields, status: :unprocessable_entity
     end
   end
@@ -89,6 +89,7 @@ class BaseBatchesController < ApplicationController
   end
 
   def setup_csv_fields
+    ap @batch.csv
     csv_content = @batch.csv.download
     csv_rows = CSV.parse(csv_content)
     @csv_headers = csv_rows.first
@@ -96,16 +97,16 @@ class BaseBatchesController < ApplicationController
 
     # Get fields based on batch type
     @address_fields = if @batch.is_a?(Letter::Batch)
-                        # For letter batches, include address fields and rubber_stamps
-                        (Address.column_names - ["id", "created_at", "updated_at", "batch_id"]) +
-                          ["rubber_stamps"]
-                      else
-                        # For other batches, just include address fields
-                        (Address.column_names - ["id", "created_at", "updated_at"])
-                      end
+        # For letter batches, include address fields and rubber_stamps
+        (Address.column_names - ["id", "created_at", "updated_at", "batch_id"]) +
+          ["rubber_stamps"]
+      else
+        # For other batches, just include address fields
+        (Address.column_names - ["id", "created_at", "updated_at"])
+      end
   end
 
   def mapping_params
     params.require(:mapping).permit!
   end
-end 
+end

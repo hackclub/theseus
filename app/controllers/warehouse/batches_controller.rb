@@ -127,7 +127,7 @@ class Warehouse::BatchesController < BaseBatchesController
   private
 
   def batch_params
-    params.require(:warehouse_batch).permit(:warehouse_template_id, :warehouse_user_facing_title, tags: [])
+    params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
   end
 
   def set_allowed_templates
