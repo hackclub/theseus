@@ -29,7 +29,7 @@
     <ul>
       <%= nav_item(root_path, "Home") %>
       <li>
-        <details <%= 'open' if request.path.start_with?('/warehouse') %>>
+        <details <%= 'open' if request.path.start_with?('/back_office/warehouse') %>>
           <summary>Warehouse</summary>
           <ul>
             <%= nav_item(warehouse_batches_path, "Batches") %>
@@ -40,7 +40,7 @@
         </details>
       </li>
       <li>
-        <details <%= 'open' if request.path.start_with?('/letters') || request.path.start_with?('/return_addresses') %>>
+        <details <%= 'open' if request.path.start_with?('/back_office/letter') || request.path.start_with?('/back_office/return_addresses') %>>
           <summary>Mail</summary>
           <ul>
             <%= nav_item(letters_path, "Letters") %>
@@ -50,7 +50,7 @@
         </details>
       </li>
       <li>
-        <details <%= 'open' if request.path.start_with?('/tags') %>>
+        <details <%= 'open' if request.path.start_with?('/back_office/tags') %>>
           <summary>Accounting</summary>
           <ul>
             <%= nav_item(tags_path, "Tags") %>
@@ -68,7 +68,7 @@
       </li>
       <% admin_tool do %>
         <li>
-          <details <%= 'open' if request.path.start_with?('/admin') || request.path.start_with?('/blazer') || request.path.start_with?('/good_job') %>>
+          <details>
             <summary>Admin</summary>
             <ul>
               <%= nav_item(good_job_path, "good job, #{current_user.username}!") %>
