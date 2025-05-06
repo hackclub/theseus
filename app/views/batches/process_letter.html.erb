@@ -17,7 +17,7 @@
       <% if standard_templates.present? %>
         <optgroup label="Standard 4x6 Labels">
           <% standard_templates.uniq.each do |template| %>
-            <option value="<%= template %>"><%= template.to_s.humanize %></option>
+            <option value="<%= template.to_s %>"><%= template.to_s %></option>
           <% end %>
         </optgroup>
       <% end %>
@@ -26,7 +26,7 @@
       <% if envelope_templates.present? %>
         <optgroup label="#10 Envelopes">
           <% envelope_templates.uniq.each do |template| %>
-            <option value="<%= template %>"><%= template.to_s.humanize %></option>
+            <option value="<%= template.to_s %>"><%= template.to_s %></option>
           <% end %>
         </optgroup>
       <% end %>
@@ -167,6 +167,16 @@
     const usPostageType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;
     const intlPostageType = document.querySelector('input[name="batch[intl_postage_type]"]:checked').value;
     const paymentAccountSelect = document.querySelector('select[name="batch[usps_payment_account_id]"]');
+    const templateSelect = document.querySelector('#batch_template_cycle');
+
+    // Prevent empty values in template cycle
+    templateSelect.addEventListener('change', function() {
+      const selectedOptions = Array.from(this.selectedOptions);
+      if (selectedOptions.length === 0) {
+        // If nothing is selected, select the first option
+        this.options[0].selected = true;
+      }
+    });
 
     function updatePaymentAccountRequired() {
       const usPostageType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;

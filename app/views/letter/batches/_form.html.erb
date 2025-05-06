@@ -1,12 +1,51 @@
-  <div class="form-group">
-    <%= form.label :letter_weight, "Weight (oz)", class: "form-label" %>
-    <%= form.number_field :letter_weight, step: 0.1, class: "form-control" %>
+<%= form_with(model: batch, url: letter_batches_path, scope: :letter_batch) do |form| %>
+  <% if batch.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(batch.errors.count, "error") %> prohibited this batch from being saved:</h2>
+
+      <ul>
+        <% batch.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= render partial: "letters/letter_attributes_form", locals: { form: form, is_batch: true } %>
+
+  <div class="field">
+    <%= form.label :letter_mailer_id_id, "USPS Mailer ID" %>
+    <%= form.collection_select :letter_mailer_id_id,
+                             USPS::MailerId.all,
+                             :id,
+                             :display_name,
+                             { selected: USPS::MailerId.first&.id } %>
   </div>
 
-  <div class="form-group">
-    <%= form.label :mailing_date, class: "form-label" %>
-    <%= form.date_field :mailing_date, 
-      value: @batch.mailing_date || @batch.default_mailing_date,
-      min: Date.current,
-      class: "form-control" %>
-  </div> 
+  <div class="field">
+    <%= form.label :letter_return_address_id, "Return Address" %>
+    <%= link_to "(manage)", return_addresses_path %>
+    <%= form.collection_select :letter_return_address_id,
+                             ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
+                             :id,
+                             :display_name,
+                             { selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id } %>
+  </div>
+
+  <div class="field">
+    <%= form.label :letter_return_address_name, "Custom Return Address Name (optional)", class: "form-label" %>
+    <%= form.text_field :letter_return_address_name, class: "form-control", placeholder: "Leave blank to use the return address name" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :csv, "CSV File" %>
+    <%= form.file_field :csv, accept: ".csv" %>
+  </div>
+
+  <%= render 'shared/tag_picker', form: form, field_name: :tags %>
+
+  <div class="actions">
+    <%= form.submit "Create Batch" %>
+    <%= link_to "Back to batches", letter_batches_path %>
+  </div>
+<% end %> 

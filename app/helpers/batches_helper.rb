@@ -4,7 +4,7 @@ module BatchesHelper
                   when 'awaiting_field_mapping'
                     ['warning', 'awaiting field mapping']
                   when 'fields_mapped'
-                    ['info', 'fields mapped']
+                    ['info', 'ready to process']
                   when 'processed'
                     ['success', 'processed']
                   else

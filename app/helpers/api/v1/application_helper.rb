@@ -13,6 +13,10 @@ module API
       ensure
         @expand = before
       end
+
+      def pii(&block)
+        yield if @pii
+      end
     end
   end
 end

@@ -1,7 +1,14 @@
 module API
   module V1
     class ApplicationController < ActionController::API
+      attr_reader :current_user
+
+      before_action :authenticate!
       before_action :set_expand
+      before_action :set_pii
+
+      include Pundit::Authorization
+      include ActionController::HttpAuthentication::Token::ControllerMethods
 
       rescue_from Pundit::NotAuthorizedError do |e|
         render json: { error: "not_authorized" }, status: :forbidden
@@ -12,12 +19,32 @@ module API
       end
 
       rescue_from ActiveRecord::RecordInvalid do |e|
-        render json: { error: "invalid_operation", messages: e.record.errors.full_messages }, status: :bad_request
+        render json: { error: "validation_error", messages: e.record.errors.full_messages }, status: :bad_request
       end
+
+      rescue_from ActiveRecord::RecordNotUnique do |e|
+        render json: { error: "idempotency_error", messages: ["a record by that idempotency key already exists!"] }, status: :bad_request
+      end
+
+      private
 
       def set_expand
         @expand = params[:expand].to_s.split(",").map { |e| e.strip.to_sym }
       end
+
+      def set_pii
+        @pii = current_token&.pii?
+      end
+
+      def authenticate!
+        @current_token = authenticate_with_http_token { |t, _options| APIKey.find_by(token: t) }
+        unless @current_token&.active?
+          return render json: { error: "invalid_auth" }, status: :unauthorized
+        end
+        @current_user = current_token&.user
+      end
+
+      attr_reader :current_token
     end
   end
 end

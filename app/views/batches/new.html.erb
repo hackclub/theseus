@@ -46,6 +46,10 @@
                                :display_name,
                                { selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id } %>
     </div>
+    <div class="field">
+      <%= form.label :letter_return_address_name, "Custom Return Address Name (optional)", class: "form-label" %>
+      <%= form.text_field :letter_return_address_name, class: "form-control", placeholder: "Leave blank to use the return address name" %>
+    </div>
   </div>
 
   <div class="field">

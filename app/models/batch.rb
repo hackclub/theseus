@@ -12,6 +12,7 @@
 #  letter_weight               :decimal(, )
 #  letter_width                :decimal(, )
 #  tags                        :citext           default([]), is an Array
+#  template_cycle              :string           default([]), is an Array
 #  type                        :string           not null
 #  warehouse_user_facing_title :string
 #  created_at                  :datetime         not null
@@ -80,51 +81,130 @@ class Batch < ApplicationRecord
 
   GREMLINS = [
     "‎",
-    "​"
+    "​",
   ].join
+
   def run_map!
     csv_content = csv.download
-    CSV.parse(csv_content, headers: true, encoding: "UTF-8", converters: [ ->(s) { s&.strip&.delete(GREMLINS).presence } ])&.each_with_index do |row, i|
-    begin
-        build_mapping(row)
-      # figure out how to rescue this
+    rows = CSV.parse(csv_content, headers: true, encoding: "UTF-8", converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])
+
+    # Phase 1: Collect all address data
+    address_attributes = []
+    row_map = {}  # Keep rows in a hash
+    Parallel.each(rows.each_with_index, in_threads: 8) do |row, i|
+      begin
+        # Skip rows where first_name is blank
+        next if row[field_mapping["first_name"]].blank?
+
+        address_attrs = build_address_attributes(row)
+        if address_attrs
+          address_attributes << address_attrs
+          row_map[i] = row  # Store row in hash
+        end
+      rescue => e
+        Rails.logger.error("Error processing row #{i} in batch #{id}: #{e.message}")
+        raise
+      end
     end
+
+    # Bulk insert all addresses
+    if address_attributes.any?
+      now = Time.current
+      address_attributes.each do |attrs|
+        attrs[:created_at] = now
+        attrs[:updated_at] = now
+        attrs[:batch_id] = id
+      end
+
+      begin
+        Address.insert_all!(address_attributes)
+      rescue ActiveRecord::RecordInvalid => e
+        Rails.logger.error("Failed to insert addresses: #{e.message}")
+        raise
+      end
+
+      # Phase 2: Create associated records (letters) for each address
+      # Fetch all addresses we just created
+      addresses = Address.where(batch_id: id).where(created_at: now).to_a
+
+      Parallel.each(addresses.each_with_index, in_threads: 8) do |address, i|
+        begin
+          ActiveRecord::Base.connection_pool.with_connection do
+            ActiveRecord::Base.transaction do
+              build_mapping(row_map[i], address)
+            end
+          end
+        rescue => e
+          Rails.logger.error("Error creating associated records for address #{address.id} in batch #{id}: #{e.message}")
+          raise
+        end
+      end
     end
+
     mark_fields_mapped
     save!
   end
 
-
   private
 
-  def build_address(row)
+  def build_address_attributes(row)
     csv_country = row[field_mapping["country"]]
-
-    country = FrickinCountryNames.find_country!(csv_country)
-
+    country = FrickinCountryNames.find_country(csv_country)
     postal_code = row[field_mapping["postal_code"]]
+    state = row[field_mapping["state"]]
 
-    if country.alpha2 == "US" && postal_code.length < 5
+    # Try AI translation if:
+    # 1. Country couldn't be found by FrickinCountryNames, or
+    # 2. Country is not US
+    if country.nil? || country.alpha2 != "US"
+      begin
+        translated = AIService.fix_address(row, field_mapping)
+        if translated
+          # If AI translation succeeded, try to find the country again
+          translated_country = FrickinCountryNames.find_country(translated[:country])
+          if translated_country
+            # Preserve original first_name and last_name
+            translated[:first_name] = row[field_mapping["first_name"]]
+            translated[:last_name] = row[field_mapping["last_name"]]
+            translated[:country] = translated_country.alpha2
+            return translated
+          end
+        end
+      rescue => e
+        Rails.logger.error("AI translation failed for batch #{id}: #{e.message}")
+        raise
+      end
+    end
+
+    # Process US addresses or fallback for failed translations
+    if country&.alpha2 == "US" && postal_code.present? && postal_code.length < 5
       postal_code = postal_code.rjust(5, "0")
     end
 
-    state = FrickinCountryNames.normalize_state(country, row[field_mapping["state"]])
+    # Normalize state name to abbreviation if country is found
+    normalized_state = if country
+        FrickinCountryNames.normalize_state(country, state)
+      else
+        state
+      end
 
-    addresses.build(
+    {
       first_name: row[field_mapping["first_name"]],
       last_name: row[field_mapping["last_name"]],
       line_1: row[field_mapping["line_1"]],
       line_2: row[field_mapping["line_2"]],
       city: row[field_mapping["city"]],
-      state: state,
+      state: normalized_state,
       postal_code: postal_code,
-      country: country.alpha2,
+      country: country&.alpha2 || csv_country&.upcase, # Use FCN alpha2 if available, otherwise original country code
       phone_number: row[field_mapping["phone_number"]],
       email: row[field_mapping["email"]],
-      )
+    }
   end
-  def build_mapping(row)
-    build_address(row)
+
+  def build_mapping(row, address)
+    # Base class just returns the address
+    address
   end
 
   def update_associated_tags

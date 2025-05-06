@@ -1,0 +1,62 @@
+<% content_for :title, "Process Warehouse Batch ##{@batch.id}" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Process Warehouse Batch #<%= @batch.id %></h1>
+    <div class="actions">
+      <%= secondary_link_to "Back to batch", warehouse_batch_path(@batch) do %>
+        <%= back_icon %>Back to batch
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="text-sm font-medium mb-0">Batch Summary</h2>
+    </div>
+    <div class="card-body">
+      <div class="text-sm mb-4">
+        This will create <strong><%= @batch.addresses.count %></strong> warehouse orders, containing:
+      </div>
+
+      <div class="mb-4">
+        <ul class="list-disc list-inside">
+          <% @batch.warehouse_template.line_items.each do |line_item| %>
+            <li class="text-sm">
+              <%= line_item.quantity %>x <%= line_item.sku.name %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <div class="text-sm space-y-2">
+        <div>
+          <span class="text-gray-500">Contents Cost:</span>
+          <%= number_to_currency @batch.contents_cost %>
+        </div>
+        <div>
+          <span class="text-gray-500">Warehouse Labor:</span>
+          <%= number_to_currency @batch.labor_cost %>
+        </div>
+        <div>
+          <span class="text-gray-500">Postage Cost:</span>
+          <span class="text-gray-500">(to be determined)</span>
+        </div>
+        <div class="font-medium">
+          <span class="text-gray-500">Estimated Total:</span>
+          <%= number_to_currency @batch.total_cost %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <%= button_to process_warehouse_batch_path(@batch), 
+                    method: :post,
+                    class: "btn btn-primary w-full" do %>
+        <%= check_icon %>Process Batch
+      <% end %>
+    </div>
+  </div>
+</div> 

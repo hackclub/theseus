@@ -1,57 +1,57 @@
 class Letter::BatchPolicy < ApplicationPolicy
   def index?
-    true
+    user.present?
   end
 
   def show?
-    true
+    user.present?
   end
 
   def new?
-    true
+    user.present?
   end
 
   def create?
-    true
+    user.present?
   end
 
   def edit?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def update?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def destroy?
-    user_is_admin
+    user.admin?
   end
 
   def map_fields?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def set_mapping?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def process_form?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def process_batch?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def mark_printed?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def mark_mailed?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   def update_costs?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 end 

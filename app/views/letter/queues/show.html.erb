@@ -1,0 +1,104 @@
+<p style="color: green"><%= notice %></p>
+
+<div class="container">
+  <div class="page-header">
+    <h1><%= @letter_queue.name %></h1>
+    <div class="actions">
+      <%= link_to "< back to queues", letter_queues_path %>
+      <%= link_to "edit this queue", edit_letter_queue_path(@letter_queue) %>
+      <% admin_tool do %>
+        <%= button_to "destroy this queue", @letter_queue, method: :delete %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="content">
+    <section>
+      <h2>queue details</h2>
+      <div class="p-3">
+        <div class="mb-4">
+          <h3>owner</h3>
+          <%= render "shared/user_mention", user: @letter_queue.user %>
+        </div>
+        
+        <div class="mb-4">
+          <h3>tags</h3>
+          <%= render 'shared/tags', tags: @letter_queue.tags %>
+        </div>
+        
+        <div class="details-grid">
+          <div>
+            <h3>return address</h3>
+            <% if @letter_queue.letter_return_address.present? %>
+              <address class="address-box">
+                <div><%= @letter_queue.letter_return_address_name || @letter_queue.letter_return_address.name %></div>
+                <div><%= @letter_queue.letter_return_address.line_1 %></div>
+                <% if @letter_queue.letter_return_address.line_2.present? %>
+                  <div><%= @letter_queue.letter_return_address.line_2 %></div>
+                <% end %>
+                <div><%= @letter_queue.letter_return_address.city %>, <%= @letter_queue.letter_return_address.state %> <%= @letter_queue.letter_return_address.postal_code %></div>
+                <div><%= @letter_queue.letter_return_address.country %></div>
+              </address>
+            <% else %>
+              <p>no return address</p>
+            <% end %>
+          </div>
+          
+          <div>
+            <h3>mailer id</h3>
+            <div class="info-box">
+              <%= @letter_queue.letter_mailer_id&.display_name || "no mailer id" %>
+            </div>
+          </div>
+        </div>
+        
+        <h3>letter specs</h3>
+        <%= render 'shared/letter_attributes', record: @letter_queue %>
+      </div>
+    </section>
+  </div>
+</div>
+
+<hr/>
+
+<details>
+  <summary>api docs:</summary>
+  <div class="api-docs">
+    <h4>what do?</h4>
+    <p>send a POST request to <%= copy_to_clipboard create_letter_api_v1_letter_queue_url(@letter_queue) do %>
+      <code><%= create_letter_api_v1_letter_queue_url @letter_queue %></code>
+    <% end %> with JSON like:</p>
+    
+    <%= render_json_example({
+      recipient_email: current_user.email,
+      address: {
+        first_name: "Bort",
+        last_name: "Fargler",
+        line_1: "8605 Santa Clausica Blvd.",
+        line_2: "PMB 86294 (optional)",
+        city: "West Sillywood",
+        state: "CA",
+        postal_code: '90069'
+      },
+      rubber_stamps: "extra text if the template you're using supports it",
+      idempotency_key: "optional but it'd be a great idea... rec#{SecureRandom.alphanumeric 12}?",
+      metadata: {
+        whatever_you_want: "this gets JSONB'd, you can stash program-specific meta info here",
+        seriously_any_keys_and_values: "as long as postgres can serialize it :3"
+      }
+    }) %>
+    
+    <p>use an <code>Authorization</code> header of <code>Bearer (one of your <%= link_to "API keys", api_keys_path, target: "_blank"%>)</code></p>
+  </div>
+</details>
+
+<hr/>
+
+<h3>letters</h3>
+<%= render partial: 'batches/letters_collection', locals: { letters: @letter_queue.letters.queued } %>
+
+<% if @letter_queue.letters.queued.any? %>
+  <div class="mt-4">
+    <%= button_to "make batch!", make_batch_from_letter_queue_path(@letter_queue), class: "btn success" %>
+  </div>
+<% end %>

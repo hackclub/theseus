@@ -110,7 +110,6 @@ end
 
 Rails.application.routes.draw do
 
-
   scope path: "back_office" do
     get "/tags", to: "tags#index"
     get "/tags/:id", to: "tags#show", as: :tag_stats
@@ -126,8 +125,31 @@ Rails.application.routes.draw do
         get :preview_template if Rails.env.development?
       end
     end
-    get "batches/new"
-    get "batches/import"
+    namespace :letter do
+      resources :batches do
+        member do
+          get "/map", to: "batches#map_fields", as: :map_fields
+          post :set_mapping
+          get "/process", to: "batches#process_form", as: :process_confirm
+          post "/process", to: "batches#process_batch", as: :process
+          post :mark_printed
+          post :mark_mailed
+          post :update_costs
+        end
+      end
+      resources :queues do
+        member do
+          post :batch, as: :make_batch_from
+        end
+      end
+    end
+    resources :api_keys do
+      member do
+        get "/revoke", to: "api_keys#revoke_confirm", as: :revoke_confirm
+        post :revoke
+      end
+    end
+
     namespace :admin do
       resources :addresses
       resources :return_addresses
@@ -137,7 +159,6 @@ Rails.application.routes.draw do
       namespace :warehouse do
         resources :templates
         resources :orders
-        resources :purpose_codes
         resources :skus
       end
 
@@ -173,22 +194,18 @@ Rails.application.routes.draw do
           post "send_to_warehouse"
         end
       end
-      resources :purpose_codes
-      resources :skus, except: [ :destroy ]
+      resources :batches do
+        member do
+          get "/map", to: "batches#map_fields", as: :map_fields
+          post :set_mapping
+          get "/process", to: "batches#process_form", as: :process_confirm
+          post "/process", to: "batches#process_batch", as: :process
+        end
+      end
+      resources :skus
     end
     resources :users
     resources :return_addresses
-    resources :batches do
-      member do
-        get "/map", to: "batches#map_fields", as: :map_fields
-        post :set_mapping
-        get "/process", to: "batches#process_form", as: :process_confirm
-        post "/process", to: "batches#process_batch", as: :process
-        post :mark_printed
-        post :mark_mailed
-        post :update_costs
-      end
-    end
     root "static_pages#index"
 
     delete "signout", to: "sessions#destroy", as: :signout
@@ -229,8 +246,6 @@ Rails.application.routes.draw do
   post "/impersonate", to: "public/impersonations#create", as: :public_impersonate
   get "/stop_impersonating", to: "public/impersonations#stop_impersonating", as: :public_stop_impersonating
 
-  
-
   get "/:public_id", to: "public/public_identifiable#show", constraints: { public_id: /(pkg|ltr)![^\/]+/ }
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -244,6 +259,22 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  namespace :api do
+    defaults format: :json do
+
+      namespace :v1 do
+        resource :user
+        resources :letters
+        resources :letter_queues do
+          member do
+            post '', to: 'letter_queues#create_letter', as: :create_letter
+          end
+        end
+      end
+    end
+  end
+
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

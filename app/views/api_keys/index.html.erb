@@ -1,0 +1,8 @@
+<% content_for :title  do %>
+  API keys
+<% end %>
+<h1>API keys</h1>
+<div class="actions">
+  <%= create_button new_api_key_path, "visit the locksmith!" %>
+</div>
+<%= render @api_keys %>

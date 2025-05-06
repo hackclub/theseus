@@ -1,0 +1,18 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Queues" %>
+
+<h1>Queues</h1>
+
+<div id="letter_queues">
+  <article>
+    <% @letter_queues.each do |letter_queue| %>
+      <%= render letter_queue %>
+      <p>
+        <%= link_to "Show this queue", letter_queue %>
+      </p>
+    <% end %>
+  </article>
+</div>
+
+<%= link_to "New queue", new_letter_queue_path %>

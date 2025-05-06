@@ -1,0 +1,65 @@
+<%= form_with(model: letter_queue) do |form| %>
+  <% if letter_queue.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(letter_queue.errors.count, "error") %> prohibited this letter_queue from being saved:</h2>
+
+      <ul>
+        <% letter_queue.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <h3>the important part:</h3>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="form-group">
+      <%= form.label :name, class: "form-label" %>
+      <%= form.text_field :name, class: "form-control" %>
+    </div>
+    
+    <div class="form-group">
+      <%= render 'shared/tag_picker', form: form %>
+    </div>
+  </div>
+
+  <h3>set defaults for letters:</h3>
+  <%= render 'letters/letter_attributes_form', form: form, is_batch: true %>
+
+  <div class="form-group">
+    <%= form.label :letter_mailer_id_id, "USPS Mailer ID", class: "form-label" %>
+    <%= form.collection_select :letter_mailer_id_id,
+                             USPS::MailerId.all,
+                             :id,
+                             :display_name,
+                             { selected: USPS::MailerId.first&.id },
+                             { class: "form-control" } %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :letter_return_address_id, "Return Address", class: "form-label" %>
+    <%= link_to "(manage)", return_addresses_path, class: "text-sm" %>
+    <%= form.collection_select :letter_return_address_id,
+                             ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)),
+                             :id,
+                             :display_name,
+                             { selected: ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).first&.id },
+                             { class: "form-control" } %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :letter_return_address_name, "custom return address name", class: "form-label" %>
+    <%= form.text_field :letter_return_address_name, class: "form-control", placeholder: "leave blank to use the address' default name" %>
+  </div>
+
+  <% admin_tool do %>
+    <div>
+      <%= form.label :slug, style: "display: block" %>
+      <%= form.text_field :slug %>
+    </div>
+  <% end %>
+
+  <div class="form-group mt-4">
+    <%= form.submit class: "btn success" %>
+  </div>
+<% end %>

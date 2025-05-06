@@ -1,0 +1,17 @@
+<h1>New API key</h1>
+<%= form_with model: @api_key do |f| %>
+  <fieldset>
+    <%= f.label :name, "Name" %>
+    <%= f.text_field :name %>
+    <small>short description of what it's for – think "high-seas"</small>
+  </fieldset>
+  <fieldset>
+    <%= f.label :pii, "PII access?" %>
+    <%= f.check_box :pii %>
+    <label for="api_key_pii">
+      should this key be able to read address data? <small><small>(probably not!)</small></small>
+    </label>
+  </fieldset>
+  <%= f.submit "create API key!" %>
+
+<% end %>

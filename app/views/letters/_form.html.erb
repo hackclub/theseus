@@ -41,6 +41,10 @@
           <%= link_to "Manage Return Addresses", return_addresses_path(from_letter: true) %>
         </small>
       </div>
+      <div class="form-group">
+        <%= form.label :return_address_name, "Custom Return Address Name (optional)", class: "form-label" %>
+        <%= form.text_field :return_address_name, class: "form-control", placeholder: "Leave blank to use the return address name" %>
+      </div>
     </div>
   </fieldset>
 

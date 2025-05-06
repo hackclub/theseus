@@ -8,15 +8,19 @@
 #  height              :decimal(, )
 #  imb_rollover_count  :integer
 #  imb_serial_number   :integer
+#  mailed_at           :datetime
 #  mailing_date        :date
 #  metadata            :jsonb
 #  non_machinable      :boolean
 #  postage             :decimal(, )
 #  postage_type        :integer
+#  printed_at          :datetime
 #  processing_category :integer
+#  received_at         :datetime
 #  recipient_email     :string
 #  rubber_stamps       :text
 #  tags                :citext           default([]), is an Array
+#  user_facing_title   :string
 #  weight              :decimal(, )
 #  width               :decimal(, )
 #  created_at          :datetime         not null
@@ -24,6 +28,7 @@
 #  address_id          :bigint           not null
 #  batch_id            :bigint
 #  return_address_id   :bigint           not null
+#  user_id             :bigint           not null
 #  usps_mailer_id_id   :bigint           not null
 #
 # Indexes
@@ -33,6 +38,7 @@
 #  index_letters_on_imb_serial_number  (imb_serial_number)
 #  index_letters_on_return_address_id  (return_address_id)
 #  index_letters_on_tags               (tags) USING gin
+#  index_letters_on_user_id            (user_id)
 #  index_letters_on_usps_mailer_id_id  (usps_mailer_id_id)
 #
 # Foreign Keys
@@ -40,6 +46,7 @@
 #  fk_rails_...  (address_id => addresses.id)
 #  fk_rails_...  (batch_id => batches.id)
 #  fk_rails_...  (return_address_id => return_addresses.id)
+#  fk_rails_...  (user_id => users.id)
 #  fk_rails_...  (usps_mailer_id_id => usps_mailer_ids.id)
 #
 class Letter < ApplicationRecord
@@ -55,12 +62,18 @@ class Letter < ApplicationRecord
   belongs_to :return_address, optional: true
   has_many :iv_mtr_events, class_name: "USPS::IVMTR::Event"
   belongs_to :user
+  belongs_to :queue, class_name: "Letter::Queue", optional: true
 
   aasm timestamps: true do
+    state :queued
     state :pending, initial: true
     state :printed
     state :mailed
     state :received
+
+    event :batch_from_queue do
+      transitions from: :queued, to: :pending
+    end
 
     event :mark_printed do
       transitions from: :pending, to: :printed
@@ -81,6 +94,10 @@ class Letter < ApplicationRecord
 
   def display_name
     user_facing_title || tags.compact_blank.join(', ') || public_id
+  end
+
+  def return_address_name_line
+    return_address_name.presence || return_address&.name
   end
 
   def been_mailed?

@@ -1,0 +1,39 @@
+<%= form_with(model: batch, url: warehouse_batches_path) do |form| %>
+  <% if batch.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(batch.errors.count, "error") %> prohibited this batch from being saved:</h2>
+
+      <ul>
+        <% batch.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :warehouse_template_id, "Template" %>
+    <%= form.collection_select :warehouse_template_id,
+                             @allowed_templates,
+                             :id,
+                             :name,
+                             { selected: @allowed_templates.first&.id } %>
+  </div>
+
+  <div class="field">
+    <%= form.label :warehouse_user_facing_title, "Title" %>
+    <%= form.text_field :warehouse_user_facing_title %>
+  </div>
+
+  <div class="field">
+    <%= form.label :csv, "CSV File" %>
+    <%= form.file_field :csv, accept: ".csv" %>
+  </div>
+
+  <%= render 'shared/tag_picker', form: form, field_name: :tags %>
+
+  <div class="actions">
+    <%= form.submit "Create Batch" %>
+    <%= link_to "Back to batches", warehouse_batches_path %>
+  </div>
+<% end %> 

@@ -12,6 +12,7 @@
 #  letter_weight               :decimal(, )
 #  letter_width                :decimal(, )
 #  tags                        :citext           default([]), is an Array
+#  template_cycle              :string           default([]), is an Array
 #  type                        :string           not null
 #  warehouse_user_facing_title :string
 #  created_at                  :datetime         not null
@@ -46,6 +47,7 @@ class Letter::Batch < Batch
   has_many :letters, dependent: :destroy
   belongs_to :mailer_id, class_name: "USPS::MailerId", foreign_key: "letter_mailer_id_id", optional: true
   belongs_to :letter_return_address, class_name: "ReturnAddress", optional: true
+  belongs_to :letter_queue, :class_name => "Letter::Queue", optional: true
 
   # Add ActiveStorage attachment for the batch label PDF
   has_one_attached :pdf_label
@@ -56,6 +58,8 @@ class Letter::Batch < Batch
   attribute :letter_weight, :decimal
   attribute :letter_processing_category, :integer
   attribute :user_facing_title, :string
+  attribute :letter_return_address_name, :string
+  attribute :letter_queue_id, :integer
   attr_accessor :template, :template_cycle
   attribute :letter_mailing_date, :date
 
@@ -77,7 +81,7 @@ class Letter::Batch < Batch
     pdf_label.attach(
       io: io,
       filename: "label_batch_#{Time.now.to_i}.pdf",
-      content_type: "application/pdf"
+      content_type: "application/pdf",
     )
   end
 
@@ -123,9 +127,9 @@ class Letter::Batch < Batch
         end
       end
 
-      unless options[:payment_account].check_funds_available(indicia_cost)
-        raise "...we're out of money (ask Nora to put at least #{ActiveSupport::NumberHelper.number_to_currency(indicia_cost)} in the #{options[:payment_account].display_name} account!)"
-      end
+      # unless options[:payment_account].check_funds_available(indicia_cost)
+      #   raise "...we're out of money (ask Nora to put at least #{ActiveSupport::NumberHelper.number_to_currency(indicia_cost)} in the #{options[:payment_account].display_name} account!)"
+      # end
 
       purchase_batch_indicia(options[:payment_account])
     end
@@ -149,7 +153,7 @@ class Letter::Batch < Batch
       indicium = USPS::Indicium.new(
         letter: letter,
         payment_account: payment_account,
-        mailing_date: letter_mailing_date
+        mailing_date: letter_mailing_date,
       )
       indicium.buy!(payment_token)
     end
@@ -206,10 +210,10 @@ class Letter::Batch < Batch
     letters.includes(:address, :usps_indicium).each_with_object({ us: 0, intl: 0 }) do |letter, differences|
       # Determine what postage type this letter would use
       effective_postage_type = if letter.address.us?
-        us_postage_type || letter.postage_type
-      else
-        intl_postage_type || letter.postage_type
-      end
+          us_postage_type || letter.postage_type
+        else
+          intl_postage_type || letter.postage_type
+        end
 
       # Skip if not switching to indicia
       next unless effective_postage_type == "indicia"
@@ -225,14 +229,14 @@ class Letter::Batch < Batch
 
         # Indicia price is metered_price
         indicia_price = if letter.usps_indicium.present?
-          letter.usps_indicium.postage
-        else
-          USPS::PricingEngine.metered_price(
-            letter.processing_category,
-            letter.weight,
-            letter.non_machinable
-          )
-        end
+            letter.usps_indicium.postage
+          else
+            USPS::PricingEngine.metered_price(
+              letter.processing_category,
+              letter.weight,
+              letter.non_machinable
+            )
+          end
 
         # Difference should be negative (savings)
         differences[:us] += indicia_price - retail_price
@@ -247,16 +251,16 @@ class Letter::Batch < Batch
 
         # Indicia price is flirted price (higher than retail)
         indicia_price = if letter.usps_indicium.present?
-          letter.usps_indicium.postage
-        else
-          # Use flirt to get the closest US price that's higher than the FCMI rate
-          flirted = letter.flirt
-          USPS::PricingEngine.metered_price(
-            flirted[:processing_category],
-            flirted[:weight],
-            flirted[:non_machinable]
-          )
-        end
+            letter.usps_indicium.postage
+          else
+            # Use flirt to get the closest US price that's higher than the FCMI rate
+            flirted = letter.flirt
+            USPS::PricingEngine.metered_price(
+              flirted[:processing_category],
+              flirted[:weight],
+              flirted[:non_machinable]
+            )
+          end
 
         # Difference should be positive (additional cost)
         differences[:intl] += indicia_price - retail_price
@@ -292,25 +296,24 @@ class Letter::Batch < Batch
 
   def address_fields
     # Only include address fields and rubber_stamps for letter mapping
-    [ "rubber_stamps" ]
+    ["rubber_stamps"]
   end
 
-  def build_mapping(row)
-    address = build_address(row)
-
+  def build_mapping(row, address)
     # Build letter with batch-level specs and extra data
     letters.build(
       height: letter_height,
       width: letter_width,
       weight: letter_weight,
       processing_category: letter_processing_category,
-      recipient_email: row[field_mapping["email"]],
+      recipient_email: row&.dig(field_mapping["email"]),
       address: address,
       usps_mailer_id: mailer_id,
       return_address: letter_return_address,
-      rubber_stamps: row[field_mapping["rubber_stamps"]],
+      return_address_name: letter_return_address_name,
+      rubber_stamps: row&.dig(field_mapping["rubber_stamps"]),
       tags: tags,
-      user: user
+      user: user,
     )
   end
 
