@@ -5,9 +5,11 @@
     </summary>
 
     <% unless record.nil? %>
-
-      <%== ap record %>
-
+      <% if record.is_a?(Norairrecord::Table) %>
+        <%== ap record.fields%>
+      <% else %>
+        <%== ap record %>
+      <% end %>
       <div class="border-left ml1">
 
         <!-- JSON -->
@@ -17,7 +19,7 @@
           </summary>
           <div class="overflow-x-auto">
             <pre class="w-max">
-              <%= JSON.pretty_generate(record.as_json) %>
+<%= JSON.pretty_generate(record.as_json) %>
             </pre>
           </div>
         </details>
