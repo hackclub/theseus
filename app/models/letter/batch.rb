@@ -70,6 +70,8 @@ class Letter::Batch < Batch
   validate :mailing_date_not_in_past, if: -> { letter_mailing_date.present? }, on: :create
   validates :letter_processing_category, presence: true
 
+  after_update :update_letter_tags, if: :saved_change_to_tags?
+
   def self.model_name
     Batch.model_name
   end
@@ -293,6 +295,10 @@ class Letter::Batch < Batch
   end
 
   private
+
+  def update_letter_tags
+    letters.update_all(tags: tags)
+  end
 
   def address_fields
     # Only include address fields and rubber_stamps for letter mapping
