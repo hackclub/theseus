@@ -7,7 +7,7 @@
       </h3>
     </div>
     <div class="card-body">
-      <div class="grid md:grid-cols-2 gap-4 mb-4">
+      <div class="md:grid-cols-2 gap-4">
         <div>
           <span class="text-gray-500">Recipient:</span>
           <%= order.address.name_line %> (<%= order.recipient_email %>)
@@ -17,10 +17,6 @@
           <%= render 'shared/tags', tags: order.tags %>
         </div>
       </div>
-      <div>
-        <span class="text-gray-500">Contents:</span>
-        <%= render 'warehouse/orders/line_items', order: order %>
-      </div>
     </div>
   </article>
-<% end %>
+<% end %> 
