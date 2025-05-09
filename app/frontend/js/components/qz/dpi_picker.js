@@ -10,7 +10,8 @@ function RadioButton() {
 export function DPIPicker() {
     const DPI_OPTS = {
         203: "most common",
-        300: "fancier!"
+        300: "fancier!",
+        305: "sometimes?"
     }
     return html`
         <fieldset disabled=${qz_disconnected}>

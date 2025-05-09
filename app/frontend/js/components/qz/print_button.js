@@ -2,8 +2,9 @@ import {print} from "../../../entrypoints/qz";
 
 export function PrintButton() {
     this.disabled = false
-    useChange([qz_settings.printer, qz_state.status], () => {
-        this.disabled = qz_state.status !== 'connected' || qz_settings.printer === 'pick a printer...' || !qz_settings.printer
+    this.printing = false;
+    useChange([qz_settings.printer, qz_state.status, this.printing], () => {
+        this.disabled = this.printing || qz_state.status !== 'connected' || qz_settings.printer === 'pick a printer...' || !qz_settings.printer
     })
 
     const handlePrintSuccess = () => {
@@ -15,8 +16,8 @@ export function PrintButton() {
     };
 
     return html`
-        <button class="btn success" on:click=${() => {print(qz_state.pdf_url, 'file', handlePrintSuccess)}}
-                disabled=${use(this.disabled)}>🖨️ print!
+        <button class="btn success" on:click=${() => {this.printing = true;print(qz_state.pdf_url, 'file', handlePrintSuccess)}}
+                disabled=${use(this.disabled)}>🖨️ ${this.printing ? "printing..." : "print!"  }
         </button>
     `
 }
