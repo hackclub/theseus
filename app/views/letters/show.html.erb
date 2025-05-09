@@ -165,7 +165,7 @@
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                       </svg>
-                      mark all printed!
+                      mark printed!
                     <% end %>                    <%= button_to "Clear Label", clear_label_letter_path(@letter), method: :post, class: "contrast", data: { confirm: "Are you sure you want to clear this label?" } %>
                   </div>
                 </div>
@@ -212,7 +212,12 @@
             <% when 'printed' %>
               <div class="mb-4">
                 <h3>Label</h3>
-                <%= button_to "I Mailed It", mark_mailed_letter_path(@letter), method: :post, class: "success" %>
+                <%= button_to mark_mailed_letter_path(@letter), method: :post, class: "btn btn-sm success" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  mark as mailed!
+                <% end %>
               </div>
             <% when 'mailed' %>
               <div class="mb-4">
