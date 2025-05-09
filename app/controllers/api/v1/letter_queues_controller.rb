@@ -3,6 +3,24 @@ module API
     class LetterQueuesController < ApplicationController
       before_action :set_letter_queue
 
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        render json: { error: "Queue not found" }, status: :not_found
+      end
+
+      rescue_from ActiveRecord::RecordInvalid do |e|
+        render json: {
+          error: "Validation failed",
+          details: e.record.errors.full_messages,
+        }, status: :unprocessable_entity
+      end
+
+      rescue_from USPS::Indicium::Error do |e|
+        render json: {
+          error: "Failed to purchase indicia",
+          details: e.message,
+        }, status: :unprocessable_entity
+      end
+
       def show
         authorize @letter_queue
       end
@@ -29,6 +47,31 @@ module API
         render @letter, status: :created
         #   rescue ActiveRecord::RecordInvalid => e
         # render json: { error: e.record.errors.full_messages }, status: :unprocessable_entity
+      end
+
+      def create_instant_letter
+        queue = Letter::InstantQueue.find_by!(slug: params[:id])
+
+        address = Address.create!(
+          name: params[:address][:name],
+          street1: params[:address][:street1],
+          street2: params[:address][:street2],
+          city: params[:address][:city],
+          state: params[:address][:state],
+          zip: params[:address][:zip],
+          country: params[:address][:country],
+        )
+
+        letter = queue.process_letter_instantly!(address)
+
+        render json: {
+          letter: {
+            id: letter.public_id,
+            status: letter.aasm_state,
+            label_url: letter.label.attached? ? rails_blob_url(letter.label) : nil,
+            created_at: letter.created_at,
+          },
+        }, status: :created
       end
 
       private

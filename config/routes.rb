@@ -555,6 +555,14 @@ Rails.application.routes.draw do
           member do
             post "", to: "letter_queues#create_letter", as: :create_letter
           end
+          collection do
+            post "instant/:id", to: "letter_queues#create_instant_letter", as: :create_instant_letter
+          end
+        end
+        resources :letters, only: [] do
+          collection do
+            post :create_instantly
+          end
         end
       end
     end
