@@ -10,7 +10,6 @@ export function QZPrinterPicker() {
                             <option value="${printer}" selected=${printer == qz_settings.printer}>${printer}</option>`)
                         ))}
             </select>
-            <p>${use(qz_settings.printer)}</p>
         </div>
     `
 }
