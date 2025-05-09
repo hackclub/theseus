@@ -1,0 +1,29 @@
+<%= render "letter/queues/queue", queue: instant_queue %>
+<div class="mt-4">
+  <h4>Instant Queue Details</h4>
+  <p>
+    <strong>Template:</strong>
+    <%= instant_queue.template %>
+  </p>
+  <p>
+    <strong>Postage Type:</strong>
+    <%= instant_queue.postage_type.titleize %>
+  </p>
+  <% if instant_queue.indicia? %>
+    <p>
+      <strong>Payment Account:</strong>
+      <%= instant_queue.usps_payment_account&.display_name %>
+    </p>
+  <% end %>
+  <p>
+    <strong>QR Code:</strong>
+    <%= instant_queue.include_qr_code ? "Yes" : "No" %>
+  </p>
+  <% if instant_queue.letter_mailing_date %>
+    <p>
+      <strong>Mailing Date:</strong>
+      <%= instant_queue.letter_mailing_date.strftime("%B %d, %Y") %>
+    </p>
+  <% end %>
+</div>
+ 

@@ -8,6 +8,7 @@ module API
       end
 
       private
+
       def set_letter
         @letter = Letter.find_by_public_id!(params[:id])
       end

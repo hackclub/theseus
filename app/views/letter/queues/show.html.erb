@@ -1,5 +1,4 @@
 <p style="color: green"><%= notice %></p>
-
 <div class="container">
   <div class="page-header">
     <h1><%= @letter_queue.name %></h1>
@@ -11,7 +10,6 @@
       <% end %>
     </div>
   </div>
-
   <div class="content">
     <section>
       <h2>queue details</h2>
@@ -20,12 +18,10 @@
           <h3>owner</h3>
           <%= render "shared/user_mention", user: @letter_queue.user %>
         </div>
-        
         <div class="mb-4">
           <h3>tags</h3>
           <%= render 'shared/tags', tags: @letter_queue.tags %>
         </div>
-        
         <div class="details-grid">
           <div>
             <h3>return address</h3>
@@ -43,7 +39,6 @@
               <p>no return address</p>
             <% end %>
           </div>
-          
           <div>
             <h3>mailer id</h3>
             <div class="info-box">
@@ -51,24 +46,20 @@
             </div>
           </div>
         </div>
-        
         <h3>letter specs</h3>
         <%= render 'shared/letter_attributes', record: @letter_queue %>
       </div>
     </section>
   </div>
 </div>
-
 <hr/>
-
 <details>
   <summary>api docs:</summary>
   <div class="api-docs">
     <h4>what do?</h4>
-    <p>send a POST request to <%= copy_to_clipboard create_letter_api_v1_letter_queue_url(@letter_queue) do %>
-      <code><%= create_letter_api_v1_letter_queue_url @letter_queue %></code>
-    <% end %> with JSON like:</p>
-    
+    <p>send a POST request to <%= copy_to_clipboard @letter_queue.is_a?(Letter::InstantQueue) ?  create_instant_letter_api_v1_letter_queues_url(@letter_queue) : api_v1_letter_queue_url(@letter_queue) do %>
+        <code><%= @letter_queue.is_a?(Letter::InstantQueue) ?  create_instant_letter_api_v1_letter_queues_path(@letter_queue) : api_v1_letter_queue_path(@letter_queue) %></code>
+      <% end %> with JSON like:</p>
     <%= render_json_example({
       recipient_email: current_user.email,
       address: {
@@ -78,7 +69,8 @@
         line_2: "PMB 86294 (optional)",
         city: "West Sillywood",
         state: "CA",
-        postal_code: '90069'
+        postal_code: '90069',
+        country: "United States"
       },
       rubber_stamps: "extra text if the template you're using supports it",
       idempotency_key: "optional but it'd be a great idea... rec#{SecureRandom.alphanumeric 12}?",
@@ -87,16 +79,12 @@
         seriously_any_keys_and_values: "as long as postgres can serialize it :3"
       }
     }) %>
-    
     <p>use an <code>Authorization</code> header of <code>Bearer (one of your <%= link_to "API keys", api_keys_path, target: "_blank"%>)</code></p>
   </div>
 </details>
-
 <hr/>
-
 <h3>letters</h3>
 <%= render partial: 'batches/letters_collection', locals: { letters: @letter_queue.letters.queued } %>
-
 <% if @letter_queue.letters.queued.any? %>
   <div class="mt-4">
     <%= button_to "make batch!", make_batch_from_letter_queue_path(@letter_queue), class: "btn success" %>

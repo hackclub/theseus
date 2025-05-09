@@ -1,18 +1,16 @@
 <p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Queues" %>
-
 <h1>Queues</h1>
-
 <div id="letter_queues">
   <% @letter_queues.each do |letter_queue| %>
     <article>
       <%= render letter_queue %>
       <p>
-        <%= link_to "Show this queue", letter_queue %>
+        <%= link_to "Show this queue", 
+            letter_queue.is_a?(Letter::InstantQueue) ? letter_instant_queue_path(letter_queue) : letter_queue_path(letter_queue) %>
       </p>
     </article>
   <% end %>
 </div>
-
 <%= link_to "New queue", new_letter_queue_path %>
+<%= link_to "New instant queue", new_letter_instant_queue_path %>
