@@ -1,5 +1,4 @@
 <% content_for :title, "Orders" %>
-
 <div class="page-header mb-8 flex justify-between items-center">
   <h1 class="text-2xl font-bold">Orders</h1>
   <div class="actions">
@@ -11,7 +10,6 @@
     <% end %>
   </div>
 </div>
-
 <ul class="tabs">
   <li class="tabs__item">
     <%= link_to "Unbatched Orders", warehouse_orders_path, class: "tabs__link #{params[:view] != 'batched' ? 'tabs__link--active' : ''}" %>
@@ -20,7 +18,6 @@
     <%= link_to "Batched Orders", warehouse_orders_path(view: 'batched'), class: "tabs__link #{params[:view] == 'batched' ? 'tabs__link--active' : ''}" %>
   </li>
 </ul>
-
 <div class="orders-container">
   <div class="bg-gray-100 rounded-lg border border-gray-200">
     <div class="border-b border-gray-200 p-4">
@@ -28,7 +25,7 @@
     </div>
     <div class="p-6">
       <% if @warehouse_orders.any? %>
-        <%= render partial: 'batches/orders_collection', locals: { orders: @warehouse_orders } %>
+        <%= render partial: 'warehouse/orders/orders_collection', locals: { orders: @warehouse_orders } %>
       <% else %>
         <div class="text-center py-8">
           <p class="text-gray-500">No <%= params[:view] == 'batched' ? 'batched' : 'unbatched' %> orders found.</p>
@@ -37,7 +34,6 @@
     </div>
   </div>
 </div>
-
 <% if params[:view] != 'batched' %>
   <div class="mt-8">
     <%= paginate @warehouse_orders %>

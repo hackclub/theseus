@@ -27,6 +27,10 @@ class ReturnAddressPolicy < ApplicationPolicy
     user_is_admin || record_belongs_to_user
   end
 
+  def set_as_home?
+    record_belongs_to_user || record.shared?
+  end
+
   private
 
   def record_belongs_to_user

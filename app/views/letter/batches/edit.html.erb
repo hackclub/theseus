@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  <%= form_with(model: [:letter, @batch], url: letter_batch_path(@batch), method: :patch) do |form| %>
+  <%= form_with(model: @batch, url: letter_batch_path(@batch), method: :patch, scope: :letter_batch) do |form| %>
     <% if @batch.errors.any? %>
       <div class="alert alert-danger">
         <h2><%= pluralize(@batch.errors.count, "error") %> prohibited this batch from being saved:</h2>

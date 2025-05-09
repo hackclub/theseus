@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_06_011956) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_06_153655) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -388,6 +388,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_06_011956) do
     t.boolean "can_warehouse"
     t.boolean "back_office", default: false
     t.boolean "can_impersonate_public"
+    t.bigint "home_mid_id", default: 1, null: false
+    t.bigint "home_return_address_id", default: 1, null: false
+    t.index ["home_mid_id"], name: "index_users_on_home_mid_id"
+    t.index ["home_return_address_id"], name: "index_users_on_home_return_address_id"
   end
 
   create_table "usps_indicia", force: :cascade do |t|
@@ -568,6 +572,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_06_011956) do
   add_foreign_key "public_impersonations", "users"
   add_foreign_key "public_login_codes", "public_users", column: "user_id"
   add_foreign_key "return_addresses", "users"
+  add_foreign_key "users", "return_addresses", column: "home_return_address_id"
+  add_foreign_key "users", "usps_mailer_ids", column: "home_mid_id"
   add_foreign_key "usps_indicia", "letters"
   add_foreign_key "usps_indicia", "usps_payment_accounts"
   add_foreign_key "usps_iv_mtr_events", "letters", on_delete: :nullify

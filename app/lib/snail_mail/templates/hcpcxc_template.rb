@@ -9,7 +9,7 @@ module SnailMail
       def render(pdf, letter)
         pdf.image(
           image_path("dino-waving.png"),
-          at: [ 333, letter.address.us? ? 163 : 140 ],
+          at: [ 333, 163 ],
           width: 87
         )
 

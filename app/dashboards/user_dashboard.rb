@@ -16,8 +16,10 @@ class UserDashboard < Administrate::BaseDashboard
     slack_id: Field::String,
     username: Field::String,
     warehouse_templates: Field::HasMany,
+    home_mid: Field::BelongsTo,
+    home_return_address: Field::BelongsTo,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime
+    updated_at: Field::DateTime,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -44,6 +46,8 @@ class UserDashboard < Administrate::BaseDashboard
     slack_id
     username
     warehouse_templates
+    home_mid
+    home_return_address
     created_at
     updated_at
   ].freeze
@@ -58,7 +62,8 @@ class UserDashboard < Administrate::BaseDashboard
     is_admin
     slack_id
     username
-    warehouse_templates
+    home_mid
+    home_return_address
   ].freeze
 
   # COLLECTION_FILTERS

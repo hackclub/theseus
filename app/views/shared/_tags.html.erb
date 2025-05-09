@@ -3,7 +3,7 @@
 <% if tags.present? %>
   <div class="tags">
     <% tags.compact_blank.each do |tag| %>
-    <%= render 'tags/tag', tag: %>
+      <%= render 'tags/tag', tag: %>
     <% end %>
   </div>
 <% end %> 

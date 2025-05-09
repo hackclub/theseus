@@ -1,16 +1,16 @@
 module SnailMail
   module Templates
-    class HCBStickersTemplate < BaseTemplate
+    class HackatimeTemplate < BaseTemplate
       def self.template_name
-        "HCB Stickers"
+        "Hackatime (new)"
       end
 
 
       def render(pdf, letter)
         pdf.image(
-          image_path("lilia-hcb-stickers-bg.png"),
-          at: [ 0, 288 ],
-          width: 432
+          image_path("hackatime/its_about_time.png"),
+          at: [ 13, 219 ],
+          width: 409
         )
 
         # Render speech bubble
@@ -21,24 +21,24 @@ module SnailMail
         # )
 
         # Render return address
-        render_return_address(pdf, letter, 10, 278, 146, 70)
+        render_return_address(pdf, letter, 10, 278, 146, 70, font: "f25")
 
         # Render destination address in speech bubble
         render_destination_address(
           pdf,
           letter,
-          192,
-          149,
-          226,
-          57,
-          { size: 16, valign: :bottom, align: :left }
+          80,
+          134,
+          290,
+          86,
+          { size: 19, valign: :top, align: :left }
         )
 
         # Render IMb barcode
         render_imb(pdf, letter, 216, 25, 207)
 
         render_letter_id(pdf, letter, 341, 19, 10)
-        render_qr_code(pdf, letter, 5, 196, 50)
+        render_qr_code(pdf, letter, 5, 55, 50)
 
         render_postage(pdf, letter)
       end

@@ -99,7 +99,7 @@ module SnailMail
 
     # Render Intelligent Mail barcode
     def render_imb(pdf, letter, x, y, width, options = {})
-      return unless letter.address.us?
+      # return unless letter.address.us?
 
       default_options = {
         font: "imb",
@@ -150,7 +150,7 @@ module SnailMail
       IMb.new(letter).generate
     end
 
-    def render_postage(pdf, letter, x = 294)
+    def render_postage(pdf, letter, x = pdf.bounds.right - 138)
       if letter.postage_type == "indicia"
         IMI.render_indicium(pdf, letter, letter.usps_indicium, x)
         FIM.render_fim_d(pdf)

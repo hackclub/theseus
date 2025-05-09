@@ -18,6 +18,8 @@ class User < ApplicationRecord
   has_many :warehouse_templates, class_name: "Warehouse::Template", inverse_of: :user
   has_many :return_addresses, dependent: :destroy
   has_many :letters
+  belongs_to :home_mid, class_name: "USPS::MailerId", optional: true
+  belongs_to :home_return_address, class_name: "ReturnAddress", optional: true
 
   include PublicIdentifiable
 
@@ -40,7 +42,7 @@ class User < ApplicationRecord
       client_id: ENV["SLACK_CLIENT_ID"],
       redirect_uri: redirect_uri,
       state: SecureRandom.hex(24),
-      user_scope: "users.profile:read,users:read,users:read.email"
+      user_scope: "users.profile:read,users:read,users:read.email",
     }
 
     URI.parse("https://slack.com/oauth/v2/authorize?#{params.to_query}")
@@ -49,19 +51,19 @@ class User < ApplicationRecord
   def self.from_slack_token(code, redirect_uri)
     # Exchange code for token
     response = HTTP.post("https://slack.com/api/oauth.v2.access", form: {
-      client_id: ENV["SLACK_CLIENT_ID"],
-      client_secret: ENV["SLACK_CLIENT_SECRET"],
-      code: code,
-      redirect_uri: redirect_uri
-    })
+                                                                    client_id: ENV["SLACK_CLIENT_ID"],
+                                                                    client_secret: ENV["SLACK_CLIENT_SECRET"],
+                                                                    code: code,
+                                                                    redirect_uri: redirect_uri,
+                                                                  })
 
     data = JSON.parse(response.body.to_s)
 
     return nil unless data["ok"]
 
     # Get user info
-    user_response = HTTP.auth("Bearer #{data['authed_user']['access_token']}")
-                        .get("https://slack.com/api/users.info?user=#{data['authed_user']['id']}")
+    user_response = HTTP.auth("Bearer #{data["authed_user"]["access_token"]}")
+                        .get("https://slack.com/api/users.info?user=#{data["authed_user"]["id"]}")
 
     user_data = JSON.parse(user_response.body.to_s)
 

@@ -1,0 +1,80 @@
+<% if local_assigns[:collection] %>
+  <tr class="tr">
+    <td class="td"><%= base.created_at.in_time_zone('America/New_York') %></td>
+    <td class="td">
+      <%= base.type_text %>: <%= base.title_text %>
+    </td>
+    <td class="td"><%= base.status_text %></td>
+    <td class="td">
+      <%= link_to "Open", show_lsv_path(LSV.slug_for(base), base.id),
+                  onclick: "openIframeWindow(this.href, '#{base.type_text}: #{base.title_text}'); return false;", 
+                  class: 'btn' %>
+    </td>
+  </tr>
+<% else %>
+<% content_for :window_title do %>
+  <%= base.type_text %>: <%= base.title_text %>
+<% end %>
+  <div class="window-body">
+    <div class="field-row" style="margin-bottom: 1rem;">
+      <b style="margin: 0;"><%= base.title_text %></b>
+    </div>
+
+    <div class="field-row" style="margin-bottom: 0.5rem;">
+      <label style="width: 80px;">Type:</label>
+      <span><%= base.type_text %></span>
+    </div>
+
+    <div class="field-row" style="margin-bottom: 0.5rem;">
+      <label style="width: 80px;">Status:</label>
+      <span><%= base.status_text %></span>
+    </div>
+
+    <% if base["Warehouse-Service"] %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;">Service:</label>
+        <span><%= base["Warehouse–Service"] %></span>
+      </div>
+    <% end %>
+
+    <% if base.tracking_number %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;">Tracking:</label>
+        <% if base.tracking_link %>
+          <%= link_to(base.tracking_number, base.tracking_link, target: "_blank", class: "link") %>
+        <% else %>
+          <span><%= base.tracking_number %></span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if base.description %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;"><%= base.description.is_a?(Array) ? "Contents:" : "Description:" %></label>
+        <% if base.description.is_a? Array %>
+          <ul class="tree-view" style="margin: 0;">
+            <% base.description.each do |item| %>
+              <li><%= item %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <span><%= base.description %></span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="field-row" style="margin-bottom: 0.5rem;">
+      <label style="width: 80px;">Created:</label>
+      <span><%= base.created_at %></span>
+    </div>
+
+    <% back_office_tool do %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;">Airtable:</label>
+        <span class="internal"><%= link_to(base.source_id, base.source_url, target: "_blank") %></span>
+      </div>
+    <% end %>
+
+    <%= render 'application/admin_inspector', record: base %>
+  </div>
+<% end %>
