@@ -1,5 +1,5 @@
 import qz from 'qz-tray'
-import 'dreamland/dev'
+import 'dreamland'
 
 let qzState = $state({
     status: "connecting", availablePrinters: []

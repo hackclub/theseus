@@ -1,5 +1,5 @@
 import {connect_qz, qz, qzState, qzSettingsStore, print} from './qz'
-import 'dreamland/dev'
+import 'dreamland'
 
 import {QZStatusBanner} from "../js/components/qz/status_banner";
 import {QZPrinterPicker} from "../js/components/qz/printer_picker";

@@ -1,4 +1,4 @@
-import 'dreamland/dev'
+import 'dreamland'
 let root = document.getElementById('instant_print_root')
 import {InstantPrintWindow} from '~/js/components/instant_print_window'
 import {connect_qz} from "./qz";
