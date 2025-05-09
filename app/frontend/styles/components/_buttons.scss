@@ -137,7 +137,7 @@ input[type='submit'],
 
     &.success {
       border-color: map-get($palette, success);
-      color: map-get($palette, success);
+      color: map-get($palette, success) !important;
       &:hover, &:focus, &[aria-expanded='true'] {
         background: rgba(map-get($palette, success), 0.1);
       }
