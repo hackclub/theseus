@@ -20,6 +20,7 @@
     "@tsparticles/confetti": "^3.8.1",
     "dreamland": "^0.0.25",
     "jquery": "^3.7.1",
+    "qz-tray": "^2.2.4",
     "select2": "^4.1.0-rc.0",
     "selectize": "^0.12.6",
     "vanilla-nested": "^1.7.1",

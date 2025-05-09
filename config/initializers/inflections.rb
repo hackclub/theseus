@@ -31,4 +31,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.irregular "is", "are"
   inflect.irregular "this", "these"
   inflect.acronym "AI"
+  inflect.acronym "QZ"
 end

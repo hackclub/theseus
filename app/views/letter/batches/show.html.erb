@@ -1,5 +1,4 @@
 <% content_for :title, "Letter Batch ##{@batch.id} - #{@batch.addresses.count} letters" %>
-
 <div class="flex items-center justify-between mb-4">
   <h1 class="text-2xl font-bold">Letter Batch #<%= @batch.id %></h1>
   <div class="flex gap-2">
@@ -7,9 +6,7 @@
     <%= link_to "Edit batch", edit_letter_batch_path(@batch), class: "btn btn-primary" %>
   </div>
 </div>
-
 <%= render partial: "batch", locals: { batch: @batch } %>
-
 <% if @batch.processed? %>
   <% if @batch.pdf_label.attached? %>
     <div class="card mb-4">
@@ -29,16 +26,14 @@
               </svg>
               Download PDF
             <% end %>
-            
             <% if @batch.letters.any? && @batch.letters.all?(&:pending?) %>
-              <%= button_to mark_printed_letter_batch_path(@batch), method: :post, class: "btn btn-sm btn-success", data: { confirm: "Are you sure you want to mark all letters as printed?" } do %>
+              <%= button_to mark_printed_letter_batch_path(@batch), method: :post, class: "btn btn-sm success", id: 'mark_printed' do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Mark All Printed
+                mark all printed!
               <% end %>
             <% end %>
-            
             <% if @batch.letters.any? && @batch.letters.all?(&:printed?) %>
               <%= button_to mark_mailed_letter_batch_path(@batch), method: :post, class: "btn btn-sm btn-info", data: { confirm: "Are you sure you want to mark all letters as mailed?" } do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,10 +44,16 @@
             <% end %>
           </div>
         </div>
+        <%# Add PDF preview and instant print %>
+        <%= render 'shared/instant_print_window', url: rails_blob_path(@batch.pdf_label, disposition: 'inline') %>
+        <div class="mt-4">
+          <div class="border rounded overflow-hidden" style="height: 600px;">
+            <iframe src="<%= rails_blob_path(@batch.pdf_label, disposition: 'inline') %>" class="w-full h-full border-0"></iframe>
+          </div>
+        </div>
       </div>
     </div>
   <% end %>
-
   <% if @batch.letters.any? %>
     <div class="card">
       <div class="card-header">
@@ -87,19 +88,16 @@
     </div>
   <% end %>
 <% end %>
-
 <%= render partial: 'admin_inspector', locals: { record: @batch } %>
-
-          <div class="text-sm mb-3">
-            <span class="text-gray-500">Weight:</span>
-            <%= @batch.letter_weight %> oz
-          </div>
-          <div class="text-sm mb-3">
-            <span class="text-gray-500">Mailing Date:</span>
-            <%= @batch.letter_mailing_date %>
-          </div>
-        </div>
-      </div>
-
-      <h3 class="text-sm font-medium mb-2">Specifications</h3>
-      <%= render 'shared/letter_attributes', record: @batch %> 
+<div class="text-sm mb-3">
+  <span class="text-gray-500">Weight:</span>
+  <%= @batch.letter_weight %> oz
+</div>
+<div class="text-sm mb-3">
+  <span class="text-gray-500">Mailing Date:</span>
+  <%= @batch.letter_mailing_date %>
+</div>
+</div>
+</div>
+<h3 class="text-sm font-medium mb-2">Specifications</h3>
+<%= render 'shared/letter_attributes', record: @batch %> 

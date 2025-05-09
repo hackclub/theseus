@@ -1,9 +1,8 @@
 <% content_for :title, "#{@letter.user_facing_title || 'Letter'} #{@letter.public_id} - #{@letter.address.name_line}" %>
-
 <div class="container">
   <div class="page-header">
     <h1 class="page-title">
-     <%= @letter.public_id %> – <% if @letter.user_facing_title.present? %>
+      <%= @letter.public_id %> – <% if @letter.user_facing_title.present? %>
         <%= @letter.user_facing_title %>
       <% else %>
         Letter to <%= @letter.address.name_line %>
@@ -20,7 +19,6 @@
       <%= button_to "Delete", letter_path(@letter), method: :delete, data: { confirm: "Are you sure?" }, class: "btn danger btn-small" %>
     </div>
   </div>
-
   <div class="grid">
     <div class="grid md:grid-cols-12 gap-4">
       <div class="md:col-span-8">
@@ -29,10 +27,8 @@
             <h2>Details</h2>
             <%= link_to "Show on public page", public_letter_path(@letter), target: "_blank" %>
           </header>
-          
           <div class="p-3">
             <%= render 'shared/tags', tags: @letter.tags %>
-            
             <div class="grid md:grid-cols-2 gap-4 mb-4">
               <div>
                 <h3>From</h3>
@@ -50,7 +46,6 @@
                   <p>No return address</p>
                 <% end %>
               </div>
-              
               <div>
                 <h3>To</h3>
                 <address class="p-2 border rounded">
@@ -64,10 +59,8 @@
                 </address>
               </div>
             </div>
-            
             <h3>Specifications</h3>
             <%= render 'shared/letter_attributes', record: @letter %>
-            
             <h3>Postage Information</h3>
             <article>
               <div class="p-3">
@@ -127,11 +120,9 @@
                 <% end %>
               </div>
             </article>
-            
             <% if @letter.batch.present? %>
               <%= render 'shared/batch_info', record: @letter %>
             <% end %>
-            
             <% if @letter.imb_serial_number.present? && @letter.address.country&.upcase == 'US' %>
               <h3>IMb Information</h3>
               <div class="grid md:grid-cols-2 gap-3">
@@ -145,7 +136,6 @@
                 </div>
               </div>
             <% end %>
-            
             <% if @letter.rubber_stamps.present? %>
               <article>
                 <header>Rubber Stamps</header>
@@ -154,16 +144,13 @@
             <% end %>
           </div>
         </article>
-        
         <%= render partial: "admin_inspector", locals: {record: @letter} %>
       </div>
-      
       <div class="md:col-span-4">
         <article class="sticky top-4">
           <header>
             <h2>Actions</h2>
           </header>
-          
           <div class="p-3">
             <% case @letter.aasm_state %>
             <% when 'pending' %>
@@ -174,8 +161,12 @@
                     <%= link_to "View Label", rails_blob_path(@letter.label, disposition: 'inline'), class: "primary", target: "_blank" %>
                   </div>
                   <div class="flex gap-2 mb-3">
-                    <%= button_to "Mark as Printed", mark_printed_letter_path(@letter), method: :post, class: "success" %>
-                    <%= button_to "Clear Label", clear_label_letter_path(@letter), method: :post, class: "contrast", data: { confirm: "Are you sure you want to clear this label?" } %>
+                    <%= button_to mark_printed_letter_path(@batch), method: :post, class: "btn btn-sm success", id: 'mark_printed' do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      </svg>
+                      mark all printed!
+                    <% end %>                    <%= button_to "Clear Label", clear_label_letter_path(@letter), method: :post, class: "contrast", data: { confirm: "Are you sure you want to clear this label?" } %>
                   </div>
                 </div>
               <% else %>
@@ -203,14 +194,12 @@
                         <% end %>
                       </select>
                     </div>
-                    
                     <div class="mb-3">
                       <label>
                         <input type="checkbox" name="qr" value="1" checked>
                         Include QR Code
                       </label>
                     </div>
-                    
                     <button type="submit" class="btn btn-small success">
                       Generate Label
                     </button>
@@ -238,8 +227,8 @@
             <% end %>
           </div>
         </article>
-        
         <% if @letter.label.attached? %>
+          <%= render 'shared/instant_print_window', url: rails_blob_path(@letter.label, disposition: 'inline') %>
           <article class="mt-4">
             <header>
               <h2>Label Preview</h2>
