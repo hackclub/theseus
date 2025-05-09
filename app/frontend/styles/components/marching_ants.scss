@@ -1,0 +1,16 @@
+.breathe-green {
+  border: 2px dashed rgb(34, 139, 34);
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0% {
+    border-color: rgba(34, 139, 34, 0.4);
+  }
+  50% {
+    border-color: rgba(34, 139, 34, 1);
+  }
+  100% {
+    border-color: rgba(34, 139, 34, 0.4);
+  }
+}

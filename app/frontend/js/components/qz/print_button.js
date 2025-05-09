@@ -16,8 +16,17 @@ export function PrintButton() {
     };
 
     return html`
-        <button class="btn success" on:click=${() => {this.printing = true;print(qz_state.pdf_url, 'file', handlePrintSuccess)}}
-                disabled=${use(this.disabled)}>🖨️ ${use(this.printing, (p) => (p ? "printing..." : "print!")) }
-        </button>
+
+<div>
+    <button class="btn success" style="margin: 5px" on:click=${() => {
+        this.printing = true;
+        print(qz_state.pdf_url, 'file', handlePrintSuccess)
+    }}
+            disabled=${use(this.disabled)}>🖨️ ${use(this.printing, (p) => (p ? "printing..." : "print!"))}
+    </button>
+</div>
+
     `
 }
+
+
