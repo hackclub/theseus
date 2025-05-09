@@ -107,7 +107,8 @@ class Letter::BatchesController < BaseBatchesController
           include_qr_code: letter_batch_params[:include_qr_code],
         )
         @batch.mark_processed! if @batch.may_mark_processed?
-        redirect_to letter_batch_path(@batch), notice: "Batch processed successfully"
+
+        redirect_to letter_batch_path(@batch, print_now: 1), notice: "Batch processed successfully"
       rescue => e
         redirect_to process_letter_batch_path(@batch), alert: "Failed to process batch: #{e.message}"
       end
@@ -197,6 +198,7 @@ class Letter::BatchesController < BaseBatchesController
       :intl_postage_type,
       :usps_payment_account_id,
       :include_qr_code,
+      :print_immediately,
       template_cycle: [],
       tags: [],
     )

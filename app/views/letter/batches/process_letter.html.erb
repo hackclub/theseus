@@ -107,6 +107,11 @@
           <%= f.label :include_qr_code, "Include QR Code", class: "form-label" %>
           <%= f.check_box :include_qr_code, class: "form-checkbox", checked: true %>
         </div>
+
+        <div class="form-group">
+          <%= f.label :immediate_print, "⚡ print immediately when done?", class: "form-label" %>
+          <%= f.check_box :immediate_print, class: "form-checkbox", checked: false %>
+        </div>
       </div>
 
       <div class="actions">

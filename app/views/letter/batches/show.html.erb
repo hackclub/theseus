@@ -54,24 +54,24 @@
                 <div class="overflow-x-auto">
                   <table class="table">
                     <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
+                    <tr>
+                      <th>ID</th>
+                      <th>Address</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
-                      <% @batch.letters.each do |letter| %>
-                        <tr>
-                          <td><%= letter.public_id %></td>
-                          <td><%= letter.address.snailify %></td>
-                          <td><%= letter.aasm.current_state %></td>
-                          <td>
-                            <%= link_to "View", letter_path(letter), class: "btn btn-sm btn-secondary" %>
-                          </td>
-                        </tr>
-                      <% end %>
+                    <% @batch.letters.each do |letter| %>
+                      <tr>
+                        <td><%= letter.public_id %></td>
+                        <td><%= letter.address.snailify %></td>
+                        <td><%= letter.aasm.current_state %></td>
+                        <td>
+                          <%= link_to "View", letter_path(letter), class: "btn btn-sm btn-secondary" %>
+                        </td>
+                      </tr>
+                    <% end %>
                     </tbody>
                   </table>
                 </div>
@@ -84,7 +84,7 @@
             <h2>Admin Information</h2>
           </header>
           <div class="p-3">
-            <%= render partial: "admin_inspector", locals: {record: @batch} %>
+            <%= render partial: "admin_inspector", locals: { record: @batch } %>
           </div>
         </article>
       </div>
@@ -101,43 +101,45 @@
                   <div class="border rounded overflow-hidden">
                     <iframe src="<%= rails_blob_path(@batch.pdf_label, disposition: 'inline') %>" class="w-full h-full border-0"></iframe>
                   </div>
-                  <p class="text-xs text-gray-500">Generated on <%= @batch.pdf_label.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                  <p class="text-xs text-gray-500">Generated
+                    on <%= @batch.pdf_label.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
                 </div>
                 <div class="flex gap-2">
                   <%= link_to rails_blob_path(@batch.pdf_label, disposition: "attachment"), class: "btn btn-sm btn-primary" do %>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                     </svg>
                     Download PDF
                   <% end %>
                 </div>
               </div>
-            </article>
-            <%= render 'shared/instant_print_window', url: rails_blob_path(@batch.pdf_label, disposition: 'inline') unless @batch.letters.all?(&:mailed?) %>
-            <% if @batch.processed? %>
-              <div class="mt-4">
-                <% if @batch.letters.any? && @batch.letters.all?(&:pending?) %>
-                  <%= button_to mark_printed_letter_batch_path(@batch), method: :post, class: "btn btn-block success mb-2", id: 'mark_printed' do %>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Mark All Printed
-                  <% end %>
+            </div>
+          </article>
+          <%= render 'shared/instant_print_window', url: rails_blob_path(@batch.pdf_label, disposition: 'inline') unless @batch.letters.all?(&:mailed?) %>
+          <% if @batch.processed? %>
+            <div class="mt-4">
+              <% if @batch.letters.any? && @batch.letters.all?(&:pending?) %>
+                <%= button_to mark_printed_letter_batch_path(@batch), method: :post, class: "btn btn-block success mb-2", id: 'mark_printed' do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                  </svg>
+                  Mark All Printed
                 <% end %>
-                <% if @batch.letters.any? && @batch.letters.all?(&:printed?) %>
-                  <%= button_to mark_mailed_letter_batch_path(@batch), method: :post, class: "btn btn-block btn-info", data: { confirm: "Are you sure you want to mark all letters as mailed?" } do %>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Mark All Mailed
-                  <% end %>
+              <% end %>
+              <% if @batch.letters.any? && @batch.letters.all?(&:printed?) %>
+                <%= button_to mark_mailed_letter_batch_path(@batch), method: :post, class: "btn btn-block btn-info", data: { confirm: "Are you sure you want to mark all letters as mailed?" } do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                  Mark All Mailed
                 <% end %>
-              </div>
-            <% end %>
+              <% end %>
+            </div>
+          <% end %>
           </div>
-        </article>
-      <% end %>
-    </div>
+          </article>
+        <% end %>
+        </div>
   </div>
 </div>
 </div>

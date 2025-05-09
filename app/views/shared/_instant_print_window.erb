@@ -4,6 +4,7 @@
 <% end %>
 <article class="mt-4">
   <h4>⚡ Instant Print</h4>
+  <%= content_tag("div", id: "instant_print_root", data: { url:,  print_now: params[:print_now] }.compact_blank) { } %>
   <div id="instant_print_root" data-url="<%= url %>">
   </div>
 </article>

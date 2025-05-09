@@ -3,4 +3,8 @@ let root = document.getElementById('instant_print_root')
 import {InstantPrintWindow} from '~/js/components/instant_print_window'
 import {connect_qz} from "./qz";
 root.appendChild(h(InstantPrintWindow, {pdf_url: root.dataset.url}))
-connect_qz();
+await connect_qz();
+console.log("wew")
+if(root.dataset.printNow) {
+    setTimeout(()=>{document.querySelector('[data-component="PrintButton"]').click()})
+}
