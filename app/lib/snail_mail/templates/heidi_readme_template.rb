@@ -11,10 +11,10 @@ module SnailMail
         render_destination_address(
           pdf,
           letter,
-          137,
-          160+10,
-          280,
-          100,
+          133,
+          176,
+          256,
+          107,
           { size: 18, valign: :center, align: :left }
         )
 
