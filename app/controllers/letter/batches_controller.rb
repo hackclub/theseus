@@ -120,9 +120,11 @@ class Letter::BatchesController < BaseBatchesController
       @batch.letters.each do |letter|
         letter.mark_printed! if letter.may_mark_printed?
       end
-      redirect_to letter_batch_path(@batch), notice: "All letters have been marked as printed."
+      flash[:success] = "all letters have been marked as printed!"
+      redirect_to letter_batch_path(@batch)
     else
-      redirect_to letter_batch_path(@batch), alert: "Cannot mark letters as printed. Batch must be processed."
+      flash[:alert] = "Cannot mark letters as printed. Batch must be processed."
+      redirect_to letter_batch_path(@batch)
     end
   end
 
