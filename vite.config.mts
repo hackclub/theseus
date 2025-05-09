@@ -17,5 +17,8 @@ export default defineConfig({
     alias: {
       '@': './app/frontend'
     }
+  },
+  build: {
+    target: 'esnext' //browsers can handle the latest ES features
   }
 })
