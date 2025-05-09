@@ -27,7 +27,7 @@ class Letter::BatchesController < BaseBatchesController
     @batch = Letter::Batch.new(batch_params.merge(user: current_user))
 
     if @batch.save
-      redirect_to letter_batch_path(@batch), notice: "Batch was successfully created."
+      redirect_to map_fields_letter_batch_path(@batch), notice: "Batch was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
