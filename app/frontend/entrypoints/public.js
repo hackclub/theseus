@@ -8,5 +8,3 @@ import '~/js/turbo-confirm.js'
 import '@hotwired/turbo-rails'
 
 Turbo.config.forms.mode = "optin";
-
-// import "dreamland/dist/all.js"

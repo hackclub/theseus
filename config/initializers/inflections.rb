@@ -33,4 +33,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "AI"
   inflect.acronym "LSV"
   inflect.acronym "MSR"
+  inflect.acronym "QZ"
 end

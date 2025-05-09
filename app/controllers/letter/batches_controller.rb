@@ -27,7 +27,7 @@ class Letter::BatchesController < BaseBatchesController
     @batch = Letter::Batch.new(batch_params.merge(user: current_user))
 
     if @batch.save
-      redirect_to letter_batch_path(@batch), notice: "Batch was successfully created."
+      redirect_to map_fields_letter_batch_path(@batch), notice: "Batch was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -107,7 +107,8 @@ class Letter::BatchesController < BaseBatchesController
           include_qr_code: letter_batch_params[:include_qr_code],
         )
         @batch.mark_processed! if @batch.may_mark_processed?
-        redirect_to letter_batch_path(@batch), notice: "Batch processed successfully"
+
+        redirect_to letter_batch_path(@batch, print_now: 1), notice: "Batch processed successfully"
       rescue => e
         redirect_to process_letter_batch_path(@batch), alert: "Failed to process batch: #{e.message}"
       end
@@ -120,9 +121,11 @@ class Letter::BatchesController < BaseBatchesController
       @batch.letters.each do |letter|
         letter.mark_printed! if letter.may_mark_printed?
       end
-      redirect_to letter_batch_path(@batch), notice: "All letters have been marked as printed."
+      flash[:success] = "all letters have been marked as printed!"
+      redirect_to letter_batch_path(@batch)
     else
-      redirect_to letter_batch_path(@batch), alert: "Cannot mark letters as printed. Batch must be processed."
+      flash[:alert] = "Cannot mark letters as printed. Batch must be processed."
+      redirect_to letter_batch_path(@batch)
     end
   end
 
@@ -195,6 +198,7 @@ class Letter::BatchesController < BaseBatchesController
       :intl_postage_type,
       :usps_payment_account_id,
       :include_qr_code,
+      :print_immediately,
       template_cycle: [],
       tags: [],
     )

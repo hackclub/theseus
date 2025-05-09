@@ -528,6 +528,12 @@ Rails.application.routes.draw do
 
   get "/:public_id", to: "public/public_identifiable#show", constraints: { public_id: /(pkg|ltr)![^\/]+/ }
 
+  resource :qz_tray, only: [] do
+    get :cert
+    get :settings
+    post :sign
+    get :test_print
+  end
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
