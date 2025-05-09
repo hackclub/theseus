@@ -12,6 +12,19 @@
       should this key be able to read address data? <small><small>(probably not!)</small></small>
     </label>
   </fieldset>
-  <%= f.submit "create API key!" %>
-
+  <% admin_tool do %>
+    <fieldset>
+      <%= f.label :may_impersonate, "Can impersonate?" %>
+      <%= f.check_box :may_impersonate %>
+      <label for="api_key_may_impersonate">
+        can this key impersonate other back office users?
+        <small>
+          <small>
+            (don't enable this unless you actually need it)
+          </small>
+        </small>
+      </label>
+    </fieldset>
+  <% end %>
+  <%= f.submit "create API key!", class: "btn success btn-small" %>
 <% end %>

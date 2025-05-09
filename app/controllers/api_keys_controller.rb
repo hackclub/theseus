@@ -12,8 +12,13 @@ class APIKeysController < ApplicationController
   end
 
   def create
-    @api_key = APIKey.new(params.require(:api_key).permit(:name, :pii).merge(user: current_user))
+    permitted_params = [:name, :pii]
+    permitted_params << :may_impersonate if current_user.admin?
+
+    @api_key = APIKey.new(params.require(:api_key).permit(*permitted_params).merge(user: current_user))
+
     authorize @api_key
+
     if @api_key.save
       redirect_to api_key_path(@api_key)
     else
@@ -38,6 +43,7 @@ class APIKeysController < ApplicationController
   end
 
   private
+
   def set_api_key
     @api_key = policy_scope(APIKey).find(params[:id])
   end
