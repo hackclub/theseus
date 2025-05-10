@@ -12,6 +12,8 @@ class Letter::Queue < ApplicationRecord
   validates :letter_mailer_id, presence: true
   validates :letter_return_address, presence: true, on: :process
   validates :letter_processing_category, presence: true
+  validates :tags, presence: true, length: { minimum: 1 }
+  validate :type_cannot_be_changed, on: :update
 
   def create_letter!(address, params)
     letter = letters.build(
@@ -45,7 +47,7 @@ class Letter::Queue < ApplicationRecord
         user_facing_title: user_facing_title,
         tags: tags,
         letter_queue_id: id,
-        user: user
+        user: user,
       )
       batch.save!
       letters.queued.each do |letter|
@@ -65,5 +67,11 @@ class Letter::Queue < ApplicationRecord
 
   def set_slug
     self.slug = self.name.parameterize
+  end
+
+  def type_cannot_be_changed
+    if type_changed? && persisted?
+      errors.add(:type, "cannot be changed after creation")
+    end
   end
 end

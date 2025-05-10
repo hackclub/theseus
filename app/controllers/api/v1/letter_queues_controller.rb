@@ -19,6 +19,17 @@ module API
         authorize @letter_queue
       end
 
+      def queued
+        # authorize @letter_queue, policy_class: Letter::QueuePolicy
+        raise Pundit::NotAuthorizedError unless current_token&.pii?
+
+        return render json: { error: "no" } unless @letter_queue.is_a?(Letter::InstantQueue)
+        @expand = [:label]
+
+        @letters = @letter_queue.letters.pending
+        render "api/v1/letters/letter_collection"
+      end
+
       def create_letter
         authorize @letter_queue
 
@@ -80,6 +91,7 @@ module API
           :rubber_stamps,
           :recipient_email,
           :idempotency_key,
+          :return_address_name,
           metadata: {},
           address: [
             :first_name,

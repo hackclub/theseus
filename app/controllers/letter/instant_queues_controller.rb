@@ -5,6 +5,10 @@ class Letter::InstantQueuesController < Letter::QueuesController
     @letter_queue = Letter::InstantQueue.new
   end
 
+  def show
+    @letters = @letter_queue.letters
+  end
+
   private
 
   def set_letter_queue

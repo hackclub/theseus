@@ -5,6 +5,9 @@ class Letter::InstantQueue < Letter::Queue
   validates :usps_payment_account_id, presence: true, if: :indicia?
   validates :letter_mailing_date, presence: true, if: :indicia?
 
+  # Associations
+  belongs_to :usps_payment_account, class_name: "USPS::PaymentAccount", optional: true
+
   # Scopes
   default_scope { where(type: "Letter::InstantQueue") }
 
