@@ -41,7 +41,15 @@ module API
         unless @current_token&.active?
           return render json: { error: "invalid_auth" }, status: :unauthorized
         end
-        @current_user = current_token&.user
+        @current_user = if current_token&.may_impersonate? && params[:impersonate].present?
+            begin
+              User.find_by!(slack_id: params[:impersonate])
+            rescue ActiveRecord::RecordNotFound
+              render json: { error: "impersonate_error", message: "couldn't find that user" }, status: :bad_request
+            end
+          else
+            current_token&.user
+          end
       end
 
       attr_reader :current_token

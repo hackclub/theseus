@@ -22,7 +22,7 @@ class Letter::QueuesController < ApplicationController
 
   # POST /letter/queues or /letter/queues.json
   def create
-    @letter_queue = Letter::Queue.new(letter_queue_params.merge(user: current_user))
+    @letter_queue = letter_queue_class.new(letter_queue_params.merge(user: current_user))
 
     respond_to do |format|
       if @letter_queue.save
@@ -76,10 +76,21 @@ class Letter::QueuesController < ApplicationController
     @letter_queue = Letter::Queue.find_by!(slug: params[:id])
   end
 
+  def letter_queue_class
+    type = params[:letter_queue]&.dig(:type) || params[:letter_instant_queue]&.dig(:type)
+    case type
+    when "Letter::InstantQueue"
+      Letter::InstantQueue
+    else
+      Letter::Queue
+    end
+  end
+
   # Only allow a list of trusted parameters through.
   def letter_queue_params
     params.require(:letter_queue).permit(
       :name,
+      :type,
       :letter_height,
       :letter_width,
       :letter_weight,
@@ -88,6 +99,11 @@ class Letter::QueuesController < ApplicationController
       :letter_return_address_id,
       :letter_return_address_name,
       :user_facing_title,
+      :template,
+      :postage_type,
+      :usps_payment_account_id,
+      :include_qr_code,
+      :letter_mailing_date,
       tags: [],
     )
   end
