@@ -3,15 +3,32 @@
     <strong>Name:</strong>
     <%= queue.name %>
   </p>
-
+  <p>
+    <strong>Type:</strong>
+    <%= queue.type&.constantize&.model_name&.human || "Regular Queue" %>
+  </p>
   <p>
     <strong>Slug:</strong>
     <%= queue.slug %>
   </p>
-
   <p>
     <strong>Owner:</strong>
     <%= render "shared/user_mention", user: queue.user %>
   </p>
-
+  <% if queue.is_a?(Letter::InstantQueue) %>
+    <p>
+      <strong>Template:</strong>
+      <%= queue.template %>
+    </p>
+    <p>
+      <strong>Postage Type:</strong>
+      <%= queue.postage_type.titleize %>
+    </p>
+    <% if queue.indicia? %>
+      <p>
+        <strong>Payment Account:</strong>
+        <%= queue.usps_payment_account&.display_name %>
+      </p>
+    <% end %>
+  <% end %>
 </div>

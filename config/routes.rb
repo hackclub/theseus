@@ -412,11 +412,8 @@ Rails.application.routes.draw do
           post :update_costs
         end
       end
-      resources :queues do
-        member do
-          post :batch, as: :make_batch_from
-        end
-      end
+      resources :queues
+      resources :instant_queues, controller: "instant_queues"
     end
     resources :api_keys do
       member do
@@ -550,11 +547,25 @@ Rails.application.routes.draw do
     defaults format: :json do
       namespace :v1 do
         resource :user
-        resources :letters
-        resources :letter_queues do
+        resources :letters do
           member do
-            post "", to: "letter_queues#create_letter", as: :create_letter
+            post :mark_printed
           end
+        end
+        resources :letter_queues, only: [:index, :show, :create, :update, :destroy] do
+          collection do
+            post "instant/:id", to: "letter_queues#create_instant_letter", as: :create_instant_letter
+            get "instant/:id/queued", to: "letter_queues#queued", as: :show_queued
+          end
+        end
+        resources :letters, only: [] do
+          collection do
+            post :create_instantly
+          end
+        end
+        resource :qz_tray, only: [] do
+          get :cert
+          post :sign
         end
       end
     end

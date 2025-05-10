@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_06_153655) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_09_182907) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -80,6 +80,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_06_153655) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "may_impersonate"
     t.index ["token_bidx"], name: "index_api_keys_on_token_bidx", unique: true
     t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
@@ -282,8 +283,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_06_153655) do
     t.string "letter_return_address_name"
     t.string "user_facing_title"
     t.citext "tags", default: [], array: true
+    t.string "type"
+    t.string "template"
+    t.string "postage_type"
+    t.bigint "usps_payment_account_id"
+    t.boolean "include_qr_code", default: true
+    t.date "letter_mailing_date"
     t.index ["letter_mailer_id_id"], name: "index_letter_queues_on_letter_mailer_id_id"
     t.index ["letter_return_address_id"], name: "index_letter_queues_on_letter_return_address_id"
+    t.index ["type"], name: "index_letter_queues_on_type"
     t.index ["user_id"], name: "index_letter_queues_on_user_id"
   end
 
@@ -563,6 +571,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_06_153655) do
   add_foreign_key "letter_queues", "return_addresses", column: "letter_return_address_id"
   add_foreign_key "letter_queues", "users"
   add_foreign_key "letter_queues", "usps_mailer_ids", column: "letter_mailer_id_id"
+  add_foreign_key "letter_queues", "usps_payment_accounts"
   add_foreign_key "letters", "addresses"
   add_foreign_key "letters", "batches"
   add_foreign_key "letters", "letter_queues"

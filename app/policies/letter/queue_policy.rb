@@ -9,6 +9,8 @@ class Letter::QueuePolicy < ApplicationPolicy
     record_belongs_to_user || user_is_admin
   end
 
+  alias_method :create_instant_letter?, :create_letter?
+
   def batch?
     record_belongs_to_user || user_is_admin
   end

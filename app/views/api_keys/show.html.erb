@@ -1,13 +1,11 @@
 <h1>API key <%= @api_key.pretty_name %>:</h1>
 <div class="actions">
-
 </div>
 <div>
   <b>key (click to copy):</b>
   <%= copy_to_clipboard(@api_key.token, tooltip_direction: 'e') do %>
     <code><%= @api_key.abbreviated %></code>
   <% end %>
-
 </div>
 <% unless @api_key.revoked? %>
   <%= link_to "revoke", revoke_confirm_api_key_path(@api_key), class: "btn danger btn-small" %>
@@ -34,12 +32,16 @@
 <div>
   <b>sees PII?</b> <%= render_checkbox @api_key.pii %>
 </div>
+<% if @api_key.may_impersonate? %>
+  <div>
+    <b>can impersonate?</b> <%= render_checkbox true %>
+  </div>
+<% end %>
 <hr/>
 <div>
   <b>created: </b> <%= @api_key.created_at.in_time_zone("America/New_York") %>
   <% if @api_key.revoked? %>
     <br/>
     <b>revoked: </b> <%= @api_key.revoked_at.in_time_zone("America/New_York") %>
-
   <% end %>
 </div>

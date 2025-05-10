@@ -13,7 +13,8 @@ module SnailMail
       DinoWavingTemplate,
       HcpcxcTemplate,
       HackatimeTemplate,
-      HeidiReadmeTemplate
+      HeidiReadmeTemplate,
+      GoodJobTemplate
     ].freeze
 
     # Default template to use when none is specified

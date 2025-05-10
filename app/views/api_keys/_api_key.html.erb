@@ -13,4 +13,7 @@
   </h3>
   <%= render 'shared/user_mention', user: api_key.user %>
   <b>PII:</b> <%= render_checkbox api_key.pii %>
+  <% if api_key.may_impersonate? %> <br/>
+    <b>impersonate:</b> <%= render_checkbox true %>
+  <% end %>
 </article>

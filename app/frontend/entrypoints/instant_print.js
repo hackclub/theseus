@@ -5,5 +5,5 @@ import {connect_qz} from "./qz";
 root.appendChild(h(InstantPrintWindow, {pdf_url: root.dataset.url}))
 await connect_qz();
 if(root.dataset.printNow) {
-    setTimeout(()=>{document.querySelector('[data-component="PrintButton"]').click()})
+    setTimeout(()=>{document.querySelector('[data-component="PrintButton"]>button').click()})
 }

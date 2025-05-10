@@ -7,7 +7,14 @@ module API
         authorize @letter
       end
 
+      def mark_printed
+        authorize @letter
+        @letter.mark_printed!
+        render @letter
+      end
+
       private
+
       def set_letter
         @letter = Letter.find_by_public_id!(params[:id])
       end

@@ -3,8 +3,34 @@ module API
     class LetterQueuesController < ApplicationController
       before_action :set_letter_queue
 
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        render json: { error: "Queue not found" }, status: :not_found
+      end
+
+      rescue_from ActiveRecord::RecordInvalid do |e|
+        Sentry.capture_exception(e)
+        render json: {
+          error: "Validation failed",
+          details: e.record.errors.full_messages,
+        }, status: :unprocessable_entity
+      end
+
       def show
         authorize @letter_queue
+      end
+
+      # this should REALLY be websockets or some shit
+      # but it's not, so we're just going to poll
+      # i'm not braining well enough to do it right anytime soon
+      def queued
+        # authorize @letter_queue, policy_class: Letter::QueuePolicy
+        raise Pundit::NotAuthorizedError unless current_token&.pii?
+
+        return render json: { error: "no" } unless @letter_queue.is_a?(Letter::InstantQueue)
+        @expand = [:label]
+
+        @letters = @letter_queue.letters.pending
+        render "api/v1/letters/letter_collection"
       end
 
       def create_letter
@@ -31,6 +57,32 @@ module API
         # render json: { error: e.record.errors.full_messages }, status: :unprocessable_entity
       end
 
+      def create_instant_letter
+        authorize @letter_queue, policy_class: Letter::QueuePolicy
+
+        # Normalize country name using FrickinCountryNames
+        country = FrickinCountryNames.find_country(letter_params[:address][:country])
+        if country.nil?
+          render json: { error: "couldn't figure out country name #{letter_params[:address][:country]}" }, status: :unprocessable_entity
+          return
+        end
+
+        # Create address with normalized country
+        address_params = letter_params[:address].merge(country: country.alpha2)
+        addy = Address.new(address_params)
+
+        @letter = @letter_queue.process_letter_instantly!(
+          addy,
+          letter_params.except(:address).merge(user: current_user),
+        )
+        @expand << :label
+        return render @letter, status: :created
+      rescue ActiveRecord::RecordNotFound
+        return render json: { error: "Queue not found" }, status: :not_found
+      rescue ActiveRecord::RecordInvalid => e
+        return render json: { error: e.record.errors.full_messages.join(", ") }, status: :unprocessable_entity
+      end
+
       private
 
       def set_letter_queue
@@ -42,6 +94,7 @@ module API
           :rubber_stamps,
           :recipient_email,
           :idempotency_key,
+          :return_address_name,
           metadata: {},
           address: [
             :first_name,
@@ -54,6 +107,11 @@ module API
             :country,
           ],
         )
+      end
+
+      def normalize_country(country)
+        return "US" if country.blank? || country.downcase == "usa" || country.downcase == "united states"
+        country
       end
     end
   end

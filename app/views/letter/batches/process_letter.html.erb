@@ -5,7 +5,6 @@
       <h1>Process Letter Batch</h1>
       <p>Review the batch details and configure processing options.</p>
     </header>
-
     <div class="card mb-4">
       <div class="card-body">
         <div class="grid md:grid-cols-2 gap-4">
@@ -52,7 +51,6 @@
         </div>
       </div>
     </div>
-
     <%= form_with(model: @batch, url: process_letter_batch_path(@batch), method: :post) do |f| %>
       <div>
         <div class="form-group">
@@ -63,7 +61,6 @@
             class: "form-control",
             required: true %>
         </div>
-
         <div class="form-group">
           <%= f.label :us_postage_type, "US Postage Type", class: "form-label" %>
           <%= f.select :us_postage_type, 
@@ -71,7 +68,6 @@
                       { selected: "indicia" }, 
                       { class: "form-select" } %>
         </div>
-
         <div class="form-group">
           <%= f.label :intl_postage_type, "International Postage Type", class: "form-label" %>
           <%= f.select :intl_postage_type, 
@@ -79,7 +75,6 @@
                       { selected: "indicia" }, 
                       { class: "form-select" } %>
         </div>
-
         <div class="form-group payment-account-field" style="display: none;">
           <%= f.label :usps_payment_account_id, "USPS Payment Account", class: "form-label" %>
           <%= f.collection_select :usps_payment_account_id,
@@ -89,31 +84,26 @@
                                 { selected: USPS::PaymentAccount.first&.id },
                                 { class: "form-select" } %>
         </div>
-
         <div class="form-group">
           <%= f.label :template_cycle, "Template Cycle", class: "form-label" %>
           <%= f.select :template_cycle,
                       SnailMail::Service.available_templates,
-                      { selected: "standard" },
+                      { selected: "Heidi Can't Readme" },
                       { multiple: true, class: "form-select" } %>
         </div>
-
         <div class="form-group">
           <%= f.label :user_facing_title, "User Facing Title", class: "form-label" %>
           <%= f.text_field :user_facing_title, class: "form-control" %>
         </div>
-
         <div class="form-group">
           <%= f.label :include_qr_code, "Include QR Code", class: "form-label" %>
           <%= f.check_box :include_qr_code, class: "form-checkbox", checked: true %>
         </div>
-
         <div class="form-group">
           <%= f.label :immediate_print, "⚡ print immediately when done?", class: "form-label" %>
           <%= f.check_box :immediate_print, class: "form-checkbox", checked: false %>
         </div>
       </div>
-
       <div class="actions">
         <%= f.submit "Process Batch", class: "contrast" %>
         <%= link_to "Cancel", letter_batch_path(@batch), class: "secondary" %>
@@ -121,128 +111,126 @@
     <% end %>
   </article>
 </div>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const usPostageSelect = document.querySelector('#batch_us_postage_type');
-  const intlPostageSelect = document.querySelector('#batch_intl_postage_type');
-  const paymentAccountField = document.querySelector('.payment-account-field');
+  document.addEventListener('DOMContentLoaded', function() {
+    const usPostageSelect = document.querySelector('#batch_us_postage_type');
+    const intlPostageSelect = document.querySelector('#batch_intl_postage_type');
+    const paymentAccountField = document.querySelector('.payment-account-field');
 
-  function updatePaymentAccountVisibility() {
-    const showPaymentAccount = usPostageSelect.value === 'indicia' || intlPostageSelect.value === 'indicia';
-    paymentAccountField.style.display = showPaymentAccount ? 'block' : 'none';
-  }
+    function updatePaymentAccountVisibility() {
+      const showPaymentAccount = usPostageSelect.value === 'indicia' || intlPostageSelect.value === 'indicia';
+      paymentAccountField.style.display = showPaymentAccount ? 'block' : 'none';
+    }
 
-  function updatePostageCosts() {
-    const usPostageType = document.querySelector('#batch_us_postage_type').value;
-    const intlPostageType = document.querySelector('#batch_intl_postage_type').value;
+    function updatePostageCosts() {
+      const usPostageType = document.querySelector('#batch_us_postage_type').value;
+      const intlPostageType = document.querySelector('#batch_intl_postage_type').value;
 
-    fetch(`<%= update_costs_letter_batch_path(@batch) %>`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-      },
-      body: JSON.stringify({
-        us_postage_type: usPostageType,
-        intl_postage_type: intlPostageType
+      fetch(`<%= update_costs_letter_batch_path(@batch) %>`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          us_postage_type: usPostageType,
+          intl_postage_type: intlPostageType
+        })
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Update costs
-      document.getElementById('total_postage_cost').textContent = `$${data.total_cost.toFixed(2)}`;
-      document.getElementById('us_cost_difference').textContent = `$${data.cost_difference.us.toFixed(2)}`;
-      document.getElementById('intl_cost_difference').textContent = `$${data.cost_difference.intl.toFixed(2)}`;
-      
-      // Update letter counts
-      document.getElementById('us_letter_count').textContent = data.us_count;
-      document.getElementById('intl_letter_count').textContent = data.intl_count;
-      
-      const usDiffElement = document.getElementById('us_cost_difference');
-      const intlDiffElement = document.getElementById('intl_cost_difference');
-      
-      // Update US cost difference styling
-      if (data.cost_difference.us < 0) {
-        usDiffElement.classList.remove('text-red-600');
-        usDiffElement.classList.add('text-green-600');
-      } else {
-        usDiffElement.classList.remove('text-green-600');
-        usDiffElement.classList.add('text-red-600');
-      }
-      
-      // Update international cost difference styling
-      if (data.cost_difference.intl < 0) {
-        intlDiffElement.classList.remove('text-red-600');
-        intlDiffElement.classList.add('text-green-600');
-      } else {
-        intlDiffElement.classList.remove('text-green-600');
-        intlDiffElement.classList.add('text-red-600');
-      }
+      .then(response => response.json())
+      .then(data => {
+        // Update costs
+        document.getElementById('total_postage_cost').textContent = `$${data.total_cost.toFixed(2)}`;
+        document.getElementById('us_cost_difference').textContent = `$${data.cost_difference.us.toFixed(2)}`;
+        document.getElementById('intl_cost_difference').textContent = `$${data.cost_difference.intl.toFixed(2)}`;
+
+        // Update letter counts
+        document.getElementById('us_letter_count').textContent = data.us_count;
+        document.getElementById('intl_letter_count').textContent = data.intl_count;
+
+        const usDiffElement = document.getElementById('us_cost_difference');
+        const intlDiffElement = document.getElementById('intl_cost_difference');
+
+        // Update US cost difference styling
+        if (data.cost_difference.us < 0) {
+          usDiffElement.classList.remove('text-red-600');
+          usDiffElement.classList.add('text-green-600');
+        } else {
+          usDiffElement.classList.remove('text-green-600');
+          usDiffElement.classList.add('text-red-600');
+        }
+
+        // Update international cost difference styling
+        if (data.cost_difference.intl < 0) {
+          intlDiffElement.classList.remove('text-red-600');
+          intlDiffElement.classList.add('text-green-600');
+        } else {
+          intlDiffElement.classList.remove('text-green-600');
+          intlDiffElement.classList.add('text-red-600');
+        }
+      });
+    }
+
+    document.querySelector('#batch_us_postage_type').addEventListener('change', () => {
+      updatePaymentAccountVisibility();
+      updatePostageCosts();
     });
+
+    document.querySelector('#batch_intl_postage_type').addEventListener('change', () => {
+      updatePaymentAccountVisibility();
+      updatePostageCosts();
+    });
+
+    // Initial check
+    updatePaymentAccountVisibility();
+    updatePostageCosts();
+  });
+</script>
+<style>
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
   }
 
-  document.querySelector('#batch_us_postage_type').addEventListener('change', () => {
-    updatePaymentAccountVisibility();
-    updatePostageCosts();
-  });
+  .grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
 
-  document.querySelector('#batch_intl_postage_type').addEventListener('change', () => {
-    updatePaymentAccountVisibility();
-    updatePostageCosts();
-  });
+  .form-group {
+    margin-bottom: 1rem;
+  }
 
-  // Initial check
-  updatePaymentAccountVisibility();
-  updatePostageCosts();
-});
-</script>
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
 
-<style>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem;
-}
+  .form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--muted-border-color);
+    border-radius: var(--border-radius);
+  }
 
-.grid {
-  display: grid;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
+  .form-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--muted-border-color);
+    border-radius: var(--border-radius);
+  }
 
-.form-group {
-  margin-bottom: 1rem;
-}
+  .form-checkbox {
+    margin-right: 0.5rem;
+  }
 
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--muted-border-color);
-  border-radius: var(--border-radius);
-}
-
-.form-select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--muted-border-color);
-  border-radius: var(--border-radius);
-}
-
-.form-checkbox {
-  margin-right: 0.5rem;
-}
-
-.actions {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
+  .actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
 </style> 

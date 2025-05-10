@@ -7,5 +7,8 @@ json.return_address do
   json.partial! letter.return_address
 end
 json.address { json.partial! letter.address }
+if expand?(:label)
+  json.label_url rails_blob_url(letter.label) if letter.label.attached?
+end
 json.rubber_stamps letter.rubber_stamps
 json.metadata letter.metadata || {}
