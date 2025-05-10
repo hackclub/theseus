@@ -19,6 +19,9 @@ module API
         authorize @letter_queue
       end
 
+      # this should REALLY be websockets or some shit
+      # but it's not, so we're just going to poll
+      # i'm not braining well enough to do it right anytime soon
       def queued
         # authorize @letter_queue, policy_class: Letter::QueuePolicy
         raise Pundit::NotAuthorizedError unless current_token&.pii?
