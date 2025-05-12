@@ -10,7 +10,7 @@ module API
       def show
         @tag = params[:id]
 
-        letter_query = Letter.with_any_tags([@tag]).mailed
+        letter_query = Letter.with_any_tags([@tag]).where(aasm_state: [:mailed, :received])
         wh_order_query = Warehouse::Order.with_any_tags([@tag]).where.not(aasm_state: [:draft, :errored])
 
         if letter_query.none? && wh_order_query.none?
