@@ -1,4 +1,6 @@
 class Letter::InstantQueue < Letter::Queue
+  # TODO: drop mailing date, wtf?
+
   # Validations
   validates :template, presence: true
   validates :postage_type, presence: true, inclusion: { in: %w[indicia stamps] }
@@ -33,7 +35,7 @@ class Letter::InstantQueue < Letter::Queue
         tags: tags,
         aasm_state: "pending",
         postage_type: postage_type,
-        mailing_date: letter_mailing_date || Date.current,
+        mailing_date: Date.current + 1.day,
         **params,
       )
       letter.save!
