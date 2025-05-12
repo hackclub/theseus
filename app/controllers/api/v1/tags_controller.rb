@@ -1,7 +1,7 @@
 module API
   module V1
     class TagsController < ApplicationController
-      skip_before_action :authenticate!
+      # skip_before_action :authenticate!
 
       def index
         @tags = ::ApplicationController.helpers.available_tags
@@ -10,8 +10,8 @@ module API
       def show
         @tag = params[:id]
 
-        letter_query = Letter.with_any_tags([@tag])
-        wh_order_query = Warehouse::Order.with_any_tags([@tag])
+        letter_query = Letter.with_any_tags([@tag]).mailed
+        wh_order_query = Warehouse::Order.with_any_tags([@tag]).where.not(aasm_state: [:draft, :errored])
 
         if letter_query.none? && wh_order_query.none?
           render json: { error: "no letters or warehouse orders found for tag #{@tag}...?" }, status: :not_found
