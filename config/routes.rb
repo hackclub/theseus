@@ -412,7 +412,11 @@ Rails.application.routes.draw do
           post :update_costs
         end
       end
-      resources :queues
+      resources :queues do
+        member do
+          post :batch, as: :make_batch_from
+        end
+      end
       resources :instant_queues, controller: "instant_queues"
     end
     resources :api_keys do
@@ -557,10 +561,8 @@ Rails.application.routes.draw do
             post "instant/:id", to: "letter_queues#create_instant_letter", as: :create_instant_letter
             get "instant/:id/queued", to: "letter_queues#queued", as: :show_queued
           end
-        end
-        resources :letters, only: [] do
-          collection do
-            post :create_instantly
+          member do
+            post "", to: "letter_queues#create_letter"
           end
         end
         resource :qz_tray, only: [] do

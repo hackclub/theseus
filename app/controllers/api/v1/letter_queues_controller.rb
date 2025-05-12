@@ -1,7 +1,8 @@
 module API
   module V1
     class LetterQueuesController < ApplicationController
-      before_action :set_letter_queue
+      before_action :set_letter_queue, only: [:show, :create_letter]
+      before_action :set_instant_letter_queue, only: [:create_instant_letter, :queued]
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         render json: { error: "Queue not found" }, status: :not_found
@@ -91,6 +92,12 @@ module API
 
       def set_letter_queue
         @letter_queue = Letter::Queue.find_by!(slug: params[:id])
+        # grossest hack on the planet, nora why are you like this
+        raise ActiveRecord::RecordNotFound if @letter_queue.is_a?(Letter::InstantQueue)
+      end
+
+      def set_instant_letter_queue
+        @letter_queue = Letter::InstantQueue.find_by!(slug: params[:id])
       end
 
       def letter_params
