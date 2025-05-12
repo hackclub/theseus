@@ -6,27 +6,30 @@ module SnailMail
         "good job"
       end
 
+      def self.template_size
+        :half_letter
+      end
+
       def render(pdf, letter)
         pdf.font "arial" do
-          pdf.text_box "good job", size: 99, at: [0,288], valign: :center, align: :center
+          pdf.text_box "good job", size: 99, at: [0, pdf.bounds.top], valign: :center, align: :center
         end
         pdf.start_new_page
 
         render_postage(pdf, letter)
 
-        render_return_address(pdf, letter, 10, 278, 146, 70, font: "arial")
-        render_imb(pdf, letter, 216, 25, 207)
+        render_return_address(pdf, letter, 10, pdf.bounds.top - 10, 146, 70, font: "arial")
+        render_imb(pdf, letter, pdf.bounds.right - 222, pdf.bounds.bottom + 25, 207)
 
         render_destination_address(
           pdf,
           letter,
-          100,
-          170,
+          150,
+          pdf.bounds.bottom + 210,
           237,
           100,
           { size: 20, valign: :bottom, align: :left, font: "arial" }
         )
-
       end
     end
   end

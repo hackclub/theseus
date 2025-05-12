@@ -4,8 +4,9 @@ module SnailMail
 
     # Template sizes in points [width, height]
     SIZES = {
-      standard: [ 6 * 72, 4 * 72 ], # 4x6 inches (432 x 288 points)
-      envelope: [ 9.5 * 72, 4.125 * 72 ] # #10 envelope (684 x 297 points)
+      standard: [6 * 72, 4 * 72], # 4x6 inches (432 x 288 points)
+      envelope: [9.5 * 72, 4.125 * 72], # #10 envelope (684 x 297 points)
+      half_letter: [8 * 72, 5 * 72], # half-letter (576 x 360 points)
     }.freeze
 
     # Template metadata - override in subclasses
@@ -50,7 +51,7 @@ module SnailMail
         align: :left,
         valign: :top,
         overflow: :shrink_to_fit,
-        min_font_size: 6
+        min_font_size: 6,
       }
 
       options = default_options.merge(options)
@@ -59,10 +60,10 @@ module SnailMail
       pdf.font(font_name) do
         pdf.text_box(
           format_return_address(letter),
-          at: [ x, y ],
+          at: [x, y],
           width: width,
           height: height,
-          **options
+          **options,
         )
       end
     end
@@ -76,7 +77,7 @@ module SnailMail
         valign: :center,
         overflow: :shrink_to_fit,
         min_font_size: 6,
-        disable_wrap_by_char: true
+        disable_wrap_by_char: true,
       }
 
       options = default_options.merge(options)
@@ -86,14 +87,14 @@ module SnailMail
       pdf.font(font_name) do
         pdf.text_box(
           letter.address.snailify,
-          at: [ x, y ],
+          at: [x, y],
           width: width,
           height: height,
-          **options
+          **options,
         )
       end
       if stroke
-        pdf.stroke { pdf.rectangle([ x, y ], width, height) }
+        pdf.stroke { pdf.rectangle([x, y], width, height) }
       end
     end
 
@@ -105,7 +106,7 @@ module SnailMail
         font: "imb",
         size: 24,
         align: :center,
-        overflow: :shrink_to_fit
+        overflow: :shrink_to_fit,
       }
 
       options = default_options.merge(options)
@@ -114,10 +115,10 @@ module SnailMail
       pdf.font(font_name) do
         pdf.text_box(
           generate_imb(letter),
-          at: [ x, y ],
+          at: [x, y],
           width: width,
           disable_wrap_by_char: true,
-          **options
+          **options,
         )
       end
     end
@@ -127,15 +128,14 @@ module SnailMail
       return unless options[:include_qr_code]
       SnailMail::QRCodeGenerator.generate_qr_code(pdf, "https://hack.club/#{letter.public_id}", x, y, size)
       pdf.font("f25") do
-        pdf.text_box("scan this so we know you got it!", at: [x+3, y+22], width: 54, size: 6.4)
+        pdf.text_box("scan this so we know you got it!", at: [x + 3, y + 22], width: 54, size: 6.4)
       end
     end
 
     def render_letter_id(pdf, letter, x, y, size, opts = {})
       return if options[:include_qr_code]
-      pdf.font(opts.delete(:font) || "f25") { pdf.text_box(letter.public_id, at: [ x, y ], size:, overflow: :shrink_to_fit, valign: :top, **opts) }
+      pdf.font(opts.delete(:font) || "f25") { pdf.text_box(letter.public_id, at: [x, y], size:, overflow: :shrink_to_fit, valign: :top, **opts) }
     end
-
 
     private
 
@@ -159,37 +159,37 @@ module SnailMail
         stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
 
         requested_stamps = if stamps.size == 1
-          stamp = stamps.first
-          "#{stamp[:count]} #{stamp[:name]}"
-        elsif stamps.size == 2
-          "#{stamps[0][:count]} #{stamps[0][:name]} and #{stamps[1][:count]} #{stamps[1][:name]}"
-        else
-          stamps.map.with_index do |stamp, index|
-            if index == stamps.size - 1
-              "and #{stamp[:count]} #{stamp[:name]}"
-            else
-              "#{stamp[:count]} #{stamp[:name]}"
-            end
-          end.join(", ")
-        end
+            stamp = stamps.first
+            "#{stamp[:count]} #{stamp[:name]}"
+          elsif stamps.size == 2
+            "#{stamps[0][:count]} #{stamps[0][:name]} and #{stamps[1][:count]} #{stamps[1][:name]}"
+          else
+            stamps.map.with_index do |stamp, index|
+              if index == stamps.size - 1
+                "and #{stamp[:count]} #{stamp[:name]}"
+              else
+                "#{stamp[:count]} #{stamp[:name]}"
+              end
+            end.join(", ")
+          end
 
         postage_info = <<~EOT
           i take #{ActiveSupport::NumberHelper.number_to_currency(postage_amount)} in postage, so #{requested_stamps}
         EOT
 
-        pdf.bounding_box([ pdf.bounds.right - 55, pdf.bounds.top - 5 ], width: 50, height: 50) do
+        pdf.bounding_box([pdf.bounds.right - 55, pdf.bounds.top - 5], width: 50, height: 50) do
           pdf.font("f25") do
-          pdf.text_box(
-            postage_info,
-            at: [ 1, 48 ],
-            width: 48,
-            height: 45,
-            size: 8,
-            align: :center,
-            min_font_size: 4,
-            overflow: :shrink_to_fit,
-          )
-        end
+            pdf.text_box(
+              postage_info,
+              at: [1, 48],
+              width: 48,
+              height: 45,
+              size: 8,
+              align: :center,
+              min_font_size: 4,
+              overflow: :shrink_to_fit,
+            )
+          end
         end
       end
     end
@@ -199,12 +199,12 @@ module SnailMail
       return "No return address" unless return_address
 
       <<~EOA
-      #{letter.return_address_name_line}
-      #{[ return_address.line_1, return_address.line_2 ].compact_blank.join("\n")}
-      #{return_address.city}, #{return_address.state} #{return_address.postal_code}
-      #{return_address.country if return_address.country != letter.address.country}
+        #{letter.return_address_name_line}
+        #{[return_address.line_1, return_address.line_2].compact_blank.join("\n")}
+        #{return_address.city}, #{return_address.state} #{return_address.postal_code}
+        #{return_address.country if return_address.country != letter.address.country}
       EOA
-      .strip
+        .strip
     end
   end
 end

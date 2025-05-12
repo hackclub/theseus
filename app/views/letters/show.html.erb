@@ -184,9 +184,9 @@
                             <% end %>
                           </optgroup>
                         <% end %>
-                        <% envelope_templates = SnailMail::Service.templates_for_size(:envelope) %>
+                        <% envelope_templates = SnailMail::Service.templates_for_size(:half_letter) %>
                         <% if envelope_templates.present? %>
-                          <optgroup label="#10 Envelopes">
+                          <optgroup label="Half-letter postcards">
                             <% envelope_templates.each do |template| %>
                               <option value="<%= template %>"><%= template.to_s.humanize %></option>
                             <% end %>
