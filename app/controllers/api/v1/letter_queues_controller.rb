@@ -45,6 +45,8 @@ module API
 
         # Create address with normalized country
         address_params = letter_params[:address].merge(country: country.alpha2)
+        # Normalize state name to abbreviation
+        address_params[:state] = FrickinCountryNames.normalize_state(country, address_params[:state])
         addy = Address.new(address_params)
 
         @letter = @letter_queue.create_letter!(
@@ -69,6 +71,8 @@ module API
 
         # Create address with normalized country
         address_params = letter_params[:address].merge(country: country.alpha2)
+        # Normalize state name to abbreviation
+        address_params[:state] = FrickinCountryNames.normalize_state(country, address_params[:state])
         addy = Address.new(address_params)
 
         @letter = @letter_queue.process_letter_instantly!(
