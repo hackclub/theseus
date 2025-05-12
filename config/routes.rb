@@ -569,6 +569,7 @@ Rails.application.routes.draw do
           get :cert
           post :sign
         end
+        resources :tags, only: [:index, :show]
       end
     end
   end
