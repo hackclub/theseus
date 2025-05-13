@@ -9,7 +9,7 @@ module API
       end
 
       rescue_from ActiveRecord::RecordInvalid do |e|
-        Sentry.capture_exception(e)
+        Honeybadger.notify(e)
         render json: {
           error: "Validation failed",
           details: e.record.errors.full_messages,

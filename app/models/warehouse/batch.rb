@@ -100,4 +100,26 @@ class Warehouse::Batch < Batch
   def update_associated_tags
     orders.update_all(tags: tags)
   end
+
+  def process_with_zenventory!(options = {})
+    return false unless fields_mapped?
+
+    # Create orders for each address
+    addresses.each do |address|
+      begin
+        Zenventory.create_customer_order(update_hash)
+      rescue Zenventory::ZenventoryError => e
+        uuid = Honeybadger.notify(e)
+        errors.add(:base, "couldn't create order, Zenventory said: #{e.message} (error: #{uuid})")
+        throw(:abort)
+      end
+    end
+
+    # Dispatch all orders
+    orders.each do |order|
+      order.dispatch!
+    end
+
+    mark_processed!
+  end
 end

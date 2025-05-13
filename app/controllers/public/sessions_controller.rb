@@ -29,8 +29,8 @@ module Public
 
     def login_code
       valid_code = LoginCode.where(token: params[:token], used_at: nil)
-                               .where("expires_at > ?", Time.current)
-                               .first
+        .where("expires_at > ?", Time.current)
+        .first
 
       if valid_code
         valid_code.mark_used!

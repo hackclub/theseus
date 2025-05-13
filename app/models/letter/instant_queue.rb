@@ -73,7 +73,8 @@ class Letter::InstantQueue < Letter::Queue
         rescue => e
           Rails.logger.error("Failed to create indicium for letter #{letter.id}: #{e.message}")
           Rails.logger.error(e.backtrace.join("\n"))
-          raise
+          uuid = Honeybadger.notify(e)
+          raise "Failed to create indicium (please report EID: #{uuid} immediately)"
         end
       end
       letter

@@ -10,7 +10,7 @@ module SnailMail
 
     def initialize(options = {})
       @options = {
-        margin: 0
+        margin: 0,
       }.merge(options)
     end
 
@@ -30,7 +30,7 @@ module SnailMail
         # Ensure all template sizes are the same
         sizes = template_classes.map(&:template_size).uniq
         if sizes.length > 1
-          raise Error, "Mixed template sizes in batch (#{sizes.join(', ')}). All templates must have the same size."
+          raise Error, "Mixed template sizes in batch (#{sizes.join(", ")}). All templates must have the same size."
         end
 
         # Create template lookup for faster access
@@ -66,11 +66,11 @@ module SnailMail
 
       pdf = Prawn::Document.new(
         page_size: page_size,
-        margin: @options[:margin]
+        margin: @options[:margin],
       )
 
       register_fonts(pdf)
-      pdf.fallback_fonts([ "arial" ])
+      pdf.fallback_fonts(["arial"])
       pdf
     end
 
@@ -80,7 +80,7 @@ module SnailMail
         "arial" => { normal: font_path("arial.otf") },
         "f25" => { normal: font_path("f25.ttf") },
         "imb" => { normal: font_path("imb.ttf") },
-        "gohu" => { normal: font_path("gohu.ttf") }
+        "gohu" => { normal: font_path("gohu.ttf") },
       )
     end
 

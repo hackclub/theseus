@@ -114,7 +114,8 @@ class Warehouse::BatchesController < BaseBatchesController
         @batch.run_map!
       rescue StandardError => e
         Rails.logger.warn(e)
-        redirect_to warehouse_batch_path(@batch), flash: { alert: "Error mapping fields! #{e.message}" }
+        uuid = Honeybadger.notify(e)
+        redirect_to warehouse_batch_path(@batch), flash: { alert: "Error mapping fields! #{e.message} (please report EID: #{uuid})" }
         return
       end
       redirect_to process_confirm_warehouse_batch_path(@batch), notice: "Field mapping saved. Please review and process your batch."

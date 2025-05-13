@@ -34,14 +34,16 @@ module FaradayMiddleware
     def on_complete(env)
       unless env.response.success?
         unless env.response.body.respond_to?(:dig)
-          raise USPS::USPSError, env.response.body
+          uuid = Honeybadger.notify(USPS::USPSError.new(env.response.body))
+          raise USPS::USPSError, "#{env.response.body} (please report EID: #{uuid})"
         end
         if env.response.body.dig(:error, :message) == "Address Not Found."
           raise USPS::NxAddress
         elsif env.response.body.dig(:error, :message) == "Invalid Zip Code."
           raise USPS::NxZIP
         else
-          raise USPS::USPSError, env.response.body
+          uuid = Honeybadger.notify(USPS::USPSError.new(env.response.body))
+          raise USPS::USPSError, "#{env.response.body} (please report EID: #{uuid})"
         end
       end
     end
@@ -112,7 +114,7 @@ class USPS::APIService
         state: state,
         urbanization: urbanization,
         ZIPCode: zip_code,
-        ZIPPlus4: zip_plus_4
+        ZIPPlus4: zip_plus_4,
       }.compact_blank).body
     end
 
@@ -164,7 +166,7 @@ class USPS::APIService
         city: city,
         state: state,
         ZIPCode: zip_code,
-        ZIPPlus4: zip_plus_4
+        ZIPPlus4: zip_plus_4,
       }.compact_blank).body
     end
 
@@ -195,7 +197,7 @@ class USPS::APIService
         hasLooseItems: false,
         isRigid: false,
         isSelfMailer: false,
-        isBooklet: false
+        isBooklet: false,
       },
       receipt_option: "NONE",
       image_type: "TIFF",
@@ -211,17 +213,17 @@ class USPS::APIService
             length: length,
             height: height,
             thickness: thickness,
-            nonMachinableIndicators: non_machinable_indicators
+            nonMachinableIndicators: non_machinable_indicators,
           },
           imageInfo: {
             receiptOption: receipt_option,
             imageType: image_type,
-            labelType: label_type
-          }
+            labelType: label_type,
+          },
         },
         {
           "X-Payment-Authorization-Token" => payment_token,
-          "Accept" => "application/vnd.usps.labels+json"
+          "Accept" => "application/vnd.usps.labels+json",
         },
       ).body
     end
@@ -244,7 +246,7 @@ class USPS::APIService
         prod: "apis",
         cat: "api-cat",
         cat_no_s: "api-cat",
-        tem: "apis-tem"
+        tem: "apis-tem",
       }[ENVIRONMENT]
       "https://#{host}.usps.com"
     end
@@ -264,7 +266,7 @@ class USPS::APIService
         Rails.application.credentials.usps.dig(ENVIRONMENT, :consumer_secret),
         site: "#{api_host}/oauth2/v3",
         token_url: "token",
-        auth_scheme: :request_body
+        auth_scheme: :request_body,
       )
     end
   end

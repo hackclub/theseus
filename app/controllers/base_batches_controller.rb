@@ -72,7 +72,8 @@ class BaseBatchesController < ApplicationController
       rescue StandardError => e
         raise
         Rails.logger.warn(e)
-        redirect_to send("#{@batch.class.name.split("::").first.downcase}_batch_path", @batch), flash: { alert: "error mapping fields! #{e.message}" }
+        uuid = Honeybadger.notify(e)
+        redirect_to send("#{@batch.class.name.split("::").first.downcase}_batch_path", @batch), flash: { alert: "error mapping fields! #{e.message} (please report EID: #{uuid})" }
         return
       end
       redirect_to send("process_confirm_#{@batch.class.name.split("::").first.downcase}_batch_path", @batch), notice: "Field mapping saved. Please review and process your batch."

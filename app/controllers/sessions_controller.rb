@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :new, :create ]
+  skip_before_action :authenticate_user!, only: [:new, :create]
 
   skip_after_action :verify_authorized
 
@@ -16,7 +16,8 @@ class SessionsController < ApplicationController
 
     if params[:error].present?
       Rails.logger.error "Slack OAuth error: #{params[:error]}"
-      redirect_to login_path, alert: "failed to authenticate with Slack!"
+      uuid = Honeybadger.notify("Slack OAuth error: #{params[:error]}")
+      redirect_to login_path, alert: "failed to authenticate with Slack! (error: #{uuid})"
       return
     end
 
@@ -24,7 +25,8 @@ class SessionsController < ApplicationController
       @user = User.from_slack_token(params[:code], redirect_uri)
     rescue => e
       Rails.logger.error "Error creating user from Slack data: #{e.message}"
-      redirect_to login_path, alert: "error authenticating!"
+      uuid = Honeybadger.notify(e)
+      redirect_to login_path, alert: "error authenticating! (error: #{uuid})"
       return
     end
 
@@ -41,7 +43,7 @@ class SessionsController < ApplicationController
   def impersonate
     unless current_user.admin?
       redirect_to root_path, alert: "you are not authorized to impersonate users. this incident has been reported :-P"
-      Sentry.capture_message("#{current_user.username} tried to impersonate #{params[:id]}??")
+      Honeybadger.notify("Impersonation attempt by #{current_user.username} to #{params[:id]}")
       return
     end
 

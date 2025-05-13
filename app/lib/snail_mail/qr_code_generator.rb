@@ -15,7 +15,7 @@ module SnailMail
       module_px_size: 6,
       resize_gte_to: false,
       resize_exactly_to: false,
-      size: 120
+      size: 120,
     }.freeze
 
     # Generate a QR code and add it to the PDF
@@ -33,11 +33,12 @@ module SnailMail
         io.rewind
 
         # Add the PNG to the PDF without creating a file
-        pdf.image io, at: [ x, y ], width: size, height: size
+        pdf.image io, at: [x, y], width: size, height: size
       rescue => e
         Rails.logger.error("QR code generation failed: #{e.message}")
+        uuid = Honeybadger.notify(e)
         # Fallback to a text label if QR code fails
-        pdf.text_box "QR Error", at: [ x, y ], width: size, height: size
+        pdf.text_box "QR Error (error: #{uuid})", at: [x, y], width: size, height: size
       end
     end
   end

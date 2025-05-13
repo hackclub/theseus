@@ -141,9 +141,7 @@ gem "vite_rails"
 
 gem "blazer", "~> 3.3"
 
-gem "sentry-ruby"
 
-gem "sentry-rails"
 gem "redis", "~> 5.4"
 
 gem "valid_email2", "~> 7.0"
@@ -157,3 +155,5 @@ gem "blind_index", "~> 2.7"
 gem "ruby-openai", "~> 8.1"
 
 gem "parallel", "~> 1.26"
+
+gem "honeybadger", "~> 5.28"

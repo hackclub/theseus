@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>error!!</title>
+    <style>
+        @font-face {
+            font-family: DOSVGA;
+            src: url(/unifont.woff) format("woff");
+            font-style: normal;
+            font-display: swap
+        }
+
+        :root {
+            --blue: rgb(42, 100, 197)
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--blue);
+            font-family: DOSVGA, Courier, monospace;
+            font-size: 18px;
+            color: #fff;
+            text-align: center
+        }
+
+        .logo {
+            margin: 0;
+            color: var(--blue);
+            background-color: #fff
+        }
+
+        a {
+            color: #fff;
+        }
+
+        .logo-container {
+            background-color: #fff;
+            display: inline-block;
+            padding: 0 10px;
+            margin: 10px
+        }
+
+        @keyframes blinky {
+            50% {
+                opacity: 0
+            }
+        }
+
+        .error-code {
+            margin: 10px 0;
+            animation: blinky 1s step-start infinite
+        }
+
+        .error-message {
+            margin: 20px 0;
+            line-height: 1.5;
+            max-width: 720px;
+            text-align: left;
+        }
+
+        .bootloader-link {
+            color: inherit;
+            text-decoration-thickness: 1px;
+            float: left;
+        }
+
+        .error-id {
+            text-align: left;
+            margin-left: 10px;
+        }
+
+        .error-id-text {
+            background-color: #fff;
+            color: var(--blue);
+            padding: 0 5px;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <div class="logo-container">
+            <p class="logo">Theseus</p>
+        </div>
+        <p class="error-code">ERROR 500</p>
+        <p class="error-message">
+            An internal server error has occurred.<br />
+            Please poke <a href="https://hackclub.slack.com/team/U06QK6AG3RD" target="_blank">@nora</a> with the
+            following error ID and what you were trying to do when this happened.
+        </p>
+        <p class="error-id">
+            <b>Error ID:</b><span class="error-id-text"
+                onclick="navigator.clipboard.writeText(this.textContent); this.textContent = 'copied!'"><!-- HONEYBADGER ERROR --></span>
+            (click to copy)
+        </p>
+        <a class="bootloader-link" href="/"><- return to homepage</a>
+    </div>
+</body>
+
+</html>

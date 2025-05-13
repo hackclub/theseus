@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user, :user_signed_in?
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, :set_honeybadger_context
 
   def current_user
     @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
@@ -20,7 +20,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_from Pundit::NotAuthorizedError do
+  def set_honeybadger_context
+    Honeybadger.context({
+      user_id: current_user&.id,
+      user_email: current_user&.email,
+    })
+  end
+
+  rescue_from Pundit::NotAuthorizedError do |e|
     flash[:error] = "you don't seem to be authorized – ask nora?"
     redirect_to root_path
   end
