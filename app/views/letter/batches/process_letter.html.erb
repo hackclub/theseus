@@ -7,48 +7,57 @@
     </header>
     <div class="card mb-4">
       <div class="card-body">
-        <div class="grid md:grid-cols-2 gap-4">
-          <div>
-            <h3 class="text-sm font-medium mb-2">Letter Counts</h3>
-            <div class="text-sm mb-2">
-              <span class="text-gray-500">US Letters:</span>
-              <span id="us_letter_count" class="font-medium">
-                <%= @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
-              </span>
+        <% if @batch.letter_return_address&.us? %>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <h3 class="text-sm font-medium mb-2">Letter Counts</h3>
+              <div class="text-sm mb-2">
+                <span class="text-gray-500">US Letters:</span>
+                <span id="us_letter_count" class="font-medium">
+                  <%= @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
+                </span>
+              </div>
+              <div class="text-sm mb-2">
+                <span class="text-gray-500">International Letters:</span>
+                <span id="intl_letter_count" class="font-medium">
+                  <%= @batch.letters.joins(:address).where.not(addresses: { country: "US" }).count %>
+                </span>
+              </div>
+              <div class="text-sm mb-2">
+                <span class="text-gray-500">Total Letters:</span>
+                <span class="font-medium">
+                  <%= @batch.letters.count %>
+                </span>
+              </div>
             </div>
-            <div class="text-sm mb-2">
-              <span class="text-gray-500">International Letters:</span>
-              <span id="intl_letter_count" class="font-medium">
-                <%= @batch.letters.joins(:address).where.not(addresses: { country: "US" }).count %>
-              </span>
-            </div>
-            <div class="text-sm mb-2">
-              <span class="text-gray-500">Total Letters:</span>
-              <span class="font-medium">
-                <%= @batch.letters.count %>
-              </span>
+            <div>
+              <h3 class="text-sm font-medium mb-2">Projected Costs</h3>
+              <div class="text-sm mb-2">
+                <span class="text-gray-500">Total Postage Cost:</span>
+                <span id="total_postage_cost" class="font-medium">$<%= sprintf('%.2f', @batch.postage_cost) %></span>
+              </div>
+              <div class="text-sm mb-2">
+                <span class="text-gray-500">US Cost Difference:</span>
+                <span id="us_cost_difference" class="font-medium text-green-600">
+                  $<%= sprintf('%.2f', @batch.postage_cost_difference[:us]) %>
+                </span>
+              </div>
+              <div class="text-sm mb-2">
+                <span class="text-gray-500">International Cost Difference:</span>
+                <span id="intl_cost_difference" class="font-medium text-red-600">
+                  $<%= sprintf('%.2f', @batch.postage_cost_difference[:intl]) %>
+                </span>
+              </div>
             </div>
           </div>
-          <div>
-            <h3 class="text-sm font-medium mb-2">Projected Costs</h3>
-            <div class="text-sm mb-2">
-              <span class="text-gray-500">Total Postage Cost:</span>
-              <span id="total_postage_cost" class="font-medium">$<%= sprintf('%.2f', @batch.postage_cost) %></span>
-            </div>
-            <div class="text-sm mb-2">
-              <span class="text-gray-500">US Cost Difference:</span>
-              <span id="us_cost_difference" class="font-medium text-green-600">
-                $<%= sprintf('%.2f', @batch.postage_cost_difference[:us]) %>
-              </span>
-            </div>
-            <div class="text-sm mb-2">
-              <span class="text-gray-500">International Cost Difference:</span>
-              <span id="intl_cost_difference" class="font-medium text-red-600">
-                $<%= sprintf('%.2f', @batch.postage_cost_difference[:intl]) %>
-              </span>
-            </div>
+        <% else %>
+          <div class="text-sm mb-2">
+            <span class="text-gray-500">Total Letters:</span>
+            <span class="font-medium">
+              <%= @batch.letters.count %>
+            </span>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
     <%= form_with(model: @batch, url: process_letter_batch_path(@batch), method: :post) do |f| %>
@@ -61,20 +70,40 @@
             class: "form-control",
             required: true %>
         </div>
-        <div class="form-group">
-          <%= f.label :us_postage_type, "US Postage Type", class: "form-label" %>
-          <%= f.select :us_postage_type, 
-                      [["Stamps", "stamps"], ["Indicia", "indicia"], ["International Origin", "international_origin"]], 
-                      { selected: "indicia" }, 
-                      { class: "form-select" } %>
-        </div>
-        <div class="form-group">
-          <%= f.label :intl_postage_type, "International Postage Type", class: "form-label" %>
-          <%= f.select :intl_postage_type, 
-                      [["Stamps", "stamps"], ["Indicia", "indicia"], ["International Origin", "international_origin"]], 
-                      { selected: "indicia" }, 
-                      { class: "form-select" } %>
-        </div>
+        <% if @batch.letter_return_address&.us? %>
+          <div>
+            <h4 class="text-sm font-medium mb-2">US Mail</h4>
+            <div class="space-y-2">
+              <div class="form-check">
+                <%= f.radio_button :us_postage_type, "stamps", class: "form-check-input", checked: true %>
+                <%= f.label :us_postage_type_stamps, "Stamps", class: "form-check-label" %>
+              </div>
+              <div class="form-check">
+                <%= f.radio_button :us_postage_type, "indicia", class: "form-check-input" %>
+                <%= f.label :us_postage_type_indicia, "Indicia (Metered)", class: "form-check-label" %>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-sm font-medium mb-2">International Mail</h4>
+            <div class="space-y-2">
+              <div class="form-check">
+                <%= f.radio_button :intl_postage_type, "stamps", class: "form-check-input", checked: true %>
+                <%= f.label :intl_postage_type_stamps, "Stamps", class: "form-check-label" %>
+              </div>
+              <div class="form-check">
+                <%= f.radio_button :intl_postage_type, "indicia", class: "form-check-input" %>
+                <%= f.label :intl_postage_type_indicia, "Indicia (Metered)", class: "form-check-label" %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <div class="banner banner-info">
+            <strong>hey!</strong> jsyk, since you're mailing from outside the US, we can't buy postage or calculate costs.
+          </div>
+          <%= f.hidden_field :us_postage_type, value: "international_origin" %>
+          <%= f.hidden_field :intl_postage_type, value: "international_origin" %>
+        <% end %>
         <div class="form-group payment-account-field" style="display: none;">
           <%= f.label :usps_payment_account_id, "USPS Payment Account", class: "form-label" %>
           <%= f.collection_select :usps_payment_account_id,

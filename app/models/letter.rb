@@ -173,7 +173,7 @@ class Letter < ApplicationRecord
   end
 
   def validate_postage_type_by_return_address
-    if return_address.present?
+    if return_address.present? && postage_type.present?
       if return_address.us?
         if postage_type == "international_origin"
           errors.add(:postage_type, "cannot be international origin when return address is in the US")
@@ -287,13 +287,7 @@ class Letter < ApplicationRecord
           )
         end
       when "international_origin"
-        # For international origin, use FCMI price
-        USPS::PricingEngine.fcmi_price(
-          processing_category,
-          weight,
-          address.country,
-          non_machinable
-        )
+        0
       end
   end
 

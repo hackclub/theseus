@@ -138,9 +138,10 @@
   }
   } else {
   internationalOriginOption.style.display = 'block';
-  stampsRadio.checked = false;
-  indiciaRadio.checked = false;
+  // Only set international_origin if no postage type is selected yet
+  if (!stampsRadio.checked && !indiciaRadio.checked && !internationalOriginRadio.checked) {
   internationalOriginRadio.checked = true;
+  }
   }
   }
   returnAddressSelect.addEventListener('change', updatePostageTypeOptions);

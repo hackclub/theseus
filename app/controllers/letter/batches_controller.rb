@@ -40,13 +40,13 @@ class Letter::BatchesController < BaseBatchesController
       # Update associated letters if the batch hasn't been processed
       if @batch.may_mark_processed?
         @batch.letters.update_all(
-          letter_height: @batch.letter_height,
-          letter_width: @batch.letter_width,
-          letter_weight: @batch.letter_weight,
-          letter_mailing_date: @batch.letter_mailing_date,
-          letter_mailer_id_id: @batch.letter_mailer_id_id,
-          letter_return_address_id: @batch.letter_return_address_id,
-          letter_return_address_name: @batch.letter_return_address_name,
+          height: @batch.letter_height,
+          width: @batch.letter_width,
+          weight: @batch.letter_weight,
+          mailing_date: @batch.letter_mailing_date,
+          usps_mailer_id_id: @batch.letter_mailer_id_id,
+          return_address_id: @batch.letter_return_address_id,
+          return_address_name: @batch.letter_return_address_name,
         )
       end
 

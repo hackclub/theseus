@@ -100,7 +100,15 @@ module SnailMail
 
     # Render Intelligent Mail barcode
     def render_imb(pdf, letter, x, y, width, options = {})
-      # return unless letter.address.us?
+
+      # we want an IMb if:
+      # - the letter is US-to-US (end-to-end IV)
+      # - the letter is US-to-non-US (IV until it's out of the US)
+      # - the letter is non-US-to-US (IV after it enters the US)
+      # but not if
+      # - the letter is non-US-to-non-US (that'd be pretty stupid)
+
+      return unless letter.address.us? || letter.return_address.us?
 
       default_options = {
         font: "imb",

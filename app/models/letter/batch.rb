@@ -94,10 +94,12 @@ class Letter::Batch < Batch
     if options[:us_postage_type].present? || options[:intl_postage_type].present? || options[:user_facing_title].present?
       letters.each do |letter|
         letter.mailing_date = letter_mailing_date
-        if letter.address.us?
-          letter.postage_type = options[:us_postage_type] == "indicia" ? :indicia : :stamps
+        if letter.return_address.us?
+          # For US return addresses, use the US postage type
+          letter.postage_type = options[:us_postage_type]
         else
-          letter.postage_type = options[:intl_postage_type] == "indicia" ? :indicia : :stamps
+          # For non-US return addresses, must use international origin
+          letter.postage_type = "international_origin"
         end
         letter.user_facing_title = options[:user_facing_title] if options[:user_facing_title].present?
         letter.save!
@@ -129,9 +131,9 @@ class Letter::Batch < Batch
         end
       end
 
-      # unless options[:payment_account].check_funds_available(indicia_cost)
-      #   raise "...we're out of money (ask Nora to put at least #{ActiveSupport::NumberHelper.number_to_currency(indicia_cost)} in the #{options[:payment_account].display_name} account!)"
-      # end
+      unless options[:payment_account].check_funds_available(indicia_cost)
+        raise "...we're out of money (ask Nora to put at least #{ActiveSupport::NumberHelper.number_to_currency(indicia_cost)} in the #{options[:payment_account].display_name} account!)"
+      end
 
       purchase_batch_indicia(options[:payment_account])
     end
