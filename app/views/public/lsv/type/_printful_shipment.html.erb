@@ -6,30 +6,27 @@
     </td>
     <td class="td"><%= printful_shipment.status_text %></td>
     <td class="td">
-      <%= link_to "Open", show_lsv_path(LSV.slug_for(base), printful_shipment.id),
+      <%= link_to "Open", show_lsv_path(LSV.slug_for(printful_shipment), printful_shipment.id),
                   onclick: "openIframeWindow(this.href, '#{printful_shipment.type_text}: #{printful_shipment.title_text}'); return false;", 
                   class: 'btn' %>
     </td>
   </tr>
 <% else %>
-<% content_for :window_title do %>
-  <%= printful_shipment.type_text %>: <%= printful_shipment.title_text %>
-<% end %>
+  <% content_for :window_title do %>
+    <%= printful_shipment.type_text %>: <%= printful_shipment.title_text %>
+  <% end %>
   <div class="window-body">
     <div class="field-row" style="margin-bottom: 1rem;">
       <b style="margin: 0;"><%= printful_shipment.title_text %></b>
     </div>
-
     <div class="field-row" style="margin-bottom: 0.5rem;">
       <label style="width: 80px;">Type:</label>
       <span><%= printful_shipment.type_text %></span>
     </div>
-
     <div class="field-row" style="margin-bottom: 0.5rem;">
       <label style="width: 80px;">Status:</label>
       <span><%= printful_shipment.status_text %></span>
     </div>
-
     <% if printful_shipment.tracking_number %>
       <div class="field-row" style="margin-bottom: 0.5rem;">
         <label style="width: 80px;">Tracking:</label>
@@ -40,7 +37,6 @@
         <% end %>
       </div>
     <% end %>
-
     <% if printful_shipment.description %>
       <div class="field-row" style="margin-bottom: 0.5rem;">
         <label style="width: 80px;">Contents:</label>
@@ -55,12 +51,10 @@
         <% end %>
       </div>
     <% end %>
-
     <div class="field-row" style="margin-bottom: 0.5rem;">
       <label style="width: 80px;">Created:</label>
       <span><%= printful_shipment.created_at %></span>
     </div>
-
     <% back_office_tool do %>
       <% if printful_shipment.fields["%order:pretty_id"] %>
         <div class="field-row" style="margin-bottom: 0.5rem;">
@@ -70,7 +64,6 @@
           </span>
         </div>
       <% end %>
-
       <% if printful_shipment.fields["packing_slip_url"] %>
         <div class="field-row" style="margin-bottom: 0.5rem;">
           <label style="width: 80px;">Packing:</label>
@@ -79,13 +72,11 @@
           </span>
         </div>
       <% end %>
-
       <div class="field-row" style="margin-bottom: 0.5rem;">
         <label style="width: 80px;">Airtable:</label>
         <span class="internal"><%= link_to(printful_shipment.source_id, printful_shipment.source_url, target: "_blank") %></span>
       </div>
     <% end %>
-
     <%= render 'application/admin_inspector', record: printful_shipment %>
   </div>
 <% end %> 
