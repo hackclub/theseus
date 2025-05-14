@@ -9,6 +9,7 @@ class Letter::QueuesController < ApplicationController
   # GET /letter/queues/1 or /letter/queues/1.json
   def show
     @letters = @letter_queue.letters.queued
+    @batches = @letter_queue.letter_batches
   end
 
   # GET /letter/queues/new

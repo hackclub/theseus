@@ -83,10 +83,17 @@
   </div>
 </details>
 <hr/>
-<h3>letters</h3>
+<h3>letters:</h3>
 <%= render partial: 'batches/letters_collection', locals: { letters: @letters } %>
 <% if @letter_queue.letters.queued.any? %>
   <div class="mt-4">
     <%= button_to "make batch!", make_batch_from_letter_queue_path(@letter_queue), class: "btn success" %>
   </div>
+<% end %>
+<hr/>
+<h3>offspring:</h3>
+<% if @batches.any? %>
+  <%= render partial: 'letter/batches/batches_collection', locals: { batches: @batches } %>
+<% else %>
+  <h2 style="font-family: 'serif'">"No batches?"</h2>
 <% end %>
