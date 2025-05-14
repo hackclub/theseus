@@ -70,7 +70,7 @@ module SnailMail
       )
 
       register_fonts(pdf)
-      pdf.fallback_fonts(["arial"])
+      pdf.fallback_fonts(["arial", "noto"])
       pdf
     end
 
@@ -81,6 +81,7 @@ module SnailMail
         "f25" => { normal: font_path("f25.ttf") },
         "imb" => { normal: font_path("imb.ttf") },
         "gohu" => { normal: font_path("gohu.ttf") },
+        "noto" => { normal: font_path("noto sans regular.ttf") },
       )
     end
 

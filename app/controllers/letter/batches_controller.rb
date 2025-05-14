@@ -37,16 +37,22 @@ class Letter::BatchesController < BaseBatchesController
   def update
     authorize @batch
     if @batch.update(batch_params)
+      validate_postage_types
+      if @batch.errors.any?
+        render :edit, status: :unprocessable_entity
+        return
+      end
+
       # Update associated letters if the batch hasn't been processed
       if @batch.may_mark_processed?
         @batch.letters.update_all(
-          letter_height: @batch.letter_height,
-          letter_width: @batch.letter_width,
-          letter_weight: @batch.letter_weight,
-          letter_mailing_date: @batch.letter_mailing_date,
-          letter_mailer_id_id: @batch.letter_mailer_id_id,
-          letter_return_address_id: @batch.letter_return_address_id,
-          letter_return_address_name: @batch.letter_return_address_name,
+          height: @batch.letter_height,
+          width: @batch.letter_width,
+          weight: @batch.letter_weight,
+          mailing_date: @batch.letter_mailing_date,
+          usps_mailer_id_id: @batch.letter_mailer_id_id,
+          return_address_id: @batch.letter_return_address_id,
+          return_address_name: @batch.letter_return_address_name,
         )
       end
 
@@ -203,5 +209,17 @@ class Letter::BatchesController < BaseBatchesController
       template_cycle: [],
       tags: [],
     )
+  end
+
+  def validate_postage_types
+    return unless @batch.letter_return_address&.us?
+
+    if @batch.us_postage_type.present? && !%w[stamps indicia].include?(@batch.us_postage_type)
+      @batch.errors.add(:us_postage_type, "must be either 'stamps' or 'indicia'")
+    end
+
+    if @batch.intl_postage_type.present? && !%w[stamps indicia].include?(@batch.intl_postage_type)
+      @batch.errors.add(:intl_postage_type, "must be either 'stamps' or 'indicia'")
+    end
   end
 end

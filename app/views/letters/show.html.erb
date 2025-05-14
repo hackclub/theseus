@@ -107,6 +107,17 @@
                       </div>
                     <% end %>
                   <% end %>
+                <% elsif @letter.postage_type == "international_origin" %>
+                  <p>
+                    <strong>Postage Type:</strong>
+                    International Origin
+                  </p>
+                  <div class="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <strong>Cost:</strong>
+                      whatever <%= @letter.return_address.country %> charges to send a letter to <%= @letter.address.country %>
+                    </div>
+                  </div>
                 <% else %>
                   <p>
                     <strong>Postage Type:</strong>

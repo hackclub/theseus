@@ -26,7 +26,8 @@ class ReturnAddressesController < ApplicationController
       if params[:from_letter].present?
         redirect_to new_letter_path, notice: "Return address was successfully created. Please select it from the dropdown."
       else
-        redirect_to @return_address, notice: "Return address was successfully created."
+        flash[:success] = "Return address was successfully created."
+        redirect_to return_addresses_path
       end
     else
       render :new, status: :unprocessable_entity

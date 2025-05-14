@@ -93,7 +93,7 @@ class Letter < ApplicationRecord
   end
 
   def display_name
-    user_facing_title || tags.compact_blank.join(', ') || public_id
+    user_facing_title || tags.compact_blank.join(", ") || public_id
   end
 
   def return_address_name_line
@@ -126,7 +126,7 @@ class Letter < ApplicationRecord
     label.attach(
       io: io,
       filename: "label_#{Time.now.to_i}.pdf",
-      content_type: "application/pdf"
+      content_type: "application/pdf",
     )
   end
 
@@ -147,12 +147,13 @@ class Letter < ApplicationRecord
 
   enum :processing_category, {
     letter: 0,
-    flat: 1
+    flat: 1,
   }, instance_methods: false, prefix: true, suffix: true
 
   enum :postage_type, {
     stamps: 0,
-    indicia: 1
+    indicia: 1,
+    international_origin: 2,
   }, instance_methods: false
 
   has_one :usps_indicium, class_name: "USPS::Indicium"
@@ -161,12 +162,27 @@ class Letter < ApplicationRecord
   validates :mailing_date, presence: true, if: -> { postage_type == "indicia" }
   validate :mailing_date_not_in_past, if: -> { mailing_date.present? }, on: :create
   validates :processing_category, presence: true
+  validate :validate_postage_type_by_return_address
 
   before_save :set_postage
 
   def mailing_date_not_in_past
     if mailing_date < Date.current
       errors.add(:mailing_date, "cannot be in the past")
+    end
+  end
+
+  def validate_postage_type_by_return_address
+    if return_address.present? && postage_type.present?
+      if return_address.us?
+        if postage_type == "international_origin"
+          errors.add(:postage_type, "cannot be international origin when return address is in the US")
+        end
+      else
+        if postage_type != "international_origin"
+          errors.add(:postage_type, "must be international origin when return address is not in the US")
+        end
+      end
     end
   end
 
@@ -195,14 +211,14 @@ class Letter < ApplicationRecord
   def events
     iv = iv_mtr_events.map do |event|
       e = event.hydrated
-    {
-      happened_at: event.happened_at.in_time_zone("America/New_York"),
-      source: "USPS IV-MTR",
-      location: "#{e.scan_facility_city}, #{e.scan_facility_state} #{e.scan_facility_zip}",
-      facility: "#{e.scan_facility_name} (#{e.scan_locale_key})",
-      description: "[OP#{e.opcode.code}] #{e.opcode.process_description}",
-      extra_info: "#{e.handling_event_type_description} – #{e.mail_phase} – #{e.machine_name} (#{event.payload.dig("machineId") || "no ID"})"
-    }
+      {
+        happened_at: event.happened_at.in_time_zone("America/New_York"),
+        source: "USPS IV-MTR",
+        location: "#{e.scan_facility_city}, #{e.scan_facility_state} #{e.scan_facility_zip}",
+        facility: "#{e.scan_facility_name} (#{e.scan_locale_key})",
+        description: "[OP#{e.opcode.code}] #{e.opcode.process_description}",
+        extra_info: "#{e.handling_event_type_description} – #{e.mail_phase} – #{e.machine_name} (#{event.payload.dig("machineId") || "no ID"})",
+      }
     end
     timestamps = []
     location = return_address.location
@@ -211,21 +227,21 @@ class Letter < ApplicationRecord
       source: "Hack Club",
       facility: "Mailer",
       description: "Letter printed.",
-      location:
+      location:,
     } if printed_at
     timestamps << {
       happened_at: mailed_at.in_time_zone("America/New_York"),
       source: "Hack Club",
       facility: "Mailer",
       description: "Letter mailed!",
-      location:
+      location:,
     } if mailed_at
     timestamps << {
       happened_at: received_at.in_time_zone("America/New_York"),
       source: "You!",
       facility: "Your mailbox",
       description: "You received this letter!",
-      location: "wherever you live"
+      location: "wherever you live",
     } if received_at
     (iv + timestamps).sort_by { |event| event[:happened_at] }
   end
@@ -234,50 +250,52 @@ class Letter < ApplicationRecord
 
   def set_postage
     self.postage = case postage_type
-    when "indicia"
-      if usps_indicium.present?
-        # Use actual indicia price if indicia are bought
-        usps_indicium.cost
-      elsif address.us?
-        # For US mail without bought indicia, use metered price
-        USPS::PricingEngine.metered_price(
-          processing_category,
-          weight,
-          non_machinable
-        )
-      else
-        # For international mail without bought indicia, use FLIRT-ed price
-        flirted = flirt
-        USPS::PricingEngine.metered_price(
-          flirted[:processing_category],
-          flirted[:weight],
-          flirted[:non_machinable]
-        )
+      when "indicia"
+        if usps_indicium.present?
+          # Use actual indicia price if indicia are bought
+          usps_indicium.cost
+        elsif address.us?
+          # For US mail without bought indicia, use metered price
+          USPS::PricingEngine.metered_price(
+            processing_category,
+            weight,
+            non_machinable
+          )
+        else
+          # For international mail without bought indicia, use FLIRT-ed price
+          flirted = flirt
+          USPS::PricingEngine.metered_price(
+            flirted[:processing_category],
+            flirted[:weight],
+            flirted[:non_machinable]
+          )
+        end
+      when "stamps"
+        # For stamps, use stamp price for US and desired price for international
+        if address.us?
+          USPS::PricingEngine.domestic_stamp_price(
+            processing_category,
+            weight,
+            non_machinable
+          )
+        else
+          USPS::PricingEngine.fcmi_price(
+            processing_category,
+            weight,
+            address.country,
+            non_machinable
+          )
+        end
+      when "international_origin"
+        0
       end
-    when "stamps"
-      # For stamps, use stamp price for US and desired price for international
-      if address.us?
-        USPS::PricingEngine.domestic_stamp_price(
-          processing_category,
-          weight,
-          non_machinable
-        )
-      else
-        USPS::PricingEngine.fcmi_price(
-          processing_category,
-          weight,
-          address.country,
-          non_machinable
-        )
-      end
-    end
   end
 
   def set_imb_sequence
     sn, rollover = usps_mailer_id.next_sn_and_rollover
     update_columns(
       imb_serial_number: sn,
-      imb_rollover_count: rollover
+      imb_rollover_count: rollover,
     )
   end
 end

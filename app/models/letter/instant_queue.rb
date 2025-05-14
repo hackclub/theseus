@@ -3,7 +3,7 @@ class Letter::InstantQueue < Letter::Queue
 
   # Validations
   validates :template, presence: true
-  validates :postage_type, presence: true, inclusion: { in: %w[indicia stamps] }
+  validates :postage_type, presence: true, inclusion: { in: %w[indicia stamps international_origin] }
   validates :usps_payment_account_id, presence: true, if: :indicia?
   validates :letter_mailing_date, presence: true, if: :indicia?
 

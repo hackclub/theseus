@@ -71,7 +71,7 @@
     <div class="form-group">
       <%= form.label :postage_type, "Postage Type", class: "form-label" %>
       <%= form.select :postage_type,
-                     [["Indicia", "indicia"], ["Stamps", "stamps"]],
+                     [["Indicia", "indicia"], ["Stamps", "stamps"], ["International Origin", "international_origin"]],
                      { selected: letter_queue.postage_type || "indicia" },
                      { class: "form-control", onchange: "togglePaymentAccount(this)" } %>
     </div>
