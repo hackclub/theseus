@@ -1,29 +1,29 @@
 class Letter::BatchesController < BaseBatchesController
   # GET /letter/batches
   def index
-    authorize Letter::Batch
+    authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batches = Letter::Batch.all.order(created_at: :desc)
   end
 
   # GET /letter/batches/new
   def new
-    authorize Letter::Batch
+    authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batch = Letter::Batch.new
   end
 
   # GET /letter/batches/:id
   def show
-    authorize @batch
+    authorize @batch, policy_class: Letter::BatchPolicy
   end
 
   # GET /letter/batches/:id/edit
   def edit
-    authorize @batch
+    authorize @batch, policy_class: Letter::BatchPolicy
   end
 
   # POST /letter/batches
   def create
-    authorize Letter::Batch
+    authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batch = Letter::Batch.new(batch_params.merge(user: current_user))
 
     if @batch.save
@@ -35,7 +35,7 @@ class Letter::BatchesController < BaseBatchesController
 
   # PATCH /letter/batches/:id
   def update
-    authorize @batch
+    authorize @batch, policy_class: Letter::BatchPolicy
     if @batch.update(batch_params)
       validate_postage_types
       if @batch.errors.any?
@@ -70,18 +70,18 @@ class Letter::BatchesController < BaseBatchesController
 
   # DELETE /letter/batches/:id
   def destroy
-    authorize @batch
+    authorize @batch, policy_class: Letter::BatchPolicy
     @batch.destroy
     redirect_to letter_batches_path, notice: "Batch was successfully destroyed."
   end
 
   def process_form
-    authorize @batch, :process_form?
+    authorize @batch, :process_form?, policy_class: Letter::BatchPolicy
     render :process_letter
   end
 
   def process_batch
-    authorize @batch, :process_batch?
+    authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
     @batch = Batch.find(params[:id])
 
     if request.post?
@@ -123,7 +123,7 @@ class Letter::BatchesController < BaseBatchesController
   end
 
   def mark_printed
-    authorize @batch, :mark_printed?
+    authorize @batch, :mark_printed?, policy_class: Letter::BatchPolicy
     if @batch.processed?
       @batch.letters.each do |letter|
         letter.mark_printed! if letter.may_mark_printed?
@@ -137,7 +137,7 @@ class Letter::BatchesController < BaseBatchesController
   end
 
   def mark_mailed
-    authorize @batch, :mark_mailed?
+    authorize @batch, :mark_mailed?, policy_class: Letter::BatchPolicy
     if @batch.processed?
       @batch.letters.each do |letter|
         letter.mark_mailed! if letter.may_mark_mailed?
@@ -149,7 +149,7 @@ class Letter::BatchesController < BaseBatchesController
   end
 
   def update_costs
-    authorize @batch, :update_costs?
+    authorize @batch, :update_costs?, policy_class: Letter::BatchPolicy
     # Calculate counts without saving
     us_letters = @batch.letters.joins(:address).where(addresses: { country: "US" })
     intl_letters = @batch.letters.joins(:address).where.not(addresses: { country: "US" })

@@ -54,4 +54,4 @@ class Letter::BatchPolicy < ApplicationPolicy
   def update_costs?
     user.present?
   end
-end 
+end
