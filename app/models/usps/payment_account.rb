@@ -26,10 +26,9 @@ class USPS::PaymentAccount < ApplicationRecord
 
   enum :account_type, {
     EPS: 0,
-    PERMIT: 1
-    # METER: 2 # someday.... someday i will be a PC Postage vendor..,,,..,
+    PERMIT: 1,
+  # METER: 2 # someday.... someday i will be a PC Postage vendor..,,,..,
   }
-
 
   def display_name
     case account_type
@@ -54,7 +53,6 @@ class USPS::PaymentAccount < ApplicationRecord
   validates :permit_number, presence: true, if: :PERMIT?
   validates :permit_zip, presence: true, if: :PERMIT?
 
-
   def create_payment_token
     roles = [
       {
@@ -65,30 +63,31 @@ class USPS::PaymentAccount < ApplicationRecord
         accountNumber: account_number,
         permitNumber: permit_number,
         permitZIP: permit_zip,
-        manifestMID: manifest_mid || usps_mailer_id.mid
+        manifestMID: manifest_mid || usps_mailer_id.mid,
       }.compact_blank,
       {
         roleName: "LABEL_OWNER",
         CRID: usps_mailer_id.crid,
         MID: usps_mailer_id.mid,
-        manifestMID: manifest_mid || usps_mailer_id.mid
+        manifestMID: manifest_mid || usps_mailer_id.mid,
       },
       {
         roleName: "MAIL_OWNER",
         CRID: usps_mailer_id.crid,
         MID: usps_mailer_id.mid,
-        manifestMID: manifest_mid || usps_mailer_id.mid
-      }
+        manifestMID: manifest_mid || usps_mailer_id.mid,
+      },
     ]
     USPS::APIService.create_payment_token(roles:)
   end
 
   def check_funds_available(amount)
+    return true if ach?
     USPS::APIService.payment_account_inquiry(
       account_number:,
       account_type: account_type.to_s,
       permit_zip:,
-      amount:
+      amount:,
     )[:sufficientFunds]
   end
 end

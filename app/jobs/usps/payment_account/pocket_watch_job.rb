@@ -7,6 +7,10 @@ class USPS::PaymentAccount::PocketWatchJob < ApplicationJob
     broke_accounts = []
 
     USPS::PaymentAccount.all.each do |acct|
+      if acct.ach?
+        Rails.logger.info("skipping pacc #{acct.id} because it's ach")
+        next
+      end
       broke_accounts << acct unless acct.check_funds_available(THRESHOLD)
     end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_09_182907) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_14_131909) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -463,6 +463,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_182907) do
     t.datetime "updated_at", null: false
     t.string "name"
     t.string "manifest_mid"
+    t.boolean "ach"
     t.index ["usps_mailer_id_id"], name: "index_usps_payment_accounts_on_usps_mailer_id_id"
   end
 

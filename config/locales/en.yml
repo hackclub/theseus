@@ -33,6 +33,8 @@ en:
       user:
         home_mid: "Home Mailer ID"
         home_return_address: "Home Return Address"
+      usps_payment_account:
+        ach: "is ACH?"
   helpers:
     label:
       user:
@@ -46,5 +48,7 @@ en:
       warehouse_sku:
         sku: "SKU"
         zenventory_id: "Zenventory internal ID"
+      usps_payment_account:
+        ach: "is ACH?"
 
 # TODO: localize models so stuff is more obvious
