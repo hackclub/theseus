@@ -13,7 +13,7 @@ module SnailMail
       serial_number = letter.imb_serial_number
       routing_code = letter.address.us? ? letter.address.postal_code.gsub(/[^0-9]/, "") : nil # zip(+dpc?) but no dash
 
-      routing_code = nil unless [5, 9, 11].include?(routing_code.length)
+      routing_code = nil unless [5, 9, 11].include?(routing_code&.length)
 
       begin
         Imb::Barcode.new(
