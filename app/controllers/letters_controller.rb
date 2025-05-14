@@ -26,8 +26,8 @@ class LettersController < ApplicationController
   def new
     authorize Letter
     @letter = Letter.new
+    @letter.return_address = current_user.home_return_address || ReturnAddress.first
     @letter.build_address
-    # Don't build a return address by default - let the user select one
   end
 
   # GET /letters/1/edit
