@@ -13,7 +13,7 @@ module SnailMail
       generator = LabelGenerator.new(options)
 
       # Generate PDF without writing to disk
-      pdf = generator.generate([ letter ], nil, [ template_name ])
+      pdf = generator.generate([letter], nil, [template_name])
 
       pdf
     end
@@ -26,7 +26,7 @@ module SnailMail
       validate_template_cycle(template_cycle) if template_cycle
 
       # If no template cycle is provided, use the default template
-      template_cycle ||= [ default_template ]
+      template_cycle ||= [default_template]
 
       # Get template classes once, avoid repeated lookups
       template_classes = template_cycle.map do |name|
@@ -36,7 +36,7 @@ module SnailMail
       # Ensure all templates in the cycle are of the same size
       template_sizes = template_classes.map(&:template_size).uniq
       if template_sizes.length > 1
-        raise Error, "All templates in cycle must have the same size. Found: #{template_sizes.join(', ')}"
+        raise Error, "All templates in cycle must have the same size. Found: #{template_sizes.join(", ")}"
       end
 
       # Generate labels with template cycling without writing to disk
@@ -58,7 +58,7 @@ module SnailMail
           name: template_class.template_name.to_sym,
           size: template_class.template_size,
           description: template_class.template_description,
-          is_default: template_class == Templates::DEFAULT_TEMPLATE
+          is_default: template_class == Templates::DEFAULT_TEMPLATE,
         }
       end
     end
@@ -112,9 +112,9 @@ module SnailMail
       raise Error, "Template cycle must be an array" unless template_cycle.is_a?(Array)
       raise Error, "Template cycle cannot be empty" if template_cycle.empty?
 
-      invalid_templates = template_cycle.reject { |name| templates_exist?([ name ]) }
+      invalid_templates = template_cycle.reject { |name| templates_exist?([name]) }
       if invalid_templates.any?
-        raise Error, "Invalid templates in cycle: #{invalid_templates.join(', ')}"
+        raise Error, "Invalid templates in cycle: #{invalid_templates.join(", ")}"
       end
     end
   end
