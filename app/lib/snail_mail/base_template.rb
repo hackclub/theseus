@@ -162,7 +162,7 @@ module SnailMail
       if letter.postage_type == "indicia"
         IMI.render_indicium(pdf, letter, letter.usps_indicium, x)
         FIM.render_fim_d(pdf)
-      else
+      elsif letter.postage_type == "stamps"
         postage_amount = letter.postage
         stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
 
@@ -197,6 +197,12 @@ module SnailMail
               min_font_size: 4,
               overflow: :shrink_to_fit,
             )
+          end
+        end
+      else
+        pdf.bounding_box([pdf.bounds.right - 55, pdf.bounds.top - 5], width: 52, height: 50) do
+          pdf.font("f25") do
+            pdf.text_box("please affix however much postage your post would like", at: [1, 48], width: 50, height: 45, size: 8, align: :center, min_font_size: 4, overflow: :shrink_to_fit)
           end
         end
       end
