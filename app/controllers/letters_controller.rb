@@ -42,6 +42,11 @@ class LettersController < ApplicationController
     @letter = Letter.new(letter_params.merge(user: current_user))
     authorize @letter
 
+    # Set postage type to international_origin if return address is not US
+    if @letter.return_address && @letter.return_address.country != "US"
+      @letter.postage_type = "international_origin"
+    end
+
     if @letter.save
       redirect_to @letter, notice: "Letter was successfully created."
     else
@@ -56,6 +61,14 @@ class LettersController < ApplicationController
     if @letter.batch_id.present? && params[:letter][:postage_type].present?
       redirect_to @letter, alert: "Cannot change postage type for a letter that is part of a batch."
       return
+    end
+
+    # Set postage type to international_origin if return address is not US
+    if params[:letter][:return_address_id].present?
+      return_address = ReturnAddress.find(params[:letter][:return_address_id])
+      if return_address.country != "US"
+        params[:letter][:postage_type] = "international_origin"
+      end
     end
 
     if @letter.update(letter_params)
