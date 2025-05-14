@@ -86,7 +86,7 @@ module SnailMail
 
       pdf.font(font_name) do
         pdf.text_box(
-          letter.address.snailify,
+          letter.address.snailify(letter.return_address.country),
           at: [x, y],
           width: width,
           height: height,
@@ -141,7 +141,7 @@ module SnailMail
 
     # Format destination address
     def format_destination_address(letter)
-      letter.address.snailify
+      letter.address.snailify(letter.return_address.country)
     end
 
     # Generate IMb barcode

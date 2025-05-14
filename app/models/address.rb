@@ -32,23 +32,23 @@ class Address < ApplicationRecord
   validates_presence_of :first_name, :line_1, :city, :state, :postal_code, :country
 
   def name_line
-    [ first_name, last_name ].join(" ")
+    [first_name, last_name].join(" ")
   end
 
   def us_format
-  <<~EOA
-  #{name_line}
-  #{[ line_1, line_2 ].compact_blank.join("\n")}
-  #{city}, #{state} #{postal_code}
-  #{country}
-  EOA
+    <<~EOA
+      #{name_line}
+      #{[line_1, line_2].compact_blank.join("\n")}
+      #{city}, #{state} #{postal_code}
+      #{country}
+    EOA
   end
 
   def us?
     country == "US"
   end
 
-  def snailify
+  def snailify(origin = "US")
     SnailButNbsp.new(
       name: name_line,
       line_1:,
@@ -56,7 +56,8 @@ class Address < ApplicationRecord
       city:,
       region: state,
       postal_code:,
-      country: country
+      country: country,
+      origin: origin,
     ).to_s
   end
 end

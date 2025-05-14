@@ -64,14 +64,14 @@
         <div class="form-group">
           <%= f.label :us_postage_type, "US Postage Type", class: "form-label" %>
           <%= f.select :us_postage_type, 
-                      [["Stamps", "stamps"], ["Indicia", "indicia"]], 
+                      [["Stamps", "stamps"], ["Indicia", "indicia"], ["International Origin", "international_origin"]], 
                       { selected: "indicia" }, 
                       { class: "form-select" } %>
         </div>
         <div class="form-group">
           <%= f.label :intl_postage_type, "International Postage Type", class: "form-label" %>
           <%= f.select :intl_postage_type, 
-                      [["Stamps", "stamps"], ["Indicia", "indicia"]], 
+                      [["Stamps", "stamps"], ["Indicia", "indicia"], ["International Origin", "international_origin"]], 
                       { selected: "indicia" }, 
                       { class: "form-select" } %>
         </div>

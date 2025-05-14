@@ -2,7 +2,6 @@
   <% if letter.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(letter.errors.count, "error") %> prohibited this letter from being saved:</h2>
-
       <ul>
         <% letter.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -10,22 +9,18 @@
       </ul>
     </div>
   <% end %>
-
   <div class="form-group">
     <%= form.label :user_facing_title, "Title", class: "form-label" %>
     <%= form.text_field :user_facing_title, class: "form-control", placeholder: "e.g. Monthly Newsletter" %>
   </div>
-
   <fieldset>
     <legend>Letter Specs</legend>
     <%= render partial: "letters/letter_attributes_form", locals: { form: form } %>
   </fieldset>
-
   <fieldset>
     <legend>Recipient Address</legend>
     <%= render partial: "addresses/nested_form", locals: { form: form } %>
   </fieldset>
-
   <fieldset>
     <legend>Return Address</legend>
     <div class="grid">
@@ -36,7 +31,7 @@
                                  :id,
                                  :display_name,
                                  { prompt: "Select a return address...", selected: current_user.home_return_address_id },
-                                 { class: "form-control" } %>
+                                 { class: "form-control", data: { controller: "return-address" } } %>
         <small>
           <%= link_to "Manage Return Addresses", return_addresses_path(from_letter: true) %>
         </small>
@@ -47,7 +42,6 @@
       </div>
     </div>
   </fieldset>
-
   <fieldset>
     <legend>USPS Mailer ID</legend>
     <div class="grid">
@@ -65,7 +59,6 @@
       please leave this at the default if you're mailing from HQ – otherwise talk to nora (it has USPS implications)
     </div>
   </fieldset>
-
   <fieldset>
     <legend>Additional Data</legend>
     <div class="grid">
@@ -80,10 +73,8 @@
         <small>Extra text to print on the label!</small>
       </div>
     </div>
-
     <%= render 'shared/tag_picker', form: form %>
   </fieldset>
-
   <fieldset>
     <legend>Postage Options</legend>
     <div class="grid">
@@ -95,16 +86,19 @@
         <small>Check this if the letter contains rigid items or is otherwise non-machinable.</small>
       </div>
     </div>
-
     <div class="grid">
       <div>
         <label>
-          <%= form.radio_button :postage_type, "stamps", checked: true %>
+          <%= form.radio_button :postage_type, "stamps", checked: true, class: "postage-type-option" %>
           Stamps
         </label>
         <label>
-          <%= form.radio_button :postage_type, "indicia" %>
+          <%= form.radio_button :postage_type, "indicia", class: "postage-type-option" %>
           Indicia (Metered)
+        </label>
+        <label class="international-origin-option" style="display: none;">
+          <%= form.radio_button :postage_type, "international_origin", class: "postage-type-option" %>
+          International Origin
         </label>
         <small>
           <% if @letter.address&.us? %>
@@ -116,7 +110,6 @@
       </div>
     </div>
   </fieldset>
-
   <div class="grid">
     <div>
       <%= form.submit "do it!", class: "success" %>
@@ -124,17 +117,34 @@
     </div>
   </div>
 <% end %>
-
 <%= javascript_tag do %>
   document.addEventListener('DOMContentLoaded', function() {
-    const indiciaRadio = document.querySelector('input[name="letter[postage_type]"][value="indicia"]');
-    const stampsRadio = document.querySelector('input[name="letter[postage_type]"][value="stamps"]');
-
-    function togglePaymentAccount() {
-      // No longer needed since we removed the payment account field
-    }
-
-    indiciaRadio.addEventListener('change', togglePaymentAccount);
-    stampsRadio.addEventListener('change', togglePaymentAccount);
+  const returnAddressSelect = document.querySelector('#letter_return_address_id');
+  const internationalOriginOption = document.querySelector('.international-origin-option');
+  const stampsRadio = document.querySelector('input[name="letter[postage_type]"][value="stamps"]');
+  const indiciaRadio = document.querySelector('input[name="letter[postage_type]"][value="indicia"]');
+  const internationalOriginRadio = document.querySelector('input[name="letter[postage_type]"][value="international_origin"]');
+  // Store country data in a data attribute when rendering the select options
+  const returnAddresses = <%= raw ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).map { |ra| { id: ra.id, country: ra.country } }.to_json %>;
+  function updatePostageTypeOptions() {
+  const selectedId = returnAddressSelect.value;
+  if (!selectedId) return;
+  const selectedAddress = returnAddresses.find(ra => ra.id.toString() === selectedId);
+  const isUS = selectedAddress?.country === 'US';
+  if (isUS) {
+  internationalOriginOption.style.display = 'none';
+  if (internationalOriginRadio.checked) {
+  stampsRadio.checked = true;
+  }
+  } else {
+  internationalOriginOption.style.display = 'block';
+  stampsRadio.checked = false;
+  indiciaRadio.checked = false;
+  internationalOriginRadio.checked = true;
+  }
+  }
+  returnAddressSelect.addEventListener('change', updatePostageTypeOptions);
+  // Initial check
+  updatePostageTypeOptions();
   });
 <% end %>
