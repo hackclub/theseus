@@ -92,8 +92,8 @@
   </div>
 <% end %>
 <hr/>
-<h3>offspring:</h3>
-<% if @batches.any? %>
+<% if @batches&.any? %>
+  <h3>offspring:</h3>
   <%= render partial: 'letter/batches/batches_collection', locals: { batches: @batches } %>
 <% else %>
   <h2 style="font-family: 'serif'">"No batches?"</h2>
