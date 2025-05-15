@@ -49,7 +49,7 @@ class User
         .map do |letter|
         {
           type: "Letters printed but not marked mailed",
-          name: "Letter #{letter.public_id}",
+          name: "Letter #{letter.public_id} – #{letter.user_facing_title || letter.tags.join(", ")}",
           subtitle: "to #{letter.address.name_line}",
           link: Rails.application.routes.url_helpers.letter_path(letter),
         }
