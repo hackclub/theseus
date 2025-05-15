@@ -66,6 +66,7 @@ class Letter::QueuesController < ApplicationController
       redirect_to @letter_queue
     end
     batch = @letter_queue.make_batch(user: current_user)
+    User::UpdateTasksJob.perform_now(current_user)
     flash[:success] = "now do something with it!"
     redirect_to process_letter_batch_path batch
   end

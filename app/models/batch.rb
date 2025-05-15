@@ -59,17 +59,31 @@ class Batch < ApplicationRecord
 
     event :mark_processed do
       transitions from: :fields_mapped, to: :processed
+      after do
+        User::UpdateTasksJob.perform_now(user)
+      end
     end
   end
 
   self.inheritance_column = "type"
   belongs_to :user
+  belongs_to :letter_queue, optional: true, class_name: "Letter::Queue"
   has_one_attached :csv
   has_one_attached :labels_pdf
   has_one_attached :pdf_document
   has_many :addresses, dependent: :destroy
 
   after_save :update_associated_tags, if: :saved_change_to_tags?
+
+  def origin
+    if letter_queue.present?
+      "queue: #{letter_queue.name}"
+    elsif csv.present?
+      "csv: #{csv.filename}"
+    else
+      "unknown"
+    end
+  end
 
   def attach_pdf(pdf_data)
     PdfAttachmentUtil.attach_pdf(pdf_data, self, :pdf_document)

@@ -1,0 +1,18 @@
+<h1>your tasks:
+  <sup style="display: inline-block;"><%= button_to "↻", refresh_tasks_path, method: :post, class: "btn btn-tiny success" %></sup>
+</h1>
+<br/>
+<ul>
+  <% @tasks.group_by { |task| task[:type] }.each do |type, tasks| %>
+    <li><b><%= type %>:</b></li>
+    <ul>
+      <% tasks.each do |task| %>
+        <li><%= task[:name] %>
+          <% if task[:subtitle] %>
+            <small class="muted"><i>(<%= task[:subtitle] %>)</i></small>
+          <% end %>
+          <%= link_to "(go!)", task[:link] %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</ul>

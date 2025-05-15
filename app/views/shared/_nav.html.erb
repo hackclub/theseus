@@ -12,6 +12,7 @@
         <% if current_user %>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <%= render "shared/user_mention", user: current_user %>
+            <iframe src="<%= badge_tasks_path %>" width="50" height="40" style="border: none;"></iframe>
             <%= button_to "log out", signout_path, {method: :delete, class: "btn outlined muted btn-tiny"} %>
             <% if session[:impersonator_user_id] %>
               <%= button_to "stop impersonating", stop_impersonating_path, {method: :get, class: "btn outlined info btn-tiny"} %>
@@ -70,7 +71,6 @@
         <details <%= 'open' if [settings_qz_tray_path].include? request.path %>>
           <summary>Settings</summary>
           <%= nav_item settings_qz_tray_path, "print settings" %>
-
         </details>
       </li>
       <% admin_tool do %>

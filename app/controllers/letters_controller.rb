@@ -131,6 +131,7 @@ class LettersController < ApplicationController
   def mark_mailed
     authorize @letter, :mark_mailed?
     if @letter.mark_mailed!
+      User::UpdateTasksJob.perform_now(current_user)
       redirect_to @letter, notice: "Letter has been marked as mailed."
     else
       redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(", ")}"

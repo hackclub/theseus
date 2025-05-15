@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%= vite_client_tag %>
+    <%= vite_stylesheet_tag 'app_style.scss' %>
+  </head>
+  <body style="margin: 0 !important;">
+    <% if @tasks.any? %>
+      <%= link_to tasks_path, target: "_top" do%>
+        <div class="badge
+        <% if @tasks.count < 10 %>
+          success
+        <% elsif @tasks.count < 50 %>
+          info
+        <% else %>
+          warning
+        <% end %>
+        " style="margin: 0 !important;">
+          <%= @tasks.count %><% if @tasks.count > 50 %>?<% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </body>
+</html>

@@ -386,6 +386,12 @@ end
 
 Rails.application.routes.draw do
   scope path: "back_office" do
+    scope :my do
+      resource :tasks, only: %i(show) do
+        get :badge
+        post :refresh
+      end
+    end
     get "/tags", to: "tags#index"
     get "/tags/:id", to: "tags#show", as: :tag_stats
     post "/tags/refresh", to: "tags#refresh", as: :refresh_tags

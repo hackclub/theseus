@@ -18,6 +18,8 @@ class User < ApplicationRecord
   has_many :warehouse_templates, class_name: "Warehouse::Template", inverse_of: :user
   has_many :return_addresses, dependent: :destroy
   has_many :letters
+  has_many :batches
+  has_many :letter_queues, dependent: :destroy, class_name: "Letter::Queue"
   belongs_to :home_mid, class_name: "USPS::MailerId", optional: true
   belongs_to :home_return_address, class_name: "ReturnAddress", optional: true
 
