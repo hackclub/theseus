@@ -14,6 +14,8 @@ module SnailMail
         pdf.font "arial" do
           pdf.text_box "good job", size: 99, at: [0, pdf.bounds.top], valign: :center, align: :center
         end
+
+        pdf.text_box "from: @#{letter.metadata["gj_from"]}\n#{letter.metadata["gj_reason"]}", size: 18, at: [100, 100], align: :left
         pdf.start_new_page
 
         render_postage(pdf, letter)
