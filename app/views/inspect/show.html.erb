@@ -1,0 +1,14 @@
+<h1 style="font-family: 'Comic Sans MS', 'Comic Sans"> inspektor </h1>
+<%= render "admin_inspector", record: @record %>
+<b>associated fields:</b> <br/>
+<ul>
+  <% @linked_fields.each do |field, link| %>
+    <li>
+      <%= field %>: <% if link.present? %>
+        <%= link_to "here!", link %>
+      <% else %>
+        <i>not present</i>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

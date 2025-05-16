@@ -386,6 +386,16 @@ end
 
 Rails.application.routes.draw do
   scope path: "back_office" do
+    resources :public_ids, only: [:index] do
+      collection do
+        post :lookup
+      end
+    end
+
+    namespace :inspect do
+      resources :iv_mtr_events, only: [:show]
+      resources :indicia, only: [:show]
+    end
     scope :my do
       resource :tasks, only: %i(show) do
         get :badge

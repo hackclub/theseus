@@ -1,0 +1,6 @@
+<h1>enter one of those IDs we're always putting on things:</h1>
+<%= form_with url: lookup_public_ids_path, method: :post do |f| %>
+  <%= f.label :id, "ID:" %>
+  <%= f.text_field :id %>
+  <%= f.submit "go!", class: "btn success btn-small" %>
+<% end %>
