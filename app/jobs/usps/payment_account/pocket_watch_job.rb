@@ -14,6 +14,6 @@ class USPS::PaymentAccount::PocketWatchJob < ApplicationJob
       broke_accounts << acct unless acct.check_funds_available(THRESHOLD)
     end
 
-    USPS::PaymentAccountMailer.get_your_eps_racks_up(accounts: broke_accounts).deliver_later
+    USPS::PaymentAccountMailer.get_your_eps_racks_up(accounts: broke_accounts).deliver_later if broke_accounts.any?
   end
 end
