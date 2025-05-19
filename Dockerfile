@@ -33,6 +33,8 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     imagemagick \
     libmagickwand-dev
 
+RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
+
 # Install Node.js and Yarn
 ARG NODE_VERSION=23.6.0
 ARG YARN_VERSION=1.22.22
