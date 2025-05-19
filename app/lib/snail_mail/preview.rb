@@ -57,6 +57,8 @@ module SnailMail
       Templates.available_templates.each do |name|
         template = Templates.get_template_class(name)
         first_name, last_name = names.sample.split(" ")
+        return_address_name = names.sample
+
         mock_letter = OpenStruct.new(
           address: FakeAddress.new(
             first_name:,
@@ -69,6 +71,7 @@ module SnailMail
             country: "US",
           ),
           return_address:,
+          return_address_name:,
           postage_type: "stamps",
           postage: 0.73,
           usps_mailer_id:,
