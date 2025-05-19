@@ -5,12 +5,11 @@ module SnailMail
         "HCB Stickers"
       end
 
-
       def render(pdf, letter)
         pdf.image(
           image_path("lilia-hcb-stickers-bg.png"),
-          at: [ 0, 288 ],
-          width: 432
+          at: [0, 288],
+          width: 432,
         )
 
         # Render speech bubble
@@ -37,7 +36,7 @@ module SnailMail
         # Render IMb barcode
         render_imb(pdf, letter, 216, 25, 207)
 
-        render_letter_id(pdf, letter, 341, 19, 10)
+        render_letter_id(pdf, letter, 10, 12, 10)
         render_qr_code(pdf, letter, 5, 196, 50)
 
         render_postage(pdf, letter)

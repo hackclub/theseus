@@ -3,6 +3,12 @@
     <strong>Name:</strong>
     <%= queue.name %>
   </p>
+  <% if queue.user_facing_title.present? %>
+    <p>
+      <strong>Display Title:</strong>
+      <%= queue.user_facing_title %>
+    </p>
+  <% end %>
   <p>
     <strong>Type:</strong>
     <%= queue.type&.constantize&.model_name&.human || "Regular Queue" %>

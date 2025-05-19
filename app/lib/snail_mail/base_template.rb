@@ -18,6 +18,10 @@ module SnailMail
       :standard # default to 4x6 standard
     end
 
+    def self.show_on_single?
+      false
+    end
+
     def self.template_description
       "A label template"
     end

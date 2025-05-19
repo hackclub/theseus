@@ -5,12 +5,11 @@ module SnailMail
         "Hackatime (new)"
       end
 
-
       def render(pdf, letter)
         pdf.image(
           image_path("hackatime/its_about_time.png"),
-          at: [ 13, 219 ],
-          width: 409
+          at: [13, 219],
+          width: 409,
         )
 
         # Render speech bubble
@@ -37,7 +36,7 @@ module SnailMail
         # Render IMb barcode
         render_imb(pdf, letter, 216, 25, 207)
 
-        render_letter_id(pdf, letter, 341, 19, 10)
+        render_letter_id(pdf, letter, 10, 19, 10)
         render_qr_code(pdf, letter, 5, 55, 50)
 
         render_postage(pdf, letter)

@@ -5,12 +5,15 @@ module SnailMail
         "Mail Orpheus!"
       end
 
+      def self.show_on_single?
+        true
+      end
 
       def render(pdf, letter)
         pdf.image(
           image_path("eleeza-mail-orpheus.png"),
-          at: [ 320, 113 ],
-          width: 106.4
+          at: [320, 113],
+          width: 106.4,
         )
 
         # Render speech bubble

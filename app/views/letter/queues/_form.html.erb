@@ -20,20 +20,31 @@
       <%= form.text_field :name, class: "form-control" %>
     </div>
     <div class="form-group">
+      <%= form.label :user_facing_title, "Display Title", class: "form-label" %>
+      <%= form.text_field :user_facing_title, class: "form-control", placeholder: "Optional title that will be shown to users" %>
+    </div>
+    <div class="form-group">
       <%= render 'shared/tag_picker', form: form %>
     </div>
   </div>
-  <div class="form-group">
-    <%= form.label :type, "Queue Type", class: "form-label" %>
-    <%= form.select :type, 
+  <% if letter_queue.new_record? %>
+    <div class="form-group">
+      <%= form.label :type, "Queue Type", class: "form-label" %>
+      <%= form.select :type, 
         [
           ["Regular Queue", "Letter::Queue"],
           ["Instant Queue", "Letter::InstantQueue"]
         ],
         { selected: letter_queue.type || "Letter::Queue" },
         { class: "form-control", onchange: "toggleQueueType(this)" } %>
-  </div>
+    </div>
+  <% end %>
   <h3>set defaults for letters:</h3>
+  <div class="form-group">
+    <%= form.label :template, "Label Template", class: "form-label" %>
+    <%= form.hidden_field :template, id: "selected_template", value: letter_queue.template %>
+    <%= render "shared/template_picker", multiple: false, show_all: true %>
+  </div>
   <%= render 'letters/letter_attributes_form', form: form, is_batch: true %>
   <div class="form-group">
     <%= form.label :letter_mailer_id_id, "USPS Mailer ID", class: "form-label" %>
@@ -61,13 +72,6 @@
   <%# Instant Queue specific fields %>
   <div id="instantFields" style="display: <%= letter_queue.is_a?(Letter::InstantQueue) ? 'block' : 'none' %>">
     <h3>Instant Queue Settings</h3>
-    <div class="form-group">
-      <%= form.label :template, "Label Template", class: "form-label" %>
-      <%= form.select :template,
-                     SnailMail::Service.available_templates,
-                     { selected: letter_queue.template || "Heidi Can't Readme" },
-                     { class: "form-control" } %>
-    </div>
     <div class="form-group">
       <%= form.label :postage_type, "Postage Type", class: "form-label" %>
       <%= form.select :postage_type,

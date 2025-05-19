@@ -1,6 +1,12 @@
 <%= render "letter/queues/queue", queue: instant_queue %>
 <div class="mt-4">
   <h4>Instant Queue Details</h4>
+  <% if instant_queue.user_facing_title.present? %>
+    <p>
+      <strong>Display Title:</strong>
+      <%= instant_queue.user_facing_title %>
+    </p>
+  <% end %>
   <p>
     <strong>Template:</strong>
     <%= instant_queue.template %>
@@ -26,4 +32,3 @@
     </p>
   <% end %>
 </div>
- 

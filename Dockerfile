@@ -29,7 +29,9 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     libpq-dev \
     node-gyp \
     pkg-config \
-    python-is-python3
+    python-is-python3 \ 
+    imagemagick \
+    libmagickwand-dev
 
 # Install Node.js and Yarn
 ARG NODE_VERSION=23.6.0

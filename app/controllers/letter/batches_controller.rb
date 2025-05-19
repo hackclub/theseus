@@ -108,7 +108,7 @@ class Letter::BatchesController < BaseBatchesController
           payment_account: payment_account,
           us_postage_type: letter_batch_params[:us_postage_type],
           intl_postage_type: letter_batch_params[:intl_postage_type],
-          template_cycle: letter_batch_params[:template_cycle].compact_blank,
+          template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank,
           user_facing_title: letter_batch_params[:user_facing_title],
           include_qr_code: letter_batch_params[:include_qr_code],
         )
@@ -207,7 +207,7 @@ class Letter::BatchesController < BaseBatchesController
       :usps_payment_account_id,
       :include_qr_code,
       :print_immediately,
-      template_cycle: [],
+      :template_cycle,
       tags: [],
     )
   end

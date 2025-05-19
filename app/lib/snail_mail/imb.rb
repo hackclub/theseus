@@ -9,7 +9,8 @@ module SnailMail
     def generate
       barcode_id = "00"  # no OEL
       stid = "310" # no address corrections – no printed endorsements, but! IV-MTR!
-      mailer_id = letter.usps_mailer_id.mid
+      mailer_id = letter.usps_mailer_id&.mid
+      return "" unless mailer_id
       serial_number = letter.imb_serial_number
       routing_code = letter.address.us? ? letter.address.postal_code.gsub(/[^0-9]/, "") : nil # zip(+dpc?) but no dash
 

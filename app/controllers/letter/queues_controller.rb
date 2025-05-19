@@ -68,7 +68,7 @@ class Letter::QueuesController < ApplicationController
     batch = @letter_queue.make_batch(user: current_user)
     User::UpdateTasksJob.perform_now(current_user)
     flash[:success] = "now do something with it!"
-    redirect_to process_letter_batch_path batch
+    redirect_to process_letter_batch_path(batch, uft: @letter_queue.user_facing_title, template: @letter_queue.template)
   end
 
   private

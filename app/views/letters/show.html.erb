@@ -185,25 +185,8 @@
                   <h3>Generate Label</h3>
                   <%= form_tag(generate_label_letter_path(@letter), method: :post) do %>
                     <div class="mb-3">
-                      <label for="template">Template Style</label>
-                      <select name="template" id="template">
-                        <% standard_templates = SnailMail::Service.templates_for_size(:standard) %>
-                        <% if standard_templates.present? %>
-                          <optgroup label="Standard 4x6 Labels">
-                            <% standard_templates.each do |template| %>
-                              <option value="<%= template %>"><%= template.to_s.humanize %></option>
-                            <% end %>
-                          </optgroup>
-                        <% end %>
-                        <% envelope_templates = SnailMail::Service.templates_for_size(:half_letter) %>
-                        <% if envelope_templates.present? %>
-                          <optgroup label="Half-letter postcards">
-                            <% envelope_templates.each do |template| %>
-                              <option value="<%= template %>"><%= template.to_s.humanize %></option>
-                            <% end %>
-                          </optgroup>
-                        <% end %>
-                      </select>
+                      <%= render 'shared/template_picker', multiple: false %>
+                      <input type="hidden" name="template" id="selected_template">
                     </div>
                     <div class="mb-3">
                       <label>

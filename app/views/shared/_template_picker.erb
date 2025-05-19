@@ -1,0 +1,161 @@
+<%# Template picker partial that supports both single and multiple selection %>
+<div class="template-picker" data-multiple="<%= local_assigns[:multiple] %>">
+  <div class="template-picker__header">
+    <h3 class="template-picker__title">Select Template<%= local_assigns[:multiple] ? "s" : "" %></h3>
+    <% if local_assigns[:multiple] %>
+      <div class="template-picker__mode-toggle">
+        <button type="button" class="template-picker__mode-button" onclick="toggleTemplateMode(this)">
+          <span class="mode-text">Single Selection</span>
+        </button>
+      </div>
+    <% end %>
+  </div>
+  <div class="template-picker__grid">
+    <% templates = (local_assigns[:multiple] || local_assigns[:show_all]) ? SnailMail::Templates.available_templates : SnailMail::Templates.available_single_templates %>
+    <% templates.each do |template_name| %>
+      <% template_class = SnailMail::Templates.get_template_class(template_name) %>
+      <% preview_image = "images/template_previews/#{template_class.name.split('::').last.underscore}.png" %>
+      <div class="template-picker__item" 
+           data-template-name="<%= template_name %>">
+        <div class="template-picker__preview">
+          <%= vite_image_tag preview_image, alt: "#{template_name} preview", class: "template-picker__image" %>
+        </div>
+        <div class="template-picker__label">
+          <%= template_name.to_s.titleize %>
+        </div>
+        <% if local_assigns[:multiple] %>
+          <div class="template-picker__order"></div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <div class="template-picker__footer">
+    <div class="template-picker__selected-count">
+      please select a template!
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const picker = document.querySelector('.template-picker');
+    const hiddenInput = document.getElementById('selected_template');
+
+    // If there's a pre-selected value, select that template
+    if (hiddenInput && hiddenInput.value) {
+      const templateName = hiddenInput.value;
+      const templateItem = picker.querySelector(`[data-template-name="${templateName}"]`);
+      if (templateItem) {
+        templateItem.classList.add('selected');
+        updateSelectedCount(picker);
+      }
+    }
+
+    // Add click handlers to all template items
+    document.querySelectorAll('.template-picker__item').forEach(item => {
+      item.addEventListener('click', function() {
+        selectTemplate(this);
+      });
+    });
+
+    // Add form submission handler
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        const selectedTemplates = picker.querySelectorAll('.template-picker__item.selected');
+        if (selectedTemplates.length === 0) {
+          e.preventDefault();
+          alert('Please select at least one template before processing the batch.');
+        }
+      });
+    }
+  });
+
+  function selectTemplate(element) {
+    const picker = element.closest('.template-picker');
+    const isMultiple = picker.dataset.multiple === 'true';
+    const modeText = picker.querySelector('.mode-text');
+    const isMultipleMode = modeText && modeText.textContent === 'Multiple Selection';
+
+    if (isMultiple && isMultipleMode) {
+      toggleMultipleSelection(element);
+    } else {
+      selectSingleTemplate(element);
+    }
+
+    updateSelectedCount(picker);
+  }
+
+  function toggleMultipleSelection(element) {
+    const order = element.querySelector('.template-picker__order');
+    const isSelected = element.classList.contains('selected');
+
+    if (isSelected) {
+      element.classList.remove('selected');
+      order.textContent = '';
+      updateOrderNumbers(element.closest('.template-picker'));
+    } else {
+      element.classList.add('selected');
+      const selectedCount = element.closest('.template-picker').querySelectorAll('.template-picker__item.selected').length;
+      order.textContent = selectedCount;
+    }
+
+    updateTemplateInput(element.closest('.template-picker'));
+  }
+
+  function selectSingleTemplate(element) {
+    const picker = element.closest('.template-picker');
+    picker.querySelectorAll('.template-picker__item').forEach(item => {
+      item.classList.remove('selected');
+      const order = item.querySelector('.template-picker__order');
+      if (order) order.textContent = '';
+    });
+    element.classList.add('selected');
+    updateTemplateInput(picker);
+  }
+
+  function updateTemplateInput(picker) {
+    const selectedTemplates = Array.from(picker.querySelectorAll('.template-picker__item.selected'))
+      .map(item => item.dataset.templateName);
+
+    const hiddenInput = document.getElementById('selected_template');
+    if (hiddenInput) {
+      hiddenInput.value = selectedTemplates.join(',');
+    }
+  }
+
+  function updateOrderNumbers(picker) {
+    let order = 1;
+    picker.querySelectorAll('.template-picker__item.selected').forEach(item => {
+      const orderElement = item.querySelector('.template-picker__order');
+      if (orderElement) orderElement.textContent = order++;
+    });
+  }
+
+  function updateSelectedCount(picker) {
+    const count = picker.querySelectorAll('.template-picker__item.selected').length;
+    const countElement = picker.querySelector('.template-picker__selected-count');
+    if (countElement) {
+      countElement.textContent = count === 0
+        ? "please select a template!"
+        : `${count} template${count === 1 ? "" : "s"} selected`;
+    }
+  }
+
+  function toggleTemplateMode(button) {
+    const picker = button.closest('.template-picker');
+    const modeText = button.querySelector('.mode-text');
+    const isMultipleMode = modeText.textContent === 'Multiple Selection';
+
+    modeText.textContent = isMultipleMode ? 'Single Selection' : 'Multiple Selection';
+
+    // Clear selection when switching modes
+    picker.querySelectorAll('.template-picker__item').forEach(item => {
+      item.classList.remove('selected');
+      const order = item.querySelector('.template-picker__order');
+      if (order) order.textContent = '';
+    });
+
+    updateSelectedCount(picker);
+    updateTemplateInput(picker);
+  }
+</script>

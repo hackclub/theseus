@@ -50,3 +50,5 @@ node_modules
 *.local
 
 *.key
+
+app/frontend/images/template_previews/*

@@ -5,12 +5,15 @@ module SnailMail
         "Dino Waving"
       end
 
+      def self.show_on_single?
+        true
+      end
 
       def render(pdf, letter)
         pdf.image(
           image_path("dino-waving.png"),
-          at: [ 333,  163 ],
-          width: 87
+          at: [333, 163],
+          width: 87,
         )
 
         # Render return address

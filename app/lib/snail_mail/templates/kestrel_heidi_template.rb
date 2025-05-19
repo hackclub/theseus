@@ -5,12 +5,15 @@ module SnailMail
         "kestrel's heidi template!"
       end
 
+      def self.show_on_single?
+        true
+      end
 
       def render(pdf, letter)
         pdf.image(
           image_path("kestrel-mail-heidi.png"),
-          at: [ 107, 216 ],
-          width: 305
+          at: [107, 216],
+          width: 305,
         )
 
         render_return_address(pdf, letter, 10, 278, 190, 90, size: 14)
@@ -27,7 +30,7 @@ module SnailMail
 
         render_imb(pdf, letter, 124, 120, 200)
 
-        render_qr_code(pdf, letter, 7, 72+7, 72)
+        render_qr_code(pdf, letter, 7, 72 + 7, 72)
 
         render_postage(pdf, letter)
       end

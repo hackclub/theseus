@@ -14,7 +14,7 @@ module SnailMail
       HcpcxcTemplate,
       HackatimeTemplate,
       HeidiReadmeTemplate,
-      GoodJobTemplate
+      GoodJobTemplate,
     ].freeze
 
     # Default template to use when none is specified
@@ -47,12 +47,12 @@ module SnailMail
         template_name = options[:template]&.to_sym
 
         template_class = if template_name
-          # Find template by name
-          TEMPLATES.find { |t| t.template_name.to_sym == template_name }
-        else
-          # Use default
-          DEFAULT_TEMPLATE
-        end
+            # Find template by name
+            TEMPLATES.find { |t| t.template_name.to_sym == template_name }
+          else
+            # Use default
+            DEFAULT_TEMPLATE
+          end
 
         # Create a new instance of the template
         template_class ? template_class.new(options) : DEFAULT_TEMPLATE.new(options)
@@ -67,6 +67,10 @@ module SnailMail
       # List all available template names
       def available_templates
         TEMPLATES.map { |t| t.template_name.to_sym }
+      end
+
+      def available_single_templates
+        TEMPLATES.select { |t| t.show_on_single? }.map { |t| t.template_name.to_sym }
       end
 
       # Check if a template exists
