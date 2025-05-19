@@ -34,4 +34,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "LSV"
   inflect.acronym "MSR"
   inflect.acronym "QZ"
+  inflect.acronym "OTP"
 end
