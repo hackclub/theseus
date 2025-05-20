@@ -144,6 +144,11 @@ class Letter::Batch < Batch
     mark_processed!
   end
 
+  def regenerate_labels!(options = {})
+    labels_pdf.purge
+    generate_labels(options)
+  end
+
   # Purchase indicia for all letters in the batch using a single payment token
   def purchase_batch_indicia(payment_account)
     # Create a single payment token for the entire batch

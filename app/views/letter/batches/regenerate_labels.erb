@@ -1,0 +1,16 @@
+<h1>regenerate labels</h1>
+<%= form_with(model: @batch, url: regenerate_labels_letter_batch_path(@batch), method: :post) do |f| %>
+  <div class="form-group">
+    <%= f.label :template_cycle, "templates to use:", class: "form-label" %>
+    <%= f.hidden_field :template_cycle, id: "selected_template", value: params[:template] %>
+    <%= render "shared/template_picker", multiple: true %>
+  </div>
+  <div class="form-group">
+    <%= f.label :include_qr_code, "Include QR Code", class: "form-label" %>
+    <%= f.check_box :include_qr_code, class: "form-checkbox", checked: true %>
+  </div>
+  <div class="actions">
+    <%= f.submit "Regenerate Labels", class: "contrast" %>
+    <%= link_to "nevermind", letter_batch_path(@batch)%>
+  </div>
+<% end %>

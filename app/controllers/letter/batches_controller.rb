@@ -171,6 +171,20 @@ class Letter::BatchesController < BaseBatchesController
     }
   end
 
+  def regenerate_form
+    authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    render :regenerate_labels
+  end
+
+  def regenerate_labels
+    authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    @batch.regenerate_labels!(
+      template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank,
+      include_qr_code: letter_batch_params[:include_qr_code],
+    )
+    redirect_to letter_batch_path(@batch), notice: "Labels regenerated successfully"
+  end
+
   private
 
   def batch_params

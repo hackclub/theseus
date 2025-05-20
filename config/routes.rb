@@ -426,6 +426,8 @@ Rails.application.routes.draw do
           post :mark_printed
           post :mark_mailed
           post :update_costs
+          get :regen, to: "batches#regenerate_form", as: :regenerate_form
+          post :regen, to: "batches#regenerate_labels", as: :regenerate_labels
         end
       end
       resources :queues do
