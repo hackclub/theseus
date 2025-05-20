@@ -85,10 +85,10 @@ class Batch < ApplicationRecord
     end
   end
 
-  def csv_io
-    io = StringIO.new(csv.download)
-    io.set_encoding_by_bom
-    io
+  def csv_data
+    csv.open do |file|
+      File.read(file, encoding: "bom|utf-8")
+    end
   end
 
   def attach_pdf(pdf_data)
@@ -105,7 +105,7 @@ class Batch < ApplicationRecord
   ].join
 
   def run_map!
-    rows = CSV.parse(csv_io, headers: true, converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])
+    rows = CSV.parse(csv_data, headers: true, converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])
 
     # Phase 1: Collect all address data
     address_attributes = []
