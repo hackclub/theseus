@@ -6,7 +6,15 @@
     <p> there's not a whole lot here yet?</p>
     <% if current_public_user %>
       <p>you're currently signed in as <b><%= current_public_user.email %></b></p>
-      <p>view <%= link_to "your mail", my_mail_path %>?</p>
+      <b> Would you like to...</b>
+      <ul>
+        <li>
+          <p>view <%= link_to "your mail", my_mail_path %>?</p>
+        </li>
+        <li>
+          set up an <%= link_to "API key", public_api_keys_path %>?
+        </li>
+      </ul>
       <%= button_to "log out?", public_logout_path, { method: :delete } %>
     <% else %>
       <p>if you're interested in <b>your</b> mail in particular, you can always...</p>
@@ -18,7 +26,6 @@
     <% end %>
   </div>
 </div>
-
 <div class="window" style="width: 320px;">
   <div class="title-bar">
     <div class="title-bar-text">Leaderboard</div>

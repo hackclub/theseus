@@ -1,0 +1,32 @@
+<div class="window" style="width: 320px">
+  <div class="title-bar">
+    <div class="title-bar-text">API Keys</div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Close", public_root_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <% if @api_keys&.any? %>
+      <div class="sunken-panel" style="height: 80px">
+        <table class="interactive">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Token</th>
+              <th>Created</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= render @api_keys %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      You don't have any API keys yet. <br/>
+      Would you like to change that?
+    <% end %>
+    <div class="field-row" style="justify-content: flex-end">
+      <%= button_to "Create API Key", new_public_api_key_path, method: :get, class: "default" %>
+    </div>
+  </div>

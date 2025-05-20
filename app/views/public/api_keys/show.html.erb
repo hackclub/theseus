@@ -1,0 +1,30 @@
+<div class="window">
+  <div class="title-bar">
+    <div class="title-bar-text">API Key: <%= @api_key.name %></div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Close", public_api_keys_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <div class="field-row">
+      <b>Created:</b>
+      <%= @api_key.created_at %>
+    </div>
+    <div class="field-row">
+      <b>Status:</b>
+      <%= @api_key.revoked? ? "Revoked" : "Active" %>
+    </div>
+    <% if @api_key.revoked? %>
+      <div class="field-row">
+        <b>Revoked:</b>
+        <%= @api_key.revoked_at %>
+      </div>
+    <% end %>
+    <div class="field-row">
+      <b>key (click to copy):</b>
+      <%= copy_to_clipboard(@api_key.token, tooltip_direction: 'e') do %>
+        <pre><%= @api_key.token %></pre>
+      <% end %>
+    </div>
+    <%= button_to "revoke", revoke_confirm_public_api_key_path(@api_key), method: :get, class: "default" %>
+  </div>
