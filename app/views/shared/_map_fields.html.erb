@@ -3,39 +3,45 @@
   default_mapping = {
     # loops defaults
     'email' => 'email',
-    'firstName' => 'first_name',
-    'lastName' => 'last_name',
-    'addressLine1' => 'line_1',
-    'addressLine2' => 'line_2',
-    'addressCity' => 'city',
-    'addressState' => 'state',
-    'addressZipCode' => 'postal_code',
-    'addressZip' => 'postal_code',
-    'addressCountry' => 'country',
+    'firstname' => 'first_name',
+    'lastname' => 'last_name',
+    'addressline1' => 'line_1',
+    'addressline2' => 'line_2',
+    'addresscity' => 'city',
+    'addressstate' => 'state',
+    'addresszipcode' => 'postal_code',
+    'addresszip' => 'postal_code',
+    'addresscountry' => 'country',
     'rubber_stamps' => 'rubber_stamps',
     # hcb promotions
-    'Address (zip/postal code)' => 'postal_code',
-    'Address (city)' => 'city',
-    'Address (state/province)' => 'state',
-    'Address (country)' => 'country',
-    'Address (line 1)' => 'line_1',
-    'Address (line 2)' => 'line_2',
-    'Recipient Name' => 'first_name',
-    'Login Email' => 'email',
+    'address (zip/postal code)' => 'postal_code',
+    'address (city)' => 'city',
+    'address (state/province)' => 'state',
+    'address (country)' => 'country',
+    'address (line 1)' => 'line_1',
+    'address (line 2)' => 'line_2',
+    'recipient name' => 'first_name',
+    'login email' => 'email',
     # unified YSWS DB
-    'Address (Line 1)' => 'line_1',
-    'Address (Line 2)' => 'line_2',
-    'City' => 'city',
-    'State / Province' => 'state',
-    'ZIP / Postal Code' => 'postal_code',
-    'Country' => 'country',
-    'First Name' => 'first_name',
-    'Last Name' => 'last_name',
-    'Email' => 'email'
-    
+    'address (line 1)' => 'line_1',
+    'address (line 2)' => 'line_2',
+    'city' => 'city',
+    'state / province' => 'state',
+    'zip / postal code' => 'postal_code',
+    'country' => 'country',
+    'first name' => 'first_name',
+    'last name' => 'last_name',
+    'email' => 'email',
+    'rubber stamps' => 'rubber_stamps',
+    'zip/postal code' => 'postal_code',
+    'city' => 'city',
+    'state/province' => 'state',
+    'country' => 'country',
+    'line 1' => 'line_1',
+    'line 2' => 'line_2',
+    'address' => 'line_1'
   }
 %>
-
 <div class="container">
   <article>
     <header>
@@ -43,18 +49,24 @@
       <p>Select the corresponding address field for each CSV column.</p>
       <p><small>Orange borders indicate automatically mapped fields. You can modify these if needed.</small></p>
     </header>
-
     <%# List unmapped fields %>
     <% 
-      mapped_fields = @csv_headers.map { |header| default_mapping[header] }.compact
+      mapped_fields = @csv_headers.map { |header| default_mapping[header.downcase] }.compact
       unmapped_fields = (@address_fields - ["batch_id"]) - mapped_fields
-      required_unmapped = BaseBatchesController::REQUIRED_FIELDS & unmapped_fields
+      
+      # Find required fields that couldn't be automapped
+      required_unmapped = BaseBatchesController::REQUIRED_FIELDS.select do |field|
+        # Check if any CSV header could potentially map to this field
+        !@csv_headers.any? do |header|
+          default_mapping[header.downcase] == field
+        end
+      end
+      
       optional_unmapped = unmapped_fields - BaseBatchesController::REQUIRED_FIELDS
       
       # Debug output
       Rails.logger.debug "Available fields: #{@address_fields.inspect}"
     %>
-    
     <% if unmapped_fields.any? %>
       <div class="unmapped-fields">
         <h3>Unmapped Fields</h3>
@@ -76,7 +88,6 @@
         <% end %>
       </div>
     <% end %>
-
     <%= form_with(model: @batch, url: send("set_mapping_#{@batch.class.name.split('::').first.downcase}_batch_path", @batch), method: :post) do |f| %>
       <div class="mapping-container">
         <% 
@@ -95,10 +106,9 @@
                 <% end %>
               </div>
             </div>
-
             <div class="field-mapping">
               <% 
-                default_value = default_mapping[header]
+                default_value = default_mapping[header.downcase]
                 is_automapped = default_value.present?
               %>
               <%= select_tag "mapping[#{header}]",
@@ -113,7 +123,6 @@
           </div>
         <% end %>
       </div>
-
       <%# Add hidden fields for required fields if they're not already mapped %>
       <% 
         mapped_fields = @csv_headers.map { |header| default_mapping[header] }.compact
@@ -145,7 +154,6 @@
           end
         end
       %>
-
       <div class="actions">
         <%= f.submit "Save Mapping", class: "contrast" %>
         <%= link_to "Cancel", send("#{@batch.class.name.split('::').first.downcase}_batch_path", @batch), class: "secondary" %>
@@ -153,137 +161,135 @@
     <% end %>
   </article>
 </div>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Get all select elements
-  const selects = document.querySelectorAll('.form-select');
-  
-  // Function to update the disabled state of options and borders
-  function updateSelects() {
-    // Get all currently selected values (excluding empty selections)
-    const selectedValues = Array.from(selects)
-      .map(select => select.value)
-      .filter(value => value !== '');
-    
-    // For each select element
-    selects.forEach(select => {
-      const currentValue = select.value;
-      
-      // Reset border color
-      select.style.border = '2px solid var(--muted-border-color)';
-      
-      // If this field has an automap value and user hasn't changed it
-      if (select.dataset.automapValue && currentValue === select.dataset.automapValue) {
-        select.style.border = '2px solid #ffa500'; // Orange for automapped
-      }
-      
-      // If user has changed the value from the automapped one
-      if (currentValue !== '' && select.dataset.automapValue && currentValue !== select.dataset.automapValue) {
-        select.dataset.usermapped = 'true';
-        select.style.border = '2px solid #2ecc71'; // Green for user changed
-      } else {
-        delete select.dataset.usermapped;
-      }
-      
-      // First, enable all options
-      for (let i = 0; i < select.options.length; i++) {
-        select.options[i].disabled = false;
-      }
-      
-      // Then disable options that are selected in other dropdowns
-      selectedValues.forEach(value => {
-        if (value !== currentValue) {
-          // Find the option with this value in the current select
-          for (let i = 0; i < select.options.length; i++) {
-            if (select.options[i].value === value) {
-              select.options[i].disabled = true;
-              break;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get all select elements
+    const selects = document.querySelectorAll('.form-select');
+
+    // Function to update the disabled state of options and borders
+    function updateSelects() {
+      // Get all currently selected values (excluding empty selections)
+      const selectedValues = Array.from(selects)
+        .map(select => select.value)
+        .filter(value => value !== '');
+
+      // For each select element
+      selects.forEach(select => {
+        const currentValue = select.value;
+
+        // Reset border color
+        select.style.border = '2px solid var(--muted-border-color)';
+
+        // If this field has an automap value and user hasn't changed it
+        if (select.dataset.automapValue && currentValue === select.dataset.automapValue) {
+          select.style.border = '2px solid #ffa500'; // Orange for automapped
+        }
+
+        // If user has changed the value from the automapped one
+        if (currentValue !== '' && select.dataset.automapValue && currentValue !== select.dataset.automapValue) {
+          select.dataset.usermapped = 'true';
+          select.style.border = '2px solid #2ecc71'; // Green for user changed
+        } else {
+          delete select.dataset.usermapped;
+        }
+
+        // First, enable all options
+        for (let i = 0; i < select.options.length; i++) {
+          select.options[i].disabled = false;
+        }
+
+        // Then disable options that are selected in other dropdowns
+        selectedValues.forEach(value => {
+          if (value !== currentValue) {
+            // Find the option with this value in the current select
+            for (let i = 0; i < select.options.length; i++) {
+              if (select.options[i].value === value) {
+                select.options[i].disabled = true;
+                break;
+              }
             }
           }
-        }
+        });
       });
+    }
+
+    // Run the update function immediately
+    updateSelects();
+
+    // Add change event listeners to all selects
+    selects.forEach(select => {
+      select.addEventListener('change', updateSelects);
     });
-  }
-  
-  // Run the update function immediately
-  updateSelects();
-  
-  // Add change event listeners to all selects
-  selects.forEach(select => {
-    select.addEventListener('change', updateSelects);
   });
-});
 </script>
-
 <style>
-.mapping-container {
-  margin: 0.5rem 0;
-}
-
-.mapping-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  background: var(--card-background-color);
-  border-radius: var(--border-radius);
-}
-
-.field-name {
-  font-weight: bold;
-  color: var(--primary);
-}
-
-.field-preview {
-  color: var(--muted-color);
-  font-size: 0.875rem;
-}
-
-.form-select {
-  width: 100%;
-  border: 2px solid var(--muted-border-color);
-  border-radius: var(--border-radius);
-  transition: border-color 0.2s ease;
-}
-
-.form-select option:disabled {
-  color: var(--muted-color);
-}
-
-.actions {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.unmapped-fields {
-  margin: 1rem 0;
-  padding: 1rem;
-  background: var(--card-background-color);
-  border: 1px solid var(--muted-border-color);
-  border-radius: var(--border-radius);
-}
-
-.unmapped-fields h3 {
-  margin-top: 0;
-  color: var(--primary);
-}
-
-.unmapped-fields ul {
-  margin: 0.5rem 0;
-  padding-left: 1.5rem;
-}
-
-.unmapped-fields li {
-  margin: 0.25rem 0;
-}
-
-@media (max-width: 768px) {
-  .mapping-row {
-    grid-template-columns: 1fr;
+  .mapping-container {
+    margin: 0.5rem 0;
   }
-}
+
+  .mapping-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: var(--card-background-color);
+    border-radius: var(--border-radius);
+  }
+
+  .field-name {
+    font-weight: bold;
+    color: var(--primary);
+  }
+
+  .field-preview {
+    color: var(--muted-color);
+    font-size: 0.875rem;
+  }
+
+  .form-select {
+    width: 100%;
+    border: 2px solid var(--muted-border-color);
+    border-radius: var(--border-radius);
+    transition: border-color 0.2s ease;
+  }
+
+  .form-select option:disabled {
+    color: var(--muted-color);
+  }
+
+  .actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .unmapped-fields {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--card-background-color);
+    border: 1px solid var(--muted-border-color);
+    border-radius: var(--border-radius);
+  }
+
+  .unmapped-fields h3 {
+    margin-top: 0;
+    color: var(--primary);
+  }
+
+  .unmapped-fields ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .unmapped-fields li {
+    margin: 0.25rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .mapping-row {
+      grid-template-columns: 1fr;
+    }
+  }
 </style> 
