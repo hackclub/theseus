@@ -105,8 +105,7 @@ class Batch < ApplicationRecord
   ].join
 
   def run_map!
-    csv_content = csv.download
-    rows = CSV.parse(csv_content, headers: true, encoding: "UTF-8", converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])
+    rows = CSV.parse(csv_io, headers: true, converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])
 
     # Phase 1: Collect all address data
     address_attributes = []
