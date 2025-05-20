@@ -46,32 +46,31 @@ module SnailMail
       )
 
       names = [
-        "Orpheus Hackworth",
+        "Orpheus",
         "Heidi Hakkuun",
         "Dinobox",
         "Arcadius",
+        "Cap'n Trashbeard",
       ]
 
       usps_mailer_id = OpenStruct.new(mid: "111111")
 
       Templates.available_templates.each do |name|
         template = Templates.get_template_class(name)
-        first_name, last_name = names.sample.split(" ")
-        return_address_name = names.sample
+        sender, recipient = names.sample(2)
 
         mock_letter = OpenStruct.new(
           address: FakeAddress.new(
-            first_name:,
-            last_name:,
             line_1: "8605 Santa Monica Blvd",
             line_2: "Apt. 86294",
             city: "West Hollywood",
             state: "CA",
             postal_code: "90069",
             country: "US",
+            name_line: sender,
           ),
           return_address:,
-          return_address_name:,
+          return_address_name_line: recipient,
           postage_type: "stamps",
           postage: 0.73,
           usps_mailer_id:,
