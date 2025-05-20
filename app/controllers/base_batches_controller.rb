@@ -90,9 +90,7 @@ class BaseBatchesController < ApplicationController
   end
 
   def setup_csv_fields
-    ap @batch.csv
-    csv_content = @batch.csv.download
-    csv_rows = CSV.parse(csv_content)
+    csv_rows = CSV.parse(@batch.csv_io)
     @csv_headers = csv_rows.first
     @csv_preview = csv_rows[1..PREVIEW_ROWS] || []
 

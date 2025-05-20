@@ -85,6 +85,12 @@ class Batch < ApplicationRecord
     end
   end
 
+  def csv_io
+    io = StringIO.new(csv.download)
+    io.set_encoding_by_bom
+    io
+  end
+
   def attach_pdf(pdf_data)
     PdfAttachmentUtil.attach_pdf(pdf_data, self, :pdf_document)
   end
