@@ -172,15 +172,23 @@
                     <%= link_to "View Label", rails_blob_path(@letter.label, disposition: 'inline'), class: "primary", target: "_blank" %>
                   </div>
                   <div class="flex gap-2 mb-3">
+                    <%= button_to "Clear Label", clear_label_letter_path(@letter), method: :post, class: "contrast", data: { confirm: "Are you sure you want to clear this label?" } %>
+                  </div>
+                </div>
+              <% end %>
+              <% if @letter.batch.present? || @letter.label.attached? %>
+                <div class="mb-4">
+                  <h3>Actions</h3>
+                  <div class="flex gap-2">
                     <%= button_to mark_printed_letter_path(@letter), method: :post, class: "btn btn-sm success", id: 'mark_printed' do %>
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                       </svg>
                       mark printed!
-                    <% end %>                    <%= button_to "Clear Label", clear_label_letter_path(@letter), method: :post, class: "contrast", data: { confirm: "Are you sure you want to clear this label?" } %>
+                    <% end %>
                   </div>
                 </div>
-              <% else %>
+              <% elsif !@letter.batch.present? %>
                 <div class="mb-4">
                   <h3>Generate Label</h3>
                   <%= form_tag(generate_label_letter_path(@letter), method: :post) do %>
