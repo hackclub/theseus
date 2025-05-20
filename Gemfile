@@ -121,7 +121,7 @@ gem "prawn", "~> 2.5"
 
 gem "usps_intelligent_barcode", "~> 1.0"
 
-gem "rqrcode", "~> 2.2"
+gem "rqrcode", "~> 3.1"
 
 gem "kaminari", "~> 1.2"
 
