@@ -159,3 +159,5 @@ gem "parallel", "~> 1.26"
 gem "honeybadger", "~> 5.28"
 
 gem "rmagick", "~> 5.3"
+
+gem "jb", "~> 0.8.2"

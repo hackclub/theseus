@@ -1,0 +1,12 @@
+{
+  id: letter.public_id,
+  type: :letter,
+  path: if_expand(:path) { public_v1_letter_path(letter) },
+  public_url: public_letter_url(letter),
+  status: letter.aasm_state,
+  tags: letter.tags || [],
+  title: letter.user_facing_title,
+  created_at: letter.created_at,
+  updated_at: letter.updated_at,
+  events: if_expand(:events) { letter.events },
+}.compact

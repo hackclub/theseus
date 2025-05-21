@@ -1,0 +1,14 @@
+<tr>
+  <td>
+    <%= link_to api_key.name, public_api_key_path(api_key) %>
+  </td>
+  <td>
+    <%= api_key.abbreviated %>
+  </td>
+  <td>
+    <%= api_key.created_at.strftime("%b %d, %Y") %>
+  </td>
+  <td>
+    <%= api_key.revoked? ? "Revoked" : "Active" %>
+  </td>
+</tr>

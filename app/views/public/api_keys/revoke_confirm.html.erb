@@ -1,0 +1,15 @@
+<div class="window">
+  <div class="title-bar">
+    <div class="title-bar-text">Are you sure?</div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Close", public_api_keys_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <b>Are you sure you want to revoke the API key </b>"<%= @api_key.name %>"<b>?</b>
+    <p>This action cannot be undone, and everything that uses this key will stop working.</p>
+    <div class="field-row" style="justify-content: flex-end">
+      <%= button_to "i understand, do it.", revoke_public_api_key_path(@api_key), method: :post, class: "default" %>
+    </div>
+  </div>
+</div>

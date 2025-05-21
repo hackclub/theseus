@@ -1,0 +1,7 @@
+{
+  mail: expand(:path) do
+    @mail.map do |m|
+      render m
+    end
+  end,
+}

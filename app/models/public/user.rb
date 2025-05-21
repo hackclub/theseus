@@ -9,6 +9,9 @@
 #
 class Public::User < ApplicationRecord
   has_many :login_codes
+  include PublicIdentifiable
+
+  set_public_id_prefix :uzr
 
   def create_login_code
     login_codes.create!

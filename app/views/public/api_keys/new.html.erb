@@ -1,0 +1,24 @@
+<div class="window" style="width: 320px">
+  <div class="title-bar">
+    <div class="title-bar-text">Create API Key</div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Close", public_root_path) %>
+    </div>
+  </div>
+  <div class="window-body">
+    <%= form_with model: @api_key, url: public_api_keys_path do |f| %>
+      <div class="field-row">
+        <%= f.label :name, "Name:" %>
+        <%= f.text_field :name, placeholder: ["Letter Lynx", "Package Panda", "Mail Mouse", "Letter Lemur"].sample %>
+      </div>
+      <small>
+        Just for your reference. <br/>
+        Maybe something short and descriptive of where you'll use it?
+      </small> <br/>
+      <br/>
+      <div class="field-row" style="justify-content: flex-end">
+        <%= f.submit "Create API Key", class: "default" %>
+      </div>
+    <% end %>
+  </div>
+</div>

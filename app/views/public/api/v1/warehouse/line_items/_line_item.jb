@@ -1,0 +1,5 @@
+{
+  hc_sku: line_item.sku.sku,
+  name: line_item.sku.name,
+  quantity: line_item.quantity,
+}

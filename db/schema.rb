@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_19_143542) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_20_210018) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -337,6 +337,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_19_143542) do
     t.index ["usps_mailer_id_id"], name: "index_letters_on_usps_mailer_id_id"
   end
 
+  create_table "public_api_keys", force: :cascade do |t|
+    t.bigint "public_user_id", null: false
+    t.string "token_ciphertext"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.string "token_bidx"
+    t.index ["public_user_id"], name: "index_public_api_keys_on_public_user_id"
+    t.index ["token_bidx"], name: "index_public_api_keys_on_token_bidx", unique: true
+  end
+
   create_table "public_impersonations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "justification"
@@ -579,6 +591,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_19_143542) do
   add_foreign_key "letters", "return_addresses"
   add_foreign_key "letters", "users"
   add_foreign_key "letters", "usps_mailer_ids"
+  add_foreign_key "public_api_keys", "public_users"
   add_foreign_key "public_impersonations", "users"
   add_foreign_key "public_login_codes", "public_users", column: "user_id"
   add_foreign_key "return_addresses", "users"

@@ -1,0 +1,3 @@
+{
+  legacy_shipment_viewer_records: expand(:path) { @lsv.map { |l| render(l) } || [] },
+}
