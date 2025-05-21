@@ -3,9 +3,9 @@ module Public
     module V1
       class MailController < ApplicationController
         def index
-          # @mail =
-          # Warehouse::Order.where(recipient_email: current_public_user.email) # +
-          @mail = Letter.where(recipient_email: current_public_user.email)
+          @mail =
+            Warehouse::Order.where(recipient_email: current_public_user.email) +
+            Letter.where(recipient_email: current_public_user.email)
           unless params[:no_load_lsv]
             @mail += LSV::TYPES.map { |type| type.find_by_email(current_public_user.email) }.flatten
           end
