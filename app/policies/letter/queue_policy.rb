@@ -6,7 +6,7 @@ class Letter::QueuePolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   def create_letter?
-    record_belongs_to_user || user_is_admin
+    user.present?
   end
 
   alias_method :create_instant_letter?, :create_letter?
