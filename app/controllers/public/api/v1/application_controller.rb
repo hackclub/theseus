@@ -2,6 +2,8 @@ module Public
   module API
     module V1
       class ApplicationController < ActionController::API
+        prepend_view_path "app/views/public/api/v1"
+
         attr_reader :current_public_user
 
         before_action :authenticate!

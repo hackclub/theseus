@@ -1,0 +1,22 @@
+slug = LSV.slug_for(base)
+json = {
+  id: base.id,
+  type: :legacy_shipment_viewer_record,
+  subtype: base.class.name.underscore.split("/").last,
+  path: if_expand(:path) { public_v1_lsv_path(slug, base.id) },
+  public_url: show_lsv_url(slug, base.id),
+  original_id: base.source_id,
+  created_at: base.created_at,
+  title: base.title_text,
+  status: base.status_text,
+  tracking_number: base.tracking_number,
+  tracking_link: base.tracking_link,
+}
+
+if base.description.is_a?(Array)
+  json[:contents] = base.description
+else
+  json[:description] = base.description
+end
+
+json.compact

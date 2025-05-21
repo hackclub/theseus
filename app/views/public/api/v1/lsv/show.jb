@@ -1,0 +1,3 @@
+{
+  legacy_shipment_viewer_record: render(@lsv),
+}

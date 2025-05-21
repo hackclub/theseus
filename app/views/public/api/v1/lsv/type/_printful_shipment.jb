@@ -1,0 +1,16 @@
+slug = LSV.slug_for(printful_shipment)
+{
+  id: printful_shipment.source_id,
+  type: :legacy_shipment_viewer_record,
+  subtype: :printful_shipment,
+  path: if_expand(:path) { public_v1_lsv_path(slug, printful_shipment.id) },
+  public_url: show_lsv_url(slug, printful_shipment.id),
+  original_id: printful_shipment.source_id,
+  created_at: printful_shipment.created_at,
+  title: printful_shipment.title_text,
+  status: printful_shipment.status_text,
+  tracking_number: printful_shipment.tracking_number,
+  tracking_link: printful_shipment.tracking_link,
+  contents: printful_shipment.description&.map(&:strip),
+  order_id: printful_shipment.fields["%order:pretty_id"],
+}.compact

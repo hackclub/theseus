@@ -279,7 +279,15 @@
 #                         test_print_qz_tray GET    /qz_tray/test_print(.:format)                                                                     qz_trays#test_print
 #                         rails_health_check GET    /up(.:format)                                                                                     rails/health#show
 #                                usps_iv_mtr POST   /webhooks/usps/iv_mtr(.:format)                                                                   usps/iv_mtr/webhook#ingest
-#                         me_api_api_v1_user GET    /api/public/api/v1/user/me(.:format)                                                              api/public/api/v1/users#me {:format=>:json}
+#                               public_v1_me GET    /api/public/v1/me(.:format)                                                                       public/api/v1/users#me {:format=>:json}
+#                          public_v1_letters GET    /api/public/v1/letters(.:format)                                                                  public/api/v1/letters#index {:format=>:json}
+#                           public_v1_letter GET    /api/public/v1/letters/:id(.:format)                                                              public/api/v1/letters#show {:format=>:json}
+#                         public_v1_packages GET    /api/public/v1/packages(.:format)                                                                 public/api/v1/packages#index {:format=>:json}
+#                          public_v1_package GET    /api/public/v1/packages/:id(.:format)                                                             public/api/v1/packages#show {:format=>:json}
+#                       public_v1_mail_index GET    /api/public/v1/mail(.:format)                                                                     public/api/v1/mail#index {:format=>:json}
+#                        public_v1_lsv_index GET    /api/public/v1/lsv(.:format)                                                                      public/api/v1/lsv#index {:format=>:json}
+#                              public_v1_lsv GET    /api/public/v1/lsv/:slug/:id(.:format)                                                            public/api/v1/lsv#show {:format=>:json}
+#                                  api_v1_me GET    /api/public/v1/me(.:format)                                                                       api/public/api/v1/users#me {:format=>:json}
 #                            new_api_v1_user GET    /api/v1/user/new(.:format)                                                                        api/v1/users#new {:format=>:json}
 #                           edit_api_v1_user GET    /api/v1/user/edit(.:format)                                                                       api/v1/users#edit {:format=>:json}
 #                                api_v1_user GET    /api/v1/user(.:format)                                                                            api/v1/users#show {:format=>:json}
@@ -608,10 +616,17 @@ Rails.application.routes.draw do
   end
 
   scope :api do
-    namespace :public do
-      scope "", module: :api do
-        namespace :v1 do
-          get :me, to: "users#me"
+    defaults format: :json do
+      namespace :public do
+        scope "", module: :api do
+          namespace :v1 do
+            get :me, to: "users#me"
+            resources :letters, only: [:index, :show]
+            resources :packages, only: [:index, :show]
+            resources :mail, only: [:index]
+            resources :lsv, only: [:index]
+            get "/lsv/:slug/:id", to: "lsv#show", as: :lsv
+          end
         end
       end
     end
