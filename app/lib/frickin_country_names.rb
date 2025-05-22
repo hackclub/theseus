@@ -4,16 +4,17 @@ module FrickinCountryNames
   class << self
     # all of these have been problems:
     SILLY_LOOKUP_TABLE = {
-      "hong kong sar" => "HK"
+      "hong kong sar" => "HK",
+      "россия" => "RU",
     }
     UNSTATABLE_COUNTRIES = %w[EG SG]
 
     def find_country(string_to_ponder)
       normalized = ActiveSupport::Inflector.transliterate(string_to_ponder.strip)
       country = ISO3166::Country.find_country_by_alpha2(normalized) ||
-        ISO3166::Country.find_country_by_alpha3(normalized) ||
-        ISO3166::Country.find_country_by_any_name(normalized) ||
-        ISO3166::Country.find_country_by_alpha2(SILLY_LOOKUP_TABLE[normalized.downcase])
+                ISO3166::Country.find_country_by_alpha3(normalized) ||
+                ISO3166::Country.find_country_by_any_name(normalized) ||
+                ISO3166::Country.find_country_by_alpha2(SILLY_LOOKUP_TABLE[normalized.downcase])
     end
 
     def find_country!(string_to_ponder)
@@ -39,7 +40,6 @@ module FrickinCountryNames
   end
 end
 
-
 # lol countries can't find subdivisions by unofficial names
 module ISO3166
   module CountrySubdivisionMethods
@@ -48,9 +48,11 @@ module ISO3166
         subdivision_str == k || v.name == subdivision_str || v.translations&.values.include?(subdivision_str) || v.unofficial_names&.include?(subdivision_str) || stupid_compare(v.translations&.values, subdivision_str) || v.unofficial_names && stupid_compare(Array(v.unofficial_names), subdivision_str)
       end.values.first
     end
+
     def stupid_compare(arr, val)
       arr.map { |s| tldc(s) }.include?(val)
     end
+
     def tldc(s)
       ActiveSupport::Inflector.transliterate(s.strip).downcase
     end
