@@ -14,6 +14,7 @@ module FrickinCountryNames
       country = ISO3166::Country.find_country_by_alpha2(normalized) ||
                 ISO3166::Country.find_country_by_alpha3(normalized) ||
                 ISO3166::Country.find_country_by_any_name(normalized) ||
+                ISO3166::Country.find_country_by_alpha2(SILLY_LOOKUP_TABLE[string_to_ponder.strip.downcase]) ||
                 ISO3166::Country.find_country_by_alpha2(SILLY_LOOKUP_TABLE[normalized.downcase])
     end
 
