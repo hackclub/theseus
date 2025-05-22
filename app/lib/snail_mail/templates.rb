@@ -16,6 +16,7 @@ module SnailMail
       HeidiReadmeTemplate,
       GoodJobTemplate,
       HackatimeOTPTemplate,
+      AthenaStickersTemplate,
     ].freeze
 
     # Default template to use when none is specified
