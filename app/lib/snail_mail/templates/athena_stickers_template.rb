@@ -10,7 +10,7 @@ module SnailMail
       end
 
       def render(pdf, letter)
-        render_return_address(pdf, letter, 5, pdf.bounds.top - 45, 190, 90, size: 8, font: "f25", no_name_line: true)
+        render_return_address(pdf, letter, 5, pdf.bounds.top - 45, 190, 90, size: 8, font: "f25")
         pdf.image(
           image_path("athena/logo-stars.png"),
           at: [5, pdf.bounds.top - 5],
