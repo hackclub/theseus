@@ -31,7 +31,6 @@ module API
         @expand = [:label]
 
         @letters = @letter_queue.letters.pending
-        render "api/v1/letters/letter_collection"
       end
 
       def create_letter
