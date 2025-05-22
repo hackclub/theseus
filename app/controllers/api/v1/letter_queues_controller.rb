@@ -53,8 +53,8 @@ module API
           addy,
           letter_params.except(:address).merge(user: current_user),
         )
+        render :create_letter, status: :created
 
-        render @letter, status: :created
         #   rescue ActiveRecord::RecordInvalid => e
         # render json: { error: e.record.errors.full_messages }, status: :unprocessable_entity
       end
@@ -80,7 +80,7 @@ module API
           letter_params.except(:address).merge(user: current_user),
         )
         @expand << :label
-        return render @letter, status: :created
+        render :create_letter, status: :created
       rescue ActiveRecord::RecordNotFound
         return render json: { error: "Queue not found" }, status: :not_found
       rescue ActiveRecord::RecordInvalid => e
