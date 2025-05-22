@@ -1,0 +1,14 @@
+{
+  tag: @tag,
+  letters: {
+    count: @letter_count,
+    postage_cost: @letter_postage_cost,
+  },
+  warehouse_orders: {
+    count: @warehouse_order_count,
+    postage_cost: @warehouse_order_postage_cost,
+    labor_cost: @warehouse_order_labor_cost,
+    contents_cost: @warehouse_order_contents_cost,
+    total_cost: @warehouse_order_total_cost,
+  },
+}

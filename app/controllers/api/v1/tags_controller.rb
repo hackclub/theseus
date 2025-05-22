@@ -41,6 +41,10 @@ module API
         @warehouse_order_contents_cost = cached_data[:warehouse_order_contents_cost]
         @warehouse_order_total_cost = cached_data[:warehouse_order_total_cost]
       end
+
+      def letters
+        @letters = Letter.with_any_tags(params[:id])
+      end
     end
   end
 end

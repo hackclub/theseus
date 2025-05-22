@@ -660,7 +660,11 @@ Rails.application.routes.draw do
           get :cert
           post :sign
         end
-        resources :tags, only: [:index, :show]
+        resources :tags, only: [:index, :show] do
+          member do
+            get :letters
+          end
+        end
       end
     end
   end

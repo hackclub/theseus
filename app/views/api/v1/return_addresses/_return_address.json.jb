@@ -1,0 +1,8 @@
+{
+  line_1: return_address.line_1,
+  line_2: return_address.line_2,
+  city: return_address.city,
+  state: return_address.state,
+  postal_code: return_address.postal_code,
+  country: return_address.country,
+}.compact_blank

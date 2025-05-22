@@ -1,6 +1,7 @@
 module API
   module V1
     class ApplicationController < ActionController::API
+      prepend_view_path Rails.root.join("app/views/api/v1")
       attr_reader :current_user
 
       before_action :authenticate!

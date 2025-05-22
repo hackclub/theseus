@@ -1,0 +1,13 @@
+return_address = render letter.return_address
+return_address[:name] = letter.return_address_name_line
+{
+  id: letter.public_id,
+  sender: letter.user.public_id,
+  status: letter.aasm_state,
+  tags: letter.tags,
+  return_address:,
+  address: render(letter.address),
+  label_url: pii { if_expand(:label) { rails_blob_url(letter.label) if letter.label.attached? } },
+  rubber_stamps: letter.rubber_stamps,
+  metadata: letter.metadata || {},
+}.compact_blank

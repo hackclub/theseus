@@ -15,6 +15,10 @@ class LetterPolicy < ApplicationPolicy
     true
   end
 
+  def by_tag?
+    true
+  end
+
   def edit?
     record_belongs_to_user || user_is_admin
   end
@@ -60,4 +64,4 @@ class LetterPolicy < ApplicationPolicy
   def record_belongs_to_user
     user && (record.user == user || record.batch&.user == user)
   end
-end 
+end
