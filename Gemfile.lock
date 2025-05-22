@@ -182,6 +182,15 @@ GEM
     faraday-net_http_persistent (2.3.0)
       faraday (~> 2.5)
       net-http-persistent (>= 4.0.4, < 5)
+    ferrum (0.17.1)
+      addressable (~> 2.5)
+      base64 (~> 0.2)
+      concurrent-ruby (~> 1.1)
+      webrick (~> 1.7)
+      websocket-driver (~> 0.7)
+    ferrum_pdf (0.3.0)
+      ferrum (~> 0.15)
+      rails (>= 6.0.0)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
     ffi (1.17.2-arm-linux-gnu)
@@ -281,6 +290,8 @@ GEM
       railties (>= 6.1)
       rexml
     lint_roller (1.1.0)
+    literal (1.7.1)
+      zeitwerk
     llhttp-ffi (0.5.1)
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
@@ -359,6 +370,11 @@ GEM
       racc
     pdf-core (0.10.0)
     pg (1.5.9)
+    phlex (2.2.1)
+      zeitwerk (~> 2.7)
+    phlex-rails (2.2.0)
+      phlex (~> 2.2.1)
+      railties (>= 7.1, < 9)
     pkg-config (1.6.2)
     pp (0.6.2)
       prettyprint
@@ -585,6 +601,7 @@ GEM
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
+    webrick (1.9.1)
     websocket (1.2.11)
     websocket-driver (0.7.7)
       base64
@@ -626,6 +643,7 @@ DEPENDENCIES
   dotenv-rails (~> 3.1)
   easypost (~> 6.4)
   faraday (~> 2.12)
+  ferrum_pdf (~> 0.3.0)
   filterrific (~> 5.2)
   foreman (~> 0.88.1)
   good_job (~> 4.9)
@@ -639,6 +657,7 @@ DEPENDENCIES
   kamal
   kaminari (~> 1.2)
   letter_opener_web (~> 3.0)
+  literal (~> 1.7)
   lockbox (~> 2.0)
   net-http (~> 0.6.0)
   nokogiri (~> 1.18)
@@ -646,6 +665,7 @@ DEPENDENCIES
   oauth2 (~> 2.0)
   parallel (~> 1.26)
   pg (~> 1.1)
+  phlex-rails (~> 2.2)
   prawn (~> 2.5)
   propshaft
   puma (>= 5.0)
