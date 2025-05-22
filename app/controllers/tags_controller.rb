@@ -15,36 +15,36 @@ class TagsController < ApplicationController
   # GET /tags/1 or /tags/1.json
   def show
     tag = params[:id]
-    time_period = params[:time_period] || 'all_time'
+    time_period = params[:time_period] || "all_time"
     year = params[:year]&.to_i || Time.current.year
     month = params[:month]&.to_i
-    
+
     # Base queries
-    letter_query = Letter.with_any_tags([tag])
+    letter_query = Letter.with_any_tags([tag]).where.not(status: "queued")
     wh_order_query = Warehouse::Order.with_any_tags([tag])
-    
+
     # Apply time period filter
     case time_period
-    when 'ytd'
+    when "ytd"
       start_date = Date.new(year, 1, 1)
-      letter_query = letter_query.where('created_at >= ?', start_date)
-      wh_order_query = wh_order_query.where('created_at >= ?', start_date)
-    when 'month'
+      letter_query = letter_query.where("created_at >= ?", start_date)
+      wh_order_query = wh_order_query.where("created_at >= ?", start_date)
+    when "month"
       if month.present?
         start_date = Date.new(year, month, 1)
         end_date = start_date.end_of_month
         letter_query = letter_query.where(created_at: start_date..end_date)
         wh_order_query = wh_order_query.where(created_at: start_date..end_date)
       end
-    when 'last_week'
-      letter_query = letter_query.where('created_at >= ?', 1.week.ago)
-      wh_order_query = wh_order_query.where('created_at >= ?', 1.week.ago)
-    when 'last_month'
-      letter_query = letter_query.where('created_at >= ?', 1.month.ago)
-      wh_order_query = wh_order_query.where('created_at >= ?', 1.month.ago)
-    when 'last_year'
-      letter_query = letter_query.where('created_at >= ?', 1.year.ago)
-      wh_order_query = wh_order_query.where('created_at >= ?', 1.year.ago)
+    when "last_week"
+      letter_query = letter_query.where("created_at >= ?", 1.week.ago)
+      wh_order_query = wh_order_query.where("created_at >= ?", 1.week.ago)
+    when "last_month"
+      letter_query = letter_query.where("created_at >= ?", 1.month.ago)
+      wh_order_query = wh_order_query.where("created_at >= ?", 1.month.ago)
+    when "last_year"
+      letter_query = letter_query.where("created_at >= ?", 1.year.ago)
+      wh_order_query = wh_order_query.where("created_at >= ?", 1.year.ago)
     end
 
     @letter_count = letter_query.count
