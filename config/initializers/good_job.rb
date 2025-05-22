@@ -30,7 +30,11 @@ Rails.application.configure do
     },
     usps_pocketwatch: {
       cron: "0 5 * * *",  # 5:00 UTC = midnight EST
-      class: "USPS::PaymentAccount::PocketWatchJob"
-    }
+      class: "USPS::PaymentAccount::PocketWatchJob",
+    },
+    airtable_athena_stickers_etl: {
+      cron: "*/22 * * * *",
+      class: "AirtableETL::AthenaStickersETLJob",
+    },
   }
 end
