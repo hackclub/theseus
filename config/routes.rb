@@ -426,6 +426,8 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
+  get "customs_receipts/index"
+  get "customs_receipts/show"
   scope path: "back_office" do
     resources :public_ids, only: [:index] do
       collection do
@@ -446,6 +448,11 @@ Rails.application.routes.draw do
     get "/tags", to: "tags#index"
     get "/tags/:id", to: "tags#show", as: :tag_stats
     post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
+    resources :customs_receipts, only: [:index] do
+      collection do
+        get :generate
+      end
+    end
     resources :letters do
       member do
         post :generate_label
