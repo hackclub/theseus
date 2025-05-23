@@ -1,0 +1,6 @@
+<h1>generate customs receipt</h1>
+<%= form_with url: generate_customs_receipts_path, method: :get do |f| %>
+  <%= f.label :search, "search:" %>
+  <%= f.text_field :search, placeholder: "ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)" %>
+  <%= f.submit "Generate" %>
+<% end %>

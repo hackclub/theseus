@@ -82,4 +82,9 @@
     </div>
   </div>
 <% end %>
+<% if current_public_user&.email == @package.recipient_email && !@package.address.us? %>
+  <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+    <%= button_to "generate customs receipt", package_customs_receipt_path(@package), method: :get %>
+  </div>
+<% end %>
 <%= render partial: 'application/admin_inspector', locals: { record: @package } %>

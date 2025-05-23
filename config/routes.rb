@@ -426,6 +426,8 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
+  get "customs_receipts/index"
+  get "customs_receipts/show"
   scope path: "back_office" do
     resources :public_ids, only: [:index] do
       collection do
@@ -446,6 +448,11 @@ Rails.application.routes.draw do
     get "/tags", to: "tags#index"
     get "/tags/:id", to: "tags#show", as: :tag_stats
     post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
+    resources :customs_receipts, only: [:index] do
+      collection do
+        get :generate
+      end
+    end
     resources :letters do
       member do
         post :generate_label
@@ -587,6 +594,11 @@ Rails.application.routes.draw do
   end
 
   get "/lsv/:slug/:id", to: "public/lsv#show", as: :show_lsv
+  get "/lsv/msr/:id/customs_receipt", to: "public/lsv#customs_receipt", as: :msr_customs_receipt
+  post "/lsv/msr/:id/customs_receipt", to: "public/lsv#generate_customs_receipt", as: :msr_generate_customs_receipt
+
+  get "/packages/:id/customs_receipt", to: "public/packages#customs_receipt", as: :package_customs_receipt
+  post "/packages/:id/customs_receipt", to: "public/packages#generate_customs_receipt", as: :package_generate_customs_receipt
 
   get "/letters/:id", to: "public/letters#show", as: :public_letter
   get "/packages/:id", to: "public/packages#show", as: :public_package

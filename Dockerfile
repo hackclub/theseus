@@ -33,7 +33,9 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     imagemagick \
     libmagickwand-dev \
     ghostscript \
-    libyaml-dev
+    libyaml-dev \
+    chromium
+
 RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
 
 # Install Node.js and Yarn

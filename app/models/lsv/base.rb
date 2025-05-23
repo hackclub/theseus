@@ -96,5 +96,9 @@ module LSV
         source_record: source_url,
       }.compact.to_json
     end
+
+    def to_param
+      id
+    end
   end
 end

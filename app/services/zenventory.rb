@@ -31,20 +31,19 @@ class Zenventory
 
     def get_customer_order(id)
       response = conn.get("customer-orders/#{id}").body
-      Rails.logger.debug { "Zenventory Order Response: #{response.inspect}" }
       response
     end
 
     def create_customer_order(params = {})
       conn.post("customer-orders",
-            saveAsDraft: !(ENV["SEND_REAL_ORDERS"] == "yeah"),
-            **params).body
+                saveAsDraft: !(ENV["SEND_REAL_ORDERS"] == "yeah"),
+                **params).body
     end
 
     def update_customer_order(id, params = {})
       conn.put("customer-orders/#{id}",
-      saveAsDraft: !(ENV["SEND_REAL_ORDERS"] == "yeah"),
-      **params).body
+               saveAsDraft: !(ENV["SEND_REAL_ORDERS"] == "yeah"),
+               **params).body
     end
 
     def get_inventory(params = {})
@@ -76,7 +75,7 @@ class Zenventory
         conn.get("reports/#{category}/#{report_key}", csv: true, **params).body,
         headers: true,
         converters: %i[numeric date],
-        header_converters: %i[downcase symbol]
+        header_converters: %i[downcase symbol],
       )&.map(&:to_h)
     end
 
