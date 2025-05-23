@@ -1,0 +1,14 @@
+<%= {
+      transactionalId: "REPLACE_WITH_ACTUAL_TRANSACTIONAL_ID",
+      email: @recipient,
+      dataVariables: {
+        order_number: @order_number
+      },
+      attachments: [
+        {
+          filename: "customs-receipt.pdf",
+          contentType: "application/pdf",
+          data: Base64.strict_encode64(@pdf_data)
+        }
+      ]
+    }.to_json %> 

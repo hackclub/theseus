@@ -17,10 +17,11 @@ module CustomsReceipt
           not_gifted: false,
           additional_info:,
           contents: order.dig(:items)&.map do |item|
+            price = item.dig(:price)
             CustomsReceiptItem.new(
               name: item.dig(:description),
               quantity: item.dig(:quantity),
-              value: item.dig(:price)&.to_f || 0,
+              value: (price != 0.0 ? price : Warehouse::SKU.find_by(sku: item.dig(:sku))&.declared_unit_cost.to_f) || 1.0,
             )
           end,
           shipping_cost:,
@@ -62,7 +63,7 @@ module CustomsReceipt
           order_number: msr.source_id,
           tracking_number: msr["Warehouse–Tracking Number"],
           carrier: msr["Warehouse–Service"],
-          shipping_cost: msr["Warehouse–Postage Cost"]&.to_f || 0.0,
+          shipping_cost: msr["Warehouse–Postage Cost"]&.to_f,
           additional_info:,
         )
       end

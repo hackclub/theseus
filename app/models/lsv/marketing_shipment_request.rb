@@ -1,8 +1,7 @@
 module LSV
   class MarketingShipmentRequest < Base
-
     def to_partial_path
-      "lsv/type/base"
+      "lsv/type/msr"
     end
 
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
@@ -14,7 +13,7 @@ module LSV
     end
 
     def title_text
-      fields["user_facing_title"] || fields["Request Type"]&.join(', ') || "Who knows?"
+      fields["user_facing_title"] || fields["Request Type"]&.join(", ") || "Who knows?"
     end
 
     def date
@@ -59,22 +58,26 @@ module LSV
       fields["surprise"]
     end
 
+    def country
+      FrickinCountryNames.find_country(fields["Country"])&.alpha2 || "US"
+    end
+
     def icon
       return "🎁" if hide_contents? || title_text.start_with?("High Seas – Free")
-      return "💵" if fields['Request Type']&.include?("Boba Drop grant")
+      return "💵" if fields["Request Type"]&.include?("Boba Drop grant")
       return "✉️" if fields["Warehouse–Service"]&.include?("First Class")
       "📦"
     end
 
     def shipped?
-      fields["state"] == 'mailed'
+      fields["state"] == "mailed"
     end
 
     def description
       return "it's a surprise!" if hide_contents?
       begin
-        fields['user_facing_description'] ||
-          fields["Warehouse–Items Shipped JSON"] && JSON.parse(fields["Warehouse–Items Shipped JSON"]).select {|item| (item["quantity"]&.to_i || 0) > 0}.map do |item|
+        fields["user_facing_description"] ||
+          fields["Warehouse–Items Shipped JSON"] && JSON.parse(fields["Warehouse–Items Shipped JSON"]).select { |item| (item["quantity"]&.to_i || 0) > 0 }.map do |item|
             "#{item["quantity"]}x #{item["name"]}"
           end
       rescue JSON::ParserError

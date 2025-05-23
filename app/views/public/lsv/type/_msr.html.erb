@@ -1,1 +1,77 @@
-<%=  %>
+<% if local_assigns[:collection] %>
+  <tr class="tr">
+    <td class="td"><%= msr.created_at.in_time_zone('America/New_York') %></td>
+    <td class="td">
+      <%= msr.type_text %>: <%= msr.title_text %>
+    </td>
+    <td class="td"><%= msr.status_text %></td>
+    <td class="td">
+      <%= link_to "Open", show_lsv_path(LSV.slug_for(msr), msr.id),
+                  onclick: "openIframeWindow(this.href, '#{msr.type_text}: #{msr.title_text}'); return false;",
+                  class: 'btn' %>
+    </td>
+  </tr>
+<% else %>
+  <% content_for :window_title do %>
+    <%= msr.type_text %>: <%= msr.title_text %>
+  <% end %>
+  <div class="window-body">
+    <div class="field-row" style="margin-bottom: 1rem;">
+      <b style="margin: 0;"><%= msr.title_text %></b>
+    </div>
+    <div class="field-row" style="margin-bottom: 0.5rem;">
+      <label style="width: 80px;">Type:</label>
+      <span><%= msr.type_text %></span>
+    </div>
+    <div class="field-row" style="margin-bottom: 0.5rem;">
+      <label style="width: 80px;">Status:</label>
+      <span><%= msr.status_text %></span>
+    </div>
+    <% if msr["Warehouse-Service"] %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;">Service:</label>
+        <span><%= msr["Warehouse–Service"] %></span>
+      </div>
+    <% end %>
+    <% if msr.tracking_number %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;">Tracking:</label>
+        <% if msr.tracking_link %>
+          <%= link_to(msr.tracking_number, msr.tracking_link, target: "_blank", class: "link") %>
+        <% else %>
+          <span><%= msr.tracking_number %></span>
+        <% end %>
+      </div>
+    <% end %>
+    <% if msr.description %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;"><%= msr.description.is_a?(Array) ? "Contents:" : "Description:" %></label>
+        <% if msr.description.is_a? Array %>
+          <ul class="tree-view" style="margin: 0;">
+            <% msr.description.each do |item| %>
+              <li><%= item %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <span><%= msr.description %></span>
+        <% end %>
+      </div>
+    <% end %>
+    <div class="field-row" style="margin-bottom: 0.5rem;">
+      <label style="width: 80px;">Created:</label>
+      <span><%= msr.created_at %></span>
+    </div>
+    <% back_office_tool do %>
+      <div class="field-row" style="margin-bottom: 0.5rem;">
+        <label style="width: 80px;">Airtable:</label>
+        <span class="internal"><%= link_to(msr.source_id, msr.source_url, target: "_blank") %></span>
+      </div>
+    <% end %>
+    <% if current_public_user&.email == msr.email && msr.country != "US" %>
+      <div class="field-row" style="display: flex; justify-content: flex-end;">
+        <%= button_to "generate customs receipt", msr_customs_receipt_path(msr), method: :get %>
+      </div>
+    <% end %>
+    <%= render 'application/admin_inspector', record: msr %>
+  </div>
+<% end %>

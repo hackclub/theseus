@@ -1,0 +1,3 @@
+<%= content_for :window_title, "Generate customs receipt" %>
+<p>This will generate a customs receipt for shipment ID <%= @msr.id %> and email it to you at <%= @msr.email %>.</p>
+<%= button_to "do it!", msr_generate_customs_receipt_path(@msr), method: :post %>
