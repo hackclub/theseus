@@ -2,7 +2,7 @@ module CustomsReceipt
   class CustomsReceiptItem < Literal::Data
     prop :name, String
     prop :quantity, Integer
-    prop :value, Float
+    prop :value, _Any
   end
 
   class CustomsReceiptable < Literal::Data
@@ -12,7 +12,7 @@ module CustomsReceipt
     prop :not_gifted, _Boolean, default: false
     prop :additional_info, _String?
     prop :contents, _Array(CustomsReceiptItem)
-    prop :shipping_cost, _Float?
+    prop :shipping_cost, _Any?
     prop :recipient_address, String
 
     def total_value
