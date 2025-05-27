@@ -20,7 +20,7 @@ class TagsController < ApplicationController
     month = params[:month]&.to_i
 
     # Base queries
-    letter_query = Letter.with_any_tags([tag]).where.not(status: "queued")
+    letter_query = Letter.with_any_tags([tag]).where.not(aasm_state: "queued")
     wh_order_query = Warehouse::Order.with_any_tags([tag])
 
     # Apply time period filter
