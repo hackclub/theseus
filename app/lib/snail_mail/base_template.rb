@@ -165,7 +165,7 @@ module SnailMail
     def render_postage(pdf, letter, x = pdf.bounds.right - 138)
       if letter.postage_type == "indicia"
         IMI.render_indicium(pdf, letter, letter.usps_indicium, x)
-        FIM.render_fim_d(pdf)
+        FIM.render_fim_d(pdf, x - 62)
       elsif letter.postage_type == "stamps"
         postage_amount = letter.postage
         stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
