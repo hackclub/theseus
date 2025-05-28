@@ -16,7 +16,7 @@ module API
       def mark_printed
         authorize @letter
         @letter.mark_printed!
-        render @letter
+        render json: { message: "Letter marked as printed" }
       end
 
       private
