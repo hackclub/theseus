@@ -17,6 +17,7 @@ module SnailMail
       GoodJobTemplate,
       HackatimeOTPTemplate,
       AthenaStickersTemplate,
+      HCBWelcomePostcardTemplate,
     ].freeze
 
     # Default template to use when none is specified
