@@ -62,7 +62,7 @@ class Letter < ApplicationRecord
   belongs_to :return_address, optional: true
   has_many :iv_mtr_events, class_name: "USPS::IVMTR::Event"
   belongs_to :user
-  belongs_to :queue, class_name: "Letter::Queue", optional: true
+  belongs_to :queue, class_name: "Letter::Queue", foreign_key: "letter_queue_id", optional: true
 
   aasm timestamps: true do
     state :queued

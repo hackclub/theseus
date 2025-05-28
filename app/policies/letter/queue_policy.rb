@@ -15,6 +15,10 @@ class Letter::QueuePolicy < ApplicationPolicy
     record_belongs_to_user || user_is_admin
   end
 
+  def mark_printed_instants_mailed?
+    user_is_admin
+  end
+
   class Scope < ApplicationPolicy::Scope
     # NOTE: Be explicit about which records you allow access to!
     # def resolve

@@ -479,6 +479,9 @@ Rails.application.routes.draw do
         end
       end
       resources :queues do
+        collection do
+          post :mark_printed_instants_mailed
+        end
         member do
           post :batch, as: :make_batch_from
         end

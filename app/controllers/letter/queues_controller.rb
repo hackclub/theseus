@@ -71,6 +71,45 @@ class Letter::QueuesController < ApplicationController
     redirect_to process_letter_batch_path(batch, uft: @letter_queue.user_facing_title, template: @letter_queue.template)
   end
 
+  def mark_printed_instants_mailed
+    authorize Letter::Queue
+
+    # Find all letters with "printed" status in any instant letter queue
+    printed_letters = Letter.joins(:queue)
+      .where(letter_queues: { type: "Letter::InstantQueue" })
+      .where(aasm_state: "printed")
+
+    if printed_letters.empty?
+      flash[:notice] = "No printed letters found in instant queues."
+      redirect_to letter_queues_path
+      return
+    end
+
+    # Mark all printed letters as mailed
+    marked_count = 0
+    failed_letters = []
+
+    printed_letters.each do |letter|
+      begin
+        letter.mark_mailed!
+        marked_count += 1
+      rescue => e
+        failed_letters << "#{letter.public_id} (#{e.message})"
+      end
+    end
+
+    # Update user tasks after marking letters as mailed
+    User::UpdateTasksJob.perform_now(current_user) if marked_count > 0
+
+    if failed_letters.any?
+      flash[:alert] = "Marked #{marked_count} letters as mailed, but failed to mark #{failed_letters.count} letters: #{failed_letters.join(", ")}"
+    else
+      flash[:success] = "Successfully marked #{marked_count} letters as mailed from instant queues."
+    end
+
+    redirect_to letter_queues_path
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.

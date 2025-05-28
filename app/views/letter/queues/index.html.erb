@@ -1,6 +1,18 @@
 <p style="color: green"><%= notice %></p>
 <% content_for :title, "Queues" %>
 <h1>Queues</h1>
+<% admin_tool do %>
+  <div class="mb-4">
+    <%= button_to mark_printed_instants_mailed_letter_queues_path, 
+        method: :post, 
+        class: "btn success" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+      i just dumped the printer output tray into the mailbox
+    <% end %>
+  </div>
+<% end %>
 <div id="letter_queues">
   <% @letter_queues.each do |letter_queue| %>
     <article>
