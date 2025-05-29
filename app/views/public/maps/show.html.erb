@@ -1,78 +1,144 @@
-<% content_for :window_title, "Map" %>
-<% content_for :head do %>
-<% end %>
+<% content_for :window_title, "Letter Tracking Map" %>
 <div id="map" style="width: 100%; height: <%= @framed ? '100%' : '250px' %>;"></div>
 <script src="/map_js/d3.v3.min.js"></script>
 <script src="/map_js/topojson.v1.min.js"></script>
 <script src="/map_js/datamaps.world.hires.min.js"></script>
 <script>
-  var arcs = new Datamap({
+  // Letter data from Rails
+  const lettersData = <%= raw @letters_data.to_json %>;
+
+  console.log('Letters data:', lettersData);
+
+  // Initialize the map
+  var map = new Datamap({
     element: document.getElementById("map"),
     scope: 'world',
     fills: {
-      defaultFill: "#ABDDA4",
-      win: '#0fa0fa'
-    },
-    data: {
-      'TX': { fillKey: 'win' },
-      'FL': { fillKey: 'win' },
-      'NC': { fillKey: 'win' },
-      'CA': { fillKey: 'win' },
-      'NY': { fillKey: 'win' },
-      'CO': { fillKey: 'win' }
+      defaultFill: '#F5F5F5',
+      current: '#ff6b6b',
+      origin: '#4ecdc4',
+      destination: '#45b7d1'
     }
   });
 
-  // Arcs coordinates can be specified explicitly with latitude/longtitude,
-  // or just the geographic center of the state/country.
-  arcs.arc([
-    {
-      origin: 'CA',
-      destination: 'TX'
+  // Add bubbles for letter locations
+  const bubbleData = [];
+
+  lettersData.forEach(letter => {
+    // Current location (red dot)
+    if (letter.last_location_coords) {
+      bubbleData.push({
+        name: letter.title,
+        latitude: letter.last_location_coords.latitude,
+        longitude: letter.last_location_coords.longitude,
+        radius: 8,
+        fillKey: 'current',
+        letter_id: letter.id,
+        status: letter.status,
+        location: letter.last_location
+      });
+    }
+
+    // Origin (teal dot)
+    if (letter.origin_coords) {
+      bubbleData.push({
+        name: `${letter.title} - Origin`,
+        latitude: letter.origin_coords.latitude,
+        longitude: letter.origin_coords.longitude,
+        radius: 4,
+        fillKey: 'origin'
+      });
+    }
+
+    // Destination (blue dot)
+    if (letter.destination_coords) {
+      bubbleData.push({
+        name: `${letter.title} - Destination`,
+        latitude: letter.destination_coords.latitude,
+        longitude: letter.destination_coords.longitude,
+        radius: 4,
+        fillKey: 'destination'
+      });
+    }
+  });
+
+  map.bubbles(bubbleData, {
+    popupTemplate: function(geo, data) {
+      return [
+        '<div class="hoverinfo">',
+        '<strong>' + data.name + '</strong><br/>',
+        data.status ? 'Status: ' + data.status + '<br/>' : '',
+        data.location ? 'Location: ' + data.location : '',
+        '</div>'
+      ].join('');
     },
-    {
-      origin: 'OR',
-      destination: 'TX'
-    },
-    {
-      origin: 'NY',
-      destination: 'TX'
-    },
-    {
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    fillOpacity: 0.8
+  });
+
+  // Add arcs for letter paths
+  const arcs = [];
+
+  lettersData.forEach(letter => {
+    const validEvents = letter.events.filter(event =>
+      event.coordinates &&
+      event.coordinates.latitude &&
+      event.coordinates.longitude
+    );
+
+    // Solid arcs between consecutive events (traveled path)
+    for (let i = 0; i < validEvents.length - 1; i++) {
+      const current = validEvents[i];
+      const next = validEvents[i + 1];
+
+      arcs.push({
         origin: {
-            latitude: 40.639722,
-            longitude: -73.778889
+          latitude: current.coordinates.latitude,
+          longitude: current.coordinates.longitude
         },
         destination: {
-            latitude: 37.618889,
-            longitude: -122.375
-        }
-    },
-    {
-        origin: {
-            latitude: 30.194444,
-            longitude: -97.67
-        },
-        destination: {
-            latitude: 25.793333,
-            longitude: -80.290556
+          latitude: next.coordinates.latitude,
+          longitude: next.coordinates.longitude
         },
         options: {
           strokeWidth: 2,
-
-          strokeColor: 'rgba(100, 10, 200, 0.4)',
+          strokeColor: '#feca57',
           greatArc: true
         }
-    },
-    {
+      });
+    }
+
+    // Dotted arc from current location to destination
+    const lastEvent = validEvents[validEvents.length - 1];
+    if (lastEvent && letter.destination_coords && letter.status !== 'received') {
+      arcs.push({
         origin: {
-            latitude: 39.861667,
-            longitude: -104.673056
+          latitude: lastEvent.coordinates.latitude,
+          longitude: lastEvent.coordinates.longitude
         },
         destination: {
-            latitude: 35.877778,
-            longitude: -78.7875
+          latitude: letter.destination_coords.latitude,
+          longitude: letter.destination_coords.longitude
+        },
+        options: {
+          strokeWidth: 2,
+          strokeColor: '#a55eea',
+          strokeDasharray: '5,5',
+          greatArc: true
         }
+      });
     }
-  ],  {strokeWidth: 1, arcSharpness: 1.4});
+  });
+
+  if (arcs.length > 0) {
+    map.arc(arcs);
+  }
+
+  // Click handler for bubbles
+  d3.selectAll('.datamaps-bubble').on('click', function(bubble) {
+    if (bubble.letter_id) {
+      window.open(`/letters/${bubble.letter_id}`, '_blank');
+    }
+  });
 </script>
