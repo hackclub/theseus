@@ -19,11 +19,11 @@
   <% end %>>
 <% unless @framed %>
     <%= render 'public/backend_controls' %>
-    <div class="window" style="min-width: calc(min(516px, 100vw - 40px)); max-width: fit-content">
+    <div class="window" style="min-width: calc(min(516px, 100vw - 40px)); max-width: fit-content <%=yield :additional_style %>">
   <div class="title-bar">
     <div class="title-bar-text"><%= yield :window_title %></div>
     <div class="title-bar-controls">
-      <button aria-label="Close" onclick="window.location.href='<%= my_mail_path %>'"></button>
+      <button aria-label="Close" onclick="window.location.href='<%= @return_path || my_mail_path %>'"></button>
     </div>
   </div>
   <div class="window-body">

@@ -596,6 +596,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :map, only: [:show], module: :public
+
   get "/lsv/:slug/:id", to: "public/lsv#show", as: :show_lsv
   get "/lsv/msr/:id/customs_receipt", to: "public/lsv#customs_receipt", as: :msr_customs_receipt
   post "/lsv/msr/:id/customs_receipt", to: "public/lsv#generate_customs_receipt", as: :msr_generate_customs_receipt

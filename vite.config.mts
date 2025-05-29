@@ -5,6 +5,10 @@ export default defineConfig({
   plugins: [
     ViteRails(),
   ],
+  define: {
+    'this': 'globalThis',
+    'global': 'globalThis',
+  },
   css: {
     // postcss: './postcss.config.js',
     preprocessorOptions: {
@@ -20,5 +24,8 @@ export default defineConfig({
   },
   build: {
     target: 'esnext' //browsers can handle the latest ES features
+  },
+  optimizeDeps: {
+    include: ['d3', 'datamaps']
   }
 })
