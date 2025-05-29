@@ -54,4 +54,16 @@ class Letter::BatchPolicy < ApplicationPolicy
   def update_costs?
     user.present?
   end
+
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      if user&.admin?
+        scope.all
+      elsif user.present?
+        scope.where(user: user)
+      else
+        scope.none
+      end
+    end
+  end
 end

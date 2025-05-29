@@ -20,9 +20,14 @@ class Letter::QueuePolicy < ApplicationPolicy
   end
 
   class Scope < ApplicationPolicy::Scope
-    # NOTE: Be explicit about which records you allow access to!
-    # def resolve
-    #   scope.all
-    # end
+    def resolve
+      if user&.admin?
+        scope.all
+      elsif user.present?
+        scope.where(user: user)
+      else
+        scope.none
+      end
+    end
   end
 end

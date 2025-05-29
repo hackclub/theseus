@@ -4,8 +4,8 @@ class LettersController < ApplicationController
   # GET /letters
   def index
     authorize Letter
-    # Get all letters with their associations
-    @all_letters = Letter.includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
+    # Get all letters with their associations using policy scope
+    @all_letters = policy_scope(Letter).includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
       .where.not(aasm_state: "queued")
       .order(created_at: :desc)
 

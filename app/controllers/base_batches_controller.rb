@@ -8,7 +8,7 @@ class BaseBatchesController < ApplicationController
   # GET /batches or /batches.json
   def index
     authorize Batch
-    @batches = Batch.all.order(created_at: :desc)
+    @batches = policy_scope(Batch).order(created_at: :desc)
   end
 
   # GET /batches/1 or /batches/1.json

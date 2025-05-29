@@ -59,6 +59,18 @@ class LetterPolicy < ApplicationPolicy
     Rails.env.development? && (record_belongs_to_user || user_is_admin)
   end
 
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      if user&.admin?
+        scope.all
+      elsif user.present?
+        scope.where(user: user)
+      else
+        scope.none
+      end
+    end
+  end
+
   private
 
   def record_belongs_to_user

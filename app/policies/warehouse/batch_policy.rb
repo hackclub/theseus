@@ -54,4 +54,22 @@ class Warehouse::BatchPolicy < ApplicationPolicy
   def update_costs?
     user_can_warehouse
   end
-end 
+
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      if user&.admin?
+        scope.all
+      elsif user_can_warehouse
+        scope.where(user: user)
+      else
+        scope.none
+      end
+    end
+
+    private
+
+    def user_can_warehouse
+      user&.can_warehouse? || user&.admin?
+    end
+  end
+end

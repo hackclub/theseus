@@ -66,9 +66,27 @@ class BatchPolicy < ApplicationPolicy
     user_can_warehouse && record_belongs_to_user
   end
 
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      if user&.admin?
+        scope.all
+      elsif user_can_warehouse
+        scope.where(user: user)
+      else
+        scope.none
+      end
+    end
+
+    private
+
+    def user_can_warehouse
+      user&.can_warehouse? || user&.admin?
+    end
+  end
+
   private
 
   def record_belongs_to_user
     user && record.user == user
   end
-end 
+end

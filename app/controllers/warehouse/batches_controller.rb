@@ -4,7 +4,7 @@ class Warehouse::BatchesController < BaseBatchesController
   # GET /warehouse/batches or /warehouse/batches.json
   def index
     authorize Warehouse::Batch
-    @batches = Warehouse::Batch.all.order(created_at: :desc)
+    @batches = policy_scope(Warehouse::Batch).order(created_at: :desc)
   end
 
   # GET /warehouse/batches/1 or /warehouse/batches/1.json

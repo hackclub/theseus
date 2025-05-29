@@ -2,7 +2,7 @@ class Letter::BatchesController < BaseBatchesController
   # GET /letter/batches
   def index
     authorize Letter::Batch, policy_class: Letter::BatchPolicy
-    @batches = Letter::Batch.all.order(created_at: :desc)
+    @batches = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope).order(created_at: :desc)
   end
 
   # GET /letter/batches/new

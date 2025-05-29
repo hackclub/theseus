@@ -4,8 +4,8 @@ class Warehouse::OrdersController < ApplicationController
   def index
     authorize Warehouse::Order
 
-    # Get all orders with their associations
-    @all_orders = Warehouse::Order.includes(:batch, :address, :source_tag, :user)
+    # Get all orders with their associations using policy scope
+    @all_orders = policy_scope(Warehouse::Order).includes(:batch, :address, :source_tag, :user)
 
     # Filter by batched/unbatched based on view parameter
     if params[:view] == "batched"

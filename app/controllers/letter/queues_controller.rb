@@ -3,7 +3,8 @@ class Letter::QueuesController < ApplicationController
   skip_after_action :verify_authorized
   # GET /letter/queues or /letter/queues.json
   def index
-    @letter_queues = Letter::Queue.all
+    authorize Letter::Queue, policy_class: Letter::QueuePolicy
+    @letter_queues = policy_scope(Letter::Queue, policy_scope_class: Letter::QueuePolicy::Scope)
   end
 
   # GET /letter/queues/1 or /letter/queues/1.json
