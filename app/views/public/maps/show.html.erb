@@ -1,13 +1,36 @@
 <% content_for :window_title, "Letter Tracking Map" %>
-<div id="map" style="width: 100%; height: <%= @framed ? '100%' : '250px' %>;"></div>
+<div id="map-legend" style="padding: 4px; font-size: 12px; display: flex; align-items: center; gap: 20px; justify-content: center; margin: 0;">
+  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
+    <span class="legend-color" style="background: #ff6b6b;"></span>
+    Current Location
+  </span>
+  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
+    <span class="legend-color" style="background: #00e12c;"></span>
+    Traveled Path
+  </span>
+  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
+    <span class="legend-color" style="background: #0f95ef;"></span>
+    Projected Path
+  </span>
+</div>
+<div id="map" style="width: 100%; height: <%= @framed ? '100%' : '250px' %>; position: relative;"></div>
+<p>(coords not exact for obvious reasons)</p>
+<style>
+  .legend-color {
+    background: #fff;
+    box-shadow: inset -1px -1px #fff,inset 1px 1px grey,inset -2px -2px #dfdfdf,inset 2px 2px #0a0a0a;
+    display: inline-block;
+    height: 13px;
+    width: 13px;
+    flex-shrink: 0;
+  }
+</style>
 <script src="/map_js/d3.v3.min.js"></script>
 <script src="/map_js/topojson.v1.min.js"></script>
 <script src="/map_js/datamaps.world.hires.min.js"></script>
 <script>
-  // Letter data from Rails
+  // this is bad, im really sorry
   const lettersData = <%= raw @letters_data.to_json %>;
-
-  console.log('Letters data:', lettersData);
 
   // Initialize the map
   var map = new Datamap({
@@ -15,9 +38,11 @@
     scope: 'world',
     fills: {
       defaultFill: '#F5F5F5',
-      current: '#ff6b6b',
-      origin: '#4ecdc4',
-      destination: '#45b7d1'
+      current: '#ff6b6b',       // Red for current location
+      mailed: '#4ecdc4',        // Teal for mailed events
+      usps_tracking: '#feca57', // Yellow for USPS tracking events
+      received: '#45b7d1',      // Blue for received events
+      destination: '#a55eea'    // Purple for final destination
     }
   });
 
@@ -25,106 +50,65 @@
   const bubbleData = [];
 
   lettersData.forEach(letter => {
-    // Current location (red dot)
-    if (letter.last_location_coords) {
+    // Current location (where the letter is now - red dot)
+    if (letter.current_location && letter.current_location.lat && letter.current_location.lon) {
       bubbleData.push({
-        name: letter.title,
-        latitude: letter.last_location_coords.latitude,
-        longitude: letter.last_location_coords.longitude,
-        radius: 8,
+        latitude: letter.current_location.lat,
+        longitude: letter.current_location.lon,
+        radius: 2,  // Made larger for better visibility
         fillKey: 'current',
-        letter_id: letter.id,
-        status: letter.status,
-        location: letter.last_location
-      });
-    }
-
-    // Origin (teal dot)
-    if (letter.origin_coords) {
-      bubbleData.push({
-        name: `${letter.title} - Origin`,
-        latitude: letter.origin_coords.latitude,
-        longitude: letter.origin_coords.longitude,
-        radius: 4,
-        fillKey: 'origin'
-      });
-    }
-
-    // Destination (blue dot)
-    if (letter.destination_coords) {
-      bubbleData.push({
-        name: `${letter.title} - Destination`,
-        latitude: letter.destination_coords.latitude,
-        longitude: letter.destination_coords.longitude,
-        radius: 4,
-        fillKey: 'destination'
+        name: letter.bubble_title
       });
     }
   });
 
-  map.bubbles(bubbleData, {
-    popupTemplate: function(geo, data) {
-      return [
-        '<div class="hoverinfo">',
-        '<strong>' + data.name + '</strong><br/>',
-        data.status ? 'Status: ' + data.status + '<br/>' : '',
-        data.location ? 'Location: ' + data.location : '',
-        '</div>'
-      ].join('');
-    },
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
-    fillOpacity: 0.8
-  });
+
 
   // Add arcs for letter paths
   const arcs = [];
 
   lettersData.forEach(letter => {
-    const validEvents = letter.events.filter(event =>
-      event.coordinates &&
-      event.coordinates.latitude &&
-      event.coordinates.longitude
-    );
+    const coords = letter.coordinates || [];
+    const validCoords = coords.filter(coord => coord && coord.lat && coord.lon);
 
-    // Solid arcs between consecutive events (traveled path)
-    for (let i = 0; i < validEvents.length - 1; i++) {
-      const current = validEvents[i];
-      const next = validEvents[i + 1];
+    // Solid great circle arcs between consecutive coordinates (traveled path)
+    for (let i = 0; i < validCoords.length - 1; i++) {
+      const current = validCoords[i];
+      const next = validCoords[i + 1];
 
       arcs.push({
         origin: {
-          latitude: current.coordinates.latitude,
-          longitude: current.coordinates.longitude
+          latitude: current.lat,
+          longitude: current.lon
         },
         destination: {
-          latitude: next.coordinates.latitude,
-          longitude: next.coordinates.longitude
+          latitude: next.lat,
+          longitude: next.lon
         },
         options: {
-          strokeWidth: 2,
-          strokeColor: '#feca57',
+          strokeWidth: 1.2,
+          strokeColor: '#00e12c',  // Yellow for traveled path
           greatArc: true
         }
       });
     }
 
-    // Dotted arc from current location to destination
-    const lastEvent = validEvents[validEvents.length - 1];
-    if (lastEvent && letter.destination_coords && letter.status !== 'received') {
+    // Dotted great circle arc from last coordinate to final destination
+    const lastCoord = validCoords[validCoords.length - 1];
+    if (lastCoord && letter.destination_coords && letter.status !== 'received') {
       arcs.push({
         origin: {
-          latitude: lastEvent.coordinates.latitude,
-          longitude: lastEvent.coordinates.longitude
+          latitude: lastCoord.lat,
+          longitude: lastCoord.lon
         },
         destination: {
-          latitude: letter.destination_coords.latitude,
-          longitude: letter.destination_coords.longitude
+          latitude: letter.destination_coords.lat,
+          longitude: letter.destination_coords.lon
         },
         options: {
-          strokeWidth: 2,
-          strokeColor: '#a55eea',
-          strokeDasharray: '5,5',
+          strokeWidth: 1,
+          strokeColor: '#0f95ef',    // Purple for projected path
+          strokeDashArray: '5,5',    // Dotted line
           greatArc: true
         }
       });
@@ -134,11 +118,9 @@
   if (arcs.length > 0) {
     map.arc(arcs);
   }
-
-  // Click handler for bubbles
-  d3.selectAll('.datamaps-bubble').on('click', function(bubble) {
-    if (bubble.letter_id) {
-      window.open(`/letters/${bubble.letter_id}`, '_blank');
-    }
+    map.bubbles(bubbleData, {
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    fillOpacity: 0.8
   });
 </script>

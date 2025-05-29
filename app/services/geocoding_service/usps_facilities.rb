@@ -1,5 +1,5 @@
 module GeocodingService
-  module USPSFacilities
+  class USPSFacilities
     class << self
       SPECIAL_CASES = {
         "001376" => {
@@ -9,10 +9,11 @@ module GeocodingService
       }
 
       def coords_for_locale_key(locale_key)
-        SPECIAL_CASES[locale_key] || {
-          lat: nil,
-          lon: nil,
-        }
+        SPECIAL_CASES[locale_key] ||
+          Rails.cache.fetch("geocode_usps_facility_#{locale_key}", expires_in: 1.day) do
+            GeocodingService.first_hit(address_for_locale_key(locale_key)) ||
+            GeocodingService.first_hit(address_for_locale_key(locale_key).slice(:city, :state, :postalcode, :country))
+          end
       end
 
       def address_for_locale_key(locale_key)
@@ -39,6 +40,7 @@ module GeocodingService
       end
 
       def load_facilities
+        Rails.logger.info "Loading USPS facilities"
         facilities_file = File.join(File.dirname(__FILE__), "FACILITY.xlsx")
         xsv = Xsv.open(facilities_file, parse_headers: true).first
         return xsv.to_a.index_by { |row| row["LOCALE KEY"] }
