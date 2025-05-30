@@ -290,7 +290,7 @@ GEM
       railties (>= 6.1)
       rexml
     lint_roller (1.1.0)
-    literal (1.7.1)
+    literal (1.8.0)
       zeitwerk
     llhttp-ffi (0.5.1)
       ffi-compiler (~> 1.0)
@@ -659,7 +659,7 @@ DEPENDENCIES
   kamal
   kaminari (~> 1.2)
   letter_opener_web (~> 3.0)
-  literal (~> 1.7)
+  literal (~> 1.8)
   lockbox (~> 2.0)
   net-http (~> 0.6.0)
   nokogiri (~> 1.18)
