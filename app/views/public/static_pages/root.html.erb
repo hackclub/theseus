@@ -28,9 +28,20 @@
 </div>
 <div class="window" style="width: 320px;">
   <div class="title-bar">
-    <div class="title-bar-text">Leaderboard</div>
+    <div class="title-bar-text">Letterboard</div>
   </div>
   <div class="window-body" style="padding: 0">
     <iframe src="<%= this_week_leaderboards_path %>"></iframe>
+  </div>
+</div>
+<div class="window" style="width: 320px;">
+  <div class="title-bar">
+    <div class="title-bar-text">Map</div>
+    <div class="title-bar-controls">
+      <%= w95_title_button_to("Maximize", map_path) %>
+    </div>
+  </div>
+  <div class="window-body" style="padding: 0">
+    <iframe src="<%= map_path %>"></iframe>
   </div>
 </div>

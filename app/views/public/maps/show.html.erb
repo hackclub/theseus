@@ -1,0 +1,126 @@
+<% content_for :window_title, "Letter Tracking Map" %>
+<div id="map-legend" style="padding: 4px; font-size: 12px; display: flex; align-items: center; gap: 20px; justify-content: center; margin: 0;">
+  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
+    <span class="legend-color" style="background: #ff6b6b;"></span>
+    Current Location
+  </span>
+  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
+    <span class="legend-color" style="background: #00e12c;"></span>
+    Traveled Path
+  </span>
+  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
+    <span class="legend-color" style="background: #0f95ef;"></span>
+    Projected Path
+  </span>
+</div>
+<div id="map" style="width: 100%; height: <%= @framed ? '100%' : '250px' %>; position: relative;"></div>
+<p>(coords not exact for obvious reasons)</p>
+<style>
+  .legend-color {
+    background: #fff;
+    box-shadow: inset -1px -1px #fff,inset 1px 1px grey,inset -2px -2px #dfdfdf,inset 2px 2px #0a0a0a;
+    display: inline-block;
+    height: 13px;
+    width: 13px;
+    flex-shrink: 0;
+  }
+</style>
+<script src="/map_js/d3.v3.min.js"></script>
+<script src="/map_js/topojson.v1.min.js"></script>
+<script src="/map_js/datamaps.world.hires.min.js"></script>
+<script>
+  // this is bad, im really sorry
+  const lettersData = <%= raw @letters_data.to_json %>;
+
+  // Initialize the map
+  var map = new Datamap({
+    element: document.getElementById("map"),
+    scope: 'world',
+    fills: {
+      defaultFill: '#F5F5F5',
+      current: '#ff6b6b',       // Red for current location
+      mailed: '#4ecdc4',        // Teal for mailed events
+      usps_tracking: '#feca57', // Yellow for USPS tracking events
+      received: '#45b7d1',      // Blue for received events
+      destination: '#a55eea'    // Purple for final destination
+    }
+  });
+
+  // Add bubbles for letter locations
+  const bubbleData = [];
+
+  lettersData.forEach(letter => {
+    // Current location (where the letter is now - red dot)
+    if (letter.current_location && letter.current_location.lat && letter.current_location.lon) {
+      bubbleData.push({
+        latitude: letter.current_location.lat,
+        longitude: letter.current_location.lon,
+        radius: 2,  // Made larger for better visibility
+        fillKey: 'current',
+        name: letter.bubble_title
+      });
+    }
+  });
+
+
+
+  // Add arcs for letter paths
+  const arcs = [];
+
+  lettersData.forEach(letter => {
+    const coords = letter.coordinates || [];
+    const validCoords = coords.filter(coord => coord && coord.lat && coord.lon);
+
+    // Solid great circle arcs between consecutive coordinates (traveled path)
+    for (let i = 0; i < validCoords.length - 1; i++) {
+      const current = validCoords[i];
+      const next = validCoords[i + 1];
+
+      arcs.push({
+        origin: {
+          latitude: current.lat,
+          longitude: current.lon
+        },
+        destination: {
+          latitude: next.lat,
+          longitude: next.lon
+        },
+        options: {
+          strokeWidth: 1.2,
+          strokeColor: '#00e12c',  // Yellow for traveled path
+          greatArc: true
+        }
+      });
+    }
+
+    // Dotted great circle arc from last coordinate to final destination
+    const lastCoord = validCoords[validCoords.length - 1];
+    if (lastCoord && letter.destination_coords && letter.status !== 'received') {
+      arcs.push({
+        origin: {
+          latitude: lastCoord.lat,
+          longitude: lastCoord.lon
+        },
+        destination: {
+          latitude: letter.destination_coords.lat,
+          longitude: letter.destination_coords.lon
+        },
+        options: {
+          strokeWidth: 1,
+          strokeColor: '#0f95ef',    // Purple for projected path
+          strokeDashArray: '5,5',    // Dotted line
+          greatArc: true
+        }
+      });
+    }
+  });
+
+  if (arcs.length > 0) {
+    map.arc(arcs);
+  }
+    map.bubbles(bubbleData, {
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    fillOpacity: 0.8
+  });
+</script>
