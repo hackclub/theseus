@@ -7,7 +7,7 @@ module Public
 
     def show
       @return_path = public_root_path
-      @letters_data = Rails.cache.fetch("map_data8", expires_in: 1.hour) do
+      @letters_data = Rails.cache.fetch("map_data", expires_in: 1.hour) do
         fetch_recent_letters_data
       end
     end

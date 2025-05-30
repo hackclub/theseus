@@ -16,7 +16,7 @@ module GeocodingService
 
   class << self
     def geocode_address_model(address, exact: false)
-      Rails.cache.fetch("geocode_address_#{address.id}", expires_in: 1.day) do
+      Rails.cache.fetch("geocode_address_#{address.id}", expires_in: 5.months) do
         params = {
           city: address.city,
           state: address.state,
@@ -30,7 +30,7 @@ module GeocodingService
     end
 
     def geocode_return_address(return_address, exact: false)
-      Rails.cache.fetch("geocode_return_address_#{return_address.id}", expires_in: 1.day) do
+      Rails.cache.fetch("geocode_return_address_#{return_address.id}", expires_in: 5.months) do
         params = {
           city: return_address.city,
           state: return_address.state,
@@ -44,22 +44,47 @@ module GeocodingService
     end
 
     def first_hit(params)
-      nominatim(params).first
+      google_geocode(params)
     end
 
-    def nominatim(params)
-      Rails.logger.info "Nominatim: #{params}"
-      conn.get("search.php", params.merge(format: "jsonv2")).body
+    def google_geocode(params)
+      Rails.logger.info "Google Geocoding: #{params}"
+
+      address_components = []
+      address_components << params[:street] if params[:street]
+      address_components << params[:city] if params[:city]
+      address_components << params[:state] if params[:state]
+      address_components << params[:postalcode] if params[:postalcode]
+      address_components << params[:country] if params[:country]
+
+      address = address_components.join(", ")
+
+      response = conn.get("maps/api/geocode/json", {
+        address: address,
+        key: ENV["GOOGLE_MAPS_API_KEY"]
+      })
+
+      results = response.body["results"]
+      return nil if results.empty?
+
+      result = results.first
+      location = result["geometry"]["location"]
+
+      {
+        lat: location["lat"].to_s,
+        lon: location["lng"].to_s,
+        display_name: result["formatted_address"],
+        place_id: result["place_id"]
+      }
     end
 
     private
 
     def conn
-      @conn ||= Faraday.new(url: ENV["NOMINATIM_URL"]) do |faraday|
+      @conn ||= Faraday.new(url: "https://maps.googleapis.com/") do |faraday|
         faraday.request :url_encoded
-        faraday.headers["User-Agent"] = "hack club / theseus (nora@hackclub.com)"
         faraday.adapter Faraday.default_adapter
-        faraday.response :json, parser_options: { symbolize_names: true }
+        faraday.response :json
       end
     end
   end
