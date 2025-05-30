@@ -87,7 +87,7 @@ gem "oauth2", "~> 2.0"
 
 gem "snail", "~> 2.3"
 
-gem "easypost", "~> 6.4"
+gem "easypost", "~> 7.0"
 
 gem "pundit", "~> 2.5"
 
