@@ -24,9 +24,7 @@ module Public
         .includes(:iv_mtr_events, :address, :return_address)
 
       letters_data = recent_letters.map do |letter|
-        Rails.logger.info "Processing letter #{letter.public_id}"
         event_coords = build_letter_event_coordinates(letter)
-        Rails.logger.info "Event coords for #{letter.public_id}: #{event_coords.inspect}"
 
         bubble_title = if letter.aasm_state == "received"
             "a letter was received here!"
@@ -49,23 +47,18 @@ module Public
 
     def build_letter_event_coordinates(letter)
       coordinates = []
-      Rails.logger.info "Building coordinates for letter #{letter.public_id}"
 
       # Mailed event coordinates
       if letter.mailed_at.present?
-        Rails.logger.info "Adding mailed coordinates for #{letter.public_id}"
         coords = geocode_origin(letter.return_address)
-        Rails.logger.info "Mailed coords: #{coords.inspect}"
         coordinates << coords
       end
 
       # USPS tracking event coordinates
       if letter.iv_mtr_events.present?
-        Rails.logger.info "Processing #{letter.iv_mtr_events.count} USPS events for #{letter.public_id}"
         letter.iv_mtr_events.each do |event|
           if event[:locale_key]
             coords = geocode_usps_facility(event[:locale_key])
-            Rails.logger.info "USPS facility coords for #{event[:locale_key]}: #{coords.inspect}"
             coordinates << coords if coords
           end
         end
@@ -73,13 +66,10 @@ module Public
 
       # Received event coordinates
       if letter.received_at.present?
-        Rails.logger.info "Adding received coordinates for #{letter.public_id}"
         coords = geocode_destination(letter.address)
-        Rails.logger.info "Received coords: #{coords.inspect}"
         coordinates << coords
       end
 
-      Rails.logger.info "Final coordinates for #{letter.public_id}: #{coordinates.inspect}"
       coordinates.compact
     end
 
