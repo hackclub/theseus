@@ -451,7 +451,7 @@ GEM
     reline (0.6.1)
       io-console (~> 0.5)
     rexml (3.4.1)
-    rmagick (5.5.0)
+    rmagick (6.1.1)
       observer (~> 0.1)
       pkg-config (~> 1.4)
     rqrcode (2.2.0)
@@ -674,7 +674,7 @@ DEPENDENCIES
   pundit (~> 2.5)
   rails (~> 8.0.1)
   redis (~> 5.4)
-  rmagick (~> 5.3)
+  rmagick (~> 6.1)
   rqrcode (~> 2.2)
   rubocop-rails-omakase
   ruby-openai (~> 8.1)
