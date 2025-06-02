@@ -164,7 +164,7 @@ GEM
       railties (>= 6.1)
     drb (2.2.1)
     dry-cli (1.2.0)
-    easypost (6.4.1)
+    easypost (7.0.1)
     ed25519 (1.4.0)
     erb (5.0.1)
     erubi (1.13.1)
@@ -643,7 +643,7 @@ DEPENDENCIES
   csv (~> 3.3)
   debug
   dotenv-rails (~> 3.1)
-  easypost (~> 6.4)
+  easypost (~> 7.0)
   faraday (~> 2.12)
   ferrum_pdf (~> 0.3.0)
   filterrific (~> 5.2)
