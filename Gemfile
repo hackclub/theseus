@@ -101,7 +101,7 @@ gem "jquery-rails", "~> 4.6"
 
 gem "country-select", "~> 1.2"
 
-gem "countries", "~> 7.1"
+gem "countries", "~> 8.0"
 
 gem "good_job", "~> 4.9"
 
