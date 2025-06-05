@@ -1,3 +1,14 @@
 {
+  id: msr.id,
   type: :marketing_shipment_request,
+  subtype: msr.class.name.underscore.split("/").last,
+  path: if_expand(:path) { public_v1_lsv_path(slug, msr.id) },
+  public_url: show_lsv_url(slug, msr.id),
+  original_id: msr.source_id,
+  created_at: msr.created_at,
+  title: msr.title_text,
+  status: msr.status_text,
+  tracking_number: msr.tracking_number,
+  tracking_link: msr.tracking_link,
 }
+
