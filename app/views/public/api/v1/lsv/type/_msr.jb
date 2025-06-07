@@ -1,3 +1,4 @@
+slug = LSV.slug_for(msr)
 {
   id: msr.id,
   type: :marketing_shipment_request,
