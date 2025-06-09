@@ -166,6 +166,6 @@ gem "ferrum_pdf", "~> 0.3.0"
 
 gem "literal", "~> 1.7"
 
-gem "phlex-rails", "~> 2.2"
+gem "phlex-rails", "~> 2.3"
 
 gem "xsv", "~> 1.3"
