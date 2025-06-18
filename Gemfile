@@ -69,7 +69,7 @@ gem "net-http", "~> 0.6.0"
 
 gem "http", "~> 5.2"
 
-gem "annotaterb", "~> 4.14"
+gem "annotaterb", "~> 4.16"
 
 gem "aasm", "~> 5.5"
 
