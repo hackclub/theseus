@@ -103,7 +103,7 @@ gem "country-select", "~> 1.2"
 
 gem "countries", "~> 7.1"
 
-gem "good_job", "~> 4.9"
+gem "good_job", "~> 4.11"
 
 gem "awesome_print", "~> 1.9"
 
