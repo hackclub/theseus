@@ -73,7 +73,7 @@ gem "annotaterb", "~> 4.16"
 
 gem "aasm", "~> 5.5"
 
-gem "norairrecord", "~> 0.3.0"
+gem "norairrecord", "~> 0.4.0"
 
 gem "filterrific", "~> 5.2"
 
