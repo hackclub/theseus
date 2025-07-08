@@ -180,7 +180,7 @@ GEM
     et-orbi (1.2.11)
       tzinfo
     event_stream_parser (1.0.0)
-    faraday (2.13.1)
+    faraday (2.13.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -655,7 +655,7 @@ DEPENDENCIES
   debug
   dotenv-rails (~> 3.1)
   easypost (~> 7.1)
-  faraday (~> 2.12)
+  faraday (~> 2.13)
   ferrum_pdf (~> 0.3.0)
   filterrific (~> 5.2)
   foreman (~> 0.88.1)
