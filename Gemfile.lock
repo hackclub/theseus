@@ -175,7 +175,7 @@ GEM
     dry-cli (1.2.0)
     easypost (7.1.0)
     ed25519 (1.4.0)
-    erb (5.0.1)
+    erb (5.0.2)
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
@@ -197,7 +197,7 @@ GEM
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
-    ferrum_pdf (0.3.0)
+    ferrum_pdf (2.0.0)
       ferrum (~> 0.15)
       rails (>= 6.0.0)
     ffi (1.17.2-aarch64-linux-gnu)
@@ -245,7 +245,7 @@ GEM
     http-form_data (2.3.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    io-console (0.8.0)
+    io-console (0.8.1)
     irb (1.15.2)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
@@ -328,7 +328,7 @@ GEM
       uri
     net-http-persistent (4.0.6)
       connection_pool (~> 2.2, >= 2.2.4)
-    net-imap (0.5.8)
+    net-imap (0.5.9)
       date
       net-protocol
     net-pop (0.1.2)
@@ -461,7 +461,7 @@ GEM
     redis-client (0.24.0)
       connection_pool
     regexp_parser (2.10.0)
-    reline (0.6.1)
+    reline (0.6.2)
       io-console (~> 0.5)
     rexml (3.4.1)
     rmagick (5.5.0)
@@ -614,7 +614,7 @@ GEM
       railties (>= 6.0.0)
     webrick (1.9.1)
     websocket (1.2.11)
-    websocket-driver (0.7.7)
+    websocket-driver (0.8.0)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -656,7 +656,7 @@ DEPENDENCIES
   dotenv-rails (~> 3.1)
   easypost (~> 7.1)
   faraday (~> 2.13)
-  ferrum_pdf (~> 0.3.0)
+  ferrum_pdf (~> 2.0.0)
   filterrific (~> 5.2)
   foreman (~> 0.88.1)
   good_job (~> 4.11)
