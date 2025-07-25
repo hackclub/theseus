@@ -53,10 +53,10 @@ module GeocodingService
 
     def fuzz_coordinates(lat, lon)
       # Add random offset within 5 mile radius, with minimum of 3 miles for privacy
-      # 1 degree latitude ≈ 69 miles, so 5 miles ≈ 0.0725 degrees
-      # 1 degree longitude varies by latitude, but at ~45°N ≈ 49 miles, so 5 miles ≈ 0.102 degrees
-      max_lat_offset = 0.0725
-      max_lon_offset = 0.102 * Math.cos(lat * Math::PI / 180)
+      # 1 degree latitude ≈ 69 miles, so 15 miles ≈ 0.2175 degrees
+      # 1 degree longitude varies by latitude, but at ~45°N ≈ 49 miles, so 15 miles ≈ 0.306 degrees
+      max_lat_offset = 0.2175
+      max_lon_offset = 0.306 * Math.cos(lat * Math::PI / 180)
 
       # Generate random angle and distance within the annular ring (3-5 miles)
       angle = rand * 2 * Math::PI
