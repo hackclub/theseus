@@ -12,7 +12,7 @@
   <% end %>
   <%= form.label :csv, "upload a CSV:" %>
 
-  <%= form.file_field :csv, accept: 'text/csv' %>
+  <%= form.file_field :csv, accept: 'text/csv', data: { dropzone_target: "input", dropzone_title: "Drop CSV to upload" } %>
   <div>
     <%= form.submit "onward!" %>
   </div>

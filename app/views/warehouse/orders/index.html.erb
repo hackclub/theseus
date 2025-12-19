@@ -1,4 +1,5 @@
 <% content_for :title, "Orders" %>
+<% content_for :dropzone_config do %>data-dropzone-redirect-url-value="<%= new_warehouse_batch_path %>" data-dropzone-redirect-title-value="Drop CSV to create warehouse batch"<% end %>
 <div class="page-header mb-8 flex justify-between items-center">
   <h1 class="text-2xl font-bold">Orders</h1>
   <div class="actions">
