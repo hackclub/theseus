@@ -5,6 +5,7 @@ class Components::Shared::AppHeader < Components::Base
   include Phlex::Rails::Helpers::FormWith
 
   register_value_helper :request
+  register_value_helper :impersonating?
 
   def view_template
     header(class: "app-header", style: "display: flex; align-items: center; justify-content: space-between;") do
@@ -37,19 +38,35 @@ class Components::Shared::AppHeader < Components::Base
       end
 
       div(style: "display: flex; align-items: center; gap: 0.5rem;") do
+        render(Primer::Beta::IconButton.new(
+          icon: :"device-camera",
+          "aria-label": "Mail Scanner",
+          scheme: :invisible,
+          tag: :a,
+          href: scanner_letters_path
+        ))
+
         render_id_lookup_dialog
 
         if current_user
-          render(Primer::Alpha::ActionMenu.new(anchor_align: :end)) do |menu|
-            menu.with_show_button(scheme: :invisible) do |btn|
-              btn.with_leading_visual_icon(icon: :person)
-              plain current_user.username
-              plain " [IMPERSONATING]" if session[:impersonator_user_id]
+          if impersonating?
+            render(Primer::Beta::Label.new(scheme: :attention, size: :large)) do
+              plain "Impersonating #{current_user.username}"
             end
 
-            if session[:impersonator_user_id]
-              menu.with_item(label: "Stop impersonating", href: stop_impersonating_path)
-              menu.with_divider
+            render(Primer::Beta::IconButton.new(
+              icon: :skip,
+              "aria-label": "Stop impersonating",
+              scheme: :danger,
+              tag: :a,
+              href: stop_impersonating_path
+            ))
+          end
+
+          render(Primer::Alpha::ActionMenu.new(anchor_align: :end)) do |menu|
+            menu.with_show_button(scheme: :invisible) do |btn|
+              btn.with_leading_visual_icon(icon: impersonating? ? :eye : :person)
+              plain current_user.username
             end
 
             menu.with_item(label: "Log out", href: signout_path, data: {method: :delete}) do |item|
@@ -87,7 +104,4 @@ class Components::Shared::AppHeader < Components::Base
     end
   end
 
-  def session
-    Rails.application.env_config["rack.session"] || {}
-  end
 end
