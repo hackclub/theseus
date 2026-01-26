@@ -2,6 +2,7 @@
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { Html5Qrcode } from 'html5-qrcode';
   import { isProcessing } from './stores.js';
+  import { extractPublicId } from './utils.js';
 
   const dispatch = createEventDispatcher();
 
@@ -23,11 +24,6 @@
     if (isScanning) {
       stopScanning();
     }
-  }
-
-  function extractPublicIdFromUrl(text) {
-    const match = text.match(/https?:\/\/mail\.hack\.club\/([^?\/\s]+)/);
-    return match ? match[1] : null;
   }
 
   async function loadCameras() {
@@ -105,7 +101,7 @@
 
     lastScanTime = now;
 
-    const publicId = extractPublicIdFromUrl(decodedText);
+    const publicId = extractPublicId(decodedText);
     if (publicId) {
       dispatch('scan', { publicId });
     } else {

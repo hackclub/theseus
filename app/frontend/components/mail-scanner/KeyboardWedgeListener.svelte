@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { isProcessing } from './stores.js';
+  import { extractPublicId } from './utils.js';
 
   const dispatch = createEventDispatcher();
 
@@ -21,17 +22,12 @@
     detachListener();
   }
 
-  function extractPublicIdFromUrl(text) {
-    const match = text.match(/https?:\/\/mail\.hack\.club\/([^?\/\s]+)/);
-    return match ? match[1] : null;
-  }
-
   function processBuffer() {
     clearTimeout(debounceTimer);
 
     if (buffer.length === 0) return;
 
-    const publicId = extractPublicIdFromUrl(buffer);
+    const publicId = extractPublicId(buffer);
 
     if (publicId) {
       dispatch('scan', { publicId });
