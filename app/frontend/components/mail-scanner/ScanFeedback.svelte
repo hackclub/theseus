@@ -52,6 +52,14 @@
         <div style="font-size: 16px; color: var(--fgColor-muted);">Marked as mailed</div>
       {/if}
     </div>
+  {:else if $currentScan.status === 'undone'}
+    <div style="text-align: center;">
+      <div style="font-size: 14px; color: var(--fgColor-success); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">✓ Undone</div>
+      {#if $currentScan.publicId}
+        <div style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">{$currentScan.publicId}</div>
+        <div style="font-size: 14px; color: var(--fgColor-muted);">Unmarked as mailed</div>
+      {/if}
+    </div>
   {:else if $currentScan.status === 'already-mailed'}
     <div style="text-align: center; width: 100%;">
       <div style="font-size: 14px; color: var(--fgColor-danger); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Already Mailed</div>

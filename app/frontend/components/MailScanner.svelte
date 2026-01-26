@@ -146,17 +146,21 @@
     try {
       await undoMarkMailed(publicId, csrfToken);
 
-      resetCurrentScan();
-
       if (scanId) {
         removeScanFromHistory(scanId);
       }
 
       $currentScan = {
-        status: 'success',
+        status: 'undone',
         publicId,
         letter: null,
       };
+
+      addScanToHistory({
+        status: 'undone',
+        publicId,
+        letter: null,
+      });
 
       playSound('success');
       scheduleAutoReset(2000);

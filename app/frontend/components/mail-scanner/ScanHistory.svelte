@@ -17,6 +17,8 @@
     switch (status) {
       case 'success':
         return 'success';
+      case 'undone':
+        return 'accent';
       case 'error':
         return 'attention';
       case 'already-mailed':
@@ -30,6 +32,8 @@
     switch (status) {
       case 'success':
         return 'Mailed';
+      case 'undone':
+        return 'Undone';
       case 'error':
         return 'Error';
       case 'already-mailed':
