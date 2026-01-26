@@ -16,7 +16,7 @@ export function addScanToHistory(scan) {
   scanHistory.update(history => [
     { ...scan, id: Date.now(), timestamp: new Date() },
     ...history
-  ].slice(0, 100));
+  ]);
 }
 
 export function removeScanFromHistory(scanId) {
