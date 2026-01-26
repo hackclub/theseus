@@ -26,7 +26,6 @@
   }
 
   function extractPublicIdFromUrl(text) {
-    // Match: https://mail.hack.club/{public_id}?qr=1
     const match = text.match(/https?:\/\/mail\.hack\.club\/([^?\/\s]+)/);
     return match ? match[1] : null;
   }
@@ -37,7 +36,6 @@
       cameras = devices;
 
       if (devices.length > 0) {
-        // Prefer back camera on mobile
         const backCamera = devices.find(d =>
           d.label.toLowerCase().includes('back') ||
           d.label.toLowerCase().includes('rear')
@@ -96,13 +94,11 @@
   }
 
   function onScanSuccess(decodedText) {
-    // Debounce scans
     const now = Date.now();
     if (now - lastScanTime < SCAN_DEBOUNCE_MS) {
       return;
     }
 
-    // Don't scan if already processing
     if ($isProcessing) {
       return;
     }
@@ -118,7 +114,7 @@
   }
 
   function onScanFailure(error) {
-    // Ignore these - they're expected when no QR code is in frame
+    // Ignore - expected when no QR code in frame
   }
 
   async function handleCameraChange() {
@@ -137,21 +133,22 @@
   });
 </script>
 
-<div class="webcam-scanner">
+<div style="background: var(--bgColor-default); border: 1px solid var(--borderColor-default); border-radius: 6px; padding: 20px;">
   {#if errorMessage}
-    <div class="error-message">
+    <div style="padding: 12px; background: var(--bgColor-attention-muted); border: 1px solid var(--borderColor-attention-emphasis); border-radius: 6px; margin-bottom: 16px; font-size: 14px;">
       {errorMessage}
     </div>
   {/if}
 
   {#if cameras.length > 0}
-    <div class="camera-controls">
-      <label for="camera-select">Camera:</label>
+    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+      <label for="camera-select" style="font-size: 14px; font-weight: 600;">Camera:</label>
       <select
         id="camera-select"
         bind:value={selectedCamera}
         on:change={handleCameraChange}
         disabled={isScanning}
+        style="flex: 1; min-width: 200px; padding: 8px; border: 1px solid var(--borderColor-default); border-radius: 6px; background: var(--bgColor-default); font-size: 14px;"
       >
         {#each cameras as camera}
           <option value={camera.id}>{camera.label || `Camera ${camera.id}`}</option>
@@ -159,106 +156,28 @@
       </select>
 
       {#if !isScanning}
-        <button class="btn btn-primary" on:click={startScanning}>
+        <button
+          style="padding: 8px 16px; background: var(--bgColor-accent-emphasis); color: var(--fgColor-onEmphasis); border: 1px solid var(--bgColor-accent-emphasis); border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;"
+          on:click={startScanning}
+        >
           Start Camera
         </button>
       {:else}
-        <button class="btn" on:click={stopScanning}>
+        <button
+          style="padding: 8px 16px; background: var(--bgColor-default); color: var(--fgColor-default); border: 1px solid var(--borderColor-default); border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;"
+          on:click={stopScanning}
+        >
           Stop Camera
         </button>
       {/if}
     </div>
   {/if}
 
-  <div id="qr-reader" class="qr-reader"></div>
+  <div id="qr-reader" style="width: 100%; max-width: 500px; margin: 0 auto;"></div>
 
   {#if isScanning}
-    <div class="scan-instructions">
+    <div style="text-align: center; color: var(--fgColor-muted); font-size: 13px; margin-top: 12px;">
       Position QR code within the box to scan
     </div>
   {/if}
 </div>
-
-<style>
-  .webcam-scanner {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
-
-  .error-message {
-    padding: 1rem;
-    background-color: var(--bgColor-attention-muted);
-    border: 1px solid var(--borderColor-attention-emphasis);
-    border-radius: 6px;
-    color: var(--fgColor-default);
-  }
-
-  .camera-controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: var(--bgColor-muted);
-    border-radius: 6px;
-  }
-
-  .camera-controls label {
-    font-weight: 600;
-  }
-
-  .camera-controls select {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid var(--borderColor-default);
-    border-radius: 6px;
-    background-color: var(--bgColor-default);
-    color: var(--fgColor-default);
-  }
-
-  .qr-reader {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  .qr-reader :global(video) {
-    border-radius: 6px;
-  }
-
-  .scan-instructions {
-    text-align: center;
-    color: var(--fgColor-muted);
-    font-size: 0.875rem;
-  }
-
-  .btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--borderColor-default);
-    border-radius: 6px;
-    background-color: var(--bgColor-default);
-    color: var(--fgColor-default);
-    cursor: pointer;
-    font-weight: 600;
-  }
-
-  .btn:hover {
-    background-color: var(--bgColor-muted);
-  }
-
-  .btn-primary {
-    background-color: var(--bgColor-accent-emphasis);
-    color: var(--fgColor-onEmphasis);
-    border-color: var(--bgColor-accent-emphasis);
-  }
-
-  .btn-primary:hover {
-    opacity: 0.9;
-  }
-
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-</style>

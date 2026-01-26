@@ -10,7 +10,7 @@
     showFlash = true;
     setTimeout(() => {
       showFlash = false;
-    }, 1000);
+    }, 800);
   }
 
   function handleUndo() {
@@ -18,100 +18,75 @@
       dispatch('undo', { publicId: $currentScan.letter.public_id });
     }
   }
-
-  function getStatusClass() {
-    if (!$currentScan) return 'idle';
-    return $currentScan.status;
-  }
-
-  function getStatusIcon() {
-    if (!$currentScan) return '';
-    switch ($currentScan.status) {
-      case 'processing':
-        return '⏳';
-      case 'success':
-        return '✓';
-      case 'error':
-        return '⚠';
-      case 'already-mailed':
-        return '🚫';
-      default:
-        return '';
-    }
-  }
-
-  function getStatusMessage() {
-    if (!$currentScan) return 'Ready to scan';
-
-    switch ($currentScan.status) {
-      case 'processing':
-        return 'Processing...';
-      case 'success':
-        return 'Successfully marked as mailed!';
-      case 'error':
-        return $currentScan.error || 'Error occurred';
-      case 'already-mailed':
-        return 'ALREADY MAILED';
-      default:
-        return 'Ready to scan';
-    }
-  }
 </script>
 
 {#if showFlash}
-  <div class="screen-flash-red"></div>
+  <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(220, 38, 38, 0.3); z-index: 9999; animation: flash-fade 0.8s ease-out forwards; pointer-events: none;">
+  </div>
 {/if}
 
-<div class="scan-feedback scan-feedback--{getStatusClass()}">
-  <div class="status-icon">
-    {getStatusIcon()}
-  </div>
+<div style="background: var(--bgColor-default); border: 1px solid var(--borderColor-default); border-radius: 6px; padding: 24px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; {$currentScan?.status === 'success' ? 'background: var(--bgColor-success-muted); border-color: var(--borderColor-success-emphasis);' : ''} {$currentScan?.status === 'error' ? 'background: var(--bgColor-attention-muted); border-color: var(--borderColor-attention-emphasis);' : ''} {$currentScan?.status === 'already-mailed' ? 'background: var(--bgColor-danger-muted); border-color: var(--borderColor-danger-emphasis);' : ''} {$currentScan?.status === 'processing' ? 'background: var(--bgColor-accent-muted); border-color: var(--borderColor-accent-emphasis);' : ''}">
 
-  <div class="status-message">
-    {getStatusMessage()}
-  </div>
-
-  {#if $currentScan && $currentScan.letter}
-    <div class="letter-details">
-      <div class="detail-row">
-        <span class="detail-label">ID:</span>
-        <span class="detail-value">{$currentScan.letter.public_id}</span>
-      </div>
-      {#if $currentScan.letter.display_name}
-        <div class="detail-row">
-          <span class="detail-label">Letter:</span>
-          <span class="detail-value">{$currentScan.letter.display_name}</span>
-        </div>
-      {/if}
-      {#if $currentScan.letter.recipient}
-        <div class="detail-row">
-          <span class="detail-label">To:</span>
-          <span class="detail-value">{$currentScan.letter.recipient}</span>
-        </div>
+  {#if !$currentScan}
+    <div style="text-align: center;">
+      <div style="font-size: 14px; color: var(--fgColor-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Ready</div>
+      <div style="font-size: 16px; color: var(--fgColor-muted);">Waiting for scan...</div>
+    </div>
+  {:else if $currentScan.status === 'processing'}
+    <div style="text-align: center;">
+      <div style="font-size: 14px; color: var(--fgColor-default); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Processing</div>
+      <div style="font-size: 16px; color: var(--fgColor-muted);">Marking {$currentScan.publicId} as mailed...</div>
+    </div>
+  {:else if $currentScan.status === 'success'}
+    <div style="text-align: center;">
+      <div style="font-size: 14px; color: var(--fgColor-success); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">✓ Success</div>
+      {#if $currentScan.letter}
+        <div style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">{$currentScan.letter.public_id}</div>
+        {#if $currentScan.letter.display_name}
+          <div style="font-size: 14px; color: var(--fgColor-muted);">{$currentScan.letter.display_name}</div>
+        {/if}
+        {#if $currentScan.letter.recipient}
+          <div style="font-size: 13px; color: var(--fgColor-muted); margin-top: 2px;">To: {$currentScan.letter.recipient}</div>
+        {/if}
+      {:else}
+        <div style="font-size: 16px; color: var(--fgColor-muted);">Marked as mailed</div>
       {/if}
     </div>
-  {/if}
-
-  {#if $currentScan && $currentScan.status === 'already-mailed'}
-    <button class="undo-button" on:click={handleUndo}>
-      Undo Mark as Mailed
-    </button>
+  {:else if $currentScan.status === 'already-mailed'}
+    <div style="text-align: center; width: 100%;">
+      <div style="font-size: 14px; color: var(--fgColor-danger); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Already Mailed</div>
+      {#if $currentScan.letter}
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">{$currentScan.letter.public_id}</div>
+          {#if $currentScan.letter.display_name}
+            <div style="font-size: 14px; color: var(--fgColor-muted);">{$currentScan.letter.display_name}</div>
+          {/if}
+          {#if $currentScan.letter.mailed_at}
+            <div style="font-size: 13px; color: var(--fgColor-muted); margin-top: 6px;">
+              Mailed: {new Date($currentScan.letter.mailed_at).toLocaleString()}
+            </div>
+          {/if}
+        </div>
+      {/if}
+      <button
+        style="padding: 8px 16px; background: var(--bgColor-danger-emphasis); color: var(--fgColor-onEmphasis); border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;"
+        on:click={handleUndo}
+      >
+        Undo Mark as Mailed
+      </button>
+    </div>
+  {:else if $currentScan.status === 'error'}
+    <div style="text-align: center;">
+      <div style="font-size: 14px; color: var(--fgColor-attention); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">⚠ Error</div>
+      <div style="font-size: 14px; color: var(--fgColor-muted);">{$currentScan.error || 'Unknown error occurred'}</div>
+      {#if $currentScan.publicId}
+        <div style="font-size: 13px; color: var(--fgColor-muted); margin-top: 4px; font-family: var(--fontStack-monospace);">{$currentScan.publicId}</div>
+      {/if}
+    </div>
   {/if}
 </div>
 
 <style>
-  .screen-flash-red {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(255, 0, 0, 0.6);
-    z-index: 9999;
-    animation: flash-fade 1s ease-out forwards;
-    pointer-events: none;
-  }
-
   @keyframes flash-fade {
     0% {
       opacity: 1;
@@ -119,113 +94,5 @@
     100% {
       opacity: 0;
     }
-  }
-
-  .scan-feedback {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    border-radius: 8px;
-    min-height: 300px;
-    transition: all 0.3s ease;
-  }
-
-  .scan-feedback--idle {
-    background-color: var(--bgColor-muted);
-    border: 2px dashed var(--borderColor-default);
-  }
-
-  .scan-feedback--processing {
-    background-color: var(--bgColor-accent-muted);
-    border: 2px solid var(--borderColor-accent-emphasis);
-  }
-
-  .scan-feedback--success {
-    background-color: var(--bgColor-success-muted);
-    border: 2px solid var(--borderColor-success-emphasis);
-  }
-
-  .scan-feedback--error {
-    background-color: var(--bgColor-attention-muted);
-    border: 2px solid var(--borderColor-attention-emphasis);
-  }
-
-  .scan-feedback--already-mailed {
-    background-color: var(--bgColor-danger-muted);
-    border: 2px solid var(--borderColor-danger-emphasis);
-    animation: pulse 0.5s ease-in-out;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.02);
-    }
-  }
-
-  .status-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-
-  .status-message {
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-align: center;
-    color: var(--fgColor-default);
-    margin-bottom: 1rem;
-  }
-
-  .letter-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: var(--bgColor-default);
-    border-radius: 6px;
-    width: 100%;
-    max-width: 500px;
-  }
-
-  .detail-row {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .detail-label {
-    font-weight: 600;
-    color: var(--fgColor-muted);
-    min-width: 60px;
-  }
-
-  .detail-value {
-    color: var(--fgColor-default);
-    word-break: break-word;
-  }
-
-  .undo-button {
-    margin-top: 1rem;
-    padding: 0.75rem 1.5rem;
-    background-color: var(--bgColor-danger-emphasis);
-    color: var(--fgColor-onEmphasis);
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .undo-button:hover {
-    opacity: 0.9;
-  }
-
-  .undo-button:active {
-    transform: scale(0.98);
   }
 </style>

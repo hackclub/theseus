@@ -22,7 +22,6 @@
   }
 
   function extractPublicIdFromUrl(text) {
-    // Match: https://mail.hack.club/{public_id}?qr=1
     const match = text.match(/https?:\/\/mail\.hack\.club\/([^?\/\s]+)/);
     return match ? match[1] : null;
   }
@@ -42,28 +41,23 @@
   }
 
   function handleKeydown(event) {
-    // Ignore if typing in input/textarea
     if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
       return;
     }
 
-    // Ignore if currently processing a scan
     if ($isProcessing) {
       return;
     }
 
-    // Add character to buffer
     if (event.key.length === 1) {
       buffer += event.key;
     }
 
-    // Process on Enter
     if (event.key === 'Enter' && buffer.length > 0) {
       processBuffer();
       return;
     }
 
-    // Debounce processing
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(processBuffer, 200);
   }
@@ -89,38 +83,13 @@
   });
 </script>
 
-<div class="keyboard-wedge-status">
-  {#if isActive}
-    <span class="status-indicator status-indicator--active"></span>
-    Keyboard scanner active
-  {:else}
-    <span class="status-indicator status-indicator--inactive"></span>
-    Keyboard scanner inactive
-  {/if}
+<div style="background: var(--bgColor-default); border: 1px solid var(--borderColor-default); border-radius: 6px; padding: 20px;">
+  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+    <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--bgColor-success-emphasis); box-shadow: 0 0 10px var(--bgColor-success-emphasis);"></div>
+    <div style="font-size: 14px; font-weight: 600;">Keyboard Scanner Active</div>
+  </div>
+
+  <div style="font-size: 13px; color: var(--fgColor-muted); line-height: 1.6;">
+    Scan a QR code with your barcode scanner or paste a letter URL.
+  </div>
 </div>
-
-<style>
-  .keyboard-wedge-status {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--fgColor-muted);
-  }
-
-  .status-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-
-  .status-indicator--active {
-    background-color: var(--bgColor-success-emphasis);
-    box-shadow: 0 0 8px var(--bgColor-success-emphasis);
-  }
-
-  .status-indicator--inactive {
-    background-color: var(--bgColor-neutral-muted);
-  }
-</style>
