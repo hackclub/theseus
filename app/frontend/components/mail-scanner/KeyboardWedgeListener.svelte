@@ -58,12 +58,32 @@
     debounceTimer = setTimeout(processBuffer, 200);
   }
 
+  function handlePaste(event) {
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+      return;
+    }
+
+    if ($isProcessing) {
+      return;
+    }
+
+    event.preventDefault();
+    const pastedText = event.clipboardData.getData('text');
+
+    if (pastedText) {
+      buffer = pastedText;
+      processBuffer();
+    }
+  }
+
   function attachListener() {
     document.addEventListener('keydown', handleKeydown);
+    document.addEventListener('paste', handlePaste);
   }
 
   function detachListener() {
     document.removeEventListener('keydown', handleKeydown);
+    document.removeEventListener('paste', handlePaste);
     clearTimeout(debounceTimer);
     buffer = '';
   }
