@@ -19,15 +19,13 @@ module SnailMail
             width: 443,
           )
 
-
           render_return_address(10, 278, 260, 70, size: 8, font: "f25")
-
 
           render_destination_address(
             100,
-            200,
+            185,
             260,
-            120,
+            100,
             size: 14,
             valign: :center,
             align: :left
@@ -42,9 +40,9 @@ module SnailMail
           end
 
 
-          render_imb(140, 70, 183)
-          render_qr_code(310, 262, 42)
-          render_letter_id(2, 5, 6)
+          render_imb(102, 80, 183)
+          render_qr_code(220, 260, 40)
+          render_letter_id(10, 19, 8)
           render_postage
         end
       end
