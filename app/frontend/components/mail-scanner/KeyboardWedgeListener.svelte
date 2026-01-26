@@ -84,11 +84,9 @@
 </script>
 
 <div style="background: var(--bgColor-default); border: 1px solid var(--borderColor-default); border-radius: 6px; padding: 20px;">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-    <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--bgColor-success-emphasis); box-shadow: 0 0 10px var(--bgColor-success-emphasis);"></div>
-    <div style="font-size: 14px; font-weight: 600;">Keyboard Scanner Active</div>
+  <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+    Listening for scans
   </div>
-
   <div style="font-size: 13px; color: var(--fgColor-muted); line-height: 1.6;">
     Scan a QR code with your barcode scanner or paste a letter URL.
   </div>
