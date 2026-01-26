@@ -25,7 +25,7 @@ class Components::Shared::Nav < Components::Base
           item.with_leading_visual_icon icon: :read
           item.with_item(label: "Letters", href: letters_path) { |item| item.with_leading_visual_icon icon: :mail }
           item.with_item(label: "Batches", href: letter_batches_path) { |item| item.with_leading_visual_icon icon: :stack }
-          item.with_item(label: "Mail Scanner", href: scanner_letters_path) { |item| item.with_leading_visual_icon icon: :"device-camera" }
+          item.with_item(label: "Mail Scanner", href: scanner_letters_path) { |item| item.with_leading_visual_icon icon: :zap }
           item.with_item(label: "Return Addresses", href: return_addresses_path)
         end
 

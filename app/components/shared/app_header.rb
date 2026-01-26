@@ -39,7 +39,7 @@ class Components::Shared::AppHeader < Components::Base
 
       div(style: "display: flex; align-items: center; gap: 0.5rem;") do
         render(Primer::Beta::IconButton.new(
-          icon: :"device-camera",
+          icon: :zap,
           "aria-label": "Mail Scanner",
           scheme: :invisible,
           tag: :a,

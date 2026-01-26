@@ -83,7 +83,7 @@ class Components::StaticPages::Home < Components::Base
       mail_links = [
         { label: "Letters", href: letters_path, icon: :mail, check: -> { policy(::Letter.new).index? } },
         { label: "Batches", href: letter_batches_path, icon: :stack, check: -> { policy(::Letter::Batch.new).index? } },
-        { label: "Mail Scanner", href: scanner_letters_path, icon: :"device-camera", check: -> { policy(::Letter.new).index? } },
+        { label: "Mail Scanner", href: scanner_letters_path, icon: :zap, check: -> { policy(::Letter.new).index? } },
         { label: "Return Addresses", href: return_addresses_path, icon: :home, check: -> { policy(ReturnAddress.new).index? } }
       ]
       link_panel("Mail", mail_links)
