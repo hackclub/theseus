@@ -454,11 +454,15 @@ Rails.application.routes.draw do
       end
     end
     resources :letters do
+      collection do
+        get :scanner
+      end
       member do
         post :generate_label
         post :buy_indicia
         post :mark_printed
         post :mark_mailed
+        post :undo_mark_mailed
         post :mark_received
         post :clear_label
         get :preview_template if Rails.env.development?
