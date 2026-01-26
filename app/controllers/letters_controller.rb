@@ -313,7 +313,7 @@ class LettersController < ApplicationController
       public_id: letter.public_id,
       display_name: letter.display_name || letter.user_facing_title,
       mailed_at: letter.mailed_at&.iso8601,
-      recipient: letter.address&.name,
+      recipient: letter.address&.name_line,
       aasm_state: letter.aasm_state
     }
   end
