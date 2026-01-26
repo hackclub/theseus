@@ -10,7 +10,7 @@
     showFlash = true;
     setTimeout(() => {
       showFlash = false;
-    }, 800);
+    }, 1500);
   }
 
   function handleUndo() {
@@ -21,7 +21,7 @@
 </script>
 
 {#if showFlash}
-  <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(220, 38, 38, 0.3); z-index: 9999; animation: flash-fade 0.8s ease-out forwards; pointer-events: none;">
+  <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(220, 38, 38, 0.3); z-index: 9999; animation: flash-fade 1.5s ease-out forwards; pointer-events: none;">
   </div>
 {/if}
 
