@@ -1,5 +1,5 @@
 class LettersController < ApplicationController
-  before_action :set_letter, except: %i[ index new create ]
+  before_action :set_letter, except: %i[ index new create scanner ]
 
   # GET /letters
   def index
