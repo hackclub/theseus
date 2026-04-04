@@ -43,6 +43,12 @@
     </div>
   </div>
   <div class="window-body" style="padding: 0">
-    <iframe src="<%= map_path %>" style="width: 320px; height: 200px; border: none;"></iframe>
+    <iframe id="map-iframe" data-src="<%= map_path %>" style="width: 320px; height: 200px; border: none;"></iframe>
   </div>
 </div>
+<script>
+  window.addEventListener("load", function() {
+    var iframe = document.getElementById("map-iframe");
+    if (iframe) iframe.src = iframe.dataset.src;
+  });
+</script>
