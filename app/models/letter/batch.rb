@@ -66,7 +66,7 @@ class Letter::Batch < Batch
   attribute :user_facing_title, :string
   attribute :letter_return_address_name, :string
   attribute :letter_queue_id, :integer
-  attr_accessor :template, :template_cycle
+  attr_accessor :template, :template_cycle, :us_postage_type, :intl_postage_type
   attribute :letter_mailing_date, :date
 
   validates :letter_height, :letter_width, :letter_weight, presence: true, numericality: { greater_than: 0 }
