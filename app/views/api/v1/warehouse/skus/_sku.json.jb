@@ -1,0 +1,5 @@
+{
+  name: sku.name,
+  in_stock: sku.in_stock,
+  inbound: sku.inbound
+}

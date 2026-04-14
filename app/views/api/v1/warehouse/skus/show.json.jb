@@ -1,0 +1,3 @@
+{
+  sku: render(partial: "sku", locals: { sku: @sku })
+}
