@@ -1,23 +1,12 @@
 class Warehouse::SKUPolicy < ApplicationPolicy
-  def index?
-    user_can_warehouse
-  end
+  def index? = user_can_warehouse
 
-  def show?
-    user_can_warehouse
-  end
+  alias_method :show?, :index?
 
-  def create?
-    user_is_admin
-  end
+  def new? = user_is_admin
 
-  def new?
-    user_is_admin
-  end
-
-  def update?
-    user_is_admin
-  end
+  alias_method :create?, :new?
+  alias_method :update?, :new?
 
   class Scope < ApplicationPolicy::Scope
     def resolve
