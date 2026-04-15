@@ -1,24 +1,28 @@
 class Warehouse::SKUPolicy < ApplicationPolicy
-  def index? = user_can_warehouse
+  def index?
+    user_can_warehouse
+  end
+  
+  def show?
+    user_can_warehouse
+  end
 
-  alias_method :show?, :index?
+  def create?
+    user_is_admin
+  end
+  
+  def new?
+    user_is_admin
+  end
 
-  def new? = user_is_admin
-
-  alias_method :create?, :new?
-  alias_method :update?, :new?
+  def update?
+    user_is_admin
+  end
 
   class Scope < ApplicationPolicy::Scope
     def resolve
-      return scope.all if user_can_warehouse
-
+      return scope.all if user&.can_warehouse? || user&.admin?
       scope.none
-    end
-
-    private
-
-    def user_can_warehouse
-      user&.can_warehouse? || user&.admin?
     end
   end
 end
