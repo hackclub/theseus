@@ -139,7 +139,7 @@ gem "ivymeter", "~> 0.1.0"
 
 gem "slack-notifier", "~> 2.4"
 
-gem "nokogiri", "~> 1.18"
+gem "nokogiri", "~> 1.19"
 
 gem "vite_rails"
 
