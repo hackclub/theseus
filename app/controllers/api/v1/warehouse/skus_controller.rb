@@ -11,7 +11,7 @@ module API
         private
 
         def set_sku
-          @sku = policy_scope(::Warehouse::SKU).find(params[:id])
+          @sku = policy_scope(::Warehouse::SKU).find_by!(sku: params[:id])
         end
       end
     end
