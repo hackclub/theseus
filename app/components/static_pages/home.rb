@@ -8,10 +8,12 @@ class Components::StaticPages::Home < Components::Base
   end
 
   def view_template
-    div(class: "page-container") do
-      header_section
-      kpi_section
-      main_section
+    div(class: "home-page") do
+      div(class: "page-container") do
+        header_section
+        kpi_section
+        main_section
+      end
     end
   end
 
@@ -49,7 +51,7 @@ class Components::StaticPages::Home < Components::Base
   def kpi_section
     div(class: "content-section-lg") do
       # Action items section
-      h2(class: "home-kpi-heading") { "Needs attention" }
+      h2(class: "home-section-heading") { "Needs Attention" }
       div(class: "home-kpi-grid mb-3") do
         action_card("Orders to dispatch", stats[:orders_to_dispatch], :package, warehouse_orders_path(state: "draft"))
         action_card("Letters to print", stats[:letters_to_print], :mail, letters_path(status: "pending"))
@@ -59,7 +61,7 @@ class Components::StaticPages::Home < Components::Base
       end
 
       # Global stats section
-      h2(class: "home-kpi-heading") { "This week" }
+      h2(class: "home-section-heading") { "This Week" }
       div(class: "home-kpi-grid") do
         stat_card("In transit", stats[:orders_in_transit], :rocket, warehouse_orders_path(state: "dispatched"))
         stat_card("Orders shipped", stats[:orders_shipped_this_week], :package, warehouse_orders_path(state: "mailed"))
