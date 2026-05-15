@@ -98,7 +98,7 @@
             if @letter.usps_indicium.present?
               box.with_row do %>
                 <div class="page-title-group">
-                  <%= render Primer::Beta::Octicon.new(icon: :check_circle, color: :success) %>
+                  <%= render Primer::Beta::Octicon.new(icon: :"check-circle", color: :success) %>
                   <span class="fw-semibold text-success">Indicia Purchased</span>
                 </div>
               <% end
@@ -292,7 +292,7 @@
               <% end %>
             <% when 'received' %>
               <div class="letter-received-card">
-                <%= render Primer::Beta::Octicon.new(icon: :check_circle, size: :medium) %>
+                <%= render Primer::Beta::Octicon.new(icon: :"check-circle", size: :medium) %>
                 <div class="fw-semibold mt-1">Letter received</div>
               </div>
             <% end %>

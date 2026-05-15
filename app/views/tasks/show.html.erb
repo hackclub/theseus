@@ -16,7 +16,7 @@
 
   <% if @tasks.empty? %>
     <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :check_circle)
+      bs.with_visual_icon(icon: :"check-circle")
       bs.with_heading(tag: :h2) { "All clear!" }
       bs.with_description { "No tasks right now." }
     end %>
