@@ -1677,6 +1677,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 12px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .home-kpi-grid {
@@ -1700,10 +1701,40 @@
   border-radius: 6px;
   text-decoration: none;
   color: inherit;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(0, 0, 0, 0.02) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: all 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
   &--attention {
     background: var(--bgColor-attention-muted);
     border-color: var(--borderColor-attention-emphasis);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 2px 6px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(187, 128, 9, 0.15);
+
+    &:hover {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        0 0 12px rgba(187, 128, 9, 0.2);
+    }
   }
 }
 
@@ -1733,12 +1764,22 @@
   border: 1px solid var(--borderColor-default);
   border-radius: 6px;
   overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .link-panel-header {
   padding: 12px 16px;
   border-bottom: 1px solid var(--borderColor-default);
   background: var(--bgColor-muted);
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.02) 40%,
+    rgba(0, 0, 0, 0.04)
+  );
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .link-panel-title {
@@ -1758,6 +1799,16 @@
   padding: 10px 16px;
   text-decoration: none;
   color: inherit;
+  transition: background 0.1s ease;
+
+  &:hover {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0.02)
+    );
+    background-color: var(--bgColor-muted);
+  }
 }
 
 .link-panel-icon {
@@ -2266,4 +2317,323 @@
   text-align: center;
   padding: 16px;
   color: var(--fgColor-success);
+}
+
+// Lickable UI — aqua-era skeuomorphism, theme-aware
+
+@mixin lickable-gradient($hi, $mid, $lo) {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, $hi) 0%,
+    rgba(255, 255, 255, $mid) 40%,
+    rgba(255, 255, 255, 0) 49%,
+    rgba(0, 0, 0, $lo * 0.4) 51%,
+    rgba(0, 0, 0, $lo) 100%
+  ) !important;
+}
+
+// -- Buttons --
+
+.Button {
+  @include lickable-gradient(0.45, 0.18, 0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  text-shadow: none;
+  transition: all 0.12s ease;
+
+  &:hover:not(:disabled) {
+    @include lickable-gradient(0.55, 0.23, 0.11);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+      0 3px 8px rgba(0, 0, 0, 0.2),
+      0 1px 3px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-0.5px);
+  }
+
+  &:active:not(:disabled), &[aria-expanded="true"] {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(0, 0, 0, 0.04) 40%,
+      rgba(0, 0, 0, 0) 49%,
+      rgba(255, 255, 255, 0.03) 51%,
+      rgba(255, 255, 255, 0.08) 100%
+    ) !important;
+    box-shadow:
+      inset 0 2px 5px rgba(0, 0, 0, 0.2),
+      inset 0 1px 2px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(0.5px);
+  }
+}
+
+.Button--primary {
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.35);
+
+  &:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+      0 3px 10px rgba(45, 164, 78, 0.35),
+      0 1px 3px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  &:active:not(:disabled), &[aria-expanded="true"] {
+    box-shadow:
+      inset 0 2px 5px rgba(0, 0, 0, 0.3),
+      inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  }
+}
+
+.Button--danger {
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.35);
+
+  &:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+      0 3px 10px rgba(207, 34, 46, 0.35),
+      0 1px 3px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  &:active:not(:disabled), &[aria-expanded="true"] {
+    box-shadow:
+      inset 0 2px 5px rgba(0, 0, 0, 0.3),
+      inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  }
+}
+
+.Button--invisible {
+  background-image: none !important;
+  box-shadow: none !important;
+  text-shadow: none;
+
+  &:hover:not(:disabled) {
+    background-image: none !important;
+    box-shadow: none !important;
+    transform: none;
+  }
+
+  &:active:not(:disabled) {
+    background-image: none !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    transform: none;
+  }
+}
+
+// -- Stat pills --
+
+.stat-pill-link, .stat-pill-filter {
+  @include lickable-gradient(0.32, 0.13, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  transition: all 0.12s ease;
+
+  &:hover {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+      0 2px 6px rgba(0, 0, 0, 0.18) !important;
+    transform: translateY(-0.5px);
+  }
+}
+
+// -- Labels (candy pills) --
+
+.Label {
+  @include lickable-gradient(0.22, 0.09, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+// -- Recessed inputs --
+
+.FormControl-input-wrap {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  border-radius: 6px;
+}
+
+.FormControl-input, .FormControl-textarea, .FormControl-select {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+// -- BorderBox lift + glossy header --
+
+.Box {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+.Box-header {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.08),
+    rgba(0, 0, 0, 0.03)
+  ) !important;
+}
+
+// -- Dark mode: subtler highlights, deeper shadows --
+
+[data-color-mode="dark"], [data-dark-theme] {
+  .Button:not(.Button--invisible) {
+    @include lickable-gradient(0.18, 0.07, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+
+    &:hover:not(:disabled) {
+      @include lickable-gradient(0.24, 0.1, 0.06);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+        0 3px 8px rgba(0, 0, 0, 0.5),
+        0 1px 3px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    &:active:not(:disabled), &[aria-expanded="true"] {
+      box-shadow:
+        inset 0 2px 5px rgba(0, 0, 0, 0.4),
+        inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+    }
+  }
+
+  .Button--primary:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+      0 3px 12px rgba(45, 164, 78, 0.3),
+      0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .Button--danger:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+      0 3px 12px rgba(207, 34, 46, 0.3),
+      0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .stat-pill-link, .stat-pill-filter {
+    @include lickable-gradient(0.09, 0.04, 0.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.3) !important;
+
+    &:hover {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.4) !important;
+    }
+  }
+
+  .Label {
+    @include lickable-gradient(0.09, 0.04, 0.05);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .FormControl-input-wrap {
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 2px rgba(0, 0, 0, 0.2),
+      0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .FormControl-input, .FormControl-textarea, .FormControl-select {
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 2px rgba(0, 0, 0, 0.2),
+      0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .Box {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .Box-header {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.04),
+      rgba(0, 0, 0, 0.04)
+    ) !important;
+  }
+
+  .dash-card {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 40%,
+      rgba(0, 0, 0, 0.04) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 2px 6px rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    &--attention {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(187, 128, 9, 0.2);
+
+      &:hover {
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.12),
+          0 4px 12px rgba(0, 0, 0, 0.4),
+          0 0 12px rgba(187, 128, 9, 0.25);
+      }
+    }
+  }
+
+  .link-panel {
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .link-panel-header {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0.01) 40%,
+      rgba(0, 0, 0, 0.04)
+    );
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  }
+
+  .link-panel-item:hover {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.01)
+    );
+  }
+
+  .home-kpi-heading {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  }
 }

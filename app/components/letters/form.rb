@@ -268,7 +268,7 @@ class Components::Letters::Form < Components::Base
 
   def country_filter_script(form_id)
     script do
-      raw <<~JS
+      raw safe <<~JS
         (function() {
           var container = document.getElementById('#{form_id}');
           if (!container) return;
@@ -377,7 +377,7 @@ class Components::Letters::Form < Components::Base
     end
 
     render(Primer::Beta::Flash.new(scheme: :warning)) do
-      raw "Please leave the mailer ID at the default if you're mailing from HQ &mdash; otherwise talk to Nora (it has USPS implications)."
+      plain "Please leave the mailer ID at the default if you're mailing from HQ &mdash; otherwise talk to Nora (it has USPS implications)."
     end
   end
 
