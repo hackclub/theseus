@@ -82,7 +82,7 @@ gem "hashid-rails", "~> 1.4"
 
 gem "csv", "~> 3.3"
 
-gem "faraday", "~> 2.13"
+gem "faraday", "~> 2.14"
 
 gem "oauth2", "~> 2.0"
 
