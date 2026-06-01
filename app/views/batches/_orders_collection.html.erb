@@ -1,26 +1,21 @@
-<% orders.each do |order| %>
-  <article class="card mb-4">
-    <div class="card-header">
-      <h3 class="mb-0">
-        <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
-        <%= render 'warehouse/orders/status_badge', order: order %>
-      </h3>
-    </div>
-    <div class="card-body">
-      <div class="grid md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <span class="text-gray-500">Recipient:</span>
-          <%= order.address.name_line %> (<%= order.recipient_email %>)
-        </div>
-        <div>
-          <span class="text-gray-500">Tags:</span>
-          <%= render 'shared/tags', tags: order.tags %>
+<%= render Primer::Beta::BorderBox.new do |box| %>
+  <% orders.each do |order| %>
+    <% box.with_row do %>
+      <div class="resource-card">
+        <div class="resource-card-info flex-1">
+          <div class="order-collection-header">
+            <%= link_to order.hc_id, order, class: "mono fw-medium" %>
+            <span><%= order.user_facing_title %></span>
+            <%= render 'warehouse/orders/status_badge', order: order %>
+          </div>
+          <span class="resource-card-meta"><%= order.address.name_line %> (<%= order.recipient_email %>)</span>
+          <% if order.tags.any? %>
+            <div class="mt-1">
+              <%= render 'shared/tags', tags: order.tags %>
+            </div>
+          <% end %>
         </div>
       </div>
-      <div>
-        <span class="text-gray-500">Contents:</span>
-        <%= render 'warehouse/orders/line_items', order: order %>
-      </div>
-    </div>
-  </article>
+    <% end %>
+  <% end %>
 <% end %>

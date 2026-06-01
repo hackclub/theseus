@@ -1,54 +1,48 @@
-<%# This partial displays information about a batch for a letter or warehouse order %>
 <% if record.batch.present? %>
-  <div class="card mb-4">
-    <div class="card-header flex items-center justify-between py-2">
-      <h2 class="text-base font-medium">Part of Batch</h2>
-      <%= link_to letter_batch_path(record.batch), class: "text-sm text-blue-600 hover:text-blue-800" do %>
-        View Batch #<%= record.batch.id %>
+  <div class="content-section">
+    <h2 class="section-heading">Part of Batch</h2>
+    <%= render Primer::Beta::BorderBox.new do |box| %>
+      <% box.with_header do %>
+        <div class="kv-row">
+          <span class="fw-semibold"><%= record.batch.type.split('::').first.titleize %> Batch #<%= record.batch.id %></span>
+          <div class="page-actions">
+            <%= render Components::Shared::StatusBadge.new(status: record.batch.aasm.current_state, type: :batch) %>
+            <% batch_path = record.batch.is_a?(Letter::Batch) ? letter_batch_path(record.batch) : warehouse_batch_path(record.batch) %>
+            <%= render Primer::Beta::Button.new(tag: :a, href: batch_path, scheme: :secondary, size: :small) do |btn|
+              btn.with_trailing_visual_icon(icon: :arrow_right)
+              "View Batch"
+            end %>
+          </div>
+        </div>
       <% end %>
-    </div>
-    
-    <div class="card-body p-3">
-      <div class="grid md:grid-cols-2 gap-4 text-sm">
-        <div>
-          <span class="text-gray-500">Batch Type:</span>
-          <%= record.batch.type.split('::').first.titleize %>
-        </div>
-        <div>
-          <span class="text-gray-500">Status:</span>
-          <span class="badge <%= record.batch.aasm.current_state %>">
-            <%= record.batch.aasm.current_state.to_s.titleize %>
-          </span>
-        </div>
-        <div>
-          <span class="text-gray-500">Created:</span>
-          <%= record.batch.created_at.strftime("%B %d, %Y") %>
-        </div>
-        <div>
-          <span class="text-gray-500">Items in Batch:</span>
-          <%= record.batch.addresses.count %>
-        </div>
-        
-        <% if record.batch.is_a?(Letter::Batch) %>
+      <% box.with_body do %>
+        <div class="batch-info-grid">
           <div>
-            <span class="text-gray-500">Letter Dimensions:</span>
-            <%= "#{record.batch.letter_width}\" × #{record.batch.letter_height}\"" %>
+            <span class="kv-label">Created:</span>
+            <%= record.batch.created_at.strftime("%B %d, %Y") %>
           </div>
           <div>
-            <span class="text-gray-500">Letter Weight:</span>
-            <%= record.batch.letter_weight %> oz
+            <span class="kv-label">Items in Batch:</span>
+            <%= record.batch.addresses.count %>
           </div>
-        <% end %>
-        
-        <% if record.batch.is_a?(Warehouse::Batch) %>
-          <% if record.batch.warehouse_template.present? %>
+          <% if record.batch.is_a?(Letter::Batch) %>
             <div>
-              <span class="text-gray-500">Template:</span>
+              <span class="kv-label">Dimensions:</span>
+              <%= record.batch.letter_width %>" × <%= record.batch.letter_height %>"
+            </div>
+            <div>
+              <span class="kv-label">Weight:</span>
+              <%= record.batch.letter_weight %> oz
+            </div>
+          <% end %>
+          <% if record.batch.is_a?(Warehouse::Batch) && record.batch.warehouse_template.present? %>
+            <div>
+              <span class="kv-label">Template:</span>
               <%= record.batch.warehouse_template.name %>
             </div>
           <% end %>
-        <% end %>
-      </div>
-    </div>
+        </div>
+      <% end %>
+    <% end %>
   </div>
-<% end %> 
+<% end %>

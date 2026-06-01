@@ -1,0 +1,26 @@
+<% content_for :head do %>
+  <%= vite_javascript_tag "taggable" %>
+<% end %>
+
+<% selected_tags = taggable.try(:tags) || [] %>
+<% all_tags = available_tags(selected_tags) %>
+
+<div class="form-field-lg">
+  <%= form.label :tags, "Tags", class: "date-field-label" %>
+  <%= form.select :tags,
+                  all_tags,
+                  { selected: selected_tags, include_blank: false },
+                  { multiple: true,
+                    class: "selectize-tags",
+                    style: "width: 100%;",
+                    data: {
+                      selectize: {
+                        plugins: ['remove_button'],
+                        persist: false,
+                        create: true,
+                        maxItems: nil
+                      }
+                    }
+                  } %>
+  <p class="form-hint">Select from common tags or create your own</p>
+</div>

@@ -1,11 +1,36 @@
-<% content_for :title, "Mailers" %>
+<% content_for :title, "Mailer IDs" %>
 
-<h1>CRID/Mailer ID Pairs:</h1>
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">CRID / Mailer ID Pairs</h1>
+      <p class="page-subtitle"><%= @usps_mailer_ids.count %> registered</p>
+    </div>
+    <%= render Primer::Beta::Button.new(tag: :a, href: new_usps_mailer_id_path, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :plus)
+      "New Mailer ID"
+    end %>
+  </div>
 
-<div id="usps_mailer_ids">
-  <% @usps_mailer_ids.each do |mid| %>
-    <%= link_to mid.name, mid %> (<%= mid.crid %>/<%= mid.mid %>) <br/>
+  <% if @usps_mailer_ids.any? %>
+    <%= render Primer::Beta::BorderBox.new do |box|
+      @usps_mailer_ids.each do |mid|
+        box.with_row do %>
+          <a href="<%= usps_mailer_id_path(mid) %>" class="resource-card link-reset">
+            <span class="resource-card-title"><%= mid.name %></span>
+            <div class="resource-card-meta mailer-id-codes">
+              <span>CRID: <code><%= mid.crid %></code></span>
+              <span>MID: <code><%= mid.mid %></code></span>
+            </div>
+          </a>
+        <% end
+      end
+    end %>
+  <% else %>
+    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
+      bs.with_visual_icon(icon: :id_badge)
+      bs.with_heading(tag: :h3) { "No mailer IDs yet" }
+      bs.with_primary_action(href: new_usps_mailer_id_path) { "Add one" }
+    end %>
   <% end %>
 </div>
-<hr/>
-<%= link_to "enter a new MID?", new_usps_mailer_id_path %>

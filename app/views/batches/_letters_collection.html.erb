@@ -1,31 +1,27 @@
-<% letters.each do |letter| %>
-  <article class="card">
-    <div class="flex justify-between items-center mb-2">
-      <h3 class="text-base font-medium"><%= link_to letter.public_id, letter %> to <%= letter.address.name_line %>
-        <%= letter_status_badge(letter.aasm_state, 'float-right') %>
-      </h3>
+<%= render Primer::Beta::BorderBox.new do |box| %>
+  <% box.with_header do %>
+    <div class="batch-table-row">
+      <span class="batch-col-name col-header">Letter</span>
+      <span class="batch-col-md col-header">From</span>
+      <span class="batch-col-md col-header">Size</span>
+      <span class="batch-col-md col-header">Created</span>
+      <span class="batch-col-status col-header">Status</span>
     </div>
-
-    <div class="grid grid-cols-3 gap-1 text-sm text-gray-600">
-      <div class="truncate">
-        <span class="text-gray-400">From:</span>
-        <%= letter.return_address.present? ? letter.return_address_name_line : 'N/A' %>
+  <% end %>
+  <% letters.each do |letter| %>
+    <% box.with_row do %>
+      <div class="batch-table-row">
+        <div class="batch-col-name">
+          <%= link_to letter.public_id, letter, class: "fw-medium" %>
+          <span class="kv-label text-sm"> to <%= letter.address.name_line %></span>
+        </div>
+        <span class="batch-col-md kv-label text-sm"><%= letter.return_address.present? ? letter.return_address_name_line : '—' %></span>
+        <span class="batch-col-md text-sm"><%= letter.height %>" × <%= letter.width %>"</span>
+        <span class="batch-col-md kv-label text-sm"><%= time_ago_in_words(letter.created_at) %> ago</span>
+        <span class="batch-col-status">
+          <%= render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) %>
+        </span>
       </div>
-
-      <div class="truncate">
-        <span class="text-gray-400">Created:</span>
-        <%= time_ago_in_words(letter.created_at) %> ago
-      </div>
-
-      <div class="truncate">
-        <span class="text-gray-400">Size:</span>
-        <%= letter.height %>" × <%= letter.width %>"
-      </div>
-    </div>
-
-    <div class="mt-2 flex items-center gap-2">
-      <span class="text-gray-400">Tags:</span>
-      <%= render 'shared/tags', tags: letter.tags %>
-    </div>
-  </article>
+    <% end %>
+  <% end %>
 <% end %>

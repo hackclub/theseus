@@ -1,77 +1,72 @@
 <% content_for :title, "Indicium #{@usps_indicium.public_id}" %>
 
-<div class="container">
-  <header class="page-header mb-6">
-    <div class="flex items-center gap-4">
-      <%= link_to "← Back", usps_indicia_path, class: "text-gray-500 hover:text-gray-700" %>
-      <div>
-        <h1>Indicium</h1>
-        <div class="text-sm text-gray-500 font-mono"><%= @usps_indicium.public_id %></div>
-      </div>
+<div class="page-container--narrow">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Indicium</h1>
+      <p class="page-subtitle">
+        <%= render Components::Shared::PublicId.new(value: @usps_indicium.public_id) %>
+      </p>
     </div>
-    <div class="actions flex gap-2">
-      <%= link_to edit_usps_indicium_path(@usps_indicium), class: "btn btn-small" do %>
-        Edit
-      <% end %>
-      <%= button_to usps_indicium_path(@usps_indicium), method: :delete, class: "btn danger btn-small", data: { confirm: "Delete this indicium?" } do %>
-        Delete
+    <div class="page-actions">
+      <%= render Primer::Beta::Button.new(tag: :a, href: edit_usps_indicium_path(@usps_indicium), scheme: :secondary, size: :medium) do |btn|
+        btn.with_leading_visual_icon(icon: :pencil)
+        "Edit"
+      end %>
+      <%= form_with url: usps_indicium_path(@usps_indicium), method: :delete, data: { turbo_confirm: "Delete this indicium?" }, class: "form-inline" do %>
+        <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :medium) do |btn|
+          btn.with_leading_visual_icon(icon: :trash)
+          "Delete"
+        end %>
       <% end %>
     </div>
-  </header>
+  </div>
 
-  <div class="max-w-2xl">
-    <article>
-      <header><h2>Postage Details</h2></header>
-      <div class="p-4">
-        <dl class="grid md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <dt class="text-gray-500">Postage</dt>
-            <dd class="font-medium text-lg"><%= number_to_currency(@usps_indicium.postage) %></dd>
-          </div>
-          <div>
-            <dt class="text-gray-500">Mailing Date</dt>
-            <dd><%= @usps_indicium.mailing_date %></dd>
-          </div>
-          <div>
-            <dt class="text-gray-500">USPS SKU</dt>
-            <dd class="font-mono text-xs"><%= @usps_indicium.usps_sku %></dd>
-          </div>
-          <div>
-            <dt class="text-gray-500">Processing Category</dt>
-            <dd><%= @usps_indicium.processing_category %></dd>
-          </div>
-        </dl>
-      </div>
-    </article>
+  <div class="content-section">
+    <h2 class="section-heading">Postage Details</h2>
+    <%= render Primer::Beta::BorderBox.new do |box|
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Postage</span><span class="fw-semibold"><%= number_to_currency(@usps_indicium.postage) %></span></div>
+      <% end
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Mailing Date</span><span><%= @usps_indicium.mailing_date %></span></div>
+      <% end
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">USPS SKU</span><code><%= @usps_indicium.usps_sku %></code></div>
+      <% end
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Processing Category</span><span><%= @usps_indicium.processing_category %></span></div>
+      <% end
+    end %>
+  </div>
 
-    <article class="mt-6">
-      <header><h2>Dimensions</h2></header>
-      <div class="p-4">
-        <dl class="grid md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <dt class="text-gray-500">Weight</dt>
-            <dd><%= @usps_indicium.postage_weight %> oz</dd>
-          </div>
-          <div>
-            <dt class="text-gray-500">Length</dt>
-            <dd><%= @usps_indicium.postage_length %>"</dd>
-          </div>
-          <div>
-            <dt class="text-gray-500">Height</dt>
-            <dd><%= @usps_indicium.postage_height %>"</dd>
-          </div>
-          <div>
-            <dt class="text-gray-500">Thickness</dt>
-            <dd><%= @usps_indicium.postage_thickness %>"</dd>
-          </div>
-          <div>
-            <dt class="text-gray-500">Non-machinable</dt>
-            <dd><%= @usps_indicium.nonmachinable ? "Yes" : "No" %></dd>
-          </div>
-        </dl>
-      </div>
-    </article>
+  <div class="content-section">
+    <h2 class="section-heading">Dimensions</h2>
+    <%= render Primer::Beta::BorderBox.new do |box|
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Weight</span><span><%= @usps_indicium.postage_weight %> oz</span></div>
+      <% end
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Length</span><span><%= @usps_indicium.postage_length %>"</span></div>
+      <% end
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Height</span><span><%= @usps_indicium.postage_height %>"</span></div>
+      <% end
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Thickness</span><span><%= @usps_indicium.postage_thickness %>"</span></div>
+      <% end
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Non-machinable</span><span><%= @usps_indicium.nonmachinable ? "Yes" : "No" %></span></div>
+      <% end
+    end %>
+  </div>
 
-    <%= render partial: "admin_inspector", locals: { record: @usps_indicium } %>
+  <%= render partial: "admin_inspector", locals: { record: @usps_indicium } %>
+
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_indicia_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to indicia"
+    end %>
   </div>
 </div>

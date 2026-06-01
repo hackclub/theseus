@@ -1,16 +1,25 @@
-<h1>regenerate labels</h1>
-<%= form_with(model: @batch, url: regenerate_labels_letter_batch_path(@batch), method: :post) do |f| %>
-  <div class="form-group">
-    <%= f.label :template_cycle, "templates to use:", class: "form-label" %>
-    <%= f.hidden_field :template_cycle, id: "selected_template", value: params[:template] %>
-    <%= render "shared/template_picker", multiple: true %>
-  </div>
-  <div class="form-group">
-    <%= f.label :include_qr_code, "Include QR Code", class: "form-label" %>
-    <%= f.check_box :include_qr_code, class: "form-checkbox", checked: true %>
-  </div>
-  <div class="actions">
-    <%= f.submit "Regenerate Labels", class: "contrast" %>
-    <%= link_to "nevermind", letter_batch_path(@batch)%>
-  </div>
-<% end %>
+<div class="page-container--narrow">
+  <h1 class="page-title content-section">Regenerate Labels</h1>
+  <%= form_with(model: @batch, url: regenerate_labels_letter_batch_path(@batch), method: :post) do |f| %>
+    <div class="form-field-lg">
+      <%= f.label :template_cycle, "Templates to use:", class: "date-field-label" %>
+      <%= f.hidden_field :template_cycle, id: "selected_template", value: params[:template] %>
+      <%= render "shared/template_picker", multiple: true %>
+    </div>
+    <div class="form-field-lg">
+      <label class="form-check-label">
+        <%= f.check_box :include_qr_code, checked: true %>
+        <span class="fw-semibold">Include QR Code</span>
+      </label>
+    </div>
+    <div class="page-actions">
+      <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+        btn.with_leading_visual_icon(icon: :sync)
+        "Regenerate Labels"
+      end %>
+      <%= render Primer::Beta::Button.new(tag: :a, href: letter_batch_path(@batch), scheme: :secondary) do
+        "Cancel"
+      end %>
+    </div>
+  <% end %>
+</div>

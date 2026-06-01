@@ -1,12 +1,17 @@
-<% content_for :title, "Editing source tag" %>
+<% content_for :title, "Edit Source Tag" %>
 
-<h1>Editing source tag</h1>
+<div class="page-container--xs">
+  <div class="page-title-group content-section">
+    <h1 class="page-title">Edit Source Tag</h1>
+    <code class="kv-label"><%= @source_tag.slug %></code>
+  </div>
 
-<%= render "form", source_tag: @source_tag %>
+  <%= render "form", source_tag: @source_tag %>
 
-<br>
-
-<div>
-  <%= link_to "Show this source tag", @source_tag %> |
-  <%= link_to "Back to source tags", source_tags_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: source_tag_path(@source_tag), scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to source tag"
+    end %>
+  </div>
 </div>

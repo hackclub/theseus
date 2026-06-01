@@ -1,41 +1,58 @@
-<% content_for :head do %>
-  <%= vite_javascript_tag 'cocoon' %>
-<% end %>
-
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(warehouse_template.errors.count, "error") %> prohibited this template from being saved:</h2>
-
-      <ul>
+    <%= render Primer::Beta::Flash.new(scheme: :danger, full: true, mb: 3) do %>
+      <strong><%= pluralize(warehouse_template.errors.count, "error") %> prohibited this template from being saved:</strong>
+      <ul class="error-list">
         <% warehouse_template.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    </div>
+    <% end %>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
-
-  <div>
-    <%= form.label :public, "share this template with all users?" %>
-    <%= form.check_box :public %>
-  </div>
-
-  <h4>contents:</h4>
-  <div id='line_items'>
-    <%= form.fields_for :line_items do |line_item| %>
-      <%= render 'line_item_fields', :f => line_item %>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_header do |header| %>
+      <% header.with_title(tag: :h2) do %>Template Details<% end %>
     <% end %>
-    <div class='links'>
-      <%= link_to_add_association 'add item', form, :line_items %>
-    </div>
-  </div>
+    <% box.with_body do %>
+      <%= render Primer::Alpha::TextField.new(
+        name: "warehouse_template[name]",
+        label: "Template name",
+        value: warehouse_template.name,
+        full_width: true,
+        required: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.submit class: 'btn success btn-small' %>
+      <%= render Primer::Alpha::CheckBox.new(
+        name: "warehouse_template[public]",
+        label: "Share this template with all users",
+        checked: warehouse_template.public
+      ) %>
+    <% end %>
+  <% end %>
+
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_header do |header| %>
+      <% header.with_title(tag: :h2) do %>Contents<% end %>
+    <% end %>
+    <% box.with_body do %>
+      <%= render Components::Warehouse::LineItemsEditor.new(
+        form: form,
+        scope: :in_inventory,
+        show_unit_cost: false,
+        add_button_text: "Add Item"
+      ) %>
+    <% end %>
+  <% end %>
+
+  <div class="page-actions">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_templates_path, scheme: :secondary) do
+      "Cancel"
+    end %>
+    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :check)
+      warehouse_template.persisted? ? "Update Template" : "Create Template"
+    end %>
   </div>
 <% end %>

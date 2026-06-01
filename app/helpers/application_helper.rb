@@ -1,6 +1,16 @@
 module ApplicationHelper
   include ButtonHelper
 
+  def icon_svg(icon)
+    @icon_svg_cache ||= {}
+    unless @icon_svg_cache.key?(icon)
+      f = File.read(Rails.root.join("app", "frontend", "images", "icons", "#{icon}.svg"))
+      x = Nokogiri::HTML::DocumentFragment.parse f
+      @icon_svg_cache[icon] = x.at_css("svg").children.to_html.html_safe
+    end
+    @icon_svg_cache[icon]
+  end
+
   def admin_tool(class_name: "", element: "div", **options, &block)
     return unless current_user&.is_admin?
     concat content_tag(element, class: "admin-tool #{class_name}", **options, &block)
@@ -81,6 +91,28 @@ module ApplicationHelper
       letter_tags = Letter.all_tags
 
       (common_tags + (warehouse_order_tags + letter_tags).compact_blank.sort).uniq
+    end
+  end
+
+  def flash_scheme(type)
+    case type.to_s
+    when 'notice', 'success'
+      :success
+    when 'alert', 'error'
+      :danger
+    else
+      :default
+    end
+  end
+
+  def flash_icon(type)
+    case type.to_s
+    when 'notice', 'success'
+      :'check-circle-fill'
+    when 'alert', 'error'
+      :'alert'
+    else
+      :info
     end
   end
 

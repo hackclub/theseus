@@ -343,9 +343,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
     t.string "return_address_name"
     t.bigint "letter_queue_id"
     t.string "idempotency_key"
+    t.integer "created_via", default: 0, null: false
     t.index ["aasm_state"], name: "index_letters_on_aasm_state"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
+    t.index ["created_via"], name: "index_letters_on_created_via"
     t.index ["idempotency_key"], name: "index_letters_on_idempotency_key", unique: true
     t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
     t.index ["letter_queue_id"], name: "index_letters_on_letter_queue_id"
@@ -391,8 +393,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "opted_out_of_map", default: false
-    t.string "hca_id"
-    t.index ["hca_id"], name: "index_public_users_on_hca_id", unique: true
   end
 
   create_table "return_addresses", force: :cascade do |t|

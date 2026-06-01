@@ -144,34 +144,34 @@ namespace :usps do
     content = <<~RUBY
       module USPS
         class PricingEngine
+          # this will have to be updated when they come out with a new notice 123!
+          FCMI_RATE_TABLE = {
+            letter: {
+      #{format_fcmi_rates(fcmi_letter_rates, 8)}
+            },
+            flat: {
+      #{format_fcmi_rates(fcmi_flat_rates, 8)}
+            }
+          }
+          FCMI_NON_MACHINABLE_SURCHARGE = #{fcmi_nm_surcharge}
+
+          US_LETTER_RATES = {
+      #{format_simple_rates(us_letter_rates, 6)}
+          }
+
+          US_FLAT_RATES = {
+      #{format_simple_rates(us_flat_rates, 6)}
+          }
+
+          US_STAMP_LETTER_RATES = {
+      #{format_simple_rates(us_stamp_letter_rates, 6)}
+          }
+
+          US_STAMP_FLAT_RATES = {
+      #{format_simple_rates(us_stamp_flat_rates, 6)}
+          }
+
           class << self
-            # this will have to be updated when they come out with a new notice 123!
-            FCMI_RATE_TABLE = {
-              letter: {
-      #{format_fcmi_rates(fcmi_letter_rates, 10)}
-              },
-              flat: {
-      #{format_fcmi_rates(fcmi_flat_rates, 10)}
-              }
-            }
-            FCMI_NON_MACHINABLE_SURCHARGE = #{fcmi_nm_surcharge}
-
-            US_LETTER_RATES = {
-      #{format_simple_rates(us_letter_rates, 8)}
-            }
-
-            US_FLAT_RATES = {
-      #{format_simple_rates(us_flat_rates, 8)}
-            }
-
-            US_STAMP_LETTER_RATES = {
-      #{format_simple_rates(us_stamp_letter_rates, 8)}
-            }
-
-            US_STAMP_FLAT_RATES = {
-      #{format_simple_rates(us_stamp_flat_rates, 8)}
-            }
-
             def metered_price(processing_category, weight, non_machinable = false)
               type = processing_category.to_sym
               rates = case type

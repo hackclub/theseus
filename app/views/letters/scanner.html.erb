@@ -1,0 +1,13 @@
+<% content_for :title, "Mail Scanner" %>
+
+<div class="page-container">
+  <div class="section-title-group mb-3">
+    <h1 class="page-title">Mail Scanner</h1>
+    <%= render Components::Shared::Jumpcode.new(path: scanner_letters_path) %>
+  </div>
+  <div
+    data-svelte-component="mail-scanner"
+    data-csrf-token="<%= form_authenticity_token %>"
+    data-initial-mode="keyboard"
+  ></div>
+</div>

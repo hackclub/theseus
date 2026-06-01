@@ -4,6 +4,35 @@ class AIService
       @client ||= OpenAI::Client.new
     end
 
+    # Takes a pre-mapped hash with address field names as keys (from client-side CSV mapper)
+    def fix_address_from_hash(address_hash)
+      address_data = {
+        "first_name" => address_hash["first_name"],
+        "last_name" => address_hash["last_name"],
+        "line_1" => address_hash["line_1"],
+        "line_2" => address_hash["line_2"],
+        "city" => address_hash["city"],
+        "state" => address_hash["state"],
+        "postal_code" => address_hash["postal_code"],
+        "country" => address_hash["country"],
+      }
+
+      translated = gptize_address(address_data.keys, address_data)
+
+      {
+        first_name: address_data["first_name"]&.presence,
+        last_name: address_data["last_name"]&.presence,
+        line_1: translated["line_1"]&.presence,
+        line_2: translated["line_2"]&.presence,
+        city: translated["city"]&.presence,
+        state: translated["state"]&.presence,
+        postal_code: translated["postal_code"]&.presence,
+        country: translated["country"]&.presence,
+        phone_number: address_hash["phone_number"]&.presence,
+        email: address_hash["email"]&.presence,
+      }
+    end
+
     def fix_address(row, field_mapping)
       # Create a hash of the address fields for translation
       address_data = {

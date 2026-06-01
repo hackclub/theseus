@@ -1,18 +1,48 @@
-<h1>your tasks:
-  <sup style="display: inline-block;"><%= button_to "↻", refresh_tasks_path, method: :post, class: "btn btn-tiny success" %></sup>
-</h1>
-<br/>
-<ul>
-  <% @tasks.group_by { |task| task[:type] }.each do |type, tasks| %>
-    <li><b><%= type %>:</b></li>
-    <ul>
-      <% tasks.each do |task| %>
-        <li><%= task[:name] %>
-          <% if task[:subtitle] %>
-            <small class="muted"><i>(<%= task[:subtitle] %>)</i></small>
+<% content_for :title, "Tasks" %>
+
+<div class="page-container--narrow">
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">Your Tasks</h1>
+      <%= render Components::Shared::Jumpcode.new(path: tasks_path) %>
+    </div>
+    <%= button_to refresh_tasks_path, method: :post do %>
+      <%= render Primer::Beta::Button.new(type: :button, scheme: :secondary, size: :small) do |btn|
+        btn.with_leading_visual_icon(icon: :sync)
+        "Refresh"
+      end %>
+    <% end %>
+  </div>
+
+  <% if @tasks.empty? %>
+    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
+      bs.with_visual_icon(icon: :check_circle)
+      bs.with_heading(tag: :h2) { "All clear!" }
+      bs.with_description { "No tasks right now." }
+    end %>
+  <% else %>
+    <% @tasks.group_by { |task| task[:type] }.each do |type, tasks| %>
+      <div class="content-section">
+        <h2 class="section-heading-lg"><%= type %></h2>
+        <%= render Primer::Beta::BorderBox.new do |box| %>
+          <% tasks.each do |task| %>
+            <% box.with_row do %>
+              <div class="task-row">
+                <div>
+                  <span class="fw-medium"><%= task[:name] %></span>
+                  <% if task[:subtitle] %>
+                    <span class="resource-card-meta">(<%= task[:subtitle] %>)</span>
+                  <% end %>
+                </div>
+                <%= render Primer::Beta::Button.new(tag: :a, href: task[:link], scheme: :secondary, size: :small) do |btn|
+                  btn.with_trailing_visual_icon(icon: :arrow_right)
+                  "Go"
+                end %>
+              </div>
+            <% end %>
           <% end %>
-          <%= link_to "(go!)", task[:link] %></li>
-      <% end %>
-    </ul>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
-</ul>
+</div>

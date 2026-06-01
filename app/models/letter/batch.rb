@@ -370,18 +370,17 @@ class Letter::Batch < Batch
   end
 
   def build_mapping(row, address)
-    # Build letter with batch-level specs and extra data
     letters.build(
       height: letter_height,
       width: letter_width,
       weight: letter_weight,
       processing_category: letter_processing_category,
-      recipient_email: row&.dig(field_mapping["email"]),
+      recipient_email: row["email"],
       address: address,
       usps_mailer_id: mailer_id,
       return_address: letter_return_address,
       return_address_name: letter_return_address_name,
-      rubber_stamps: row&.dig(field_mapping["rubber_stamps"]),
+      rubber_stamps: row["rubber_stamps"],
       tags: tags,
       user: user,
     )

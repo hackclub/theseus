@@ -1,14 +1,38 @@
-<% content_for :title, "Source tags" %>
+<% content_for :title, "Source Tags" %>
 
-<h1>Source tags</h1>
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Source Tags</h1>
+      <p class="page-subtitle"><%= @source_tags.count %> source tags</p>
+    </div>
+    <%= render Primer::Beta::Button.new(tag: :a, href: new_source_tag_path, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :plus)
+      "New Source Tag"
+    end %>
+  </div>
 
-<div id="source_tags">
-  <% @source_tags.each do |source_tag| %>
-    <%= render source_tag %>
-    <p>
-      <%= link_to "Show this source tag", source_tag %>
-    </p>
+  <% if @source_tags.any? %>
+    <%= render Primer::Beta::BorderBox.new do |box|
+      @source_tags.each do |source_tag|
+        box.with_row do %>
+          <a href="<%= source_tag_path(source_tag) %>" class="resource-card link-reset">
+            <div>
+              <span class="resource-card-title"><%= source_tag.name %></span>
+              <code class="resource-card-meta resource-card-meta--inline"><%= source_tag.slug %></code>
+            </div>
+            <% if source_tag.owner.present? %>
+              <span class="resource-card-meta"><%= source_tag.owner %></span>
+            <% end %>
+          </a>
+        <% end
+      end
+    end %>
+  <% else %>
+    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
+      bs.with_visual_icon(icon: :tag)
+      bs.with_heading(tag: :h3) { "No source tags yet" }
+      bs.with_primary_action(href: new_source_tag_path) { "Create one" }
+    end %>
   <% end %>
 </div>
-
-<%= link_to "New source tag", new_source_tag_path %>

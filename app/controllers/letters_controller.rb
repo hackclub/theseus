@@ -1,19 +1,29 @@
 class LettersController < ApplicationController
-  before_action :set_letter, except: %i[ index new create ]
+  before_action :set_letter, except: %i[ index new create scanner ]
 
   # GET /letters
   def index
     authorize Letter
-    # Get all letters with their associations using policy scope
-    @all_letters = policy_scope(Letter).includes(:batch, :address, :usps_mailer_id, :label_attachment, :label_blob)
+
+    all_letters = policy_scope(Letter)
+      .includes(:batch, :address, :usps_mailer_id, :user, :label_attachment, :label_blob)
       .where.not(aasm_state: "queued")
-      .order(created_at: :desc)
 
-    # Get unbatched letters with pagination
-    @unbatched_letters = @all_letters.not_in_batch.page(params[:page]).per(20)
+    letters = all_letters
+    letters = letters.where(aasm_state: params[:status]) if params[:status].present?
+    letters = letters.where(created_via: params[:origin]) if params[:origin].present? && %w[manual bulk_upload queue api].include?(params[:origin])
+    letters = letters.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
+    letters = letters.search(params[:search]) if params[:search].present?
 
-    # Get batched letters grouped by batch
-    @batched_letters = @all_letters.in_batch.group_by(&:batch)
+    render Views::Letters::Index.new(
+      letters: letters.order(created_at: :desc).page(params[:page]).per(25),
+      all_letters: all_letters,
+      search: params[:search],
+      status: params[:status],
+      origin: params[:origin],
+      user_id: params[:user_id],
+      users: current_user&.is_admin? ? User.where(id: all_letters.select(:user_id).distinct).order(:email) : []
+    )
   end
 
   # GET /letters/1
@@ -28,13 +38,13 @@ class LettersController < ApplicationController
     @letter = Letter.new
     @letter.return_address = current_user.home_return_address || ReturnAddress.first
     @letter.build_address
+    render Views::Letters::New.new(letter: @letter)
   end
 
   # GET /letters/1/edit
   def edit
     authorize @letter
-    # If letter doesn't have a return address already, don't build one
-    # Let the user select one from the dropdown
+    render Views::Letters::Edit.new(letter: @letter)
   end
 
   # POST /letters
@@ -50,7 +60,8 @@ class LettersController < ApplicationController
     if @letter.save
       redirect_to @letter, notice: "Letter was successfully created."
     else
-      render :new, status: :unprocessable_entity
+      @letter.build_address if @letter.address.nil?
+      render Views::Letters::New.new(letter: @letter), status: :unprocessable_entity
     end
   end
 
@@ -74,7 +85,7 @@ class LettersController < ApplicationController
     if @letter.update(letter_params)
       redirect_to @letter, notice: "Letter was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render Views::Letters::Edit.new(letter: @letter), status: :unprocessable_entity
     end
   end
 
@@ -131,11 +142,44 @@ class LettersController < ApplicationController
   # POST /letters/1/mark_mailed
   def mark_mailed
     authorize @letter, :mark_mailed?
+
+    # Check if already mailed BEFORE attempting transition
+    if @letter.been_mailed?
+      respond_to do |format|
+        format.html { redirect_to @letter, alert: "Letter already marked as mailed." }
+        format.json {
+          render json: {
+            success: false,
+            error: 'already_mailed',
+            letter: letter_json(@letter)
+          }, status: :unprocessable_entity
+        }
+      end
+      return
+    end
+
     if @letter.mark_mailed!
       User::UpdateTasksJob.perform_later(current_user)
-      redirect_to @letter, notice: "Letter has been marked as mailed."
+      respond_to do |format|
+        format.html { redirect_to @letter, notice: "Letter marked as mailed." }
+        format.json {
+          render json: {
+            success: true,
+            letter: letter_json(@letter)
+          }
+        }
+      end
     else
-      redirect_to @letter, alert: "Could not mark letter as mailed: #{@letter.errors.full_messages.join(", ")}"
+      respond_to do |format|
+        format.html { redirect_to @letter, alert: "Could not mark letter as mailed." }
+        format.json {
+          render json: {
+            success: false,
+            error: 'validation_failed',
+            errors: @letter.errors.full_messages
+          }, status: :unprocessable_entity
+        }
+      end
     end
   end
 
@@ -146,6 +190,26 @@ class LettersController < ApplicationController
       redirect_to @letter, notice: "Letter has been marked as received."
     else
       redirect_to @letter, alert: "Could not mark letter as received: #{@letter.errors.full_messages.join(", ")}"
+    end
+  end
+
+  # POST /letters/1/undo_mark_mailed
+  def undo_mark_mailed
+    authorize @letter, :mark_mailed?
+
+    if @letter.mailed? || @letter.received?
+      previous_state = @letter.printed_at.present? ? 'printed' : 'pending'
+      @letter.update!(aasm_state: previous_state, mailed_at: nil)
+
+      respond_to do |format|
+        format.html { redirect_to @letter, notice: "Letter unmarked as mailed." }
+        format.json { render json: { success: true, letter: letter_json(@letter) } }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to @letter, alert: "Letter not marked as mailed." }
+        format.json { render json: { success: false, error: 'not_mailed' }, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -258,11 +322,26 @@ class LettersController < ApplicationController
     redirect_to @letter, notice: "Indicia purchased successfully (charged to #{hcb_payment_account.organization_name})."
   end
 
+  # GET /letters/scanner
+  def scanner
+    authorize Letter, :index?
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
   def set_letter
     @letter = Letter.find_by_public_id!(params[:id])
+  end
+
+  def letter_json(letter)
+    {
+      public_id: letter.public_id,
+      display_name: letter.display_name || letter.user_facing_title,
+      mailed_at: letter.mailed_at&.iso8601,
+      recipient: letter.address&.name_line,
+      aasm_state: letter.aasm_state
+    }
   end
 
   # Only allow a list of trusted parameters through.

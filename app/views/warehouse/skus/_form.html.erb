@@ -1,52 +1,108 @@
 <%= form_with(model: warehouse_sku) do |form| %>
   <% if warehouse_sku.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(warehouse_sku.errors.count, "error") %> prohibited this SKU from being saved:</h2>
-
-      <ul>
+    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
+      <strong><%= pluralize(warehouse_sku.errors.count, "error") %>:</strong>
+      <ul class="error-list">
         <% warehouse_sku.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    </div>
+    <% end %>
   <% end %>
 
-  <div>
-    <%= form.label :sku, style: "display: block" %>
-    <%= form.text_field :sku %>
-  </div>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_header do |header| %>
+      <% header.with_title(tag: :h2) do %>SKU Details<% end %>
+    <% end %>
+    <% box.with_body do %>
+      <%= render Primer::Alpha::TextField.new(
+        name: "warehouse_sku[sku]",
+        label: "SKU code",
+        value: warehouse_sku.sku,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.label :description, style: "display: block" %>
-    <%= form.textarea :description %>
-  </div>
+      <%= render Primer::Alpha::TextField.new(
+        name: "warehouse_sku[name]",
+        label: "Name",
+        value: warehouse_sku.name,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.label :unit_cost, style: "display: block" %>
-    <%= form.text_field :unit_cost %>
-  </div>
+      <%= render Primer::Alpha::TextArea.new(
+        name: "warehouse_sku[description]",
+        label: "Description",
+        value: warehouse_sku.description,
+        rows: 3,
+        full_width: true
+      ) %>
+    <% end %>
+  <% end %>
 
-  <div>
-    <%= form.label :customs_description, style: "display: block" %>
-    <%= form.textarea :customs_description %>
-  </div>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_header do |header| %>
+      <% header.with_title(tag: :h2) do %>Customs & Cost<% end %>
+    <% end %>
+    <% box.with_body do %>
+      <%= render Primer::Alpha::TextField.new(
+        name: "warehouse_sku[unit_cost]",
+        label: "Declared unit cost",
+        value: warehouse_sku.declared_unit_cost,
+        full_width: true,
+        mb: 3,
+        leading_visual: { text: "$" }
+      ) %>
 
-  <div>
-    <%= form.label :in_stock, style: "display: block" %>
-    <%= form.number_field :in_stock %>
-  </div>
+      <%= render Primer::Alpha::TextArea.new(
+        name: "warehouse_sku[customs_description]",
+        label: "Customs description",
+        value: warehouse_sku.customs_description,
+        rows: 2,
+        full_width: true
+      ) %>
+    <% end %>
+  <% end %>
 
-  <div>
-    <%= form.label :ai_enabled, style: "display: block" %>
-    <%= form.checkbox :ai_enabled %>
-  </div>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_header do |header| %>
+      <% header.with_title(tag: :h2) do %>Inventory & Settings<% end %>
+    <% end %>
+    <% box.with_body do %>
+      <%= render Primer::Alpha::TextField.new(
+        name: "warehouse_sku[in_stock]",
+        label: "In stock",
+        value: warehouse_sku.in_stock,
+        input_type: :number,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.label :enabled, style: "display: block" %>
-    <%= form.checkbox :enabled %>
-  </div>
+      <%= render Primer::Alpha::CheckBox.new(
+        name: "warehouse_sku[ai_enabled]",
+        label: "AI enabled",
+        caption: "Allow AI service to use this SKU",
+        checked: warehouse_sku.ai_enabled,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.submit %>
+      <%= render Primer::Alpha::CheckBox.new(
+        name: "warehouse_sku[enabled]",
+        label: "Enabled",
+        caption: "SKU is available for ordering",
+        checked: warehouse_sku.enabled
+      ) %>
+    <% end %>
+  <% end %>
+
+  <div class="page-actions">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_skus_path, scheme: :secondary) do
+      "Cancel"
+    end %>
+    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :check)
+      warehouse_sku.persisted? ? "Update SKU" : "Create SKU"
+    end %>
   </div>
 <% end %>

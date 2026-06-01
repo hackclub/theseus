@@ -1,11 +1,14 @@
-<% content_for :title, "New template" %>
+<% content_for :title, "New Template" %>
 
-<h1>New template</h1>
+<div class="page-container--narrow">
+  <h1 class="page-title content-section">New Template</h1>
 
-<%= render "form", warehouse_template: @warehouse_template %>
+  <%= render "form", warehouse_template: @warehouse_template %>
 
-<br>
-
-<div>
-  <%= link_to "Back to templates", warehouse_templates_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_templates_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to templates"
+    end %>
+  </div>
 </div>

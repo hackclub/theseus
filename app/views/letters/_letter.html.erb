@@ -1,36 +1,27 @@
-<div id="<%= dom_id letter %>" class="letter-item p-3 bg-white border rounded shadow-sm hover:shadow-md transition-shadow">
-  <div class="flex justify-between items-center mb-2">
-    <h3 class="text-base font-medium">
-      <%= link_to letter do %>
-        <% if letter.user_facing_title.present? %>
-          <%= letter.user_facing_title %>
-        <% else %>
-          <%= letter.public_id %> to <%= letter.address.name_line %>
-        <% end %>
+<div id="<%= dom_id letter %>" class="index-card">
+  <div class="index-card-header">
+    <a href="<%= letter_path(letter) %>" class="index-card-title">
+      <% if letter.user_facing_title.present? %>
+        <%= letter.user_facing_title %>
+      <% else %>
+        <%= letter.public_id %> to <%= letter.address.name_line %>
       <% end %>
-    </h3>
-    <%= letter_status_badge(letter.aasm_state, 'float-right') %>
+    </a>
+    <% status_scheme = { pending: :secondary, printed: :accent, mailed: :success, received: :done, canceled: :attention, errored: :danger }[letter.aasm_state.to_sym] || :secondary %>
+    <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :small)) { letter.aasm_state.humanize } %>
   </div>
-  
-  <div class="grid grid-cols-3 gap-1 text-sm text-gray-600">
-    <div class="truncate">
-      <span class="text-gray-400">From:</span>
-      <%= letter.return_address.present? ? letter.return_address_name_line : 'N/A' %>
-    </div>
-    
-    <div class="truncate">
-      <span class="text-gray-400">Created:</span>
-      <%= time_ago_in_words(letter.created_at) %>
-    </div>
-    
-    <div class="truncate">
-      <span class="text-gray-400">Size:</span>
-      <%= letter.height %>" × <%= letter.width %>"
-    </div>
+
+  <div class="index-card-meta">
+    <span>From: <%= letter.return_address.present? ? letter.return_address_name_line : 'N/A' %></span>
+    <span><%= time_ago_in_words(letter.created_at) %> ago</span>
+    <span><%= letter.height %>" x <%= letter.width %>"</span>
   </div>
-  
-  <div class="mt-2">
-    <span class="text-gray-400">Tags:</span>
-    <%= render 'shared/tags', tags: letter.tags %>
-  </div>
+
+  <% if letter.tags.present? %>
+    <div class="index-card-tags">
+      <% letter.tags.compact_blank.each do |tag| %>
+        <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { tag } %>
+      <% end %>
+    </div>
+  <% end %>
 </div>

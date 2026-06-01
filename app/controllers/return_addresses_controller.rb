@@ -4,16 +4,19 @@ class ReturnAddressesController < ApplicationController
   def index
     authorize ReturnAddress
     @return_addresses = ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
+    render Views::ReturnAddresses::Index.new(return_addresses: @return_addresses)
   end
 
   def new
     authorize ReturnAddress
     @return_address = ReturnAddress.new
     @return_address.user = current_user if user_signed_in?
+    render Views::ReturnAddresses::New.new(return_address: @return_address)
   end
 
   def edit
     authorize @return_address
+    render Views::ReturnAddresses::Edit.new(return_address: @return_address)
   end
 
   def create
@@ -30,7 +33,7 @@ class ReturnAddressesController < ApplicationController
         redirect_to return_addresses_path
       end
     else
-      render :new, status: :unprocessable_entity
+      render Views::ReturnAddresses::New.new(return_address: @return_address), status: :unprocessable_entity
     end
   end
 
@@ -42,10 +45,10 @@ class ReturnAddressesController < ApplicationController
       if params[:from_letter].present?
         redirect_to new_letter_path, notice: "Return address was successfully updated. Please select it from the dropdown."
       else
-        redirect_to @return_address, notice: "Return address was successfully updated."
+        redirect_to return_addresses_path, notice: "Return address was successfully updated."
       end
     else
-      render :edit, status: :unprocessable_entity
+      render Views::ReturnAddresses::Edit.new(return_address: @return_address), status: :unprocessable_entity
     end
   end
 

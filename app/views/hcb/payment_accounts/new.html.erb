@@ -1,51 +1,49 @@
 <% content_for :title, "Add HCB Organization" %>
 
-<div class="container">
-  <header class="page-header mb-6">
-    <div class="flex items-center gap-4">
-      <%= link_to "← Back", hcb_payment_accounts_path, class: "text-gray-500 hover:text-gray-700" %>
-      <h1>Add Organization</h1>
+<div class="page-container--xs">
+  <h1 class="page-title content-section">Add Organization</h1>
+
+  <% if @organizations.any? %>
+    <div class="content-section">
+      <h2 class="section-heading">Select Organization</h2>
+      <p class="page-subtitle mb-3">Choose which HCB organization to use for paying postage.</p>
+
+      <%= form_with url: hcb_payment_accounts_path, method: :post do |f| %>
+        <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
+          @organizations.each do |org|
+            box.with_row do %>
+              <label class="radio-label-row">
+                <%= f.radio_button :organization_id, org.id, class: "accent-radio" %>
+                <span class="fw-medium"><%= org.name %></span>
+              </label>
+            <% end
+          end
+        end %>
+
+        <div class="page-actions">
+          <%= render Primer::Beta::Button.new(tag: :a, href: hcb_payment_accounts_path, scheme: :secondary) do
+            "Cancel"
+          end %>
+          <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+            btn.with_leading_visual_icon(icon: :check)
+            "Add Organization"
+          end %>
+        </div>
+      <% end %>
     </div>
-  </header>
+  <% else %>
+    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
+      bs.with_visual_icon(icon: :organization)
+      bs.with_heading(tag: :h3) { "No organizations available" }
+      bs.with_description { "You don't belong to any HCB organizations, or all your organizations are already linked." }
+      bs.with_primary_action(href: hcb_payment_accounts_path) { "Back" }
+    end %>
+  <% end %>
 
-  <div class="max-w-lg">
-    <% if @organizations.any? %>
-      <article>
-        <header>
-          <h2>Select Organization</h2>
-        </header>
-        <div class="p-4">
-          <p class="text-gray-600 mb-4">Choose which HCB organization to use for paying postage.</p>
-          
-          <%= form_with url: hcb_payment_accounts_path, method: :post do |f| %>
-            <div class="space-y-3 mb-6">
-              <% @organizations.each do |org| %>
-                <label class="flex items-center p-3 border rounded cursor-pointer hover:bg-gray-50 has-[:checked]:border-green-500 has-[:checked]:bg-green-50">
-                  <%= f.radio_button :organization_id, org.id, class: "mr-3" %>
-                  <span class="font-medium"><%= org.name %></span>
-                </label>
-              <% end %>
-            </div>
-
-            <div class="flex gap-3">
-              <%= f.submit "Add Organization", class: "btn success" %>
-              <%= link_to "Cancel", hcb_payment_accounts_path, class: "btn btn-small" %>
-            </div>
-          <% end %>
-        </div>
-      </article>
-    <% else %>
-      <article>
-        <header>
-          <h2>No Organizations Available</h2>
-        </header>
-        <div class="p-4">
-          <p class="text-gray-600 mb-4">
-            You don't belong to any HCB organizations, or all your organizations are already linked.
-          </p>
-          <%= link_to "← Back", hcb_payment_accounts_path, class: "btn btn-small" %>
-        </div>
-      </article>
-    <% end %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: hcb_payment_accounts_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to HCB accounts"
+    end %>
   </div>
 </div>

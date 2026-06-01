@@ -1,63 +1,91 @@
 class Letter::QueuesController < ApplicationController
   before_action :set_letter_queue, only: %i[ show edit update destroy batch ]
   skip_after_action :verify_authorized
-  # GET /letter/queues or /letter/queues.json
   def index
     authorize Letter::Queue, policy_class: Letter::QueuePolicy
-    @letter_queues = policy_scope(Letter::Queue, policy_scope_class: Letter::QueuePolicy::Scope)
+    all_queues = policy_scope(Letter::Queue, policy_scope_class: Letter::QueuePolicy::Scope)
+
+    filtered = all_queues
+
+    is_admin = current_user&.is_admin?
+
+    user_id = is_admin ? params[:user_id] : nil
+    filtered = filtered.where(user_id: user_id) if user_id.present?
+    users = is_admin ? User.where(id: all_queues.select(:user_id).distinct).order(:email) : []
+
+    filtered = filtered.includes(:user) if is_admin
+
+    if params[:queue_type] == "batch"
+      filtered = filtered.where.not(type: "Letter::InstantQueue")
+    elsif params[:queue_type] == "instant"
+      filtered = filtered.where(type: "Letter::InstantQueue")
+    end
+
+    letter_counts = Letter.where(letter_queue_id: filtered.select(:id))
+                          .group(:letter_queue_id, :aasm_state)
+                          .count
+
+    render Views::Letter::Queues::Index.new(
+      letter_queues: filtered.to_a,
+      all_queues: all_queues,
+      letter_counts: letter_counts,
+      user_id: user_id,
+      queue_type: params[:queue_type],
+      users: users
+    )
   end
 
-  # GET /letter/queues/1 or /letter/queues/1.json
   def show
-    @letters = @letter_queue.letters.queued
-    @batches = @letter_queue.letter_batches
+    letter_counts = @letter_queue.letters
+                      .group(:aasm_state)
+                      .count
+
+    letters = @letter_queue.letters.order(created_at: :desc)
+    letters = letters.search(params[:search]) if params[:search].present?
+    letters = letters.where(aasm_state: params[:status]) if params[:status].present?
+
+    @batches = @letter_queue.letter_batches.order(created_at: :desc)
+
+    render Views::Letter::Queues::Show.new(
+      queue: @letter_queue,
+      letters: letters,
+      batches: @batches,
+      letter_counts: letter_counts,
+      search: params[:search],
+      status: params[:status]
+    )
   end
 
-  # GET /letter/queues/new
   def new
     @letter_queue = Letter::Queue.new
+    render Views::Letter::Queues::New.new(queue: @letter_queue)
   end
 
-  # GET /letter/queues/1/edit
   def edit
+    render Views::Letter::Queues::Edit.new(queue: @letter_queue)
   end
 
-  # POST /letter/queues or /letter/queues.json
   def create
     @letter_queue = letter_queue_class.new(letter_queue_params.merge(user: current_user))
 
-    respond_to do |format|
-      if @letter_queue.save
-        format.html { redirect_to @letter_queue, notice: "Queue was successfully created." }
-        format.json { render :show, status: :created, location: @letter_queue }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @letter_queue.errors, status: :unprocessable_entity }
-      end
+    if @letter_queue.save
+      redirect_to @letter_queue, notice: "Queue was successfully created."
+    else
+      render Views::Letter::Queues::New.new(queue: @letter_queue), status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /letter/queues/1 or /letter/queues/1.json
   def update
-    respond_to do |format|
-      if @letter_queue.update(letter_queue_params)
-        format.html { redirect_to @letter_queue, notice: "Queue was successfully updated." }
-        format.json { render :show, status: :ok, location: @letter_queue }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @letter_queue.errors, status: :unprocessable_entity }
-      end
+    if @letter_queue.update(letter_queue_params)
+      redirect_to @letter_queue, notice: "Queue was successfully updated."
+    else
+      render Views::Letter::Queues::Edit.new(queue: @letter_queue), status: :unprocessable_entity
     end
   end
 
-  # DELETE /letter/queues/1 or /letter/queues/1.json
   def destroy
     @letter_queue.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to letter_queues_path, status: :see_other, notice: "Queue was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to letter_queues_path, status: :see_other, notice: "Queue was successfully destroyed."
   end
 
   def batch
@@ -71,7 +99,7 @@ class Letter::QueuesController < ApplicationController
     batch = @letter_queue.make_batch(user: current_user, limit:)
     User::UpdateTasksJob.perform_later(current_user)
     flash[:success] = "now do something with it!"
-    redirect_to process_letter_batch_path(batch, uft: @letter_queue.user_facing_title, template: @letter_queue.template)
+    redirect_to process_confirm_letter_batch_path(batch, uft: @letter_queue.user_facing_title, template: @letter_queue.template)
   end
 
   def mark_printed_instants_mailed

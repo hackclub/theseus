@@ -1,9 +1,63 @@
-<%= render @usps_payment_account %>
-<%= render partial: "admin_inspector", locals: { record: @usps_payment_account } %>
+<% content_for :title, @usps_payment_account.display_name %>
 
-<div>
-  <%= link_to "Edit this payment account", edit_usps_payment_account_path(@usps_payment_account) %> |
-  <%= link_to "Back to payment accounts", usps_payment_accounts_path %>
+<div class="page-container--narrow">
+  <div class="page-header">
+    <div>
+      <div class="page-title-group">
+        <h1 class="page-title"><%= @usps_payment_account.display_name %></h1>
+        <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :large)) { @usps_payment_account.account_type } %>
+      </div>
+    </div>
+    <div class="page-actions">
+      <%= render Primer::Beta::Button.new(tag: :a, href: edit_usps_payment_account_path(@usps_payment_account), scheme: :secondary, size: :medium) do |btn|
+        btn.with_leading_visual_icon(icon: :pencil)
+        "Edit"
+      end %>
+      <%= form_with url: usps_payment_account_path(@usps_payment_account), method: :delete, data: { turbo_confirm: "Delete this payment account?" }, class: "form-inline" do %>
+        <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :medium) do |btn|
+          btn.with_leading_visual_icon(icon: :trash)
+          "Delete"
+        end %>
+      <% end %>
+    </div>
+  </div>
 
-  <%= button_to "Destroy this payment account", @usps_payment_account, method: :delete %>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Name</span><span><%= @usps_payment_account.name %></span></div>
+    <% end
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Account Type</span><span><%= @usps_payment_account.account_type %></span></div>
+    <% end
+    if @usps_payment_account.account_number.present?
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Account Number</span><code><%= @usps_payment_account.account_number %></code></div>
+      <% end
+    end
+    if @usps_payment_account.permit_number.present?
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Permit Number</span><code><%= @usps_payment_account.permit_number %></code></div>
+      <% end
+    end
+    if @usps_payment_account.permit_zip.present?
+      box.with_row do %>
+        <div class="kv-row"><span class="kv-label">Permit ZIP</span><code><%= @usps_payment_account.permit_zip %></code></div>
+      <% end
+    end
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Manifest MID</span><code><%= @usps_payment_account.manifest_mid || "—" %></code></div>
+    <% end
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Mailer ID</span><span><%= @usps_payment_account.usps_mailer_id&.display_name || "—" %></span></div>
+    <% end
+  end %>
+
+  <%= render partial: "admin_inspector", locals: { record: @usps_payment_account } %>
+
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_payment_accounts_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to payment accounts"
+    end %>
+  </div>
 </div>

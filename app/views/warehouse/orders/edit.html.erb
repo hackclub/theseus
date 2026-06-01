@@ -1,12 +1,17 @@
-<% content_for :title, "Editing order" %>
+<% content_for :title, "Edit order #{@warehouse_order.hc_id}" %>
 
-<h1>Editing order</h1>
+<div class="page-container--narrow">
+  <div class="page-title-group content-section">
+    <h1 class="page-title">Edit order</h1>
+    <code class="mono"><%= @warehouse_order.hc_id %></code>
+  </div>
 
-<%= render "form", warehouse_order: @warehouse_order %>
+  <%= render "form", warehouse_order: @warehouse_order %>
 
-<br>
-
-<div>
-  <%= link_to "Show this order", @warehouse_order %> |
-  <%= link_to "Back to orders", warehouse_orders_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_order_path(@warehouse_order), scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to order"
+    end %>
+  </div>
 </div>

@@ -1,11 +1,14 @@
-<% content_for :title, "New sku" %>
+<% content_for :title, "New SKU" %>
 
-<h1>New sku</h1>
+<div class="page-container--narrow">
+  <h1 class="page-title content-section">New SKU</h1>
 
-<%= render "form", warehouse_sku: @warehouse_sku %>
+  <%= render "form", warehouse_sku: @warehouse_sku %>
 
-<br>
-
-<div>
-  <%= link_to "Back to skus", warehouse_skus_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_skus_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to SKUs"
+    end %>
+  </div>
 </div>

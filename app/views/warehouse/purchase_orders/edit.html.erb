@@ -1,12 +1,16 @@
-<% content_for :title, "Edit Purchase Order" %>
+<% content_for :title, "Edit Purchase Order #{@purchase_order.order_number.presence || "##{@purchase_order.id}"}" %>
 
-<h1>Edit Purchase Order #<%= @purchase_order.id %></h1>
+<div class="page-container--narrow">
+  <div class="content-section">
+    <div class="page-title-group">
+      <h1 class="page-title">Edit Purchase Order</h1>
+      <% status_scheme = { "draft" => :secondary, "open" => :accent, "completed" => :success, "deleted" => :danger }[@purchase_order.status] || :secondary %>
+      <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :large)) { @purchase_order.humanized_state } %>
+    </div>
+    <p class="page-subtitle">
+      <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %> · <%= @purchase_order.supplier_name %>
+    </p>
+  </div>
 
-<%= render "form", purchase_order: @purchase_order %>
-
-<br>
-
-<div>
-  <%= link_to "Show this purchase order", warehouse_purchase_order_path(@purchase_order) %> |
-  <%= link_to "Back to purchase orders", warehouse_purchase_orders_path %>
+  <%= render "form", purchase_order: @purchase_order %>
 </div>

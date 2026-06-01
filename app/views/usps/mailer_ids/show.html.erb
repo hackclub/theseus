@@ -1,9 +1,40 @@
-<%= render @usps_mailer_id %>
-<%= render partial: "admin_inspector", locals: { record: @usps_mailer_id } %>
+<% content_for :title, @usps_mailer_id.name %>
 
-<div>
-  <%= link_to "edit this MID", edit_usps_mailer_id_path(@usps_mailer_id) %> |
-  <%= link_to "back to MIDs", usps_mailer_ids_path %>
+<div class="page-container--narrow">
+  <div class="page-header">
+    <h1 class="page-title"><%= @usps_mailer_id.name %></h1>
+    <div class="page-actions">
+      <%= render Primer::Beta::Button.new(tag: :a, href: edit_usps_mailer_id_path(@usps_mailer_id), scheme: :secondary, size: :medium) do |btn|
+        btn.with_leading_visual_icon(icon: :pencil)
+        "Edit"
+      end %>
+      <%= form_with url: usps_mailer_id_path(@usps_mailer_id), method: :delete, data: { turbo_confirm: "Delete this mailer ID?" }, class: "form-inline" do %>
+        <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :medium) do |btn|
+          btn.with_leading_visual_icon(icon: :trash)
+          "Delete"
+        end %>
+      <% end %>
+    </div>
+  </div>
 
-  <%= button_to "destroy this MID", @usps_mailer_id, method: :delete %>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Name</span><span><%= @usps_mailer_id.name %></span></div>
+    <% end
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">CRID</span><code><%= @usps_mailer_id.crid %></code></div>
+    <% end
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">MID</span><code><%= @usps_mailer_id.mid %></code></div>
+    <% end
+  end %>
+
+  <%= render partial: "admin_inspector", locals: { record: @usps_mailer_id } %>
+
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_mailer_ids_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to mailer IDs"
+    end %>
+  </div>
 </div>

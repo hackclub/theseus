@@ -1,6 +1,19 @@
-<h1>enter one of those IDs we're always putting on things:</h1>
-<%= form_with url: lookup_public_ids_path, method: :post do |f| %>
-  <%= f.label :id, "ID:" %>
-  <%= f.text_field :id %>
-  <%= f.submit "go!", class: "btn success btn-small" %>
-<% end %>
+<div class="page-container--xs">
+  <h1 class="page-title mb-3">ID Lookup</h1>
+  <p class="page-subtitle content-section">Enter a Theseus ID or tracking number to look it up.</p>
+  <%= form_with url: lookup_public_ids_path, method: :post do |f| %>
+    <div class="lookup-form">
+      <%= render Primer::Alpha::TextField.new(
+        name: :id,
+        label: "ID",
+        placeholder: "e.g. ltr!abc123, 9400111...",
+        full_width: true,
+        autofocus: true
+      ) %>
+      <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+        btn.with_leading_visual_icon(icon: :search)
+        "Look up"
+      end %>
+    </div>
+  <% end %>
+</div>

@@ -1,8 +1,46 @@
-<%= render @source_tag %>
+<% content_for :title, @source_tag.name %>
 
-<div>
-  <%= link_to "Edit this source tag", edit_source_tag_path(@source_tag) %> |
-  <%= link_to "Back to source tags", source_tags_path %>
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <div class="page-title-group">
+        <h1 class="page-title"><%= @source_tag.name %></h1>
+      </div>
+      <code class="kv-label"><%= @source_tag.slug %></code>
+    </div>
+    <div class="page-actions">
+      <%= render Primer::Beta::Button.new(tag: :a, href: edit_source_tag_path(@source_tag), scheme: :secondary, size: :medium) do |btn|
+        btn.with_leading_visual_icon(icon: :pencil)
+        "Edit"
+      end %>
+    </div>
+  </div>
 
-  <%= button_to "Destroy this source tag", @source_tag, method: :delete %>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Slug</span><code><%= @source_tag.slug %></code></div>
+    <% end
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Name</span><span><%= @source_tag.name %></span></div>
+    <% end
+    box.with_row do %>
+      <div class="kv-row"><span class="kv-label">Owner</span><span><%= @source_tag.owner.presence || "—" %></span></div>
+    <% end
+  end %>
+
+  <div class="footer-actions">
+    <%= form_with url: source_tag_path(@source_tag), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this source tag?" }, class: "form-inline" do %>
+      <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :small) do |btn|
+        btn.with_leading_visual_icon(icon: :trash)
+        "Delete"
+      end %>
+    <% end %>
+  </div>
+
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: source_tags_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to source tags"
+    end %>
+  </div>
 </div>

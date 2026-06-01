@@ -1,11 +1,14 @@
-<% content_for :title, "New source tag" %>
+<% content_for :title, "New Source Tag" %>
 
-<h1>New source tag</h1>
+<div class="page-container--xs">
+  <h1 class="page-title content-section">New Source Tag</h1>
 
-<%= render "form", source_tag: @source_tag %>
+  <%= render "form", source_tag: @source_tag %>
 
-<br>
-
-<div>
-  <%= link_to "Back to source tags", source_tags_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: source_tags_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to source tags"
+    end %>
+  </div>
 </div>

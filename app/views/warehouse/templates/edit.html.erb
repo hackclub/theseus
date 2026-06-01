@@ -1,12 +1,17 @@
-<% content_for :title, "Editing template" %>
+<% content_for :title, "Edit Template" %>
 
-<h1>Editing template</h1>
+<div class="page-container--narrow">
+  <div class="page-title-group content-section">
+    <h1 class="page-title">Edit Template</h1>
+    <span class="kv-label"><%= @warehouse_template.name %></span>
+  </div>
 
-<%= render "form", warehouse_template: @warehouse_template %>
+  <%= render "form", warehouse_template: @warehouse_template %>
 
-<br>
-
-<div>
-  <%= link_to "Show this template", @warehouse_template %> |
-  <%= link_to "Back to templates", warehouse_templates_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_template_path(@warehouse_template), scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to template"
+    end %>
+  </div>
 </div>

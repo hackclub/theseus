@@ -1,55 +1,46 @@
-<article id="<%= dom_id sku %>" class="card warehouse-sku-card">
-  <div class="sku-header">
-    <div class="sku-id">
-      <%= link_to sku.sku, sku %>
-        <% if sku.in_stock&.> 0 %>
-          <span class="badge success float-right">in stock</span>
-        <% elsif sku.in_stock&.< 0 %>
-          <% if sku.inbound&.>= sku.in_stock.abs %>
-            <span class="badge warning float-right">backordered (more otw)</span>
+<div class="sku-card">
+  <div class="sku-card-layout">
+    <div>
+      <div class="page-title-group">
+        <a href="<%= warehouse_sku_path(sku) %>" class="mono fw-semibold"><%= sku.sku %></a>
+        <% if sku.in_stock.to_i > 0 %>
+          <%= render(Primer::Beta::Label.new(scheme: :success, size: :small)) { "In stock" } %>
+        <% elsif sku.in_stock.to_i < 0 %>
+          <% if sku.inbound.to_i >= sku.in_stock.abs %>
+            <%= render(Primer::Beta::Label.new(scheme: :attention, size: :small)) { "Backordered" } %>
           <% else %>
-            <span class="badge error float-right">backordered (!)</span>
+            <%= render(Primer::Beta::Label.new(scheme: :danger, size: :small)) { "Backordered (!)" } %>
           <% end %>
         <% else %>
-          <span class="badge pending float-right">not in inventory</span>
+          <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { "No inventory" } %>
         <% end %>
-    </div>
-
-  </div>
-  <div class="card-content">
-    <p>
-      <strong>Name:</strong>
-      <%= sku.name %>
-    </p>
-    <p>
-      <strong>In stock:</strong>
-      <%= sku.in_stock %>
-    </p>
-    <% if sku.description.present? %>
-      <p>
-        <strong>Description:</strong>
-        <span class="sku-description"><%= sku.description %></span>
-      </p>
-    <% end %>
-    <p>
-      <strong>Unit cost:</strong>
-      <% if sku.declared_unit_cost.zero? %>
-        <span style="color: red; font-weight: bold;" title="This SKU has no cost data! Orders with this SKU cannot be dispatched.">⚠ $0.00 — no cost data!</span>
-      <% else %>
-        <%= number_to_currency sku.declared_unit_cost %>
+        <% if sku.ai_enabled %>
+          <%= render(Primer::Beta::Label.new(scheme: :accent, size: :small)) { "AI" } %>
+        <% end %>
+        <% unless sku.enabled %>
+          <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { "Disabled" } %>
+        <% end %>
+      </div>
+      <div><%= sku.name %></div>
+      <% if sku.description.present? %>
+        <div class="resource-card-meta"><%= truncate(sku.description, length: 80) %></div>
       <% end %>
-    </p>
-    <p>
-      <strong>Customs description:</strong>
-      <span class="sku-customs"><%= sku.customs_description %></span>
-    </p>
-    <p>
-      <strong>AI enabled:</strong>
-      <%= render_checkbox sku.ai_enabled %>
-    </p>
-    <p>
-      <strong>Enabled:</strong>
-      <%= render_checkbox sku.enabled  %>
-    </p>
+    </div>
+    <div class="sku-card-stats">
+      <div>
+        <div class="fw-semibold"><%= sku.in_stock || "—" %></div>
+        <div class="resource-card-meta">in stock</div>
+      </div>
+      <div>
+        <div class="fw-semibold">
+          <% if sku.declared_unit_cost.zero? %>
+            <span class="text-danger" title="No cost data — will block dispatch"><%= render Primer::Beta::Octicon.new(icon: :alert, size: :small) %> $0.00</span>
+          <% else %>
+            <%= number_to_currency(sku.declared_unit_cost) %>
+          <% end %>
+        </div>
+        <div class="resource-card-meta">unit cost</div>
+      </div>
+    </div>
   </div>
-</article>
+</div>

@@ -7,6 +7,7 @@
 #  canceled_at             :datetime
 #  carrier                 :string
 #  contents_cost           :decimal(10, 2)
+#  created_via             :integer          default("manual"), not null
 #  dispatched_at           :datetime
 #  idempotency_key         :string
 #  internal_notes          :text
@@ -28,6 +29,7 @@
 #  address_id              :bigint           not null
 #  batch_id                :bigint
 #  hc_id                   :string
+#  origin_batch_id         :bigint
 #  source_tag_id           :bigint           not null
 #  template_id             :bigint
 #  user_id                 :bigint           not null
@@ -37,8 +39,10 @@
 #
 #  index_warehouse_orders_on_address_id       (address_id)
 #  index_warehouse_orders_on_batch_id         (batch_id)
+#  index_warehouse_orders_on_created_via      (created_via)
 #  index_warehouse_orders_on_hc_id            (hc_id)
 #  index_warehouse_orders_on_idempotency_key  (idempotency_key) UNIQUE
+#  index_warehouse_orders_on_origin_batch_id  (origin_batch_id)
 #  index_warehouse_orders_on_source_tag_id    (source_tag_id)
 #  index_warehouse_orders_on_tags             (tags) USING gin
 #  index_warehouse_orders_on_template_id      (template_id)
@@ -48,6 +52,7 @@
 #
 #  fk_rails_...  (address_id => addresses.id)
 #  fk_rails_...  (batch_id => batches.id)
+#  fk_rails_...  (origin_batch_id => batches.id)
 #  fk_rails_...  (source_tag_id => source_tags.id)
 #  fk_rails_...  (template_id => warehouse_templates.id)
 #  fk_rails_...  (user_id => users.id)
@@ -59,16 +64,30 @@ class Warehouse::Order < ApplicationRecord
   include HasAddress
   include CanBeBatched
   include PublicIdentifiable
+  include PgSearch::Model
   set_public_id_prefix "pkg"
+
+  pg_search_scope :search,
+    against: %i[hc_id recipient_email user_facing_title tags],
+    associated_against: {
+      address: %i[first_name last_name]
+    },
+    using: {
+      tsearch: { prefix: true }
+    }
+
+  enum :created_via, { manual: 0, bulk_upload: 1, api: 2 }
 
   belongs_to :template, class_name: "Warehouse::Template", optional: true
   belongs_to :user
   belongs_to :source_tag
+  belongs_to :origin_batch, class_name: "Batch", optional: true
 
   validates :line_items, presence: true
   validates :recipient_email, presence: true
   validate :can_mail_parcels_to_country
 
+  before_validation :set_created_via_defaults, on: :create
   after_create :set_hc_id
   before_save :update_costs
 
@@ -347,6 +366,12 @@ class Warehouse::Order < ApplicationRecord
 
   def to_param = hc_id
 
+  def origin_label
+    return "Manual" if manual?
+    return "API" if api?
+    return origin_batch&.origin || "Bulk upload" if bulk_upload?
+  end
+
   private
 
   def set_hc_id = update_column(:hc_id, public_id)
@@ -365,5 +390,13 @@ class Warehouse::Order < ApplicationRecord
   def inherit_batch_tags
     return unless batch.present?
     self.tags = (tags + batch.tags).uniq
+  end
+
+  def set_created_via_defaults
+    if batch_id.present? && created_via.blank?
+      self.created_via = :bulk_upload
+    end
+    self.origin_batch_id ||= batch_id if bulk_upload?
+    self.created_via ||= :manual
   end
 end

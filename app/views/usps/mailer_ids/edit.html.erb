@@ -1,12 +1,15 @@
-<% content_for :title, "Editing mailer" %>
+<% content_for :title, "Edit Mailer ID" %>
 
-<h1>Editing mailer</h1>
-
-<%= render "form", usps_mailer_id: @usps_mailer_id %>
-
-<br>
-
-<div>
-  <%= link_to "back to MID", @usps_mailer_id %> |
-  <%= link_to "back to all MIDs", usps_mailer_ids_path %>
+<div class="page-container--xs">
+  <div class="page-title-group mb-3">
+    <h1 class="page-title">Edit Mailer ID</h1>
+    <span class="kv-label"><%= @usps_mailer_id.name %></span>
+  </div>
+  <%= render "form", usps_mailer_id: @usps_mailer_id %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_mailer_id_path(@usps_mailer_id), scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to mailer ID"
+    end %>
+  </div>
 </div>

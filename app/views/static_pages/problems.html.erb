@@ -1,113 +1,164 @@
-<h1>Problems</h1>
+<% content_for :title, "Problems" %>
 
-<% if @blocking.empty? && @no_po_cost.empty? && @backordered.empty? && @stuck_orders.empty? %>
-  <p>no problems! go take a nap or something.</p>
-<% end %>
+<div class="page-container">
+  <div class="page-title-group content-section">
+    <h1 class="page-title">Problems</h1>
+    <%= render Components::Shared::Jumpcode.new(path: problems_path) %>
+  </div>
 
-<% if @blocking.any? %>
-  <h2 style="color: red;">Dispatch blockers</h2>
-  <p>These enabled SKUs have <strong>no cost data at all</strong> &mdash; no PO cost, no override. Any order containing them will refuse to dispatch.</p>
-  <table class="table-fixed text-left border border-gray-300 border-collapse" style="width: 100%;">
-    <tr>
-      <th class="border border-gray-300">SKU</th>
-      <th class="border border-gray-300">Name</th>
-      <th class="border border-gray-300">In stock</th>
-      <th class="border border-gray-300">Zenventory</th>
-    </tr>
-    <% @blocking.each do |sku| %>
-      <tr>
-        <td class="border border-gray-400"><%= link_to sku.sku, warehouse_sku_path(sku) %></td>
-        <td class="border border-gray-400"><%= sku.name %></td>
-        <td class="border border-gray-400"><%= sku.in_stock || "—" %></td>
-        <td class="border border-gray-400">
-          <% if sku.zenventory_url %>
-            <%= link_to "view", sku.zenventory_url, target: "_blank" %>
-          <% end %>
-        </td>
-      </tr>
-    <% end %>
-  </table>
-<% end %>
+  <% if @blocking.empty? && @no_po_cost.empty? && @backordered.empty? && @stuck_orders.empty? %>
+    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
+      bs.with_visual_icon(icon: :check_circle)
+      bs.with_heading(tag: :h2) { "No problems!" }
+      bs.with_description { "Go take a nap or something." }
+    end %>
+  <% end %>
 
-<% if @no_po_cost.any? %>
-  <h2 style="color: orange;">Missing PO cost data</h2>
-  <p>These enabled SKUs have no <code>average_po_cost</code> from Zenventory but are covered by an override or other fallback. They work, but the PO data in Zenventory should be fixed.</p>
-  <table class="table-fixed text-left border border-gray-300 border-collapse" style="width: 100%;">
-    <tr>
-      <th class="border border-gray-300">SKU</th>
-      <th class="border border-gray-300">Name</th>
-      <th class="border border-gray-300">Declared cost</th>
-      <th class="border border-gray-300">Source</th>
-      <th class="border border-gray-300">Zenventory</th>
-    </tr>
-    <% @no_po_cost.each do |sku| %>
-      <tr>
-        <td class="border border-gray-400"><%= link_to sku.sku, warehouse_sku_path(sku) %></td>
-        <td class="border border-gray-400"><%= sku.name %></td>
-        <td class="border border-gray-400"><%= number_to_currency sku.declared_unit_cost %></td>
-        <td class="border border-gray-400">
-          <% if sku.declared_unit_cost_override&.positive? %>
-            override
-          <% else %>
-            ???
-          <% end %>
-        </td>
-        <td class="border border-gray-400">
-          <% if sku.zenventory_url %>
-            <%= link_to "view", sku.zenventory_url, target: "_blank" %>
-          <% end %>
-        </td>
-      </tr>
-    <% end %>
-  </table>
-<% end %>
+  <% if @blocking.any? %>
+    <div class="content-section-lg">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h2 class="section-heading-lg">Dispatch Blockers</h2>
+          <%= render Primer::Beta::Label.new(scheme: :danger) { "blocking" } %>
+        </div>
+        <p class="section-desc">No cost data at all — orders with these SKUs will refuse to dispatch.</p>
+      </div>
+      <%= render Primer::Beta::BorderBox.new do |box|
+        box.with_header do %>
+          <div class="problems-row">
+            <span class="problems-col-sku col-header">SKU</span>
+            <span class="problems-col-name col-header">Name</span>
+            <span class="problems-col-num col-header">In Stock</span>
+            <span class="problems-col-link col-header">Zenventory</span>
+          </div>
+        <% end
+        @blocking.each do |sku|
+          box.with_row do %>
+            <div class="problems-row">
+              <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
+              <span class="problems-col-name"><%= sku.name %></span>
+              <span class="problems-col-num"><%= sku.in_stock || "—" %></span>
+              <span class="problems-col-link">
+                <% if sku.zenventory_url %>
+                  <%= link_to "view ↗", sku.zenventory_url, target: "_blank" %>
+                <% end %>
+              </span>
+            </div>
+          <% end
+        end
+      end %>
+    </div>
+  <% end %>
 
-<% if @backordered.any? %>
-  <h2 style="color: orange;">Backordered without enough inbound</h2>
-  <p>These SKUs are oversold and don't have enough inbound stock to cover the deficit.</p>
-  <table class="table-fixed text-left border border-gray-300 border-collapse" style="width: 100%;">
-    <tr>
-      <th class="border border-gray-300">SKU</th>
-      <th class="border border-gray-300">Name</th>
-      <th class="border border-gray-300">In stock</th>
-      <th class="border border-gray-300">Inbound</th>
-      <th class="border border-gray-300">Shortfall</th>
-    </tr>
-    <% @backordered.each do |sku| %>
-      <tr>
-        <td class="border border-gray-400"><%= link_to sku.sku, warehouse_sku_path(sku) %></td>
-        <td class="border border-gray-400"><%= sku.name %></td>
-        <td class="border border-gray-400" style="color: red;"><%= sku.in_stock %></td>
-        <td class="border border-gray-400"><%= sku.inbound || 0 %></td>
-        <td class="border border-gray-400" style="color: red;"><%= sku.in_stock.abs - (sku.inbound || 0) %></td>
-      </tr>
-    <% end %>
-  </table>
-<% end %>
+  <% if @no_po_cost.any? %>
+    <div class="content-section-lg">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h2 class="section-heading-lg">Missing PO Cost Data</h2>
+          <%= render Primer::Beta::Label.new(scheme: :attention) { "degraded" } %>
+        </div>
+        <p class="section-desc">No <code>average_po_cost</code> from Zenventory — covered by fallback but should be fixed.</p>
+      </div>
+      <%= render Primer::Beta::BorderBox.new do |box|
+        box.with_header do %>
+          <div class="problems-row">
+            <span class="problems-col-sku col-header">SKU</span>
+            <span class="problems-col-name col-header">Name</span>
+            <span class="problems-col-num col-header">Cost</span>
+            <span class="problems-col-num col-header">Source</span>
+            <span class="problems-col-link col-header">Zenventory</span>
+          </div>
+        <% end
+        @no_po_cost.each do |sku|
+          box.with_row do %>
+            <div class="problems-row">
+              <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
+              <span class="problems-col-name"><%= sku.name %></span>
+              <span class="problems-col-num"><%= number_to_currency(sku.declared_unit_cost) %></span>
+              <span class="problems-col-num kv-label">
+                <%= sku.declared_unit_cost_override&.positive? ? "override" : "???" %>
+              </span>
+              <span class="problems-col-link">
+                <% if sku.zenventory_url %>
+                  <%= link_to "view ↗", sku.zenventory_url, target: "_blank" %>
+                <% end %>
+              </span>
+            </div>
+          <% end
+        end
+      end %>
+    </div>
+  <% end %>
 
-<% if @stuck_orders.any? %>
-  <h2 style="color: red;">Stuck orders</h2>
-  <p>These orders were dispatched to the warehouse over 2 weeks ago but never marked as mailed. Something might be wrong with the Zenventory sync, or they're stuck at the warehouse.</p>
-  <table class="table-fixed text-left border border-gray-300 border-collapse" style="width: 100%;">
-    <tr>
-      <th class="border border-gray-300">Order</th>
-      <th class="border border-gray-300">Recipient</th>
-      <th class="border border-gray-300">Dispatched</th>
-      <th class="border border-gray-300">Age</th>
-      <th class="border border-gray-300">Zenventory</th>
-    </tr>
-    <% @stuck_orders.each do |order| %>
-      <tr>
-        <td class="border border-gray-400"><%= link_to order.hc_id, warehouse_order_path(order) %></td>
-        <td class="border border-gray-400"><%= order.recipient_email %></td>
-        <td class="border border-gray-400"><%= order.dispatched_at.strftime("%b %d, %Y") %></td>
-        <td class="border border-gray-400" style="color: red;"><%= distance_of_time_in_words_to_now(order.dispatched_at) %> ago</td>
-        <td class="border border-gray-400">
-          <% if order.zenventory_url %>
-            <%= link_to "view", order.zenventory_url, target: "_blank" %>
-          <% end %>
-        </td>
-      </tr>
-    <% end %>
-  </table>
-<% end %>
+  <% if @backordered.any? %>
+    <div class="content-section-lg">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h2 class="section-heading-lg">Backordered Without Enough Inbound</h2>
+          <%= render Primer::Beta::Label.new(scheme: :attention) { "warning" } %>
+        </div>
+        <p class="section-desc">Oversold and not enough inbound stock to cover the deficit.</p>
+      </div>
+      <%= render Primer::Beta::BorderBox.new do |box|
+        box.with_header do %>
+          <div class="problems-row">
+            <span class="problems-col-sku col-header">SKU</span>
+            <span class="problems-col-name col-header">Name</span>
+            <span class="problems-col-num col-header">In Stock</span>
+            <span class="problems-col-num col-header">Inbound</span>
+            <span class="problems-col-num col-header">Shortfall</span>
+          </div>
+        <% end
+        @backordered.each do |sku|
+          box.with_row do %>
+            <div class="problems-row">
+              <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
+              <span class="problems-col-name"><%= sku.name %></span>
+              <span class="problems-col-num text-danger fw-semibold"><%= sku.in_stock %></span>
+              <span class="problems-col-num"><%= sku.inbound || 0 %></span>
+              <span class="problems-col-num text-danger fw-semibold"><%= sku.in_stock.abs - (sku.inbound || 0) %></span>
+            </div>
+          <% end
+        end
+      end %>
+    </div>
+  <% end %>
+
+  <% if @stuck_orders.any? %>
+    <div class="content-section-lg">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h2 class="section-heading-lg">Stuck Orders</h2>
+          <%= render Primer::Beta::Label.new(scheme: :danger) { "blocking" } %>
+        </div>
+        <p class="section-desc">Dispatched 2+ weeks ago, never marked mailed. Possible Zenventory sync issue.</p>
+      </div>
+      <%= render Primer::Beta::BorderBox.new do |box|
+        box.with_header do %>
+          <div class="problems-row">
+            <span class="problems-col-sku col-header">Order</span>
+            <span class="problems-col-name col-header">Recipient</span>
+            <span class="problems-col-num col-header">Dispatched</span>
+            <span class="problems-col-num col-header">Age</span>
+            <span class="problems-col-link col-header">Zenventory</span>
+          </div>
+        <% end
+        @stuck_orders.each do |order|
+          box.with_row do %>
+            <div class="problems-row">
+              <code class="problems-col-sku"><%= link_to order.hc_id, warehouse_order_path(order) %></code>
+              <span class="problems-col-name"><%= order.recipient_email %></span>
+              <span class="problems-col-num"><%= order.dispatched_at.strftime("%b %d") %></span>
+              <span class="problems-col-num text-danger"><%= distance_of_time_in_words_to_now(order.dispatched_at) %></span>
+              <span class="problems-col-link">
+                <% if order.zenventory_url %>
+                  <%= link_to "view ↗", order.zenventory_url, target: "_blank" %>
+                <% end %>
+              </span>
+            </div>
+          <% end
+        end
+      end %>
+    </div>
+  <% end %>
+</div>

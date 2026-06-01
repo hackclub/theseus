@@ -3,10 +3,48 @@ class Letter::InstantQueuesController < Letter::QueuesController
 
   def new
     @letter_queue = Letter::InstantQueue.new
+    render Views::Letter::InstantQueues::New.new(queue: @letter_queue)
+  end
+
+  def edit
+    render Views::Letter::InstantQueues::Edit.new(queue: @letter_queue)
+  end
+
+  def create
+    @letter_queue = Letter::InstantQueue.new(letter_queue_params.merge(user: current_user))
+
+    if @letter_queue.save
+      redirect_to @letter_queue, notice: "Queue was successfully created."
+    else
+      render Views::Letter::InstantQueues::New.new(queue: @letter_queue), status: :unprocessable_entity
+    end
+  end
+
+  def update
+    if @letter_queue.update(letter_queue_params)
+      redirect_to @letter_queue, notice: "Queue was successfully updated."
+    else
+      render Views::Letter::InstantQueues::Edit.new(queue: @letter_queue), status: :unprocessable_entity
+    end
   end
 
   def show
-    @letters = @letter_queue.letters
+    letter_counts = @letter_queue.letters
+                      .group(:aasm_state)
+                      .count
+
+    letters = @letter_queue.letters.order(created_at: :desc)
+    letters = letters.search(params[:search]) if params[:search].present?
+    letters = letters.where(aasm_state: params[:status]) if params[:status].present?
+
+    render Views::Letter::InstantQueues::Show.new(
+      queue: @letter_queue,
+      letters: letters,
+      batches: [],
+      letter_counts: letter_counts,
+      search: params[:search],
+      status: params[:status]
+    )
   end
 
   private

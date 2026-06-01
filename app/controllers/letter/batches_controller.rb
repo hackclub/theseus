@@ -3,22 +3,26 @@ class Letter::BatchesController < BaseBatchesController
   def index
     authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batches = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope).order(created_at: :desc)
+    render Views::Letter::Batches::Index.new(batches: @batches)
   end
 
   # GET /letter/batches/new
   def new
     authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batch = Letter::Batch.new
+    render Views::Letter::Batches::New.new(batch: @batch)
   end
 
   # GET /letter/batches/:id
   def show
     authorize @batch, policy_class: Letter::BatchPolicy
+    render Views::Letter::Batches::Show.new(batch: @batch)
   end
 
   # GET /letter/batches/:id/edit
   def edit
     authorize @batch, policy_class: Letter::BatchPolicy
+    render Views::Letter::Batches::Edit.new(batch: @batch)
   end
 
   # POST /letter/batches
@@ -27,9 +31,16 @@ class Letter::BatchesController < BaseBatchesController
     @batch = Letter::Batch.new(batch_params.merge(user: current_user))
 
     if @batch.save
-      redirect_to map_fields_letter_batch_path(@batch), notice: "Batch was successfully created."
+      begin
+        addresses_data = JSON.parse(params[:letter_batch][:addresses_data])
+        @batch.import_addresses!(addresses_data)
+        redirect_to process_confirm_letter_batch_path(@batch), notice: "Batch created with #{@batch.addresses.count} addresses. Review and process."
+      rescue StandardError => e
+        event_id = Sentry.capture_exception(e)&.event_id
+        redirect_to letter_batch_path(@batch), flash: { alert: "Batch created but address import failed: #{e.message} (error: #{event_id})" }
+      end
     else
-      render :new, status: :unprocessable_entity
+      render Views::Letter::Batches::New.new(batch: @batch), status: :unprocessable_entity
     end
   end
 
@@ -77,7 +88,7 @@ class Letter::BatchesController < BaseBatchesController
 
   def process_form
     authorize @batch, :process_form?, policy_class: Letter::BatchPolicy
-    render :process_letter
+    render Views::Letter::Batches::Process.new(batch: @batch)
   end
 
   def process_batch
@@ -86,7 +97,7 @@ class Letter::BatchesController < BaseBatchesController
 
     if request.post?
       if letter_batch_params[:letter_mailing_date].blank?
-        redirect_to process_letter_batch_path(@batch), alert: "Mailing date is required"
+        redirect_to process_confirm_letter_batch_path(@batch), alert: "Mailing date is required"
         return
       end
 
@@ -103,14 +114,14 @@ class Letter::BatchesController < BaseBatchesController
         payment_account = USPS::PaymentAccount.find_by(id: letter_batch_params[:usps_payment_account_id])
 
         if payment_account.nil?
-          redirect_to process_letter_batch_path(@batch), alert: "Please select a valid payment account when using indicia"
+          redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select a valid payment account when using indicia"
           return
         end
 
         hcb_payment_account = current_user.hcb_payment_accounts.find_by(id: letter_batch_params[:hcb_payment_account_id])
 
         if hcb_payment_account.nil?
-          redirect_to process_letter_batch_path(@batch), alert: "Please select an HCB payment account to purchase indicia"
+          redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select an HCB payment account to purchase indicia"
           return
         end
       else
@@ -132,7 +143,7 @@ class Letter::BatchesController < BaseBatchesController
         redirect_to letter_batch_path(@batch, print_now: letter_batch_params[:print_immediately]), notice: "Batch processed successfully"
       rescue => e
         event_id = Sentry.capture_exception(e)&.event_id
-        redirect_to process_letter_batch_path(@batch), alert: "Failed to process batch: #{e.message} (error: #{event_id})"
+        redirect_to process_confirm_letter_batch_path(@batch), alert: "Failed to process batch: #{e.message} (error: #{event_id})"
       end
     end
   end
@@ -208,6 +219,7 @@ class Letter::BatchesController < BaseBatchesController
   def batch_params
     params.require(:letter_batch).permit(
       :csv,
+      :addresses_data,
       :letter_template_id,
       :user_facing_title,
       :letter_height,

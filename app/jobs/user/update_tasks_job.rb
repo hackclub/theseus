@@ -34,11 +34,11 @@ class User
           subtitle: "#{batch.origin}#{batch.tags.any? ? " [#{batch.tags.join(", ")}]" : nil}",
           link: case batch
           when Warehouse::Batch
-            Rails.application.routes.url_helpers.process_warehouse_batch_path(batch)
+            Rails.application.routes.url_helpers.process_confirm_warehouse_batch_path(batch)
           when Letter::Batch
-            Rails.application.routes.url_helpers.process_letter_batch_path(batch)
+            Rails.application.routes.url_helpers.process_confirm_letter_batch_path(batch)
           else
-            Rails.application.routes.url_helpers.process_batch_path(batch)
+            Rails.application.routes.url_helpers.batch_path(batch)
           end,
         }
       end

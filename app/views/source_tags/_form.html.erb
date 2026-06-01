@@ -1,32 +1,49 @@
 <%= form_with(model: source_tag) do |form| %>
   <% if source_tag.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(source_tag.errors.count, "error") %> prohibited this source_tag from being saved:</h2>
-
-      <ul>
+    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
+      <strong><%= pluralize(source_tag.errors.count, "error") %>:</strong>
+      <ul class="error-list">
         <% source_tag.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    </div>
+    <% end %>
   <% end %>
 
-  <div>
-    <%= form.label :slug, style: "display: block" %>
-    <%= form.text_field :slug %>
-  </div>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_body do %>
+      <%= render Primer::Alpha::TextField.new(
+        name: "source_tag[slug]",
+        label: "Slug",
+        value: source_tag.slug,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
+      <%= render Primer::Alpha::TextField.new(
+        name: "source_tag[name]",
+        label: "Name",
+        value: source_tag.name,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.label :owner, style: "display: block" %>
-    <%= form.text_field :owner %>
-  </div>
+      <%= render Primer::Alpha::TextField.new(
+        name: "source_tag[owner]",
+        label: "Owner",
+        value: source_tag.owner,
+        full_width: true
+      ) %>
+    <% end %>
+  <% end %>
 
-  <div>
-    <%= form.submit %>
+  <div class="page-actions">
+    <%= render Primer::Beta::Button.new(tag: :a, href: source_tags_path, scheme: :secondary) do
+      "Cancel"
+    end %>
+    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :check)
+      source_tag.persisted? ? "Update Source Tag" : "Create Source Tag"
+    end %>
   </div>
 <% end %>

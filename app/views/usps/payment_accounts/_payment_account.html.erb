@@ -1,3 +1,6 @@
-<div id="<%= dom_id payment_account %>">
-  <%= payment_account.display_name %>
+<div id="<%= dom_id payment_account %>" class="index-card">
+  <div class="index-card-header">
+    <a href="<%= usps_payment_account_path(payment_account) %>" class="index-card-title"><%= payment_account.display_name %></a>
+    <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { payment_account.account_type } %>
+  </div>
 </div>

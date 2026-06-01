@@ -1,22 +1,40 @@
-<% orders.each do |order| %>
-  <article class="card mb-4">
-    <div class="card-header">
-      <h3 class="mb-0">
-        <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
-        <%= render 'warehouse/orders/status_badge', order: order %>
-      </h3>
+<%= render Primer::Beta::BorderBox.new do |box|
+  box.with_header do %>
+    <div class="li-row">
+      <span class="li-col-name col-header">Order</span>
+      <span class="collection-col col-header">Recipient</span>
+      <span class="collection-col-sm col-header">Status</span>
     </div>
-    <div class="card-body">
-      <div class="md:grid-cols-2 gap-4">
-        <div>
-          <span class="text-gray-500">Recipient:</span>
-          <%= order.address.name_line %> (<%= order.recipient_email %>)
+  <% end
+
+  orders.each do |order|
+    box.with_row do %>
+      <a href="<%= warehouse_order_path(order) %>" class="collection-link">
+        <div class="collection-link-main">
+          <div class="section-title-group mb-1">
+            <span class="mono fw-semibold text-accent"><%= order.hc_id %></span>
+            <% if order.user_facing_title.present? %>
+              <span>·</span>
+              <span class="order-row-name"><%= order.user_facing_title %></span>
+            <% end %>
+          </div>
+          <div class="resource-card-meta mt-1">
+            <%= order.created_at.strftime("%b %d, %Y") %>
+            <% if order.tags.present? %>
+              · <%= render 'shared/tags', tags: order.tags %>
+            <% end %>
+          </div>
         </div>
-        <div>
-          <span class="text-gray-500">Tags:</span>
-          <%= render 'shared/tags', tags: order.tags %>
+        <div class="collection-link-side">
+          <div class="collection-col">
+            <div class="fw-medium"><%= order.address&.name_line || "—" %></div>
+            <div class="resource-card-meta"><%= order.recipient_email %></div>
+          </div>
+          <div class="collection-col-sm">
+            <%= render 'warehouse/orders/status_badge', order: order %>
+          </div>
         </div>
-      </div>
-    </div>
-  </article>
-<% end %> 
+      </a>
+    <% end
+  end
+end %>

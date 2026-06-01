@@ -1,12 +1,15 @@
-<% content_for :title, "Editing payment account" %>
+<% content_for :title, "Edit Payment Account" %>
 
-<h1>Editing payment account</h1>
-
-<%= render "form", usps_payment_account: @usps_payment_account %>
-
-<br>
-
-<div>
-  <%= link_to "Show this payment account", @usps_payment_account %> |
-  <%= link_to "Back to payment accounts", usps_payment_accounts_path %>
+<div class="page-container--xs">
+  <div class="page-title-group content-section">
+    <h1 class="page-title">Edit Payment Account</h1>
+    <span class="kv-label"><%= @usps_payment_account.display_name %></span>
+  </div>
+  <%= render "form", usps_payment_account: @usps_payment_account %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_payment_account_path(@usps_payment_account), scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to account"
+    end %>
+  </div>
 </div>

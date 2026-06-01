@@ -4,12 +4,27 @@ class Warehouse::SKUsController < ApplicationController
   # GET /warehouse/skus or /warehouse/skus.json
   def index
     authorize Warehouse::SKU
-    @warehouse_skus = params[:include_non_inventory] ? Warehouse::SKU.all : Warehouse::SKU.in_inventory
+    include_non_inventory = params[:include_non_inventory].present?
+    warehouse_skus = include_non_inventory ? Warehouse::SKU.all : Warehouse::SKU.in_inventory
+    view = params[:view] == 'flat' ? 'flat' : 'grouped'
+    render Views::Warehouse::SKUs::Index.new(warehouse_skus:, include_non_inventory:, view:)
   end
 
   # GET /warehouse/skus/1 or /warehouse/skus/1.json
   def show
     authorize @warehouse_sku
+    @recent_orders = Warehouse::Order.joins(:line_items)
+      .where(warehouse_line_items: { sku_id: @warehouse_sku.id })
+      .distinct.order(created_at: :desc).limit(10)
+    outstanding_pos = Warehouse::PurchaseOrder.joins(:line_items)
+      .where(warehouse_purchase_order_line_items: { sku_id: @warehouse_sku.id })
+      .where.not(status: "completed")
+      .distinct
+    completed_pos = Warehouse::PurchaseOrder.joins(:line_items)
+      .where(warehouse_purchase_order_line_items: { sku_id: @warehouse_sku.id })
+      .where(status: "completed")
+      .distinct.order(created_at: :desc).limit(10)
+    @recent_purchase_orders = (outstanding_pos + completed_pos).sort_by(&:created_at).reverse
   end
 
   # GET /warehouse/skus/new

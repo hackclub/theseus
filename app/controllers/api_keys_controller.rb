@@ -4,11 +4,13 @@ class APIKeysController < ApplicationController
   def index
     authorize APIKey
     @api_keys = policy_scope(APIKey)
+    render Views::APIKeys::Index.new(api_keys: @api_keys)
   end
 
   def new
     authorize APIKey
     @api_key = APIKey.new(user: current_user)
+    render Views::APIKeys::New.new(api_key: @api_key)
   end
 
   def create
@@ -29,10 +31,12 @@ class APIKeysController < ApplicationController
 
   def show
     authorize @api_key
+    render Views::APIKeys::Show.new(api_key: @api_key)
   end
 
   def revoke_confirm
     authorize @api_key
+    render Views::APIKeys::RevokeConfirm.new(api_key: @api_key)
   end
 
   def revoke

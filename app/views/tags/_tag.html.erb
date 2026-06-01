@@ -1,5 +1,1 @@
-<span class="tag">
-  <%= link_to tag_stats_path(tag) do %>
-    <%= tag %>
-  <% end %>
-</span>
+<%= render(Primer::Beta::Label.new(tag: :a, href: tag_stats_path(tag), scheme: :secondary, size: :medium)) { tag } %>

@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite'
 import ViteRails from 'vite-plugin-rails'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 export default defineConfig({
   plugins: [
     ViteRails(),
+    svelte(),
   ],
   define: {
     'this': 'globalThis',
@@ -26,6 +28,9 @@ export default defineConfig({
     target: 'esnext' //browsers can handle the latest ES features
   },
   optimizeDeps: {
-    include: ['d3', 'datamaps']
+    include: ['d3', 'datamaps', '@primer/view-components'],
+    esbuildOptions: {
+      keepNames: true
+    }
   }
 })

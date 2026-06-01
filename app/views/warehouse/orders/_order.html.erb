@@ -1,42 +1,36 @@
-<article class="card" id="<%= dom_id order %>">
-  <header class="flex items-center justify-between">
-    <h1>
-      <%= link_to order.hc_id, order %> – <%= order.user_facing_title %>
-      <%= render 'status_badge', order: order %>
-    </h1>
-  </header>
-
-  <div class="p-3">
-    <%= render 'shared/tags', tags: order.tags %>
-
-    <div class="grid md:grid-cols-2 gap-4 mb-4">
-      <div class="order-info-panel">
-        <h3>Order Information</h3>
-        <div class="p-2 border rounded">
-          <p><span class="field-label">Recipient:</span> <%= order.address.name_line %></p>
-          <p><span class="field-label">Email:</span> <%= order.recipient_email %></p>
-        </div>
-      </div>
-
-      <div class="order-info-panel">
-        <h3>Cost Information</h3>
-        <div class="p-2 border rounded">
-          <p><span class="field-label">Labor Cost:</span> <%= number_to_currency(order.labor_cost) %></p>
-          <p><span class="field-label">Contents Cost:</span> <%= number_to_currency(order.contents_actual_cost_to_hc) %>
-          </p>
-          <p>
-            <span class="field-label">Postage Cost:</span> <%= order.postage_cost.present? ? number_to_currency(order.postage_cost) : "$?.??" %>
-          </p>
-        </div>
-      </div>
+<div class="index-card">
+  <div class="index-card-header">
+    <div class="page-title-group">
+      <a href="<%= warehouse_order_path(order) %>" class="mono index-card-title"><%= order.hc_id %></a>
+      <% if order.user_facing_title.present? %>
+        <span>·</span>
+        <span><%= order.user_facing_title %></span>
+      <% end %>
     </div>
+    <%= render 'warehouse/orders/status_badge', order: order %>
+  </div>
 
-    <div class="order-contents-section">
-      <h3>Contents</h3>
-      <div class="p-2 border rounded">
-        <%= render 'warehouse/orders/line_items', order: order %>
+  <% if order.tags.present? %>
+    <div class="tags-row">
+      <% order.tags.compact_blank.each do |tag| %>
+        <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { tag } %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="detail-grid">
+    <div>
+      <div class="detail-label">Recipient</div>
+      <div class="fw-medium"><%= order.address&.name_line || "—" %></div>
+      <div class="resource-card-meta"><%= order.recipient_email %></div>
+    </div>
+    <div>
+      <div class="detail-label">Cost</div>
+      <div>
+        <span class="kv-label">Labor:</span> <%= number_to_currency(order.labor_cost) %>
+        <span class="kv-label">Contents:</span> <%= number_to_currency(order.contents_actual_cost_to_hc) %>
+        <span class="kv-label">Postage:</span> <%= order.postage_cost.present? ? number_to_currency(order.postage_cost) : "—" %>
       </div>
     </div>
   </div>
-</article>
-
+</div>

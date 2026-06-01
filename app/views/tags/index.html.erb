@@ -1,15 +1,41 @@
 <% content_for :title, "Tags" %>
 
-<h1>Tags</h1>
-<div class="banner banner-info">
-  this page is kinda expensive so it's cached – if you want, click the refresh button
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <div class="page-title-group">
+        <h1 class="page-title">Tags</h1>
+        <%= render Components::Shared::Jumpcode.new(path: tags_path) %>
+      </div>
+      <p class="page-subtitle">Cost tracking and reporting by tag</p>
+    </div>
+    <%= form_with url: refresh_tags_path, method: :post, class: "form-inline" do %>
+      <%= render Primer::Beta::Button.new(type: :submit, scheme: :secondary, size: :medium) do |btn|
+        btn.with_leading_visual_icon(icon: :sync)
+        "Refresh"
+      end %>
+    <% end %>
+  </div>
+
+  <%= render Primer::Beta::Flash.new(scheme: :default, mb: 3) do %>
+    This page is cached for performance. Hit refresh if you need fresh data.
+  <% end %>
+
+  <div class="content-section">
+    <h2 class="section-heading">Common Tags</h2>
+    <div class="tags-row">
+      <% @common_tags.each do |tag| %>
+        <%= render(Primer::Beta::Label.new(tag: :a, href: tag_stats_path(tag.tag), scheme: :accent, size: :large)) { tag.tag } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="section-heading">All Tags</h2>
+    <div class="tags-row">
+      <% @tags.each do |tag| %>
+        <%= render(Primer::Beta::Label.new(tag: :a, href: tag_stats_path(tag), scheme: :secondary, size: :medium)) { tag } %>
+      <% end %>
+    </div>
+  </div>
 </div>
-<%= button_to "↻", refresh_tags_path %>
-<h4>Common tags:</h4>
-<% @common_tags.each do |tag| %>
-  <%= render 'tag', tag: tag.tag %>
-<% end %>
-<h4>Other tags:</h4>
-<% @tags.each do |tag| %>
-  <%= render 'tag', tag: %>
-<% end %>

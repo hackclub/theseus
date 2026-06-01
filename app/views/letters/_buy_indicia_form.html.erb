@@ -1,32 +1,40 @@
-<%= form_with(url: buy_indicia_letter_path(letter), method: :post, class: "space-y-4") do |form| %>
+<%= form_with(url: buy_indicia_letter_path(letter), method: :post) do |form| %>
   <% if current_user.hcb_payment_accounts.any? %>
-    <div>
-      <label class="block text-sm text-gray-600 mb-1">Pay with HCB Organization</label>
-      <%= form.collection_select :hcb_payment_account_id,
-        current_user.hcb_payment_accounts,
-        :id,
-        :organization_name,
-        { prompt: "Select organization..." },
-        { required: true, class: "w-full" } %>
+    <div class="form-field">
+      <%= render Primer::Alpha::Select.new(
+        name: "hcb_payment_account_id",
+        label: "Pay with HCB Organization",
+        full_width: true,
+        required: true
+      ) do |select|
+        select.with_option(value: "", label: "Select organization...")
+        current_user.hcb_payment_accounts.each do |account|
+          select.with_option(value: account.id.to_s, label: account.organization_name)
+        end
+      end %>
     </div>
 
-    <div>
-      <label class="block text-sm text-gray-600 mb-1">USPS Payment Account</label>
-      <%= form.collection_select :usps_payment_account_id, 
-        USPS::PaymentAccount.all, 
-        :id, 
-        :name, 
-        { selected: USPS::PaymentAccount.first&.id },
-        { required: true, class: "w-full" } %>
+    <div class="form-field">
+      <%= render Primer::Alpha::Select.new(
+        name: "usps_payment_account_id",
+        label: "USPS Payment Account",
+        full_width: true,
+        required: true
+      ) do |select|
+        USPS::PaymentAccount.all.each do |account|
+          select.with_option(value: account.id.to_s, label: account.name, selected: account.id == USPS::PaymentAccount.first&.id)
+        end
+      end %>
     </div>
 
-    <%= form.submit "Buy Indicia", class: "btn success w-full" %>
+    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary, block: true) do |btn|
+      btn.with_leading_visual_icon(icon: :credit_card)
+      "Buy Indicia"
+    end %>
   <% else %>
-    <div class="text-center py-4">
-      <p class="text-sm text-gray-600 mb-3">Connect your HCB account to purchase postage.</p>
-      <%= link_to new_hcb_oauth_connection_path, class: "btn btn-small" do %>
-        Connect HCB
-      <% end %>
-    </div>
+    <%= render Primer::Beta::Blankslate.new do |blankslate|
+      blankslate.with_description { "Connect your HCB account to purchase postage." }
+      blankslate.with_primary_action(href: new_hcb_oauth_connection_path, scheme: :secondary, size: :small) { "Connect HCB" }
+    end %>
   <% end %>
 <% end %>

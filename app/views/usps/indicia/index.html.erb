@@ -1,51 +1,46 @@
 <% content_for :title, "Indicia" %>
 
-<div class="container">
-  <header class="page-header mb-6">
-    <h1>Indicia</h1>
-    <div class="actions">
-      <%= link_to new_usps_indicium_path, class: "btn success btn-small" do %>
-        + New Indicium
-      <% end %>
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Indicia</h1>
+      <p class="page-subtitle"><%= @usps_indicia.count %> purchased</p>
     </div>
-  </header>
+    <%= render Primer::Beta::Button.new(tag: :a, href: new_usps_indicium_path, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :plus)
+      "New Indicium"
+    end %>
+  </div>
 
   <% if @usps_indicia.any? %>
-    <article>
-      <div class="p-4">
-        <table class="w-full text-sm">
-          <thead>
-            <tr>
-              <th class="text-left py-2">ID</th>
-              <th class="text-left py-2">SKU</th>
-              <th class="text-left py-2">Postage</th>
-              <th class="text-left py-2">Mailing Date</th>
-              <th class="text-left py-2">Category</th>
-              <th class="text-right py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @usps_indicia.each do |indicium| %>
-              <tr class="border-t hover:bg-gray-50">
-                <td class="py-3 font-mono text-xs"><%= indicium.public_id %></td>
-                <td class="py-3 font-mono text-xs"><%= indicium.usps_sku %></td>
-                <td class="py-3"><%= number_to_currency(indicium.postage) %></td>
-                <td class="py-3"><%= indicium.mailing_date %></td>
-                <td class="py-3"><%= indicium.processing_category %></td>
-                <td class="py-3 text-right">
-                  <%= link_to "View", usps_indicium_path(indicium), class: "text-sm" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </article>
+    <%= render Primer::Beta::BorderBox.new do |box|
+      box.with_header do %>
+        <div class="indicia-row">
+          <span class="indicia-col-id col-header">ID</span>
+          <code class="indicia-col-sku col-header">SKU</code>
+          <span class="indicia-col-num col-header">Postage</span>
+          <span class="indicia-col-date col-header">Date</span>
+          <span class="indicia-col-cat col-header">Category</span>
+        </div>
+      <% end
+
+      @usps_indicia.each do |indicium|
+        box.with_row do %>
+          <a href="<%= usps_indicium_path(indicium) %>" class="indicia-row link-reset">
+            <span class="indicia-col-id"><%= render Components::Shared::PublicId.new(value: indicium.public_id) %></span>
+            <code class="indicia-col-sku mono"><%= indicium.usps_sku %></code>
+            <span class="indicia-col-num fw-medium"><%= number_to_currency(indicium.postage) %></span>
+            <span class="indicia-col-date kv-label"><%= indicium.mailing_date %></span>
+            <span class="indicia-col-cat kv-label"><%= indicium.processing_category %></span>
+          </a>
+        <% end
+      end
+    end %>
   <% else %>
-    <article>
-      <div class="p-6 text-center text-gray-500">
-        No indicia purchased yet.
-      </div>
-    </article>
+    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
+      bs.with_visual_icon(icon: :mail)
+      bs.with_heading(tag: :h3) { "No indicia yet" }
+      bs.with_description { "Purchased postage will appear here." }
+    end %>
   <% end %>
 </div>

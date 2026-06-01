@@ -1,11 +1,14 @@
 <% content_for :title, "New order" %>
 
-<h1>New order</h1>
+<div class="page-container--narrow">
+  <h1 class="page-title content-section">New order</h1>
 
-<%= render "form", warehouse_order: @warehouse_order %>
+  <%= render "form", warehouse_order: @warehouse_order %>
 
-<br>
-
-<div>
-  <%= link_to "Back to orders", warehouse_orders_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_orders_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to orders"
+    end %>
+  </div>
 </div>

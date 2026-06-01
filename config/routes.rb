@@ -429,6 +429,8 @@ Rails.application.routes.draw do
   get "customs_receipts/index"
   get "customs_receipts/show"
   scope path: "back_office" do
+    get "kbar/search", to: "kbar#search"
+
     resources :public_ids, only: [:index] do
       collection do
         post :lookup
@@ -454,11 +456,15 @@ Rails.application.routes.draw do
       end
     end
     resources :letters do
+      collection do
+        get :scanner
+      end
       member do
         post :generate_label
         post :buy_indicia
         post :mark_printed
         post :mark_mailed
+        post :undo_mark_mailed
         post :mark_received
         post :clear_label
         post :clear_indicium
@@ -468,8 +474,6 @@ Rails.application.routes.draw do
     namespace :letter do
       resources :batches do
         member do
-          get "/map", to: "batches#map_fields", as: :map_fields
-          post :set_mapping
           get "/process", to: "batches#process_form", as: :process_confirm
           post "/process", to: "batches#process_batch", as: :process
           post :mark_printed
@@ -528,6 +532,7 @@ Rails.application.routes.draw do
       get "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
     end
     get "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
+    get "/dev_login", to: "sessions#dev_login" if Rails.env.development?
 
     namespace :usps do
       resources :indicia
@@ -559,10 +564,8 @@ Rails.application.routes.draw do
       end
       resources :batches do
         member do
-          get "/map", to: "batches#map_fields", as: :map_fields
-          post :set_mapping
           get "/process", to: "batches#process_form", as: :process_confirm
-          post "/process", to: "batches#process_batch", as: :process
+          post "/process", to: "batches#process_batch", as: :process_batch
         end
       end
       resources :skus
@@ -577,6 +580,7 @@ Rails.application.routes.draw do
 
     delete "signout", to: "sessions#destroy", as: :signout
     get "/login" => "static_pages#login"
+    get "/api-docs" => "static_pages#api_docs"
 
     get "/auth/hackclub/callback", to: "sessions#hackclub_callback", as: :hackclub_callback
   end
@@ -701,8 +705,7 @@ Rails.application.routes.draw do
         resource :qz_tray, only: [] do
           get :cert
           post :sign
-          match :cert, via: :options, to: "qz_trays#preflight"
-          match :sign, via: :options, to: "qz_trays#preflight"
+          match :cert, :sign, via: :options, to: "qz_trays#preflight"
         end
         resources :tags, only: [:index, :show] do
           member do

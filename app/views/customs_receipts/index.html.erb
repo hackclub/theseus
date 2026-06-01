@@ -1,6 +1,25 @@
-<h1>generate customs receipt</h1>
-<%= form_with url: generate_customs_receipts_path, method: :get do |f| %>
-  <%= f.label :search, "search:" %>
-  <%= f.text_field :search, placeholder: "ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)" %>
-  <%= f.submit "Generate" %>
-<% end %>
+<% content_for :title, "Customs Receipts" %>
+
+<div class="page-container--narrow">
+  <h1 class="page-title content-section">Generate Customs Receipt</h1>
+
+  <%= render Primer::Beta::BorderBox.new do |box| %>
+    <% box.with_body do %>
+      <%= form_with url: generate_customs_receipts_path, method: :get do |f| %>
+        <%= render Primer::Alpha::TextField.new(
+          name: "search",
+          label: "Search",
+          placeholder: "ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)",
+          full_width: true,
+          leading_visual: { icon: :search },
+          mb: 3
+        ) %>
+
+        <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+          btn.with_leading_visual_icon(icon: :file)
+          "Generate"
+        end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

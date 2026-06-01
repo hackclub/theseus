@@ -1,37 +1,39 @@
-<table class="table-fixed text-left border border-gray-300 border-collapse">
-  <tr>
-    <th class="border border-gray-300">SKU</th>
-    <th class="border border-gray-300">Quantity</th>
-    <th class="border border-gray-300">Cost to HC</th>
-    <th class="border border-gray-300">Declared value</th>
-  </tr>
-  <% order.line_items.each do |li| %>
-    <tr>
-      <td class="border border-gray-400">
-        <%= link_to li.sku.name, li.sku, target: '_blank' %>
-      </td>
-      <td class="border border-gray-400">
-        <%= li.quantity %>
-      </td>
-      <td class="border border-gray-400">
-        <%= number_to_currency li.sku.actual_cost_to_hc %>
-      </td>
-      <td class="border border-gray-400">
-        <% if li.sku.declared_unit_cost.zero? %>
-          <span style="color: red; font-weight: bold;" title="This SKU has no cost data! It will block dispatch.">⚠ $0.00</span>
-        <% else %>
-          <%= number_to_currency li.sku.declared_unit_cost %>
-        <% end %>
-      </td>
-    </tr>
-  <% end %>
-  <tr>
-    <td colspan="2">Total:</td>
-    <td class="border border-gray-400">
-      <%= number_to_currency order.contents_actual_cost_to_hc %>
-    </td>
-    <td class="border border-gray-400">
-      <%= number_to_currency order.contents_declared_unit_cost %>
-    </td>
-  </tr>
-</table>
+<%= render Primer::Beta::BorderBox.new do |box|
+  box.with_header do %>
+    <div class="li-row">
+      <span class="li-col-name col-header">SKU</span>
+      <span class="li-col-num col-header">Qty</span>
+      <span class="li-col-cost col-header">Cost to HC</span>
+      <span class="li-col-cost col-header">Declared</span>
+    </div>
+  <% end
+
+  order.line_items.each do |li|
+    box.with_row do %>
+      <div class="li-row">
+        <div class="li-col-name">
+          <%= link_to li.sku.name, warehouse_sku_path(li.sku), class: "fw-medium" %>
+          <span class="mono kv-label"><%= li.sku.sku %></span>
+        </div>
+        <span class="li-col-num fw-medium"><%= li.quantity %></span>
+        <span class="li-col-cost kv-label"><%= number_to_currency(li.sku.actual_cost_to_hc) %></span>
+        <span class="li-col-cost kv-label">
+          <% if li.sku.declared_unit_cost.zero? %>
+            <span class="text-danger fw-semibold" title="This SKU has no cost data! It will block dispatch."><%= render Primer::Beta::Octicon.new(icon: :alert, size: :small) %> $0.00</span>
+          <% else %>
+            <%= number_to_currency(li.sku.declared_unit_cost) %>
+          <% end %>
+        </span>
+      </div>
+    <% end
+  end
+
+  box.with_footer do %>
+    <div class="li-row fw-semibold">
+      <span class="li-col-name">Total</span>
+      <span class="li-col-num"></span>
+      <span class="li-col-cost"><%= number_to_currency(order.contents_actual_cost_to_hc) %></span>
+      <span class="li-col-cost"><%= number_to_currency(order.contents_declared_unit_cost) %></span>
+    </div>
+  <% end
+end %>

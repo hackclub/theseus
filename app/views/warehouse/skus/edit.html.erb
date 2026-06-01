@@ -1,12 +1,17 @@
-<% content_for :title, "Editing sku" %>
+<% content_for :title, "Edit SKU #{@warehouse_sku.sku}" %>
 
-<h1>Editing SKU: <%= @warehouse_sku.sku %></h1>
+<div class="page-container--narrow">
+  <div class="page-title-group content-section">
+    <h1 class="page-title">Edit SKU</h1>
+    <code class="mono"><%= @warehouse_sku.sku %></code>
+  </div>
 
-<%= render "form", warehouse_sku: @warehouse_sku %>
+  <%= render "form", warehouse_sku: @warehouse_sku %>
 
-<br>
-
-<div>
-  <%= link_to "back to this SKU", @warehouse_sku %> |
-  <%= link_to "back to SKUs", warehouse_skus_path %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_sku_path(@warehouse_sku), scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to SKU"
+    end %>
+  </div>
 </div>

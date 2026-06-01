@@ -118,8 +118,15 @@ class Warehouse::PurchaseOrder < ApplicationRecord
     self.notes = zenv_po[:notes] if zenv_po[:notes].present?
     self.required_by_date = Date.parse(zenv_po[:requiredByDate]) if zenv_po[:requiredByDate].present?
 
-    zenv_status = zenv_po[:status]&.downcase
-    self.status = zenv_status if %w[draft open completed deleted].include?(zenv_status)
+    self.status = if zenv_po[:deleted]
+                    "deleted"
+                  elsif zenv_po[:completed]
+                    "completed"
+                  elsif zenv_po[:draft]
+                    "draft"
+                  else
+                    "open"
+                  end
 
     save!
   end

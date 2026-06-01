@@ -1,33 +1,49 @@
 <%= form_with(model: usps_mailer_id) do |form| %>
   <% if usps_mailer_id.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(usps_mailer_id.errors.count, "error") %> prohibited this usps_mailer_id from being saved:</h2>
-
-      <ul>
+    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
+      <strong><%= pluralize(usps_mailer_id.errors.count, "error") %>:</strong>
+      <ul class="error-box-list">
         <% usps_mailer_id.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    </div>
+    <% end %>
   <% end %>
 
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_body do %>
+      <%= render Primer::Alpha::TextField.new(
+        name: "usps_mailer_id[name]",
+        label: "Name",
+        value: usps_mailer_id.name,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
+      <%= render Primer::Alpha::TextField.new(
+        name: "usps_mailer_id[crid]",
+        label: "CRID",
+        value: usps_mailer_id.crid,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.label :crid, style: "display: block" %>
-    <%= form.text_field :crid %>
-  </div>
+      <%= render Primer::Alpha::TextField.new(
+        name: "usps_mailer_id[mid]",
+        label: "MID",
+        value: usps_mailer_id.mid,
+        full_width: true
+      ) %>
+    <% end %>
+  <% end %>
 
-  <div>
-    <%= form.label :mid, style: "display: block" %>
-    <%= form.text_field :mid %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+  <div class="page-actions">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_mailer_ids_path, scheme: :secondary) do
+      "Cancel"
+    end %>
+    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :check)
+      usps_mailer_id.persisted? ? "Update Mailer ID" : "Create Mailer ID"
+    end %>
   </div>
 <% end %>

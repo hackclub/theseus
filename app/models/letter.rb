@@ -68,6 +68,17 @@ class Letter < ApplicationRecord
   include CanBeBatched
   include AASM
   include Taggable
+  include PgSearch::Model
+
+  pg_search_scope :search,
+    against: %i[user_facing_title recipient_email],
+    associated_against: {
+      address: %i[first_name last_name],
+      user: %i[email]
+    },
+    using: {
+      tsearch: { prefix: true }
+    }
   # Add ActiveStorage attachment for the label PDF
   has_one_attached :label
   belongs_to :return_address, optional: true
@@ -108,6 +119,13 @@ class Letter < ApplicationRecord
   def return_address_name_line = return_address_name.presence || return_address&.name
 
   def been_mailed? = mailed? || received?
+
+  def origin_label
+    return "Manual" if manual?
+    return "Bulk upload" if bulk_upload?
+    return queue&.name || "Queue" if queue?
+    return "API" if api?
+  end
 
   belongs_to :usps_mailer_id, class_name: "USPS::MailerId"
 
@@ -150,6 +168,8 @@ class Letter < ApplicationRecord
     query.order(imb_rollover_count: :desc).first
   end
 
+  enum :created_via, { manual: 0, bulk_upload: 1, queue: 2, api: 3 }
+
   enum :processing_category, {
     letter: 0,
     flat: 1,
@@ -169,6 +189,7 @@ class Letter < ApplicationRecord
   validates :processing_category, presence: true
   validate :validate_postage_type_by_return_address
 
+  before_validation :set_created_via_defaults, on: :create
   before_save :set_postage
 
   def mailing_date_not_in_past
@@ -303,5 +324,14 @@ class Letter < ApplicationRecord
       imb_serial_number: sn,
       imb_rollover_count: rollover,
     )
+  end
+
+  def set_created_via_defaults
+    if letter_queue_id.present? && created_via.blank?
+      self.created_via = queue.is_a?(Letter::InstantQueue) ? :api : :queue
+    elsif batch_id.present? && created_via.blank?
+      self.created_via = :bulk_upload
+    end
+    self.created_via ||= :manual
   end
 end

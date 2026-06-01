@@ -1,39 +1,48 @@
 class Warehouse::BatchesController < BaseBatchesController
-  before_action :set_allowed_templates, only: %i[ new create ]
+  before_action :set_allowed_templates, only: %i[ new create edit ]
 
-  # GET /warehouse/batches or /warehouse/batches.json
+  # GET /warehouse/batches
   def index
     authorize Warehouse::Batch
     @batches = policy_scope(Warehouse::Batch).order(created_at: :desc)
+    render Views::Warehouse::Batches::Index.new(batches: @batches)
   end
 
-  # GET /warehouse/batches/1 or /warehouse/batches/1.json
+  # GET /warehouse/batches/1
   def show
     authorize @batch
+    render Views::Warehouse::Batches::Show.new(batch: @batch)
   end
 
   # GET /warehouse/batches/new
   def new
     authorize Warehouse::Batch
     @batch = Warehouse::Batch.new
+    render Views::Warehouse::Batches::New.new(batch: @batch, allowed_templates: @allowed_templates)
   end
 
   # GET /warehouse/batches/1/edit
   def edit
     authorize @batch
+    render Views::Warehouse::Batches::Edit.new(batch: @batch, allowed_templates: @allowed_templates)
   end
 
-  # POST /warehouse/batches or /warehouse/batches.json
+  # POST /warehouse/batches
   def create
     authorize Warehouse::Batch
     @batch = Warehouse::Batch.new(batch_params.merge(user: current_user))
 
     if @batch.save
-      @batch.aasm_state = :awaiting_field_mapping
-      @batch.save!
-      redirect_to map_fields_warehouse_batch_path(@batch), notice: "Please map your CSV fields to address fields."
+      begin
+        addresses_data = JSON.parse(params[:batch][:addresses_data])
+        @batch.import_addresses!(addresses_data)
+        redirect_to process_confirm_warehouse_batch_path(@batch), notice: "Batch created with #{@batch.addresses.count} addresses. Review and process."
+      rescue StandardError => e
+        event_id = Sentry.capture_exception(e)&.event_id
+        redirect_to warehouse_batch_path(@batch), flash: { alert: "Batch created but address import failed: #{e.message} (error: #{event_id})" }
+      end
     else
-      render :new, status: :unprocessable_entity
+      render Views::Warehouse::Batches::New.new(batch: @batch, allowed_templates: @allowed_templates), status: :unprocessable_entity
     end
   end
 
@@ -69,7 +78,7 @@ class Warehouse::BatchesController < BaseBatchesController
 
       redirect_to warehouse_batch_path(@batch), notice: "Batch was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render Views::Warehouse::Batches::Edit.new(batch: @batch, allowed_templates: @allowed_templates), status: :unprocessable_entity
     end
   end
 
@@ -81,7 +90,7 @@ class Warehouse::BatchesController < BaseBatchesController
 
   def process_form
     authorize @batch, :process_form?
-    render :process_warehouse
+    render Views::Warehouse::Batches::Process.new(batch: @batch)
   end
 
   def process_batch
@@ -93,42 +102,10 @@ class Warehouse::BatchesController < BaseBatchesController
     end
   end
 
-  def set_mapping
-    authorize @batch, :set_mapping?
-    mapping = mapping_params.to_h
-
-    # Invert the mapping to get from CSV columns to address fields
-    inverted_mapping = mapping.invert
-
-    # Validate required fields
-    missing_fields = REQUIRED_FIELDS.reject { |field| inverted_mapping[field].present? }
-
-    if missing_fields.any?
-      flash.now[:error] = "Please map the following required fields: #{missing_fields.join(", ")}"
-      render :map_fields, status: :unprocessable_entity
-      return
-    end
-
-    if @batch.update!(field_mapping: inverted_mapping)
-      begin
-        @batch.run_map!
-      rescue StandardError => e
-        Rails.logger.warn(e)
-        event_id = Sentry.capture_exception(e)&.event_id
-        redirect_to warehouse_batch_path(@batch), flash: { alert: "Error mapping fields! #{e.message} (error: #{event_id})" }
-        return
-      end
-      redirect_to process_confirm_warehouse_batch_path(@batch), notice: "Field mapping saved. Please review and process your batch."
-    else
-      flash.now[:error] = "Failed to save field mapping. #{@batch.errors.full_messages.join(", ")}"
-      render :map_fields, status: :unprocessable_entity
-    end
-  end
-
   private
 
   def batch_params
-    params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
+    params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, :addresses_data, tags: [])
   end
 
   def set_allowed_templates

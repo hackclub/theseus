@@ -44,5 +44,9 @@ Rails.application.configure do
       cron: "*/23 * * * *",
       class: "AirtableETL::HCBWelcomeETLJob",
     },
+    sync_purchase_orders: {
+      cron: "*/15 * * * *",
+      class: "Warehouse::SyncPurchaseOrdersJob",
+    },
   }
 end

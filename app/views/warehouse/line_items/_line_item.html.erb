@@ -1,4 +1,4 @@
-<div>
-  <%= link_to line_item.sku.name, line_item.sku, target: '_blank' %>
+<div class="li-detail">
+  <%= link_to line_item.sku.name, line_item.sku, class: "fw-medium" %>
   <%= render partial: "admin_inspector", locals: {record: line_item} if params[:inspect_line_items] %>
 </div>

@@ -1,17 +1,11 @@
-<div id="<%= dom_id source_tag %>">
-  <p>
-    <strong>Slug:</strong>
-    <%= source_tag.slug %>
-  </p>
-
-  <p>
-    <strong>Name:</strong>
-    <%= source_tag.name %>
-  </p>
-
-  <p>
-    <strong>Owner:</strong>
-    <%= source_tag.owner %>
-  </p>
-
+<div class="index-card">
+  <div class="resource-card">
+    <div>
+      <a href="<%= source_tag_path(source_tag) %>" class="index-card-title"><%= source_tag.name %></a>
+      <code class="resource-card-meta resource-card-meta--inline"><%= source_tag.slug %></code>
+    </div>
+    <% if source_tag.owner.present? %>
+      <span class="resource-card-meta"><%= source_tag.owner %></span>
+    <% end %>
+  </div>
 </div>

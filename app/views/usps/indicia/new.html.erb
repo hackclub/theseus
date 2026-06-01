@@ -1,11 +1,12 @@
-<% content_for :title, "New indicium" %>
+<% content_for :title, "New Indicium" %>
 
-<h1>New indicium</h1>
-
-<%= render "form", usps_indicium: @usps_indicium %>
-
-<br>
-
-<div>
-  <%= link_to "Back to indicia", usps_indicia_path %>
+<div class="page-container--xs">
+  <h1 class="page-title content-section">New Indicium</h1>
+  <%= render "form", usps_indicium: @usps_indicium %>
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_indicia_path, scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to indicia"
+    end %>
+  </div>
 </div>

@@ -1,9 +1,5 @@
 class BaseBatchesController < ApplicationController
   before_action :set_batch, except: %i[ index new create ]
-  before_action :setup_csv_fields, only: %i[ map_fields set_mapping ]
-
-  REQUIRED_FIELDS = %w[first_name line_1 city state postal_code country].freeze
-  PREVIEW_ROWS = 3
 
   # GET /batches/1 or /batches/1.json
   def show
@@ -40,65 +36,9 @@ class BaseBatchesController < ApplicationController
     end
   end
 
-  def map_fields
-    authorize @batch, :map_fields?
-  end
-
-  def set_mapping
-    authorize @batch, :set_mapping?
-    mapping = mapping_params.to_h
-
-    # Invert the mapping to get from CSV columns to address fields
-    inverted_mapping = mapping.invert
-
-    # Validate required fields
-    missing_fields = REQUIRED_FIELDS.reject { |field| inverted_mapping[field].present? }
-
-    if missing_fields.any?
-      flash.now[:error] = "Please map the following required fields: #{missing_fields.join(", ")}"
-      render :map_fields, status: :unprocessable_entity
-      return
-    end
-
-    if @batch.update!(field_mapping: inverted_mapping)
-      begin
-        @batch.run_map!
-      rescue StandardError => e
-        Rails.logger.warn(e)
-        event_id = Sentry.capture_exception(e)&.event_id
-        redirect_to send("#{@batch.class.name.split("::").first.downcase}_batch_path", @batch), flash: { alert: "error mapping fields! #{e.message} (error: #{event_id})" }
-        return
-      end
-      redirect_to send("process_confirm_#{@batch.class.name.split("::").first.downcase}_batch_path", @batch), notice: "Field mapping saved. Please review and process your batch."
-    else
-      flash.now[:error] = "failed to save field mapping. #{@batch.errors.full_messages.join(", ")}"
-      render :map_fields, status: :unprocessable_entity
-    end
-  end
-
   private
 
   def set_batch
     @batch = Batch.find(params[:id])
-  end
-
-  def setup_csv_fields
-    csv_rows = CSV.parse(@batch.csv_data)
-    @csv_headers = csv_rows.first
-    @csv_preview = csv_rows[1..PREVIEW_ROWS] || []
-
-    # Get fields based on batch type
-    @address_fields = if @batch.is_a?(Letter::Batch)
-        # For letter batches, include address fields and rubber_stamps
-        (Address.column_names - ["id", "created_at", "updated_at", "batch_id"]) +
-          ["rubber_stamps"]
-      else
-        # For other batches, just include address fields
-        (Address.column_names - ["id", "created_at", "updated_at"])
-      end
-  end
-
-  def mapping_params
-    params.require(:mapping).permit!
   end
 end

@@ -18,11 +18,11 @@ class Warehouse::PurchaseOrderPolicy < ApplicationPolicy
   end
 
   def edit?
-    user_is_admin
+    user_is_admin && record.draft?
   end
 
   def update?
-    user_is_admin
+    user_is_admin && record.draft?
   end
 
   def destroy?

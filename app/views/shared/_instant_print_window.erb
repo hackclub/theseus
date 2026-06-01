@@ -2,7 +2,7 @@
   <%= vite_javascript_tag "qz" %>
   <%= vite_javascript_tag "instant_print" %>
 <% end %>
-<article class="mt-4 breathe-green">
+<article class="breathe-green mt-4">
   <h3>printing but way quicker:</h3>
   <%= content_tag("div", id: "instant_print_root", data: { url:,  print_now: params[:print_now] }.compact_blank) { } %>
   <div id="instant_print_root" data-url="<%= url %>">

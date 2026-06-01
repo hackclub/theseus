@@ -1,52 +1,102 @@
 <%= form_with(model: usps_payment_account) do |form| %>
   <% if usps_payment_account.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(usps_payment_account.errors.count, "error") %> prohibited this usps_payment_account from being saved:</h2>
-
-      <ul>
+    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
+      <strong><%= pluralize(usps_payment_account.errors.count, "error") %>:</strong>
+      <ul class="error-list">
         <% usps_payment_account.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    </div>
+    <% end %>
   <% end %>
-  <div>
-    <%= form.label :name, "Display name:" %>
-    <%= form.text_field :name %>
-  </div>
-  <div>
-    <%= form.label :usps_mailer_id_id, "CRID/MID:" %>
-    <%= form.collection_select(:usps_mailer_id_id, USPS::MailerId.all, :id, :display_name, prompt: 'select one...', required: true) %>
-  </div>
-  <div x-data="{account_type: '<%= @usps_payment_account.account_type %>'}" x-effect="console.log(account_type)">
-    <%= form.label :account_type, "Account type:" %>
-    <%= form.select :account_type, USPS::PaymentAccount.account_types.keys, { selected: @usps_payment_account.account_type }, { 'x-model' => 'account_type' } %>
-    <template x-if="account_type=='EPS'">
-      <div>
-        <%= form.label :account_number, "EPS account number:" %>
-        <%= form.text_field :account_number %>
-      </div>
-    </template>
-    <template x-if="account_type=='PERMIT'">
-      <div>
-        <div>
-          <%= form.label :permit_number, "Permit number:" %>
-          <%= form.text_field :permit_number %>
-        </div>
-        <div>
-          <%= form.label :permit_zip, "Permit ZIP:" %>
-          <%= form.text_field :permit_zip %>
-        </div>
-      </div>
-    </template>
-  </div>
 
-  <div>
-    <%= form.label :manifest_mid, "Manifest MID:" %>
-    <%= form.text_field :manifest_mid %>
-  </div>
+  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+    <% box.with_header do |header| %>
+      <% header.with_title(tag: :h2) do %>Account Details<% end %>
+    <% end %>
+    <% box.with_body do %>
+      <%= render Primer::Alpha::TextField.new(
+        name: "usps_payment_account[name]",
+        label: "Display name",
+        value: usps_payment_account.name,
+        full_width: true,
+        mb: 3
+      ) %>
 
-  <div>
-    <%= form.submit %>
+      <div class="form-field">
+        <%= render Primer::Alpha::Select.new(
+          name: "usps_payment_account[usps_mailer_id_id]",
+          label: "CRID/MID",
+          full_width: true,
+          required: true
+        ) do |select|
+          select.with_option(value: "", label: "Select one...")
+          USPS::MailerId.all.each do |mid|
+            select.with_option(value: mid.id.to_s, label: mid.display_name, selected: mid.id == usps_payment_account.usps_mailer_id_id)
+          end
+        end %>
+      </div>
+
+      <div x-data="{account_type: '<%= usps_payment_account.account_type %>'}" class="form-field">
+        <%= render Primer::Alpha::Select.new(
+          name: "usps_payment_account[account_type]",
+          label: "Account type",
+          full_width: true,
+          "x-model": "account_type"
+        ) do |select|
+          USPS::PaymentAccount.account_types.keys.each do |type|
+            select.with_option(value: type, label: type, selected: type == usps_payment_account.account_type)
+          end
+        end %>
+
+        <template x-if="account_type=='EPS'">
+          <div class="form-field">
+            <%= render Primer::Alpha::TextField.new(
+              name: "usps_payment_account[account_number]",
+              label: "EPS account number",
+              value: usps_payment_account.account_number,
+              full_width: true
+            ) %>
+          </div>
+        </template>
+        <template x-if="account_type=='PERMIT'">
+          <div class="form-field form-grid">
+            <div>
+              <%= render Primer::Alpha::TextField.new(
+                name: "usps_payment_account[permit_number]",
+                label: "Permit number",
+                value: usps_payment_account.permit_number,
+                full_width: true
+              ) %>
+            </div>
+            <div>
+              <%= render Primer::Alpha::TextField.new(
+                name: "usps_payment_account[permit_zip]",
+                label: "Permit ZIP",
+                value: usps_payment_account.permit_zip,
+                full_width: true
+              ) %>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <%= render Primer::Alpha::TextField.new(
+        name: "usps_payment_account[manifest_mid]",
+        label: "Manifest MID",
+        value: usps_payment_account.manifest_mid,
+        full_width: true
+      ) %>
+    <% end %>
+  <% end %>
+
+  <div class="page-actions">
+    <%= render Primer::Beta::Button.new(tag: :a, href: usps_payment_accounts_path, scheme: :secondary) do
+      "Cancel"
+    end %>
+    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
+      btn.with_leading_visual_icon(icon: :check)
+      usps_payment_account.persisted? ? "Update Account" : "Create Account"
+    end %>
   </div>
 <% end %>

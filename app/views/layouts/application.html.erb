@@ -10,9 +10,6 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="apple-touch-icon" href="/icon.png">
@@ -20,25 +17,29 @@
     <%= vite_client_tag %>
     <%= vite_javascript_tag 'application' %>
     <%= vite_stylesheet_tag 'app_style.scss' %>
-
-
   </head>
 
-  <body<% if Rails.env.development? %> class="not_prod"<% end %>>
+  <body data-color-mode="auto" data-light-theme="light" data-dark-theme="dark"<% if Rails.env.development? %> class="not_prod"<% end %>>
     <% if Rails.env.development? %>
       <div class="dev-border-overlay"></div>
     <% end %>
-    
-    <div class="app-layout">
-      <%= render "shared/nav" %>
-
-      <div class="content-wrapper">
-        <main class="content-container">
-          <%= render "shared/hcb_connection_banner" %>
-          <%= render "shared/flash" %>
-          <%= yield %>
-        </main>
+    <%= render Components::Shared::AppHeader.new %>
+    <% if flash.any? %>
+      <div class="flash-container" style="padding: 1em 4em">
+        <% flash.each do |type, message| %>
+          <div x-data="{ open: true }" x-show="open" @click="if ($el.querySelector('.js-flash-close')) open = false">
+            <%= render(Primer::Beta::Flash.new(scheme: flash_scheme(type), dismissible: true, icon: flash_icon(type))) { message } %>
+          </div>
+        <% end %>
       </div>
+    <% end %>
+    <div style="padding: 4em">
+      <%= yield %>
     </div>
+    <%= render Components::Shared::AppFooter.new %>
+    <% if current_user %>
+      <script type="application/json" id="kbar-data"><%= raw Shortcodes.kbar_data_for(current_user) %></script>
+      <div data-svelte-component="command-palette"></div>
+    <% end %>
   </body>
 </html>

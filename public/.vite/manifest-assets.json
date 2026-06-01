@@ -1,6 +1,162 @@
 {
+  "images/no_mail.png": {
+    "file": "assets/no_mail-BaLVWzA4.png",
+    "src": "images/no_mail.png",
+    "integrity": "sha384-HJMqyIscuKLgxu2gPAfMkKY9G4zSrWpjyF3uWCeWf/GbAXSojAq7PhcCDGpSX0le"
+  },
+  "images/icons/bank.svg": {
+    "file": "assets/bank-BNkxvNtF.svg",
+    "src": "images/icons/bank.svg",
+    "integrity": "sha384-1jQMq1GWFsVohI3C5WssWWkBqGDGXB5ZPs0BLS4QY4u9tnqN6OP6oifhnPF/84hm"
+  },
+  "images/icons/break-the-glass.png": {
+    "file": "assets/break-the-glass-CbS32e7m.png",
+    "src": "images/icons/break-the-glass.png",
+    "integrity": "sha384-7+0TuXhsWugmLDLV7GU/CxdlBSYdDKR97hl9kQlKvjGSSiVkrr1Ohk0pvLhXgGmE"
+  },
+  "images/icons/hammer.svg": {
+    "file": "assets/hammer-Dk0WhN8s.svg",
+    "src": "images/icons/hammer.svg",
+    "integrity": "sha384-Hk6t5JlvznM2QacgRje+ny3hXzkjiGmqHt3c1mAc+et0L5738Vt32dMzscg5aZ/D"
+  },
+  "images/icons/impersonate.png": {
+    "file": "assets/impersonate-CbLe7nrX.png",
+    "src": "images/icons/impersonate.png",
+    "integrity": "sha384-bxTlK72VoRPV2EB1CQHGiK814mweskcYGTzdbXMun65uYKJsglpJo6ByzI9vcuOF"
+  },
+  "images/icons/printer.svg": {
+    "file": "assets/printer-ZMakW1xH.svg",
+    "src": "images/icons/printer.svg",
+    "integrity": "sha384-ZTod4hyj2Jf7zoAnr701uRGKW3e7vjjXCpqDhdNxwuxubkgderiH/knF7fBJatvc"
+  },
   "images/login/treasure.png": {
     "file": "assets/treasure-KPG0amXu.png",
-    "src": "images/login/treasure.png"
+    "src": "images/login/treasure.png",
+    "integrity": "sha384-HhIStmD/Jdr960wvnSFA3CTYo1jmchaxrW4rwY1ulv7r0fjArZiE62+xwr9u6595"
+  },
+  "images/template_previews/athena_stickers_template.png": {
+    "file": "assets/athena_stickers_template-B-okzSoE.png",
+    "src": "images/template_previews/athena_stickers_template.png",
+    "integrity": "sha384-YaHI3u8kjxbsWrcjakLFqG0bUCw3MAnbLeWsRmE9QKVmtZhJgijlgQkcuGKmpnhu"
+  },
+  "images/template_previews/blueprint_template.png": {
+    "file": "assets/blueprint_template-DOEUKDYy.png",
+    "src": "images/template_previews/blueprint_template.png",
+    "integrity": "sha384-R9HO0sS0Ww3tL0NW5LmZ8S5lFwpPN+MdE7kNst4GZQ+xy3rxFqv74wSY/NKw2Mx6"
+  },
+  "images/template_previews/dino_waving_template.png": {
+    "file": "assets/dino_waving_template-Gn0jnNTr.png",
+    "src": "images/template_previews/dino_waving_template.png",
+    "integrity": "sha384-V0jrk8GXFU5P7+q28O3fNZEb9j4yf3RRzVgo5DxF3SOZy5T/KJ10e4z1iIw1f2v4"
+  },
+  "images/template_previews/flavortown_free_stickers_fulfillment_template.png": {
+    "file": "assets/flavortown_free_stickers_fulfillment_template-DRaOncXO.png",
+    "src": "images/template_previews/flavortown_free_stickers_fulfillment_template.png",
+    "integrity": "sha384-OSKVu2vlxDlKC0RDDbftJ4eS7AFkxZ5esgDw44sDUKpze6tgGY8FEpa8Thx/9I4m"
+  },
+  "images/template_previews/flavortown_fulfillment_template.png": {
+    "file": "assets/flavortown_fulfillment_template-DJ_a_QMx.png",
+    "src": "images/template_previews/flavortown_fulfillment_template.png",
+    "integrity": "sha384-VlsGB34HswRvMQkyH8ZO/UDpqHTzh/KaYq2TG+NOD4i7HZXU3NVp0FN2yHpTdJSp"
+  },
+  "images/template_previews/ft_well_cooked.png": {
+    "file": "assets/ft_well_cooked-CcysM_2T.png",
+    "src": "images/template_previews/ft_well_cooked.png",
+    "integrity": "sha384-WWYdYavAeiLKqx7Os+pCRwXxnOdoc3zyKiTgwFoO2ZdeR0dT9/elQKJqlSq4g7EQ"
+  },
+  "images/template_previews/good_job_template.png": {
+    "file": "assets/good_job_template-CkVYQBOB.png",
+    "src": "images/template_previews/good_job_template.png",
+    "integrity": "sha384-HSxshMI1jiLrwnuNTM3xbGWN5FX+VaVJbczAdJwfsL54gs1tcBvMPUjnwSHPP6gP"
+  },
+  "images/template_previews/hackatime7_day_streak_template.png": {
+    "file": "assets/hackatime7_day_streak_template-DT0EOZrx.png",
+    "src": "images/template_previews/hackatime7_day_streak_template.png",
+    "integrity": "sha384-gO+KeJ6bf1xxPWp2g3Aj5vqIHfsQT7UV0QOAQuko+i3k6+iyJ0rJJtrQXbZLUbPy"
+  },
+  "images/template_previews/hackatime_template.png": {
+    "file": "assets/hackatime_template-C2ChyZmI.png",
+    "src": "images/template_previews/hackatime_template.png",
+    "integrity": "sha384-RDXTaVg6Ne264JhPivP2ehPhjsJhAuuZD7oOfUtDpWGORPXSpcBPbhmxegNupw5Y"
+  },
+  "images/template_previews/haxmas_template.png": {
+    "file": "assets/haxmas_template-QSiyTXoJ.png",
+    "src": "images/template_previews/haxmas_template.png",
+    "integrity": "sha384-Y+yEtktgF3dniBAcVE6OKMSAvC0PaEyTnZFhWRpaa/h0EuqkFHXIQ2fOzJDV2yOF"
+  },
+  "images/template_previews/hcb_stickers_template.png": {
+    "file": "assets/hcb_stickers_template-B8H34mbq.png",
+    "src": "images/template_previews/hcb_stickers_template.png",
+    "integrity": "sha384-fG9b6toVoOr9rNZBPhIUs+wx5lsiFXKmMqJO071xWh0iwiJcPcWubOa8i/3dbnGg"
+  },
+  "images/template_previews/hcb_welcome_postcard_template.png": {
+    "file": "assets/hcb_welcome_postcard_template-BY8inV95.png",
+    "src": "images/template_previews/hcb_welcome_postcard_template.png",
+    "integrity": "sha384-4IOKLuYjGhxAXsxNpz7EdQRDUlV1NZh5dHv797Hhy8dKi3GRS2jlGeAsLyBp0XcE"
+  },
+  "images/template_previews/hcpcxc_template.png": {
+    "file": "assets/hcpcxc_template-aSrFsZBW.png",
+    "src": "images/template_previews/hcpcxc_template.png",
+    "integrity": "sha384-SkchDeO2He3VrX8c/7cXhOBgd4H3e/uZc31Lw7ePXJI+xjPySite/Q3OP6OZ04NG"
+  },
+  "images/template_previews/heidi_readme_template.png": {
+    "file": "assets/heidi_readme_template-C2sx5XEL.png",
+    "src": "images/template_previews/heidi_readme_template.png",
+    "integrity": "sha384-5W2kcr0ea5pRTaXb+Z+Y/HTsQTVXLLDX7gWByukADII1sc/jXEibHyvaWXArNN8g"
+  },
+  "images/template_previews/joyous_cat_template.png": {
+    "file": "assets/joyous_cat_template-B0GzEj9D.png",
+    "src": "images/template_previews/joyous_cat_template.png",
+    "integrity": "sha384-tvoMCMGRbaJAw5NYgw2ZDeAqLbM02lIfETwD4iARVn3fgrawNHHSm7mB92TKwb5l"
+  },
+  "images/template_previews/jumpstart_stickers_template.png": {
+    "file": "assets/jumpstart_stickers_template-BSsRLXDg.png",
+    "src": "images/template_previews/jumpstart_stickers_template.png",
+    "integrity": "sha384-bB4LF3aaECJG2ceHHFrHbDedV2chT8lWQQHX2qWpI3sBS3Ib34VaWlXsJLpV5L/d"
+  },
+  "images/template_previews/kestrel_heidi_template.png": {
+    "file": "assets/kestrel_heidi_template-BCgRhGYM.png",
+    "src": "images/template_previews/kestrel_heidi_template.png",
+    "integrity": "sha384-6kNd6tCVgJ4Vi3Khi25dVi24bu0WH1pS0qwe6Pna/92+FKedzbe2NHGdc4H9Gk7W"
+  },
+  "images/template_previews/mail_orpheus_template.png": {
+    "file": "assets/mail_orpheus_template-CT8oSvqs.png",
+    "src": "images/template_previews/mail_orpheus_template.png",
+    "integrity": "sha384-KyQGoKOq1LJazqFJLOfVtGC6iuWSDd6GFYDmx4Zez+MfE7F7P1Gy9y7ajeLDFT24"
+  },
+  "images/template_previews/pyramid_scheme_template.png": {
+    "file": "assets/pyramid_scheme_template-B6N8re29.png",
+    "src": "images/template_previews/pyramid_scheme_template.png",
+    "integrity": "sha384-JYOB7ti/o0SMAFQkCWeEvdH78VgUIOCQT/Qbl45sAgvp9A3PpRjEzYnbrZZF2Bgx"
+  },
+  "images/template_previews/ship_mail_template.png": {
+    "file": "assets/ship_mail_template-DeAuWAif.png",
+    "src": "images/template_previews/ship_mail_template.png",
+    "integrity": "sha384-iH0v04+HdSmUFLYOLdpF8ulZczV14vpvxpakSutqKjU5mzHIgOPSv7aYySIc2IoH"
+  },
+  "images/template_previews/sinkening_template.png": {
+    "file": "assets/sinkening_template-pYsvOzdH.png",
+    "src": "images/template_previews/sinkening_template.png",
+    "integrity": "sha384-2xaE5ICHP7tisv7FLj+TeQx8ENNdQsKOBvvQDF1aeKSHpxjq3Qr6ExoyIe3uxtb3"
+  },
+  "images/template_previews/som_magic_happening.png": {
+    "file": "assets/som_magic_happening-BY7C8vmS.png",
+    "src": "images/template_previews/som_magic_happening.png",
+    "integrity": "sha384-A7lMzx8+tANjTJ71jpIoTOJRFBzMZ69Q6U44p+zj7GenDDZ6ZZpSyW2dqIth38kg"
+  },
+  "images/template_previews/summer_of_making_free_stickers_template.png": {
+    "file": "assets/summer_of_making_free_stickers_template-C0Z-504v.png",
+    "src": "images/template_previews/summer_of_making_free_stickers_template.png",
+    "integrity": "sha384-8bWG45kT2xc/YWNorGvB6Y8gAqNgQ1kjjF9GRI76ptBMLtWs4L81Btjco4MbrivX"
+  },
+  "images/template_previews/summer_of_making_fulfillment_template.png": {
+    "file": "assets/summer_of_making_fulfillment_template-CsLWVaRd.png",
+    "src": "images/template_previews/summer_of_making_fulfillment_template.png",
+    "integrity": "sha384-1e3igGn7pe+1/N63Xv5HzkSgVPfYmCj6Yt7SBiBGHk5DKDJpaILBMV5nCIs/3PcJ"
+  },
+  "images/template_previews/tarot_template.png": {
+    "file": "assets/tarot_template-C2l-TXi9.png",
+    "src": "images/template_previews/tarot_template.png",
+    "integrity": "sha384-hsdi4sVympDMY9VU5ZdKUVnLyIUWBauL6Lr/qkM7HrER4aS8pICpEs5Ad1PmfKQU"
   }
 }

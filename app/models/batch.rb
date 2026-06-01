@@ -107,6 +107,62 @@ class Batch < ApplicationRecord
     "​",
   ].join
 
+  # New method: accepts pre-mapped address data (array of hashes with address field names as keys)
+  # from the client-side CSV mapper. Runs normalization and creates records.
+  def import_addresses!(addresses_data)
+    address_attributes = []
+    row_data = {}
+
+    Parallel.each(addresses_data.each_with_index, in_threads: 8) do |row, i|
+      begin
+        next if row["first_name"].blank?
+
+        attrs = normalize_address(row)
+        if attrs
+          address_attributes << attrs
+          row_data[i] = row
+        end
+      rescue => e
+        Rails.logger.error("Error processing row #{i} in batch #{id}: #{e.message}")
+        raise
+      end
+    end
+
+    if address_attributes.any?
+      now = Time.current
+      address_attributes.each do |attrs|
+        attrs[:created_at] = now
+        attrs[:updated_at] = now
+        attrs[:batch_id] = id
+      end
+
+      begin
+        Address.insert_all!(address_attributes)
+      rescue ActiveRecord::RecordInvalid => e
+        Rails.logger.error("Failed to insert addresses: #{e.message}")
+        raise
+      end
+
+      addresses = Address.where(batch_id: id).where(created_at: now).to_a
+
+      Parallel.each(addresses.each_with_index, in_threads: 8) do |address, i|
+        begin
+          ActiveRecord::Base.connection_pool.with_connection do
+            ActiveRecord::Base.transaction do
+              build_mapping(row_data[i], address)
+            end
+          end
+        rescue => e
+          Rails.logger.error("Error creating associated records for address #{address.id} in batch #{id}: #{e.message}")
+          raise
+        end
+      end
+    end
+
+    mark_fields_mapped unless fields_mapped? || processed?
+    save!
+  end
+
   def run_map!
     rows = CSV.parse(csv_data, headers: true, converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])
 
@@ -157,6 +213,55 @@ class Batch < ApplicationRecord
   end
 
   private
+
+  # Normalize a pre-mapped address hash (keys are address field names like "first_name", "line_1", etc.)
+  def normalize_address(row)
+    csv_country = row["country"]
+    country = FrickinCountryNames.find_country(csv_country)
+    postal_code = row["postal_code"]
+    state = row["state"]
+
+    if country.nil? || country.alpha2 != "US"
+      begin
+        translated = AIService.fix_address_from_hash(row)
+        if translated
+          translated_country = FrickinCountryNames.find_country(translated[:country])
+          if translated_country
+            translated[:first_name] = row["first_name"]
+            translated[:last_name] = row["last_name"]
+            translated[:country] = translated_country.alpha2
+            return translated
+          end
+        end
+      rescue => e
+        Rails.logger.error("AI translation failed for batch #{id}: #{e.message}")
+        raise
+      end
+    end
+
+    if country&.alpha2 == "US" && postal_code.present? && postal_code.length < 5
+      postal_code = postal_code.rjust(5, "0")
+    end
+
+    normalized_state = if country
+        FrickinCountryNames.normalize_state(country, state)
+      else
+        state
+      end
+
+    {
+      first_name: row["first_name"],
+      last_name: row["last_name"],
+      line_1: row["line_1"],
+      line_2: row["line_2"],
+      city: row["city"],
+      state: normalized_state,
+      postal_code: postal_code,
+      country: country&.alpha2 || csv_country&.upcase,
+      phone_number: row["phone_number"],
+      email: row["email"],
+    }
+  end
 
   def build_address_attributes(row)
     csv_country = row[field_mapping["country"]]

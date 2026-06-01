@@ -1,9 +1,44 @@
-<h1>Cancel order <%= @warehouse_order.hc_id %>:</h1>
-Please try to avoid needing to do this. <br/>
-If fulfillment of this order is already underway at the warehouse, this will error out and you'll need to contact them directly.
-<br/><br/>
-<%= form_with method: :post do |form| %>
-  <%= form.label :cancellation_reason, "Reason for cancellation (visible to AGH crew): " %>
-  <%= form.text_field :cancellation_reason %>
-  <%= form.submit "do it!" %>
-<% end %>
+<% content_for :title, "Cancel order #{@warehouse_order.hc_id}" %>
+
+<div class="page-container--xs">
+  <div class="page-title-group content-section">
+    <h1 class="page-title">Cancel order</h1>
+    <code class="mono"><%= @warehouse_order.hc_id %></code>
+  </div>
+
+  <%= render Primer::Beta::Flash.new(scheme: :warning, mb: 3) do %>
+    Please try to avoid needing to do this. If fulfillment is already underway at the warehouse, this will error out and you'll need to contact them directly.
+  <% end %>
+
+  <%= form_with url: cancel_warehouse_order_path(@warehouse_order), method: :post do |form| %>
+    <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
+      <% box.with_body do %>
+        <%= render Primer::Alpha::TextArea.new(
+          name: "cancellation_reason",
+          label: "Reason for cancellation",
+          caption: "Visible to AGH crew",
+          rows: 3,
+          full_width: true,
+          required: true
+        ) %>
+      <% end %>
+    <% end %>
+
+    <div class="page-actions">
+      <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_order_path(@warehouse_order), scheme: :secondary) do
+        "Never mind"
+      end %>
+      <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger) do |btn|
+        btn.with_leading_visual_icon(icon: :x)
+        "Cancel this order"
+      end %>
+    </div>
+  <% end %>
+
+  <div class="back-link">
+    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_order_path(@warehouse_order), scheme: :invisible, size: :small) do |btn|
+      btn.with_leading_visual_icon(icon: :"arrow-left")
+      "Back to order"
+    end %>
+  </div>
+</div>

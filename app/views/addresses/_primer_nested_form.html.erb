@@ -1,0 +1,165 @@
+<%
+  def country_flag(code)
+    return "" if code.blank?
+    code.upcase.chars.map { |c| (c.ord + 127397).chr(Encoding::UTF_8) }.join
+  end
+
+  countries_with_flags = Address.countries_for_select.map do |code, name|
+    {
+      code: code,
+      name: name,
+      flag: country_flag(code),
+      display: "#{country_flag(code)}  #{name}",
+      filter: "#{code}#{code}#{code} #{name}"
+    }
+  end
+
+  top_codes = %w[US CA]
+  top_countries = top_codes.map { |code| countries_with_flags.find { |c| c[:code] == code } }.compact
+  other_countries = countries_with_flags.reject { |c| top_codes.include?(c[:code]) }
+  all_ordered = top_countries + other_countries
+%>
+
+<%= form.fields_for :address do |a| %>
+  <% form_id = "address-form-#{SecureRandom.hex(4)}" %>
+  <% current_country = a.object&.country %>
+  <% current_entry = countries_with_flags.find { |c| c[:code] == current_country } %>
+
+  <div id="<%= form_id %>" class="address-form">
+    <%# Row 1: Name %>
+    <div class="two-col-equal">
+      <%= render Primer::Alpha::TextField.new(
+        name: a.field_name(:first_name),
+        label: "First name",
+        value: a.object&.first_name,
+        required: true,
+        full_width: true
+      ) %>
+      <%= render Primer::Alpha::TextField.new(
+        name: a.field_name(:last_name),
+        label: "Last name",
+        value: a.object&.last_name,
+        full_width: true
+      ) %>
+    </div>
+
+    <%# Row 2: Street address %>
+    <%= render Primer::Alpha::TextField.new(
+      name: a.field_name(:line_1),
+      label: "Street address",
+      value: a.object&.line_1,
+      required: true,
+      full_width: true
+    ) %>
+
+    <%# Row 3: Apt/Suite %>
+    <%= render Primer::Alpha::TextField.new(
+      name: a.field_name(:line_2),
+      label: "Apt, suite, unit, etc.",
+      caption: "Optional",
+      value: a.object&.line_2,
+      full_width: true
+    ) %>
+
+    <%# Row 4: City / State / Postal %>
+    <div class="address-form-city-row">
+      <%= render Primer::Alpha::TextField.new(
+        name: a.field_name(:city),
+        label: "City",
+        value: a.object&.city,
+        required: true,
+        full_width: true
+      ) %>
+      <%= render Primer::Alpha::TextField.new(
+        name: a.field_name(:state),
+        label: "State",
+        value: a.object&.state,
+        required: true,
+        full_width: true
+      ) %>
+      <%= render Primer::Alpha::TextField.new(
+        name: a.field_name(:postal_code),
+        label: "Postal code",
+        value: a.object&.postal_code,
+        required: true,
+        full_width: true
+      ) %>
+    </div>
+
+    <%# Row 5: Country %>
+    <div class="address-form-country">
+      <label class="date-field-label">
+        Country <span class="text-danger">*</span>
+      </label>
+      <div>
+        <%= render Primer::Alpha::SelectPanel.new(
+          title: "Select country",
+          size: :medium,
+          fetch_strategy: :local,
+          dynamic_label: true,
+          select_variant: :single,
+          form_arguments: { builder: a, name: :country }
+        ) do |panel| %>
+          <% panel.with_show_button(scheme: :secondary) do %>
+            <span class="country-btn-content">
+              <% if current_entry %>
+                <span class="country-flag"><%= current_entry[:flag] %></span>
+                <span><%= current_entry[:name] %></span>
+              <% else %>
+                <span class="kv-label">Select</span>
+              <% end %>
+            </span>
+          <% end %>
+
+          <% all_ordered.each do |country| %>
+            <% panel.with_item(
+              label: country[:display],
+              content_arguments: {
+                data: {
+                  value: country[:code],
+                  code: country[:code],
+                  name: country[:name]
+                }
+              },
+              data: { filter_string: country[:filter] },
+              active: country[:code] == current_country
+            ) %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var container = document.getElementById('<%= form_id %>');
+      if (!container) return;
+
+      function setupPanel() {
+        var panel = container.querySelector('select-panel');
+        if (!panel) return;
+
+        // Custom filter: exact ISO code match beats substring match
+        panel.filterFn = function(item, query) {
+          var q = query.toLowerCase().trim();
+          if (!q) return true;
+
+          var itemContent = item.querySelector('[data-code]');
+          var code = itemContent ? itemContent.dataset.code.toLowerCase() : '';
+          var name = itemContent ? itemContent.dataset.name.toLowerCase() : '';
+
+          if (code === q) return true;
+          if (name.startsWith(q)) return true;
+
+          return false;
+        };
+      }
+
+      // Run after custom element is defined
+      setupPanel();
+      if (window.customElements) {
+        window.customElements.whenDefined('select-panel').then(setupPanel);
+      }
+    })();
+  </script>
+<% end %>

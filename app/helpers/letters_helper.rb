@@ -1,4 +1,5 @@
 module LettersHelper
+  # Deprecated: Use Components::Shared::StatusBadge instead
   def letter_status_badge(status, addtl_class='nil')
 
     clazz, text = case status.to_s

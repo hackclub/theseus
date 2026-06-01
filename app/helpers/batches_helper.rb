@@ -1,4 +1,5 @@
 module BatchesHelper
+  # Deprecated: Use Components::Shared::StatusBadge instead
   def batch_status_badge(status, addtl_class='')
     clazz, text = case status.to_s
                   when 'awaiting_field_mapping'

@@ -7,44 +7,22 @@
 <% selected_tags = form.object.try(:tags) || [] %>
 <% all_tags = available_tags(selected_tags) %>
 
-<div class="form-group">
-  <%= form.label field_name, "Tags", class: "form-label" %>
-  <%= form.select field_name, 
-                  all_tags, 
-                  { selected: selected_tags, include_blank: false }, 
-                  { multiple: true, 
-                    class: "form-control selectize-tags",
-                    data: { 
+<div class="form-field-lg">
+  <%= form.label field_name, "Tags", class: "date-field-label" %>
+  <%= form.select field_name,
+                  all_tags,
+                  { selected: selected_tags, include_blank: false },
+                  { multiple: true,
+                    class: "selectize-tags",
+                    style: "width: 100%;",
+                    data: {
                       selectize: {
                         plugins: ['remove_button'],
                         persist: false,
                         create: true,
                         maxItems: nil
                       }
-                    } 
+                    }
                   } %>
-  <div class="form-hint">Select from common tags or create your own</div>
+  <p class="form-hint">Select from common tags or create your own</p>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  $('.selectize-tags').selectize({
-    plugins: ['remove_button'],
-    persist: false,
-    create: true,
-    maxItems: null,
-    onItemAdd: function(value, $item) {
-      // Remove any empty values
-      if (!value || value.trim() === '') {
-        this.removeItem(value);
-      }
-    },
-    onItemRemove: function(value) {
-      // Clean up any empty values
-      if (!value || value.trim() === '') {
-        this.removeItem(value);
-      }
-    }
-  });
-});
-</script>
