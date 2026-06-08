@@ -28,7 +28,7 @@ class Views::Warehouse::Orders::Index < Views::Base
       jumpcode_path: warehouse_orders_path,
       search_path: warehouse_orders_path,
       search_value: search,
-      search_placeholder: "Search by ID, email, name, or title...",
+      search_placeholder: "Search orders...",
       search_params: { state: state, origin: origin, user_id: user_id },
       action_href: new_warehouse_order_path,
       action_label: "+ New Order"

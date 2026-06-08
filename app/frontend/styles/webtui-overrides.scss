@@ -113,6 +113,14 @@
   .tui-banner-info, .tui-banner-notice { color: var(--info-fg-strong); --box-border-color: var(--info-border); }
   .tui-banner-info::before, .tui-banner-notice::before { background: var(--info-bg); }
 
+
+  /* ── Badges — subtle status labels, not chunky pills ── */
+  [is-="badge"] {
+    font-size: 0.85em;
+    padding: 0 0.5ch !important;
+    border-radius: 3px !important;
+    line-height: 1.4;
+  }
   /* ── Table ── */
   table {
     width: 100%;
