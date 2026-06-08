@@ -50,14 +50,12 @@
 
   .segmented {
     display: flex;
-    gap: 0;
   }
 
   .segment {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0;
     padding: 0.25lh 1ch;
     border: 1px solid var(--background2);
     background: var(--background0);
@@ -77,21 +75,13 @@
   }
 
   .segment.selected {
-    background: var(--background2);
-    border-color: var(--foreground2);
+    background: var(--background1);
+    border-color: var(--blue);
+    border-left: 2px solid var(--blue);
     color: var(--foreground0);
   }
 
-  .segment strong {
-    font-size: 0.9em;
-  }
-
-  .segment small {
-    font-size: 0.75em;
-    color: var(--foreground2);
-  }
-
-  .segment.selected small {
-    color: var(--foreground1);
-  }
+  .segment strong { font-size: 0.9em; }
+  .segment small { font-size: 0.75em; color: var(--foreground2); }
+  .segment.selected small { color: var(--foreground1); }
 </style>

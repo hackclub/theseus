@@ -35,7 +35,10 @@
       <DimensionInputs />
       <MachinableToggle />
     </div>
-    <EnvelopePreview />
+    <div class="lap-preview">
+      <span class="preview-label">Preview</span>
+      <EnvelopePreview />
+    </div>
   </div>
 
   <SmartSuggestion />
@@ -46,26 +49,40 @@
   .lap {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.75lh;
   }
 
   .lap-body {
     display: flex;
-    gap: 1.25rem;
+    gap: 2ch;
     align-items: flex-start;
   }
 
   .lap-controls {
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    gap: 0.5lh;
     flex: 1;
     min-width: 0;
   }
 
+  .lap-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25lh;
+    flex-shrink: 0;
+  }
+
+  .preview-label {
+    font-size: 0.75em;
+    color: var(--foreground2);
+    text-transform: uppercase;
+    letter-spacing: 0.1ch;
+  }
+
   @media (max-width: 540px) {
-    .lap-body {
-      flex-direction: column;
-    }
+    .lap-body { flex-direction: column; }
+    .lap-preview { display: none; }
   }
 </style>
