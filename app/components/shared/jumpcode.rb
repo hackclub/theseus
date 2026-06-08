@@ -8,7 +8,7 @@ class Components::Shared::Jumpcode < Components::Base
   def view_template
     return unless @code
 
-    tag("row", "gap-": "1", "align-": "center", class: "jumpcode") do
+    row( "gap-": "1", "align-": "center", class: "jumpcode") do
       span(
         "is-": "badge", "variant-": "background2",
         title: "Press ⌘K and type #{@code}",

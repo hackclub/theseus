@@ -1,7 +1,7 @@
 /*
  * Theseus back-office overrides for WebTUI.
  * Use generic webtui vars (--background0, --foreground0, etc.)
- * NOT Primer vars (--bgColor-*, --fgColor-*) or catppuccin-specific vars.
+ * NOT catppuccin-specific vars (--base, --surface0, etc.)
  */
 
 @layer base {
@@ -41,20 +41,20 @@
     display: flex;
     flex-direction: row;
     min-height: 100vh;
-    padding-top: 2lh; /* offset for fixed actionbar */
+    padding-top: 2lh;
   }
 
   #theseus-content {
     flex: 1;
     min-width: 0;
     padding: 1lh 2ch;
-    margin-left: 28ch; /* offset for fixed sidebar */
+    margin-left: 28ch;
   }
 
   /* ── Sidebar ── */
   .theseus-sidebar {
     position: fixed;
-    top: 2lh; /* below actionbar */
+    top: 2lh;
     left: 0;
     bottom: 0;
     width: 28ch;
@@ -70,20 +70,12 @@
   a[href]:not([data-navigable-item]) {
     color: var(--foreground2);
     text-decoration: underline;
-
-    &:hover {
-      color: var(--foreground0);
-    }
+    &:hover { color: var(--foreground0); }
   }
 
-  /* Sidebar-style nav lists */
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+  /* Sidebar nav */
+  ul { list-style: none; padding: 0; margin: 0; }
 
-  /* All navigable links */
   a[data-navigable-item] {
     color: var(--foreground2);
     text-decoration: none;
@@ -91,40 +83,29 @@
     display: flex;
     align-items: center;
     padding: 0 1ch;
-
     &:hover, &:focus, &.selected {
       background-color: var(--background1);
       color: var(--foreground0);
     }
   }
 
-  /* Tree markers only for links inside <ul> */
   ul > a[data-navigable-item]::before {
     content: '├ ';
     white-space: pre;
     color: var(--foreground2);
     flex-shrink: 0;
   }
+  ul > a[data-navigable-item]:last-of-type::before { content: '└ '; }
 
-  ul > a[data-navigable-item]:last-of-type::before {
-    content: '└ ';
-  }
-
-  /* Section headings in sidebar */
   details > summary {
     font-weight: bold;
     cursor: pointer;
     color: var(--foreground1);
     padding: 0 1ch;
-
-    &:hover, &:focus {
-      background-color: var(--background1);
-    }
+    &:hover, &:focus { background-color: var(--background1); }
   }
 
   /* ── Flash banners ── */
-
-  /* Light tokens (default) */
   :root {
     --error-bg: #fbf2f4; --error-border: #eab4bc; --error-fg-strong: #78202e;
     --warning-bg: #fffcf2; --warning-border: #ffe69b; --warning-fg-strong: #6a311c;
@@ -141,17 +122,15 @@
   .tui-banner-info, .tui-banner-notice { color: var(--info-fg-strong); --box-border-color: var(--info-border); }
   .tui-banner-info::before, .tui-banner-notice::before { background: var(--info-bg); }
 
-  /* ── Table — box-like outer border with column dividers ── */
+  /* ── Table ── */
   table {
     width: 100%;
     border-spacing: 0;
 
-    /* nuke webtui pseudo-element borders */
     &::before { display: none; }
     tr td::before, tr td::after,
     tr th::before, tr th::after { display: none; }
 
-    /* box-like outer border */
     position: relative;
     padding: 1lh 1ch;
     &::after {
@@ -162,21 +141,11 @@
       pointer-events: none;
     }
 
-    tr th, tr td {
-      padding: 0 1ch;
-      padding-bottom: 0;
-      text-align: left;
-    }
-
+    tr th, tr td { padding: 0 1ch; padding-bottom: 0; text-align: left; }
     :first-child > tr:first-child > td,
     :first-child > tr:first-child > th { padding-top: 0; }
+    tr th + th, tr td + td { border-left: 1px solid var(--background1); }
 
-    /* vertical column dividers — barely there */
-    tr th + th, tr td + td {
-      border-left: 1px solid var(--background1);
-    }
-
-    /* header row — muted italic, faint underline */
     thead tr th {
       color: var(--foreground2);
       font-weight: normal;
@@ -185,19 +154,11 @@
       border-bottom: 1px solid var(--background1);
     }
 
-    /* space between header and first data row without affecting hover */
-    thead + tbody::before {
-      content: '';
-      display: table-row;
-      height: 0.25lh;
-    }
-
-    tbody tr:hover td {
-      background-color: var(--background1);
-    }
+    thead + tbody::before { content: ''; display: table-row; height: 0.25lh; }
+    tbody tr:hover td { background-color: var(--background1); }
   }
 
-  /* ── Select — match WebTUI input styling ── */
+  /* ── Select ── */
   select {
     background-color: var(--background1);
     color: var(--foreground0);
@@ -210,131 +171,11 @@
     height: 1lh;
   }
 
-  /* ── Colored button variants ── */
+  /* ── Colored buttons ── */
   button[variant-="green"], input[type=submit][variant-="green"] { --button-primary: var(--green); --button-secondary: var(--background0); }
   button[variant-="red"], input[type=submit][variant-="red"] { --button-primary: var(--red); --button-secondary: var(--background0); }
   button[variant-="yellow"], input[type=submit][variant-="yellow"] { --button-primary: var(--yellow); --button-secondary: var(--background0); }
   button[variant-="blue"], input[type=submit][variant-="blue"] { --button-primary: var(--blue); --button-secondary: var(--background0); }
-
-  /* ── Pagination ── */
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1ch;
-    margin-top: 1lh;
-  }
-
-  .pagination-link {
-    padding: 0 1ch;
-    text-decoration: none;
-    color: var(--foreground1);
-    background: var(--background1);
-
-    &:hover {
-      background: var(--background2);
-      color: var(--foreground0);
-    }
-  }
-
-  .pagination-current {
-    padding: 0 1ch;
-    background: var(--foreground2);
-    color: var(--background0);
-    font-weight: bold;
-  }
-
-  .pagination-gap {
-    color: var(--foreground2);
-  }
-
-  /* ── Jumpcode badges ── */
-  .jumpcode {
-    display: inline-flex;
-    align-items: center;
-    gap: 1ch;
-  }
-
-  .jumpcode-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5ch;
-    padding: 0 1ch;
-    background: var(--background2);
-    color: var(--foreground2);
-    cursor: pointer;
-    font-size: 0.85em;
-  }
-
-  .jumpcode-prefix {
-    opacity: 0.6;
-    font-size: 0.85em;
-  }
-
-  .jumpcode-code {
-    padding: 0 0.5ch;
-    background: var(--background2);
-    color: var(--foreground1);
-    font-family: var(--font-family);
-    font-size: 0.85em;
-  }
-
-  .jumpcode-help-trigger {
-    color: var(--foreground2);
-    cursor: pointer;
-
-    &:hover {
-      color: var(--foreground0);
-    }
-  }
-
-  .jumpcode-dialog-body {
-    color: var(--foreground0);
-  }
-
-  .jumpcode-dialog-p {
-    margin: 0 0 1lh 0;
-  }
-
-  .jumpcode-dialog-p--last {
-    margin: 0;
-    color: var(--foreground2);
-    font-size: 0.85em;
-  }
-
-  /* ── Page header ── */
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2ch;
-    margin-bottom: 1lh;
-    padding-bottom: 1lh;
-    border-bottom: 1px solid var(--background2);
-  }
-
-  .page-title {
-    font-weight: bold;
-    margin: 0;
-    color: var(--foreground0);
-  }
-
-  .page-subtitle {
-    color: var(--foreground2);
-    margin: 0;
-  }
-
-  .page-actions {
-    display: flex;
-    gap: 1ch;
-    flex-wrap: wrap;
-  }
-
-  .page-title-group {
-    display: flex;
-    align-items: center;
-    gap: 1ch;
-  }
 
   /* ── Environment indicator ── */
   #theseus-env {
@@ -345,25 +186,19 @@
     font-size: 0.75em;
     color: var(--foreground2);
     background: var(--background1);
-    z-index: 200;
   }
 
   /* ── Responsive ── */
   @media (max-width: 64ch) {
-    .theseus-sidebar {
-      display: none;
-    }
-
-    #theseus-content {
-      margin-left: 0;
-    }
+    .theseus-sidebar { display: none; }
+    #theseus-content { margin-left: 0; }
+    .sidebar-toggle { display: inline; }
   }
 }
 
-/* ── Admin / dev gate mixins ── */
+/* ── Admin tool gates ── */
 $gate-orange: #ff8c37;
 $gate-green: #14a314;
-$gate-red: #cc241d;
 
 @mixin admin-gate($color, $label) {
   position: relative;
@@ -381,15 +216,8 @@ $gate-red: #cc241d;
     z-index: -1;
   }
 
-  &:is(div) {
-    padding: 0.5lh 1ch;
-    margin-top: 1lh;
-  }
-
-  &:is(span) {
-    display: inline-block;
-    padding: 2px 4px;
-  }
+  &:is(div) { padding: 0.5lh 1ch; margin-top: 1lh; }
+  &:is(span) { display: inline-block; padding: 2px 4px; }
 
   &::after {
     content: $label;
@@ -407,70 +235,12 @@ $gate-red: #cc241d;
 .admin-tool { @include admin-gate($gate-orange, 'admin'); }
 .dev-tool { @include admin-gate($gate-green, 'dev only'); }
 
-/* ── Theme-specific tweaks ── */
+/* ── Theme tweaks ── */
+[data-webtui-theme="vitesse-light-soft"] { --foreground2: #555b60; }
 
-/* vitesse-light-soft: better contrast for muted text */
-[data-webtui-theme="vitesse-light-soft"] {
-  --foreground2: #555b60;
-}
-
-/* gruvbox-dark-hard: dark banner tokens */
 [data-webtui-theme="gruvbox-dark-hard"] {
   --error-bg: #3b1017; --error-border: #8b2535; --error-fg-strong: #e39aa5;
   --warning-bg: #33290b; --warning-border: #7f661c; --warning-fg-strong: #ffecb4;
   --success-bg: #142c1b; --success-border: #285a37; --success-fg-strong: #b9d8c2;
   --info-bg: #0f273b; --info-border: #436075; --info-fg-strong: #d2e8f7;
-}
-
-/* ── Lickable glass — Aqua-style glossy effect ── */
-
-@mixin glass($intensity: 1) {
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.25 * $intensity) 0%,
-      rgba(255, 255, 255, 0.10 * $intensity) 45%,
-      transparent 50%,
-      rgba(0, 0, 0, 0.04 * $intensity) 55%,
-      rgba(0, 0, 0, 0.10 * $intensity) 100%
-    );
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.3 * $intensity),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.08 * $intensity);
-  }
-}
-
-.glass {
-  @include glass(1);
-}
-
-.glass-button {
-  @include glass(0.8);
-  transition: filter 0.1s ease;
-
-  &:hover:not(:disabled) {
-    @include glass(1.2);
-  }
-
-  &:active:not(:disabled) {
-    &::after {
-      background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.06) 0%,
-        rgba(0, 0, 0, 0.02) 45%,
-        transparent 50%,
-        rgba(255, 255, 255, 0.02) 55%,
-        rgba(255, 255, 255, 0.04) 100%
-      );
-      box-shadow:
-        inset 0 2px 4px rgba(0, 0, 0, 0.12);
-    }
-  }
 }

@@ -31,5 +31,6 @@
 /* Overrides */
 @import "../styles/webtui-overrides";
 
-/* Primer compat — keep loaded during migration */
-@import "../styles/app";
+/* View-specific styles (no Primer) */
+@import "../styles/utils";
+@import "../styles/views";

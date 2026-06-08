@@ -13,7 +13,7 @@ class Components::Shared::Pagination < Components::Base
     current = collection.current_page
     total = collection.total_pages
 
-    tag("row", "gap-": "1", "align-": "center center", class: "pagination") do
+    row( "gap-": "1", "align-": "center center", class: "pagination") do
       if current > 1
         a(href: page_path(1)) { "« First" }
         a(href: page_path(current - 1), rel: "prev") { "‹ Prev" }

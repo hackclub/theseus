@@ -10,9 +10,9 @@ class Components::Shared::PageHeader < Components::Base
   end
 
   def view_template
-    tag("row", "align-": "start between", "gap-": "2", style: "margin-bottom: 2lh;") do
-      tag("column") do
-        tag("row", "gap-": "1", "align-": "center") do
+    row( "align-": "start between", "gap-": "2", style: "margin-bottom: 2lh;") do
+      column do
+        row( "gap-": "1", "align-": "center") do
           h1(style: "margin: 0;") { @title }
           if @jumpcode
             render Components::Shared::Jumpcode.new(code: @jumpcode)
@@ -25,7 +25,7 @@ class Components::Shared::PageHeader < Components::Base
         end
       end
       if @actions_block
-        tag("row", "gap-": "1", "align-": "center") do
+        row( "gap-": "1", "align-": "center") do
           @actions_block.call
         end
       end

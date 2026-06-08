@@ -42,7 +42,7 @@ class Views::Letter::Queues::Index < Views::Base
         end
 
         div(class: "dropdown-container", style: "position: relative;") do
-          tag("row", "gap-": "1") do
+          row( "gap-": "1") do
             a(href: new_letter_queue_path) do
               button { "⊞ Batch queue" }
             end

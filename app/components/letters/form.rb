@@ -100,7 +100,7 @@ class Components::Letters::Form < Components::Base
 
   def field_group(label:, caption: nil, &block)
     div(style: "margin-bottom: 1lh;") do
-      tag("label", style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { label }
+      tag(:label, style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { label }
       yield
       if caption
         span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") { caption }

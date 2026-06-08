@@ -173,6 +173,8 @@ class Views::Warehouse::Orders::Index < Views::Base
           a(href: new_warehouse_order_path, "variant-": "green") { "+ New Order" }
         end
       end
+    end
+  end
   end
 
   def render_order_row(order)

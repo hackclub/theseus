@@ -7,13 +7,13 @@ class Components::Shared::ActionBar < Components::Base
   register_value_helper :impersonating?
 
   def view_template
-    tag("row", id: "theseus-actionbar", "align-": "center between") do
-      tag("row", "gap-": "1", "align-": "center") do
+    row( id: "theseus-actionbar", "align-": "center between") do
+      row( "gap-": "1", "align-": "center") do
         # mobile sidebar toggle
         button(
           class: "sidebar-toggle",
           "size-": "small",
-          onclick: "toggleSidebar()"
+          onclick: safe("toggleSidebar()")
         ) { "☰" }
 
         # brand
@@ -25,7 +25,7 @@ class Components::Shared::ActionBar < Components::Base
         end
       end
 
-      tag("row", "gap-": "2", "align-": "center") do
+      row( "gap-": "2", "align-": "center") do
         render_user_context
         render_impersonation_banner if current_user && impersonating?
 
@@ -33,10 +33,10 @@ class Components::Shared::ActionBar < Components::Base
         span(id: "theme-toggle-slot")
 
         # hints button
-        button("size-": "small", onclick: "window.openHints && window.openHints()") { "?" }
+        button("size-": "small", onclick: safe("window.openHints && window.openHints()")) { "?" }
 
         # kbar button
-        button("size-": "small", id: "kbar-trigger", onclick: "window.openKbar && window.openKbar()") { "⌘K" }
+        button("size-": "small", id: "kbar-trigger", onclick: safe("window.openKbar && window.openKbar()")) { "⌘K" }
 
         # user popover menu
         render_user_menu if current_user
@@ -71,7 +71,7 @@ class Components::Shared::ActionBar < Components::Base
         plain impersonating? ? "👁" : "👤"
       end
 
-      tag("column", **{"gap-" => "0"}, style: "min-width: 16ch;") do
+      column( **{"gap-" => "0"}, style: "min-width: 16ch;") do
         span(style: "color: var(--foreground2); padding-bottom: 0.5lh;") do
           plain current_user.username
         end

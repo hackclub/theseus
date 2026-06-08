@@ -172,10 +172,10 @@ class Components::StaticPages::Home < Components::Base
     span(class: "link-panel-icon") { "⌕" }
 
     dialog(id: "id-lookup-dialog", "size-": "medium", "position-": "center", "container-": "fill") do
-      tag("column", "box-": "round", "shear-": "top") do
-        tag("row", "align-": "center between") do
+      column( "box-": "round", "shear-": "top") do
+        row( "align-": "center between") do
           span("is-": "badge", "variant-": "background0") { "Find object by ID" }
-          button("size-": "small", "variant-": "foreground0", onclick: "this.closest('dialog').close()") { "×" }
+          button("size-": "small", "variant-": "foreground0", onclick: safe("this.closest('dialog').close()")) { "×" }
         end
         p(style: "color: var(--foreground2); margin: 0 0 1lh;") { "Enter a Theseus ID or package tracking number..." }
         div("is-": "separator")
@@ -197,6 +197,6 @@ class Components::StaticPages::Home < Components::Base
       end
     end
 
-    a(href: "#", onclick: "document.getElementById('id-lookup-dialog').showModal(); return false;", class: "Link--primary") { "ID Lookup" }
+    a(href: "#", onclick: safe("document.getElementById('id-lookup-dialog').showModal(); return false;"), class: "Link--primary") { "ID Lookup" }
   end
 end

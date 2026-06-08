@@ -27,7 +27,7 @@ class Components::Shared::UserPicker < Components::Base
           end
           plain " ▾"
         end
-        tag("column", "gap-": "0") do
+        column( "gap-": "0") do
           a(href: path_builder.call(nil), style: selected_user_id.blank? ? "font-weight: bold;" : nil) do
             plain "👤 All users"
           end

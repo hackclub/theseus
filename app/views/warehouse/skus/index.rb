@@ -544,9 +544,9 @@ class Views::Warehouse::SKUs::Index < Views::Base
   end
 
   def render_sku_actions(sku)
-    tag("details", "is-": "popover", "position-": "bottom baseline-right") do
-      tag("summary", tabindex: "0", "size-": "small") { "⋯" }
-      tag("column", "gap-": "0") do
+    tag(:details, "is-": "popover", "position-": "bottom baseline-right") do
+      tag(:summary, tabindex: "0", "size-": "small") { "⋯" }
+      column( "gap-": "0") do
         a(href: warehouse_sku_path(sku)) { "👁 View details" }
         if sku.zenventory_url.present?
           a(href: sku.zenventory_url, target: "_blank") { "↗ Open in Zenventory" }

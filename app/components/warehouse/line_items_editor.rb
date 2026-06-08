@@ -125,7 +125,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
       summary(tabindex: "0") do
         button("variant-": "green", type: "button") { "+ #{@add_button_text}" }
       end
-      tag("column", "gap-": "0", style: "max-height: 40lh; overflow-y: auto;") do
+      column( "gap-": "0", style: "max-height: 40lh; overflow-y: auto;") do
         div(style: "padding: 0.5lh 1ch;") do
           input(
             type: "text",

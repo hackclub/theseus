@@ -42,7 +42,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
               small(style: "color: var(--foreground2);") { "Leave blank to batch all #{queued_count} queued letters" }
             end
 
-            tag("row", "gap-": "1", style: "justify-content: flex-end;") do
+            row( "gap-": "1", style: "justify-content: flex-end;") do
               button(type: "submit", "variant-": "green") { "✓ Make Batch" }
             end
           end
