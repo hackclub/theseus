@@ -1,28 +1,41 @@
-// ── Page toolbar ── shared across all index pages
+// Theseus Design System — CSS
+// See local://design-system.md for the full spec.
+// Spacing: ch (horizontal), lh (vertical). No px. No rem.
+
+// ── Page toolbar ──
+// Never wraps the action button. Middle content shrinks.
 .page-toolbar {
   display: flex;
   align-items: center;
-  gap: 2ch;
-  flex-wrap: wrap;
+  gap: 1.5ch;
   padding: 0.5lh 0;
   border-bottom: 1px solid var(--background2);
   margin-bottom: 0.5lh;
+  flex-wrap: nowrap;
+  min-height: 2lh;
+
+  a:not(:has(button)) { text-decoration: none; color: var(--foreground2); }
+  a:not(:has(button)):hover { color: var(--foreground0); }
+  strong { font-size: 1.15em; flex-shrink: 0; white-space: nowrap; }
 }
 
-.toolbar-spacer { flex: 1; }
+.toolbar-spacer { flex: 1; min-width: 1ch; }
 
 .toolbar-search {
   width: 20ch;
-  font-size: 0.9em;
+  min-width: 10ch;
+  flex-shrink: 1;
 }
 
-// ── Stat filter chips ── clickable status counts
+// ── Stat filters ──
+// Clickable status counts. Separated from content below.
 .stat-filters {
   display: flex;
   align-items: center;
   gap: 0.25ch;
-  padding: 0.25lh 0;
+  padding: 0.25lh 0 0.5lh;
   margin-bottom: 0.5lh;
+  border-bottom: 1px solid var(--background1);
 }
 
 .stat-filter {
@@ -31,88 +44,101 @@
   gap: 0.5ch;
   padding: 0.15lh 1ch;
   border-radius: 4px;
-  text-decoration: none;
+  text-decoration: none !important;
   color: var(--foreground2);
   transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
 
-  &:hover {
-    background: var(--background1);
-    color: var(--foreground1);
-    text-decoration: none;
-  }
-
-  &.active {
-    background: var(--background2);
-    color: var(--foreground0);
-  }
+  &:hover { background: var(--background1); color: var(--foreground1); }
+  &.active { background: var(--background2); color: var(--foreground0); }
 }
 
-.stat-count {
-  font-weight: bold;
-  font-variant-numeric: tabular-nums;
-}
+.stat-count { font-weight: bold; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05ch; }
+.stat-total { color: var(--foreground2); margin-left: 1ch; white-space: nowrap; }
 
-.stat-label {
-  font-size: 0.85em;
-  text-transform: uppercase;
-  letter-spacing: 0.05ch;
-}
-
-.stat-total {
-  color: var(--foreground2);
-  margin-left: 1ch;
-}
-
-// ── Origin/category tabs ── underline-style filter tabs
+// ── Origin tabs ──
+// Underline-style category filters.
 .origin-tabs {
   display: flex;
   align-items: center;
-  gap: 0;
+  flex-shrink: 1;
+  overflow: hidden;
 
   a {
-    padding: 0.15lh 1ch;
-    text-decoration: none;
+    padding: 0.15lh 0.75ch;
+    text-decoration: none !important;
     color: var(--foreground2);
     border-bottom: 2px solid transparent;
     transition: all 0.1s;
+    white-space: nowrap;
 
-    &:hover {
-      color: var(--foreground0);
-      background: var(--background1);
-      text-decoration: none;
-    }
-
-    &.active {
-      color: var(--foreground0);
-      font-weight: bold;
-      border-bottom-color: var(--foreground0);
-    }
+    &:hover { color: var(--foreground0); background: var(--background1); }
+    &.active { color: var(--foreground0); font-weight: bold; border-bottom-color: var(--foreground0); }
   }
 }
 
-// ── Detail grids (show pages) ──
+// ── Detail grids ──
+// Key-value pairs. 14ch label, 1fr value.
 .detail-grid {
   display: grid;
   grid-template-columns: 14ch 1fr;
   gap: 0.25lh 2ch;
+  align-items: baseline;
 }
 
-.detail-label {
-  color: var(--foreground2);
-}
+.detail-label { color: var(--foreground2); }
 
-// ── Two-column show layout ──
+// ── Show layout ──
+// Two-column: main content + sidebar.
 .show-layout {
   display: flex;
   gap: 2ch;
+  align-items: flex-start;
 }
 
 .show-main { flex: 1; min-width: 0; }
-.show-sidebar { width: 28ch; flex-shrink: 0; }
+
+.show-sidebar {
+  width: 28ch;
+  flex-shrink: 0;
+  position: sticky;
+  top: 3lh;
+}
+
+// ── Box internal spacing ──
+// Consistent spacing inside box-="round" sections.
+// Title → separator → 0.5lh → content → 0 bottom (box padding handles it)
+[box-] {
+  > strong:first-child { display: block; }
+  > [is-="separator"] { margin-bottom: 0.5lh; }
+  margin-bottom: 1lh;
+}
+
+// ── Admin gate (inline context) ──
+// Tone down when inside toolbar — no dashed border, just a subtle label
+.page-toolbar .admin-tool {
+  &::before { display: none; }
+  &::after { display: none; }
+  padding: 0;
+  margin: 0;
+}
+
+// ── Table tags ──
+// Tags shown inline after IDs in table cells
+.row-tag {
+  color: var(--foreground2);
+  font-size: 0.85em;
+  &::before { content: '·'; margin: 0 0.5ch; }
+}
+
+// ── Form actions ──
+.form-inline { display: inline; }
+.page-actions { display: flex; gap: 1ch; align-items: center; }
 
 // ── Responsive ──
 @media (max-width: 80ch) {
   .show-layout { flex-direction: column; }
-  .show-sidebar { width: 100%; }
-  .page-toolbar { gap: 1ch; }
+  .show-sidebar { width: 100%; position: static; }
+  .page-toolbar { flex-wrap: wrap; }
 }

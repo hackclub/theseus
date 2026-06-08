@@ -39,7 +39,7 @@
         <span class="detail-label">Created</span>
         <span><%= @letter.created_at.strftime("%b %d, %Y %H:%M") %></span>
         <span class="detail-label">Dimensions</span>
-        <span><%= @letter.height %> × <%= @letter.width %> in, <%= @letter.weight %> oz</span>
+        <span><%= [@letter.height, @letter.width].compact.join(" × ").presence || "—" %> in, <%= @letter.weight || "—" %> oz</span>
         <span class="detail-label">Mailing date</span>
         <span><%= @letter.mailing_date&.strftime("%b %d, %Y") || "—" %></span>
         <span class="detail-label">Origin</span>
