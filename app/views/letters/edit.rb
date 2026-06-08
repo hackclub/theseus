@@ -6,20 +6,20 @@ class Views::Letters::Edit < Views::Base
   end
 
   def view_template
-    div(class: "page-container") do
-      div(class: "page-title-group content-section") do
-        a(href: letter_path(@letter), style: "color: var(--foreground2);") { "← Back" }
-        h1(class: "page-title") { "Editing letter" }
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      row("gap-": "1", "align-": "center") do
+        a(href: letter_path(@letter), style: "text-decoration: none; color: var(--foreground2);") { "← #{@letter.public_id}" }
+        strong(style: "font-size: 1.15em;") { "Edit Letter" }
+      end
+    end
+
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        render Components::Letters::Form.new(letter: @letter)
       end
 
-      div(class: "batch-layout") do
-        div do
-          render Components::Letters::Form.new(letter: @letter)
-        end
-
-        div(class: "sticky-sidebar") do
-          letter_info_card
-        end
+      div(class: "show-sidebar") do
+        letter_info_card
       end
     end
   end
@@ -28,24 +28,18 @@ class Views::Letters::Edit < Views::Base
 
   def letter_info_card
     div("box-": "round") do
-      h3(style: "margin: 0;") { "Letter Info" }
+      strong { "Letter Info" }
       div("is-": "separator")
-      dl(class: "edit-info-dl") do
-        dt { "ID" }
-        dd do
-          code { @letter.public_id }
-        end
 
-        dt { "Status" }
-        dd do
-          render Components::Shared::StatusBadge.new(status: @letter.aasm_state, type: :letter)
-        end
-
-        dt { "Created" }
-        dd { @letter.created_at.strftime("%b %-d, %Y") }
-
-        dt { "Origin" }
-        dd { @letter.origin_label }
+      div(class: "detail-grid") do
+        span(class: "detail-label") { "ID" }
+        span { code { @letter.public_id } }
+        span(class: "detail-label") { "Status" }
+        span { render Components::Shared::StatusBadge.new(status: @letter.aasm_state, type: :letter) }
+        span(class: "detail-label") { "Created" }
+        span { @letter.created_at.strftime("%b %-d, %Y") }
+        span(class: "detail-label") { "Origin" }
+        span { @letter.origin_label }
       end
     end
   end
