@@ -69,11 +69,26 @@ class Views::Letters::New < Views::Base
       strong { "Size Limits" }
       div("is-": "separator")
 
-      div(class: "detail-grid") do
-        span(class: "detail-label") { "Letter" }
-        span { "11.5 × 6.125 in, 3.5 oz" }
-        span(class: "detail-label") { "Flat" }
-        span { "15 × 12 in, 13 oz" }
+      table(style: "margin-top: 0.5lh;") do
+        thead do
+          tr do
+            th
+            th { "Max size" }
+            th { "Max wt" }
+          end
+        end
+        tbody do
+          tr do
+            td { "Letter" }
+            td { "11.5 × 6.125″" }
+            td { "3.5 oz" }
+          end
+          tr do
+            td { "Flat" }
+            td { "15 × 12″" }
+            td { "13 oz" }
+          end
+        end
       end
     end
   end
