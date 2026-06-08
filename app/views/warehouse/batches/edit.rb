@@ -14,10 +14,11 @@ class Views::Warehouse::Batches::Edit < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "page-toolbar") do
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Edit Warehouse Batch" }
+        render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
     end
 
@@ -52,7 +53,6 @@ class Views::Warehouse::Batches::Edit < Views::Base
             end
           end
 
-          # Tags
           tag_picker(f)
 
           row("gap-": "1", "align-": "center", style: "margin-top: 1lh;") do
@@ -69,10 +69,12 @@ class Views::Warehouse::Batches::Edit < Views::Base
           div(class: "detail-grid", style: "margin-top: 0.5lh;") do
             span(class: "detail-label") { "ID" }
             span { "##{@batch.id}" }
-            span(class: "detail-label") { "Status" }
-            span { render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch) }
+            span(class: "detail-label") { "Created" }
+            span { @batch.created_at.strftime("%b %d, %Y") }
             span(class: "detail-label") { "Addresses" }
             span { @batch.addresses.count.to_s }
+            span(class: "detail-label") { "Orders" }
+            span { @batch.orders.count.to_s }
           end
         end
       end
@@ -108,7 +110,7 @@ class Views::Warehouse::Batches::Edit < Views::Base
             option(value: tag, selected: @batch.tags&.include?(tag)) { tag }
           end
         end
-        p(style: "color: var(--foreground2); font-size: 0.9em;") { "Select from common tags or create your own" }
+        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0;") { "Select from common tags or create your own" }
       end
     end
   end

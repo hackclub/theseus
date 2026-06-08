@@ -1,6 +1,6 @@
 <% content_for :title, @warehouse_template.name %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= warehouse_templates_path %>" style="text-decoration: none; color: var(--foreground2);">← Templates</a>
     <strong style="font-size: 1.15em;"><%= @warehouse_template.name %></strong>
@@ -10,12 +10,12 @@
   </row>
   <row gap-="1" align-="center">
     <%= render Components::Shared::PublicId.new(value: @warehouse_template.public_id) %>
-    <span style="color: var(--foreground2);">by <%= @warehouse_template.user&.username || "unknown" %></span>
+    <span style="color: var(--foreground2);">by <%= @warehouse_template.user&.username || "—" %></span>
   </row>
   <span class="toolbar-spacer"></span>
   <row gap-="1" align-="center">
-    <a href="<%= edit_warehouse_template_path(@warehouse_template) %>" size-="small">✎ Edit</a>
-    <%= form_with url: warehouse_template_path(@warehouse_template), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this template?" }, class: "form-inline" do %>
+    <a href="<%= edit_warehouse_template_path(@warehouse_template) %>">✎ Edit</a>
+    <%= form_with url: warehouse_template_path(@warehouse_template), method: :delete, data: { turbo_confirm: "Delete this template?" }, class: "form-inline" do %>
       <button type="submit" variant-="red" size-="small">✕</button>
     <% end %>
   </row>
@@ -23,7 +23,7 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round">
+    <div box-="round" style="margin-bottom: 1lh;">
       <strong>Contents</strong>
       <div is-="separator"></div>
       <%= render 'warehouse/orders/line_items', order: @warehouse_template %>
@@ -36,7 +36,7 @@
       <div is-="separator"></div>
       <div class="detail-grid" style="margin-top: 0.5lh;">
         <span class="detail-label">Owner</span>
-        <span><%= @warehouse_template.user&.username || "unknown" %></span>
+        <span><%= @warehouse_template.user&.username || "—" %></span>
         <span class="detail-label">Shared</span>
         <span><%= @warehouse_template.public ? "Yes" : "No" %></span>
         <span class="detail-label">Items</span>

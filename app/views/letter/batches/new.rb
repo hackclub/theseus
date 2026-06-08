@@ -13,7 +13,6 @@ class Views::Letter::Batches::New < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    # Header
     div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
@@ -21,17 +20,15 @@ class Views::Letter::Batches::New < Views::Base
       end
     end
 
-    # Two-column layout
     div(class: "show-layout") do
       div(class: "show-main") do
         error_messages
 
         form_with(model: @batch, url: letter_batches_path, scope: :letter_batch) do |f|
-          # Letter Specs
           div("box-": "round", style: "margin-bottom: 1lh;") do
             strong { "Letter Specs" }
             div("is-": "separator")
-            div(style: "padding: 1lh 1ch;") do
+            div(style: "margin-top: 0.5lh;") do
               div(
                 data_svelte_component: "letter-attributes-picker",
                 data_form_scope: "letter_batch",
@@ -42,20 +39,18 @@ class Views::Letter::Batches::New < Views::Base
             end
           end
 
-          # Sender & Postage
           div("box-": "round", style: "margin-bottom: 1lh;") do
             strong { "Sender & Postage" }
             div("is-": "separator")
-            div(style: "padding: 1lh 1ch;") do
+            div(style: "margin-top: 0.5lh;") do
               sender_fields(f)
             end
           end
 
-          # Addresses (CSV)
           div("box-": "round", style: "margin-bottom: 1lh;") do
             strong { "Addresses" }
             div("is-": "separator")
-            div(style: "padding: 1lh 1ch;") do
+            div(style: "margin-top: 0.5lh;") do
               address_fields = (Address.column_names - %w[id created_at updated_at batch_id]) + %w[rubber_stamps]
               div(
                 data_svelte_component: "batch-csv-mapper",
@@ -65,19 +60,17 @@ class Views::Letter::Batches::New < Views::Base
             end
           end
 
-          # Tags
           tag_picker(f)
 
-          # Actions
           row("gap-": "1", style: "margin-top: 1lh;") do
             button(type: "submit", "variant-": "green") { "✓ Create Batch" }
-            a(href: letter_batches_path) { button("size-": "small") { "Cancel" } }
+            a(href: letter_batches_path) { button { "Cancel" } }
           end
         end
       end
 
       div(class: "show-sidebar") do
-        batch_info_card
+        about_card
       end
     end
   end
@@ -87,12 +80,11 @@ class Views::Letter::Batches::New < Views::Base
   def error_messages
     return unless @batch.errors.any?
 
-    div("box-": "square", class: "tui-banner tui-banner-error", style: "margin-bottom: 1lh;") do
-      strong { "[!] Hey, slight issue:" }
-      ul(class: "error-list") do
-        @batch.errors.each do |error|
-          li { error.full_message }
-        end
+    div("box-": "round", style: "margin-bottom: 1lh; border-color: var(--red);") do
+      strong(style: "color: var(--red);") { "#{@batch.errors.count} #{"error".pluralize(@batch.errors.count)} prevented saving" }
+      div("is-": "separator")
+      ul(style: "margin: 0.5lh 0 0; padding-left: 2ch;") do
+        @batch.errors.full_messages.each { |msg| li { msg } }
       end
     end
   end
@@ -109,10 +101,7 @@ class Views::Letter::Batches::New < Views::Base
           class: "select-field"
         ) do
           USPS::MailerId.all.each do |m|
-            option(
-              value: m.id,
-              selected: m.id == current_user.home_mid_id
-            ) { m.display_name }
+            option(value: m.id, selected: m.id == current_user.home_mid_id) { m.display_name }
           end
         end
       end
@@ -127,10 +116,7 @@ class Views::Letter::Batches::New < Views::Base
           class: "select-field"
         ) do
           addresses.each do |addr|
-            option(
-              value: addr.id,
-              selected: addr.id == current_user.home_return_address_id
-            ) { addr.display_name }
+            option(value: addr.id, selected: addr.id == current_user.home_return_address_id) { addr.display_name }
           end
         end
       end
@@ -162,14 +148,12 @@ class Views::Letter::Batches::New < Views::Base
     end
   end
 
-  def batch_info_card
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+  def about_card
+    div("box-": "round") do
       strong { "About Batches" }
       div("is-": "separator")
-      div(style: "padding: 0.5lh 0;") do
-        p(style: "color: var(--foreground2); margin: 0;") do
-          plain "Upload a CSV of addresses and configure letter specs. After creating, you'll map CSV columns to address fields, then process to generate labels."
-        end
+      div(style: "margin-top: 0.5lh; color: var(--foreground2);") do
+        p(style: "margin: 0;") { "Upload a CSV of addresses and configure letter specs. After creating, you'll map CSV columns to address fields, then process to generate labels." }
       end
     end
   end

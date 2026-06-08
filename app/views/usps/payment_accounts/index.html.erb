@@ -3,34 +3,34 @@
 <div class="page-toolbar">
   <row gap-="1" align-="center">
     <strong style="font-size: 1.15em;">USPS Payment Accounts</strong>
-    <span style="color: var(--foreground2);"><%= @usps_payment_accounts.count %> accounts</span>
+    <span style="color: var(--foreground2);"><%= number_with_delimiter(@usps_payment_accounts.count) %> accounts</span>
   </row>
   <span class="toolbar-spacer"></span>
-  <a href="<%= new_usps_payment_account_path %>" variant-="green">+ New Account</a>
+  <a href="<%= new_usps_payment_account_path %>"><button variant-="green">+ New Account</button></a>
 </div>
 
 <% if @usps_payment_accounts.any? %>
-  <div box-="round">
-    <table style="width: 100%; border-collapse: collapse;">
-      <thead>
-        <tr style="border-bottom: 1px solid var(--foreground2);">
-          <th style="text-align: left; padding: 0.5lh 1ch;">Name</th>
-          <th style="text-align: left; padding: 0.5lh 1ch;">Type</th>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Mailer ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @usps_payment_accounts.each do |account| %>
+        <tr>
+          <td><a href="<%= usps_payment_account_path(account) %>" style="text-decoration: none;"><strong><%= account.display_name %></strong></a></td>
+          <td><span is-="badge" variant-="background2"><%= account.account_type %></span></td>
+          <td style="color: var(--foreground2);"><%= account.usps_mailer_id&.name || "—" %></td>
         </tr>
-      </thead>
-      <tbody>
-        <% @usps_payment_accounts.each do |account| %>
-          <tr style="border-bottom: 1px solid var(--background2);">
-            <td style="padding: 0.5lh 1ch;"><a href="<%= usps_payment_account_path(account) %>"><%= account.display_name %></a></td>
-            <td style="padding: 0.5lh 1ch;"><span is-="badge" variant-="background2"><%= account.account_type %></span></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+      <% end %>
+    </tbody>
+  </table>
 <% else %>
   <div box-="round" style="text-align: center; padding: 2lh 2ch;">
     <strong>No payment accounts yet</strong>
-    <p style="color: var(--foreground2); margin: 0;"><a href="<%= new_usps_payment_account_path %>">Add one</a></p>
+    <div style="color: var(--foreground2); margin-top: 0.25lh;"><a href="<%= new_usps_payment_account_path %>">Add one</a></div>
   </div>
 <% end %>

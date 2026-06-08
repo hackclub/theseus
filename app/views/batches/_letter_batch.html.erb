@@ -1,76 +1,65 @@
-<div style="margin-top: 1lh;">
-  <div box-="round">
-    <strong>Letter Batch Preview</strong>
-    <div is-="separator"></div>
-    <div style="padding: 0.5lh 0;">
-      <row gap-="2">
-        <div style="flex: 1;">
-          <div box-="round">
-            <strong>From</strong>
-            <div is-="separator"></div>
-            <% if batch.letter_return_address.present? %>
-              <div><strong><%= batch.letter_return_address.name %></strong></div>
-              <div><%= batch.letter_return_address.line_1 %></div>
-              <% if batch.letter_return_address.line_2.present? %>
-                <div><%= batch.letter_return_address.line_2 %></div>
-              <% end %>
-              <div><%= batch.letter_return_address.city %>, <%= batch.letter_return_address.state %> <%= batch.letter_return_address.postal_code %></div>
-              <div><%= batch.letter_return_address.country %></div>
-            <% else %>
-              <span class="detail-label">No return address</span>
-            <% end %>
-          </div>
-        </div>
+<div box-="round" style="margin-bottom: 1lh;">
+  <strong>Letter Batch</strong>
+  <div is-="separator"></div>
 
-        <div style="flex: 1;">
-          <div box-="round">
-            <strong>Batch Information</strong>
-            <div is-="separator"></div>
-            <div class="detail-grid">
-              <span class="detail-label">Dimensions</span>
-              <span><%= batch.letter_width %> × <%= batch.letter_height %> in</span>
-              <span class="detail-label">Weight</span>
-              <span><%= batch.letter_weight %> oz</span>
-              <span class="detail-label">Mailer ID</span>
-              <span><%= batch.mailer_id&.display_name %></span>
-              <span class="detail-label">Address Count</span>
-              <span><%= batch.addresses.count %></span>
-            </div>
-          </div>
-        </div>
-      </row>
-
-      <% if batch.pdf_label.attached? %>
-        <div style="margin-top: 1lh;">
-          <div box-="round">
-            <strong>Generated Labels</strong>
-            <div is-="separator"></div>
-            <row gap-="1" align-="center">
-              <div style="flex: 1;">
-                <div><strong>Labels PDF</strong></div>
-                <div class="detail-label">Generated on <%= batch.pdf_label.created_at.strftime("%B %d, %Y at %I:%M %p") %></div>
-              </div>
-              <row gap-="1">
-                <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>" size-="small" variant-="green">↓ Download PDF</a>
-                <% if batch.letters.any? && batch.letters.all?(&:pending?) %>
-                  <%= button_to mark_printed_letter_batch_path(batch), method: :post, data: { confirm: "Mark all letters as printed?" } do %>
-                    <button type="button" size-="small">✓ Mark All Printed</button>
-                  <% end %>
-                <% end %>
-                <% if batch.letters.any? && batch.letters.any?(&:printed?) %>
-                  <%= button_to mark_mailed_letter_batch_path(batch), method: :post, data: { confirm: "Mark all letters as mailed?" } do %>
-                    <button type="button" size-="small">✉ Mark All Mailed</button>
-                  <% end %>
-                <% end %>
-              </row>
-            </row>
-          </div>
-        </div>
-      <% else %>
-        <div box-="round" style="margin-top: 1lh; text-align: center; padding: 1lh 2ch;">
-          <span class="detail-label">No labels have been generated yet.</span>
-        </div>
-      <% end %>
+  <row gap-="2" style="margin-top: 0.5lh; margin-bottom: 1lh;">
+    <div box-="round" style="flex: 1;">
+      <strong>From</strong>
+      <div is-="separator"></div>
+      <div style="margin-top: 0.5lh;">
+        <% if batch.letter_return_address.present? %>
+          <strong><%= batch.letter_return_address.name %></strong><br>
+          <span style="color: var(--foreground2);">
+            <%= batch.letter_return_address.line_1 %><br>
+            <% if batch.letter_return_address.line_2.present? %><%= batch.letter_return_address.line_2 %><br><% end %>
+            <%= batch.letter_return_address.city %>, <%= batch.letter_return_address.state %> <%= batch.letter_return_address.postal_code %><br>
+            <%= batch.letter_return_address.country %>
+          </span>
+        <% else %>
+          <span style="color: var(--foreground2);">No return address</span>
+        <% end %>
+      </div>
     </div>
-  </div>
+
+    <div box-="round" style="flex: 1;">
+      <strong>Info</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">Dimensions</span>
+        <span><%= batch.letter_width %> × <%= batch.letter_height %> in</span>
+        <span class="detail-label">Weight</span>
+        <span><%= batch.letter_weight %> oz</span>
+        <span class="detail-label">Mailer ID</span>
+        <span><%= batch.mailer_id&.display_name || "—" %></span>
+        <span class="detail-label">Addresses</span>
+        <span><%= batch.addresses.count %></span>
+      </div>
+    </div>
+  </row>
+
+  <% if batch.pdf_label.attached? %>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Generated Labels</strong>
+      <div is-="separator"></div>
+      <row gap-="1" align-="center" style="margin-top: 0.5lh;">
+        <span style="color: var(--foreground2);">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
+        <span class="toolbar-spacer"></span>
+        <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>"><button size-="small" variant-="green">↓ Download PDF</button></a>
+        <% if batch.letters.any? && batch.letters.all?(&:pending?) %>
+          <%= form_with url: mark_printed_letter_batch_path(batch), method: :post, data: { turbo_confirm: "Mark all letters as printed?" }, class: "form-inline" do %>
+            <button type="submit" size-="small">✓ Mark All Printed</button>
+          <% end %>
+        <% end %>
+        <% if batch.letters.any? && batch.letters.any?(&:printed?) %>
+          <%= form_with url: mark_mailed_letter_batch_path(batch), method: :post, data: { turbo_confirm: "Mark all letters as mailed?" }, class: "form-inline" do %>
+            <button type="submit" size-="small">✉ Mark All Mailed</button>
+          <% end %>
+        <% end %>
+      </row>
+    </div>
+  <% else %>
+    <div style="text-align: center; padding: 1lh 0; color: var(--foreground2);">
+      No labels generated yet.
+    </div>
+  <% end %>
 </div>

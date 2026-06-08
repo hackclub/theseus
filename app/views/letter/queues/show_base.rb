@@ -99,7 +99,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
           span(class: "detail-label") { "Tags" }
           span do
             queue.tags.each do |t|
-              span("is-": "badge") { t }
+              span("is-": "badge", "variant-": "background2") { t }
               plain " "
             end
           end
@@ -109,14 +109,15 @@ class Views::Letter::Queues::ShowBase < Views::Base
       end
     end
 
-    # Return address
-    if queue.letter_return_address.present?
-      div("box-": "round", style: "margin-bottom: 1lh;") do
-        strong { "Return Address" }
-        div("is-": "separator")
-        div(style: "margin-top: 0.5lh;") do
-          render_address(queue)
-        end
+    return_address_box if queue.letter_return_address.present?
+  end
+
+  def return_address_box
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Return Address" }
+      div("is-": "separator")
+      div(style: "margin-top: 0.5lh;") do
+        render_address(queue)
       end
     end
   end
@@ -141,11 +142,17 @@ class Views::Letter::Queues::ShowBase < Views::Base
       letters_filter_bar
 
       if letters.any?
-        table(style: "width: 100%;") do
-          tbody do
-            letters.each do |letter|
-              letter_row(letter)
+        table do
+          thead do
+            tr do
+              th { "ID" }
+              th { "Recipient" }
+              th { "Status" }
+              th { "Date" }
             end
+          end
+          tbody do
+            letters.each { |letter| letter_row(letter) }
           end
         end
       else
@@ -212,7 +219,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
       div("is-": "separator")
       div(style: "margin-top: 0.5lh;") do
         make_batch_section
-        a(href: edit_queue_path, style: "display: block; text-align: center; margin-top: 0.5lh;") do
+        a(href: edit_queue_path, style: "display: block; margin-top: 0.5lh;") do
           button("size-": "small", style: "width: 100%;") { "✎ Edit Queue" }
         end
       end
@@ -246,13 +253,15 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   def letter_row(letter)
     tr do
-      td { a(href: letter_path(letter), style: "text-decoration: none;") { letter.public_id } }
+      td do
+        a(href: letter_path(letter), style: "text-decoration: none; color: var(--foreground0);") { letter.public_id }
+      end
       td do
         name = [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ")
         plain name.presence || "—"
       end
       td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
-      td(style: "color: var(--foreground2); text-align: right;") { letter.created_at.strftime("%b %d, %Y") }
+      td(style: "color: var(--foreground2); text-align: right;") { letter.created_at.strftime("%b %-d") }
     end
   end
 
@@ -261,7 +270,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
     name = q.letter_return_address_name.presence || addr.name
 
     div do
-      div { strong { name } } if name.present?
+      strong { name } if name.present?
       div(style: "color: var(--foreground2);") do
         div { addr.line_1 }
         div { addr.line_2 } if addr.line_2.present?

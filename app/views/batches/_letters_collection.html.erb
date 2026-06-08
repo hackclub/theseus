@@ -1,25 +1,27 @@
-<div box-="round">
-  <table style="width: 100%; border-collapse: collapse;">
+<div box-="round" style="margin-bottom: 1lh;">
+  <strong>Letters</strong>
+  <div is-="separator"></div>
+  <table style="width: 100%;">
     <thead>
-      <tr style="border-bottom: 1px solid var(--background3);">
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Letter</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">From</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Size</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Created</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Status</th>
+      <tr>
+        <th style="text-align: left;">Letter</th>
+        <th style="text-align: left;">From</th>
+        <th style="text-align: left;">Size</th>
+        <th style="text-align: left;">Created</th>
+        <th style="text-align: left;">Status</th>
       </tr>
     </thead>
     <tbody>
       <% letters.each do |letter| %>
-        <tr style="border-bottom: 1px solid var(--background2);">
-          <td style="padding: 0.5lh 1ch;">
-            <%= link_to letter.public_id, letter, style: "font-weight: 500;" %>
-            <span class="detail-label"> to <%= letter.address.name_line %></span>
+        <tr>
+          <td style="padding: 0.25lh 1ch;">
+            <a href="<%= letter_path(letter) %>" style="font-weight: bold; text-decoration: none;"><%= letter.public_id %></a>
+            <span class="row-tag"><%= letter.address.name_line %></span>
           </td>
-          <td style="padding: 0.5lh 1ch;" class="detail-label"><%= letter.return_address.present? ? letter.return_address_name_line : '—' %></td>
-          <td style="padding: 0.5lh 1ch;"><%= letter.height %>" × <%= letter.width %>"</td>
-          <td style="padding: 0.5lh 1ch;" class="detail-label"><%= time_ago_in_words(letter.created_at) %> ago</td>
-          <td style="padding: 0.5lh 1ch;">
+          <td style="padding: 0.25lh 1ch; color: var(--foreground2);"><%= letter.return_address.present? ? letter.return_address_name_line : "—" %></td>
+          <td style="padding: 0.25lh 1ch;"><%= letter.height %> × <%= letter.width %> in</td>
+          <td style="padding: 0.25lh 1ch;"><%= letter.created_at.strftime(letter.created_at.year == Date.current.year ? "%b %d" : "%b %d, %Y") %></td>
+          <td style="padding: 0.25lh 1ch;">
             <%= render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) %>
           </td>
         </tr>

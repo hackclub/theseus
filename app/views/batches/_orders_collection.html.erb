@@ -1,22 +1,34 @@
-<div box-="round">
-  <% orders.each_with_index do |order, i| %>
-    <% if i > 0 %><div is-="separator"></div><% end %>
-    <div style="padding: 0.5lh 2ch;">
-      <row gap-="1" align-="center">
-        <div style="flex: 1; min-width: 0;">
-          <row gap-="1" align-="center">
-            <%= link_to order.hc_id, order, style: "font-weight: 500;" %>
-            <span><%= order.user_facing_title %></span>
+<div box-="round" style="margin-bottom: 1lh;">
+  <strong>Orders</strong>
+  <div is-="separator"></div>
+  <table style="width: 100%;">
+    <thead>
+      <tr>
+        <th style="text-align: left;">Order</th>
+        <th style="text-align: left;">Recipient</th>
+        <th style="text-align: left;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% orders.each do |order| %>
+        <tr>
+          <td style="padding: 0.25lh 1ch;">
+            <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
+            <% if order.user_facing_title.present? %>
+              <span class="row-tag"><%= order.user_facing_title %></span>
+            <% end %>
+          </td>
+          <td style="padding: 0.25lh 1ch;">
+            <%= order.address&.name_line || "—" %>
+            <% if order.recipient_email.present? %>
+              <span style="color: var(--foreground2);"> (<%= order.recipient_email %>)</span>
+            <% end %>
+          </td>
+          <td style="padding: 0.25lh 1ch;">
             <%= render 'warehouse/orders/status_badge', order: order %>
-          </row>
-          <div class="detail-label"><%= order.address.name_line %> (<%= order.recipient_email %>)</div>
-          <% if order.tags.any? %>
-            <div style="margin-top: 0.25lh;">
-              <%= render 'shared/tags', tags: order.tags %>
-            </div>
-          <% end %>
-        </div>
-      </row>
-    </div>
-  <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

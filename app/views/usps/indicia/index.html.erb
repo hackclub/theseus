@@ -3,40 +3,38 @@
 <div class="page-toolbar">
   <row gap-="1" align-="center">
     <strong style="font-size: 1.15em;">Indicia</strong>
-    <span style="color: var(--foreground2);"><%= @usps_indicia.count %> purchased</span>
+    <span style="color: var(--foreground2);"><%= number_with_delimiter(@usps_indicia.count) %> purchased</span>
   </row>
   <span class="toolbar-spacer"></span>
-  <a href="<%= new_usps_indicium_path %>" variant-="green">+ New Indicium</a>
+  <a href="<%= new_usps_indicium_path %>"><button variant-="green">+ New Indicium</button></a>
 </div>
 
 <% if @usps_indicia.any? %>
-  <div box-="round">
-    <table style="width: 100%; border-collapse: collapse;">
-      <thead>
-        <tr style="border-bottom: 1px solid var(--foreground2);">
-          <th style="text-align: left; padding: 0.5lh 1ch;">ID</th>
-          <th style="text-align: left; padding: 0.5lh 1ch;">SKU</th>
-          <th style="text-align: right; padding: 0.5lh 1ch;">Postage</th>
-          <th style="text-align: left; padding: 0.5lh 1ch;">Date</th>
-          <th style="text-align: left; padding: 0.5lh 1ch;">Category</th>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>SKU</th>
+        <th style="text-align: right;">Postage</th>
+        <th>Date</th>
+        <th>Category</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @usps_indicia.each do |indicium| %>
+        <tr>
+          <td><a href="<%= usps_indicium_path(indicium) %>" style="text-decoration: none;"><strong><%= indicium.public_id %></strong></a></td>
+          <td><code><%= indicium.usps_sku %></code></td>
+          <td style="text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(indicium.postage) %></td>
+          <td style="color: var(--foreground2);"><%= indicium.mailing_date&.strftime("%b %d") || "—" %></td>
+          <td style="color: var(--foreground2);"><%= indicium.processing_category || "—" %></td>
         </tr>
-      </thead>
-      <tbody>
-        <% @usps_indicia.each do |indicium| %>
-          <tr style="border-bottom: 1px solid var(--background2);">
-            <td style="padding: 0.5lh 1ch;"><a href="<%= usps_indicium_path(indicium) %>"><%= render Components::Shared::PublicId.new(value: indicium.public_id) %></a></td>
-            <td style="padding: 0.5lh 1ch;"><code><%= indicium.usps_sku %></code></td>
-            <td style="padding: 0.5lh 1ch; text-align: right; font-weight: 500;"><%= number_to_currency(indicium.postage) %></td>
-            <td style="padding: 0.5lh 1ch; color: var(--foreground2);"><%= indicium.mailing_date %></td>
-            <td style="padding: 0.5lh 1ch; color: var(--foreground2);"><%= indicium.processing_category %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+      <% end %>
+    </tbody>
+  </table>
 <% else %>
   <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-    <strong>✉ No indicia yet</strong>
-    <p style="color: var(--foreground2); margin: 0;">Purchased postage will appear here.</p>
+    <strong>No indicia yet</strong>
+    <div style="color: var(--foreground2); margin-top: 0.25lh;">Purchased postage will appear here.</div>
   </div>
 <% end %>

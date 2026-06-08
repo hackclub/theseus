@@ -8,8 +8,7 @@ class Views::APIKeys::Show < Views::Base
   end
 
   def view_template
-    # Header
-    div(class: "page-toolbar") do
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
         strong(style: "font-size: 1.15em;") { api_key.pretty_name }
@@ -21,64 +20,12 @@ class Views::APIKeys::Show < Views::Base
     end
 
     div(class: "show-layout") do
-      # Main content
       div(class: "show-main") do
-        # Secret Key
-        div("box-": "round", style: "margin-bottom: 1lh;") do
-          strong { "Secret Key" }
-          div("is-": "separator")
-          div(style: "margin-top: 0.5lh;") do
-            row("gap-": "1", "align-": "center") do
-              code(data_copy_to_clipboard: api_key.token) { api_key.token }
-              button(
-                "size-": "small",
-                data_copy_to_clipboard: api_key.token,
-                aria: { label: "Copy to clipboard" }
-              ) { "⎘" }
-            end
-            p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25lh 0 0;") { "Keep this secret. Don't share it with anyone." }
-          end
-        end
-
-        # Details
-        div("box-": "round", style: "margin-bottom: 1lh;") do
-          strong { "Details" }
-          div("is-": "separator")
-          div(class: "detail-grid", style: "margin-top: 0.5lh;") do
-            span(class: "detail-label") { "Name" }
-            span { api_key.pretty_name }
-            span(class: "detail-label") { "Created" }
-            span { api_key.created_at.strftime("%b %d, %Y %H:%M") }
-            if api_key.revoked?
-              span(class: "detail-label") { "Revoked" }
-              span(style: "color: var(--red);") { api_key.revoked_at.strftime("%b %d, %Y at %l:%M %p") }
-            end
-          end
-        end
-
-        # Permissions
-        div("box-": "round", style: "margin-bottom: 1lh;") do
-          strong { "Permissions" }
-          div("is-": "separator")
-          div(class: "detail-grid", style: "margin-top: 0.5lh;") do
-            span(class: "detail-label") { "PII Access" }
-            if api_key.pii
-              span(style: "color: var(--green);") { "✓ Enabled" }
-            else
-              span(style: "color: var(--foreground2);") { "✗ Disabled" }
-            end
-
-            span(class: "detail-label") { "Impersonation" }
-            if api_key.may_impersonate?
-              span(style: "color: var(--red);") { "✓ Enabled" }
-            else
-              span(style: "color: var(--foreground2);") { "✗ Disabled" }
-            end
-          end
-        end
+        secret_key_box
+        details_box
+        permissions_box
       end
 
-      # Sidebar
       div(class: "show-sidebar") do
         if api_key.active?
           div("box-": "round") do
@@ -103,6 +50,63 @@ class Views::APIKeys::Show < Views::Base
   private
 
   attr_reader :api_key
+
+  def secret_key_box
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Secret Key" }
+      div("is-": "separator")
+      div(style: "margin-top: 0.5lh;") do
+        row("gap-": "1", "align-": "center") do
+          code(data_copy_to_clipboard: api_key.token) { api_key.token }
+          button(
+            "size-": "small",
+            data_copy_to_clipboard: api_key.token,
+            aria: { label: "Copy to clipboard" }
+          ) { "⎘" }
+        end
+        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25lh 0 0;") { "Keep this secret. Don't share it with anyone." }
+      end
+    end
+  end
+
+  def details_box
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Details" }
+      div("is-": "separator")
+      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+        span(class: "detail-label") { "Name" }
+        span { api_key.pretty_name }
+        span(class: "detail-label") { "Created" }
+        span { api_key.created_at.strftime("%b %d, %Y %H:%M") }
+        if api_key.revoked?
+          span(class: "detail-label") { "Revoked" }
+          span(style: "color: var(--red);") { api_key.revoked_at.strftime("%b %d, %Y %H:%M") }
+        end
+      end
+    end
+  end
+
+  def permissions_box
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Permissions" }
+      div("is-": "separator")
+      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+        span(class: "detail-label") { "PII Access" }
+        if api_key.pii
+          span(style: "color: var(--green);") { "✓ Enabled" }
+        else
+          span(style: "color: var(--foreground2);") { "✗ Disabled" }
+        end
+
+        span(class: "detail-label") { "Impersonation" }
+        if api_key.may_impersonate?
+          span(style: "color: var(--red);") { "✓ Enabled" }
+        else
+          span(style: "color: var(--foreground2);") { "✗ Disabled" }
+        end
+      end
+    end
+  end
 
   def render_revoke_dialog
     dialog(id: "revoke-dialog", "size-": "large", "position-": "center", "container-": "fill") do

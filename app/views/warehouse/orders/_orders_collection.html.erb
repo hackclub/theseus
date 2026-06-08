@@ -1,38 +1,32 @@
-<div box-="round">
-  <div style="padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">
-    <div class="li-row">
-      <span class="li-col-name col-header">Order</span>
-      <span class="collection-col col-header">Recipient</span>
-      <span class="collection-col-sm col-header">Status</span>
-    </div>
-  </div>
-
-  <% orders.each do |order| %>
-    <a href="<%= warehouse_order_path(order) %>" class="collection-link" style="display: block; padding: 1lh 1ch; border-bottom: 1px solid var(--background3);">
-      <div class="collection-link-main">
-        <div class="section-title-group mb-1">
-          <span class="mono fw-semibold text-accent"><%= order.hc_id %></span>
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th style="text-align: left;">Order</th>
+      <th style="text-align: left;">Recipient</th>
+      <th style="text-align: left;">Created</th>
+      <th style="text-align: left;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% orders.each do |order| %>
+      <tr>
+        <td style="padding: 0.25lh 1ch;">
+          <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
           <% if order.user_facing_title.present? %>
-            <span>·</span>
-            <span class="order-row-name"><%= order.user_facing_title %></span>
+            <span class="row-tag"><%= order.user_facing_title %></span>
           <% end %>
-        </div>
-        <div class="resource-card-meta mt-1">
-          <%= order.created_at.strftime("%b %d, %Y") %>
-          <% if order.tags.present? %>
-            · <%= render 'shared/tags', tags: order.tags %>
+        </td>
+        <td style="padding: 0.25lh 1ch;">
+          <%= order.address&.name_line || "—" %>
+          <% if order.recipient_email.present? %>
+            <span style="color: var(--foreground2);"> (<%= order.recipient_email %>)</span>
           <% end %>
-        </div>
-      </div>
-      <div class="collection-link-side">
-        <div class="collection-col">
-          <div class="fw-medium"><%= order.address&.name_line || "—" %></div>
-          <div class="resource-card-meta"><%= order.recipient_email %></div>
-        </div>
-        <div class="collection-col-sm">
+        </td>
+        <td style="padding: 0.25lh 1ch;"><%= order.created_at.strftime(order.created_at.year == Date.current.year ? "%b %d" : "%b %d, %Y") %></td>
+        <td style="padding: 0.25lh 1ch;">
           <%= render 'warehouse/orders/status_badge', order: order %>
-        </div>
-      </div>
-    </a>
-  <% end %>
-</div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

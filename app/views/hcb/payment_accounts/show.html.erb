@@ -1,24 +1,28 @@
-<% content_for :title, "#{@payment_account.organization_name} - HCB" %>
+<% content_for :title, "#{@payment_account.organization_name} — HCB" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= hcb_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← HCB Accounts</a>
     <strong style="font-size: 1.15em;"><%= @payment_account.organization_name %></strong>
   </row>
+  <span class="toolbar-spacer"></span>
+  <%= form_with url: hcb_payment_account_path(@payment_account), method: :delete, data: { turbo_confirm: "Remove this organization?" }, class: "form-inline" do %>
+    <button type="submit" variant-="red" size-="small">✕ Remove</button>
+  <% end %>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round">
-      <strong style="display: block; padding: 0.5lh 1ch;">Organization Details</strong>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Organization Details</strong>
       <div is-="separator"></div>
-      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+      <div class="detail-grid" style="margin-top: 0.5lh;">
         <span class="detail-label">Organization</span>
         <span><%= @payment_account.organization_name %></span>
         <span class="detail-label">Organization ID</span>
-        <code><%= @payment_account.organization_id %></code>
+        <span><code><%= @payment_account.organization_id %></code></span>
         <span class="detail-label">Added</span>
-        <span><%= @payment_account.created_at.strftime("%B %d, %Y") %></span>
+        <span><%= @payment_account.created_at.strftime("%b %d, %Y") %></span>
       </div>
     </div>
   </div>

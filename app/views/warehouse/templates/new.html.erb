@@ -1,6 +1,6 @@
 <% content_for :title, "New Template" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= warehouse_templates_path %>" style="text-decoration: none; color: var(--foreground2);">← Templates</a>
     <strong style="font-size: 1.15em;">New Template</strong>
@@ -16,8 +16,7 @@
       <strong>Help</strong>
       <div is-="separator"></div>
       <div style="margin-top: 0.5lh; color: var(--foreground2);">
-        <p style="margin: 0 0 0.5lh;">Templates define a reusable set of line items for warehouse orders.</p>
-        <p style="margin: 0;">Shared templates are visible to all users.</p>
+        Templates define a reusable set of line items for warehouse orders. Shared templates are visible to all users.
       </div>
     </div>
   </div>

@@ -1,6 +1,17 @@
-<div style="padding: 0.5lh 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_sku_path(sku) %>" class="mono fw-semibold"><%= sku.sku %></a>
+<tr id="<%= dom_id sku %>">
+  <td style="padding: 0.25lh 1ch;">
+    <a href="<%= warehouse_sku_path(sku) %>" style="font-weight: bold; text-decoration: none;"><code><%= sku.sku %></code></a>
+    <span class="row-tag"><%= sku.name %></span>
+  </td>
+  <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= sku.in_stock || "—" %></td>
+  <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;">
+    <% if sku.declared_unit_cost.zero? %>
+      <span style="color: var(--red);" title="No cost data">⚠ $0.00</span>
+    <% else %>
+      <%= number_to_currency(sku.declared_unit_cost) %>
+    <% end %>
+  </td>
+  <td style="padding: 0.25lh 1ch;">
     <% if sku.in_stock.to_i > 0 %>
       <span is-="badge" variant-="green">In stock</span>
     <% elsif sku.in_stock.to_i < 0 %>
@@ -12,24 +23,7 @@
     <% else %>
       <span is-="badge" variant-="background2">No inventory</span>
     <% end %>
-    <% if sku.ai_enabled %>
-      <span is-="badge" variant-="blue">AI</span>
-    <% end %>
-    <% unless sku.enabled %>
-      <span is-="badge" variant-="background2">Disabled</span>
-    <% end %>
-    <span style="color: var(--foreground2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= sku.name %></span>
-    <span class="fw-semibold"><%= sku.in_stock || "—" %></span>
-    <span style="color: var(--foreground2);">in stock</span>
-    <span class="fw-semibold">
-      <% if sku.declared_unit_cost.zero? %>
-        <span style="color: var(--red);" title="No cost data — will block dispatch">⚠ $0.00</span>
-      <% else %>
-        <%= number_to_currency(sku.declared_unit_cost) %>
-      <% end %>
-    </span>
-  </row>
-  <% if sku.description.present? %>
-    <div style="color: var(--foreground2); margin-left: 2ch;"><%= truncate(sku.description, length: 80) %></div>
-  <% end %>
-</div>
+    <% if sku.ai_enabled %><span is-="badge" variant-="blue">AI</span><% end %>
+    <% unless sku.enabled %><span is-="badge" variant-="background2">Disabled</span><% end %>
+  </td>
+</tr>

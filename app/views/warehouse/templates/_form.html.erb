@@ -1,8 +1,8 @@
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
-    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
-      <strong><%= pluralize(warehouse_template.errors.count, "error") %> prohibited this template from being saved:</strong>
-      <ul class="error-list">
+    <div box-="square" style="margin-bottom: 1lh; color: var(--red);">
+      <strong>[!] <%= pluralize(warehouse_template.errors.count, "error") %>:</strong>
+      <ul style="margin: 0.25lh 0 0; padding-left: 2ch;">
         <% warehouse_template.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -14,12 +14,15 @@
     <strong>Template Details</strong>
     <div is-="separator"></div>
     <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Template name <span style="color: var(--red);">*</span></label>
         <input type="text" name="warehouse_template[name]" value="<%= warehouse_template.name %>" required style="width: 100%;">
       </div>
-
-      <label><input type="hidden" name="warehouse_template[public]" value="0"><input type="checkbox" name="warehouse_template[public]" value="1" <%= "checked" if warehouse_template.public %>> Share this template with all users</label>
+      <label>
+        <input type="hidden" name="warehouse_template[public]" value="0">
+        <input type="checkbox" name="warehouse_template[public]" value="1" <%= "checked" if warehouse_template.public %>>
+        Share with all users
+      </label>
     </div>
   </div>
 
@@ -37,7 +40,8 @@
   </div>
 
   <row gap-="1" align-="center">
-    <a href="<%= warehouse_templates_path %>">Cancel</a>
+    <span class="toolbar-spacer"></span>
+    <a href="<%= warehouse_templates_path %>" style="color: var(--foreground2);">Cancel</a>
     <button type="submit" variant-="green">✓ <%= warehouse_template.persisted? ? "Update Template" : "Create Template" %></button>
   </row>
 <% end %>

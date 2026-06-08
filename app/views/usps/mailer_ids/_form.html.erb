@@ -11,9 +11,9 @@
   <% end %>
 
   <div box-="round" style="margin-bottom: 1lh;">
-    <strong style="display: block; padding: 0.5lh 1ch;">Details</strong>
+    <strong>Details</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 1ch;">
+    <div style="margin-top: 0.5lh;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Name</label>
         <input type="text" name="usps_mailer_id[name]" value="<%= usps_mailer_id.name %>" style="width: 100%;">
@@ -32,7 +32,7 @@
   </div>
 
   <row gap-="1" align-="center" style="justify-content: flex-end;">
-    <a href="<%= usps_mailer_ids_path %>" style="color: var(--foreground2);">Cancel</a>
+    <a href="<%= usps_mailer_ids_path %>" style="color: var(--foreground2); text-decoration: none;">Cancel</a>
     <button type="submit" variant-="green"><%= usps_mailer_id.persisted? ? "Update Mailer ID" : "Create Mailer ID" %></button>
   </row>
 <% end %>

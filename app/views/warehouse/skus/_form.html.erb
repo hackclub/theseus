@@ -1,8 +1,8 @@
 <%= form_with(model: warehouse_sku) do |form| %>
   <% if warehouse_sku.errors.any? %>
-    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+    <div box-="square" style="margin-bottom: 1lh; color: var(--red);">
       <strong>[!] <%= pluralize(warehouse_sku.errors.count, "error") %>:</strong>
-      <ul class="error-list">
+      <ul style="margin: 0.25lh 0 0; padding-left: 2ch;">
         <% warehouse_sku.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -14,17 +14,15 @@
     <strong>SKU Details</strong>
     <div is-="separator"></div>
     <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">SKU code</label>
         <input type="text" name="warehouse_sku[sku]" value="<%= warehouse_sku.sku %>" style="width: 100%;">
       </div>
-
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Name</label>
         <input type="text" name="warehouse_sku[name]" value="<%= warehouse_sku.name %>" style="width: 100%;">
       </div>
-
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Description</label>
         <textarea name="warehouse_sku[description]" rows="3" style="width: 100%;"><%= warehouse_sku.description %></textarea>
       </div>
@@ -35,15 +33,14 @@
     <strong>Customs & Cost</strong>
     <div is-="separator"></div>
     <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Declared unit cost</label>
-        <div style="display: flex; align-items: center; gap: 0.5ch;">
+        <row gap-="0.5" align-="center">
           <span>$</span>
-          <input type="text" name="warehouse_sku[unit_cost]" value="<%= warehouse_sku.declared_unit_cost %>" style="width: 100%;">
-        </div>
+          <input type="text" name="warehouse_sku[unit_cost]" value="<%= warehouse_sku.declared_unit_cost %>" style="flex: 1;">
+        </row>
       </div>
-
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Customs description</label>
         <textarea name="warehouse_sku[customs_description]" rows="2" style="width: 100%;"><%= warehouse_sku.customs_description %></textarea>
       </div>
@@ -54,31 +51,30 @@
     <strong>Inventory & Settings</strong>
     <div is-="separator"></div>
     <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">In stock</label>
         <input type="number" name="warehouse_sku[in_stock]" value="<%= warehouse_sku.in_stock %>" style="width: 100%;">
       </div>
-
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label>
           <input type="checkbox" name="warehouse_sku[ai_enabled]" value="1" <%= "checked" if warehouse_sku.ai_enabled %>>
           AI enabled
         </label>
-        <div style="color: var(--foreground2); font-size: 0.9em;">Allow AI service to use this SKU</div>
+        <div style="color: var(--foreground2); font-size: 0.85em;">Allow AI service to use this SKU</div>
       </div>
-
-      <div style="margin-bottom: 1lh;">
+      <div style="margin-bottom: 0.5lh;">
         <label>
           <input type="checkbox" name="warehouse_sku[enabled]" value="1" <%= "checked" if warehouse_sku.enabled %>>
           Enabled
         </label>
-        <div style="color: var(--foreground2); font-size: 0.9em;">SKU is available for ordering</div>
+        <div style="color: var(--foreground2); font-size: 0.85em;">SKU is available for ordering</div>
       </div>
     </div>
   </div>
 
   <row gap-="1" align-="center">
-    <a href="<%= warehouse_skus_path %>">Cancel</a>
+    <span class="toolbar-spacer"></span>
+    <a href="<%= warehouse_skus_path %>" style="color: var(--foreground2);">Cancel</a>
     <button type="submit" variant-="green">✓ <%= warehouse_sku.persisted? ? "Update SKU" : "Create SKU" %></button>
   </row>
 <% end %>

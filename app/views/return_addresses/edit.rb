@@ -24,9 +24,22 @@ class Views::ReturnAddresses::Edit < Views::Base
 
       div(class: "show-sidebar") do
         div("box-": "round") do
-          strong { "Info" }
+          strong { "Current Address" }
           div("is-": "separator")
-          p(style: "color: var(--foreground2); margin: 0;") { "Return addresses appear as the sender on outgoing mail." }
+          div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+            span(class: "detail-label") { "Name" }
+            span { return_address.name.presence || "—" }
+            span(class: "detail-label") { "Line 1" }
+            span { return_address.line_1.presence || "—" }
+            span(class: "detail-label") { "City" }
+            span { return_address.city.presence || "—" }
+            span(class: "detail-label") { "State" }
+            span { return_address.state.presence || "—" }
+            span(class: "detail-label") { "ZIP" }
+            span { return_address.postal_code.presence || "—" }
+            span(class: "detail-label") { "Country" }
+            span { return_address.country.presence || "—" }
+          end
         end
       end
     end

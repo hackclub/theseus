@@ -14,7 +14,7 @@
   </div>
 
   <div class="show-sidebar">
-    <div box-="round" style="margin-bottom: 1lh;">
+    <div box-="round">
       <strong>Order Info</strong>
       <div is-="separator"></div>
       <div class="detail-grid" style="margin-top: 0.5lh;">
@@ -23,9 +23,9 @@
         <span class="detail-label">Created</span>
         <span><%= @warehouse_order.created_at.strftime("%b %d, %Y") %></span>
         <span class="detail-label">Status</span>
-        <span><%= @warehouse_order.humanized_state %></span>
+        <span><%= render 'warehouse/orders/status_badge', order: @warehouse_order %></span>
         <span class="detail-label">Created by</span>
-        <span><%= @warehouse_order.user&.email %></span>
+        <span><%= @warehouse_order.user&.email || "—" %></span>
       </div>
     </div>
   </div>

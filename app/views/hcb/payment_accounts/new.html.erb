@@ -1,6 +1,6 @@
 <% content_for :title, "Add HCB Organization" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= hcb_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← HCB Accounts</a>
     <strong style="font-size: 1.15em;">Add Organization</strong>
@@ -10,11 +10,11 @@
 <% if @organizations.any? %>
   <%= form_with url: hcb_payment_accounts_path, method: :post do |f| %>
     <div box-="round" style="margin-bottom: 1lh;">
-      <strong style="display: block; padding: 0.5lh 1ch;">Select Organization</strong>
+      <strong>Select Organization</strong>
       <div is-="separator"></div>
-      <p style="padding: 0 1ch; color: var(--foreground2);">Choose which HCB organization to use for paying postage.</p>
+      <div style="margin-top: 0.5lh; color: var(--foreground2);">Choose which HCB organization to use for paying postage.</div>
       <% @organizations.each do |org| %>
-        <label style="display: flex; align-items: center; gap: 1ch; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2); cursor: pointer;">
+        <label style="display: flex; align-items: center; gap: 1ch; padding: 0.5lh 0; border-bottom: 1px solid var(--background2); cursor: pointer;">
           <%= f.radio_button :organization_id, org.id %>
           <span style="font-weight: 500;"><%= org.name %></span>
         </label>
@@ -22,14 +22,14 @@
     </div>
 
     <row gap-="1" align-="center" style="justify-content: flex-end;">
-      <a href="<%= hcb_payment_accounts_path %>" style="color: var(--foreground2);">Cancel</a>
+      <a href="<%= hcb_payment_accounts_path %>" style="color: var(--foreground2); text-decoration: none;">Cancel</a>
       <button type="submit" variant-="green">Add Organization</button>
     </row>
   <% end %>
 <% else %>
   <div box-="round" style="text-align: center; padding: 2lh 2ch;">
     <strong>No organizations available</strong>
-    <p style="color: var(--foreground2); margin: 0;">You don't belong to any HCB organizations, or all your organizations are already linked.</p>
-    <a href="<%= hcb_payment_accounts_path %>" style="margin-top: 0.5lh; display: inline-block;">← Back</a>
+    <div style="color: var(--foreground2); margin-top: 0.25lh;">You don't belong to any HCB organizations, or all your organizations are already linked.</div>
+    <div style="margin-top: 1lh;"><a href="<%= hcb_payment_accounts_path %>" style="color: var(--foreground2);">← Back</a></div>
   </div>
 <% end %>

@@ -1,200 +1,179 @@
-<div class="page-container">
-  <div class="content-section">
-    <div class="page-header">
-      <div>
-        <div class="page-title-group">
-          <h1 class="page-title font-mono"><%= @warehouse_sku.sku %></h1>
-          <% if @warehouse_sku.in_stock.to_i > 10 %>
-            <span is-="badge" variant-="green">In stock</span>
-          <% elsif @warehouse_sku.in_stock.to_i.between?(1, 10) %>
-            <span is-="badge" variant-="yellow">Low stock</span>
-          <% elsif @warehouse_sku.in_stock.to_i < 0 %>
-            <% if @warehouse_sku.inbound.to_i >= @warehouse_sku.in_stock.abs %>
-              <span is-="badge" variant-="yellow">Backordered</span>
-            <% else %>
-              <span is-="badge" variant-="red">Backordered (!)</span>
+<% content_for :title, @warehouse_sku.sku %>
+
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
+    <strong style="font-size: 1.15em;"><%= @warehouse_sku.sku %></strong>
+    <% if @warehouse_sku.in_stock.to_i > 10 %>
+      <span is-="badge" variant-="green">In stock</span>
+    <% elsif @warehouse_sku.in_stock.to_i.between?(1, 10) %>
+      <span is-="badge" variant-="yellow">Low stock</span>
+    <% elsif @warehouse_sku.in_stock.to_i < 0 %>
+      <% if @warehouse_sku.inbound.to_i >= @warehouse_sku.in_stock.abs %>
+        <span is-="badge" variant-="yellow">Backordered</span>
+      <% else %>
+        <span is-="badge" variant-="red">Backordered (!)</span>
+      <% end %>
+    <% else %>
+      <span is-="badge" variant-="background2">No inventory</span>
+    <% end %>
+    <% if @warehouse_sku.ai_enabled %><span is-="badge" variant-="blue">AI</span><% end %>
+    <% unless @warehouse_sku.enabled %><span is-="badge" variant-="background2">Disabled</span><% end %>
+  </row>
+  <row gap-="1" align-="center">
+    <span style="color: var(--foreground2);"><%= @warehouse_sku.name %></span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <row gap-="1" align-="center">
+    <% admin_tool do %>
+      <a href="<%= edit_admin_warehouse_sku_path(@warehouse_sku) %>">✎ Edit</a>
+    <% end %>
+    <% if @warehouse_sku.zenventory_url.present? %>
+      <% admin_tool do %>
+        <a href="<%= @warehouse_sku.zenventory_url %>" target="_blank">↗ Zenventory</a>
+      <% end %>
+    <% end %>
+  </row>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Details</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">In Stock</span>
+        <span><%= @warehouse_sku.in_stock || "—" %></span>
+        <span class="detail-label">Inbound</span>
+        <span><%= @warehouse_sku.inbound || "—" %></span>
+        <span class="detail-label">Unit Cost</span>
+        <span><%= number_to_currency(@warehouse_sku.declared_unit_cost) %></span>
+        <span class="detail-label">Category</span>
+        <span><%= @warehouse_sku.category&.humanize || "—" %></span>
+        <% if @warehouse_sku.description.present? %>
+          <span class="detail-label">Description</span>
+          <span><%= @warehouse_sku.description %></span>
+        <% end %>
+        <% if @warehouse_sku.customs_description.present? %>
+          <span class="detail-label">Customs</span>
+          <span><%= @warehouse_sku.customs_description %></span>
+        <% end %>
+        <% if @warehouse_sku.country_of_origin.present? %>
+          <span class="detail-label">Origin</span>
+          <span><%= @warehouse_sku.country_of_origin %></span>
+        <% end %>
+        <% if @warehouse_sku.hs_code.present? %>
+          <span class="detail-label">HS Code</span>
+          <span><code><%= @warehouse_sku.hs_code %></code></span>
+        <% end %>
+        <% if @warehouse_sku.average_po_cost.present? %>
+          <span class="detail-label">Avg PO Cost</span>
+          <span><%= number_to_currency(@warehouse_sku.average_po_cost) %></span>
+        <% end %>
+        <% if @warehouse_sku.actual_cost_to_hc.present? %>
+          <span class="detail-label">Actual Cost</span>
+          <span><%= number_to_currency(@warehouse_sku.actual_cost_to_hc) %></span>
+        <% end %>
+        <span class="detail-label">Zenventory ID</span>
+        <span><code><%= @warehouse_sku.zenventory_id || "—" %></code></span>
+      </div>
+    </div>
+
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Recent Orders</strong>
+      <div is-="separator"></div>
+      <% if @recent_orders.any? %>
+        <table style="width: 100%; margin-top: 0.5lh;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">Order</th>
+              <th style="text-align: left;">Recipient</th>
+              <th style="text-align: right;">Qty</th>
+              <th style="text-align: left;">Tracking</th>
+              <th style="text-align: left;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_orders.each do |order| %>
+              <% line_item = order.line_items.find_by(sku_id: @warehouse_sku.id) %>
+              <tr>
+                <td style="padding: 0.25lh 1ch;">
+                  <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
+                </td>
+                <td style="padding: 0.25lh 1ch;"><%= order.address&.name_line || "—" %></td>
+                <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
+                <td style="padding: 0.25lh 1ch;">
+                  <% if order.tracking_number.present? %>
+                    <a href="<%= order.tracking_url %>" target="_blank" style="color: var(--foreground2);"><%= order.pretty_via %> ↗</a>
+                  <% else %>
+                    <span style="color: var(--foreground2);">—</span>
+                  <% end %>
+                </td>
+                <td style="padding: 0.25lh 1ch;">
+                  <% status_variant = { "draft" => "background2", "dispatched" => "blue", "mailed" => "green", "canceled" => "red", "errored" => "red" }[order.aasm_state] || "background2" %>
+                  <span is-="badge" variant-="<%= status_variant %>"><%= order.humanized_state %></span>
+                </td>
+              </tr>
             <% end %>
-          <% else %>
-            <span is-="badge" variant-="background2">No inventory</span>
-          <% end %>
-          <% if @warehouse_sku.ai_enabled %>
-            <span is-="badge" variant-="blue">AI</span>
-          <% end %>
-          <% unless @warehouse_sku.enabled %>
-            <span is-="badge" variant-="background2">Disabled</span>
-          <% end %>
-        </div>
-        <p class="page-subtitle"><%= @warehouse_sku.name %></p>
-      </div>
-
-      <div class="page-actions">
-        <% admin_tool do %>
-          <a href="<%= edit_admin_warehouse_sku_path(@warehouse_sku) %>" variant-="green" size-="small">✎ Edit</a>
-        <% end %>
-        <% if @warehouse_sku.zenventory_url.present? %>
-          <% admin_tool do %>
-            <a href="<%= @warehouse_sku.zenventory_url %>" target="_blank" size-="small">↗ Zenventory</a>
-          <% end %>
-        <% end %>
-      </div>
+          </tbody>
+        </table>
+      <% else %>
+        <div style="text-align: center; padding: 1lh 0; color: var(--foreground2);">No orders yet.</div>
+      <% end %>
     </div>
+
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Purchase Orders</strong>
+      <div is-="separator"></div>
+      <% if @recent_purchase_orders.any? %>
+        <table style="width: 100%; margin-top: 0.5lh;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">PO</th>
+              <th style="text-align: left;">Supplier</th>
+              <th style="text-align: right;">Qty</th>
+              <th style="text-align: right;">Unit Cost</th>
+              <th style="text-align: left;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_purchase_orders.each do |po| %>
+              <% line_item = po.line_items.find_by(sku_id: @warehouse_sku.id) %>
+              <tr>
+                <td style="padding: 0.25lh 1ch;">
+                  <a href="<%= warehouse_purchase_order_path(po) %>" style="font-weight: bold; text-decoration: none;"><%= po.order_number.presence || "##{po.id}" %></a>
+                </td>
+                <td style="padding: 0.25lh 1ch; color: var(--foreground2);"><%= po.supplier_name %></td>
+                <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
+                <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(line_item&.unit_cost) %></td>
+                <td style="padding: 0.25lh 1ch;">
+                  <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[po.status] || "background2" %>
+                  <span is-="badge" variant-="<%= status_variant %>"><%= po.humanized_state %></span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div style="text-align: center; padding: 1lh 0; color: var(--foreground2);">No purchase orders yet.</div>
+      <% end %>
+    </div>
+
+    <%= render partial: "admin_inspector", locals: { record: @warehouse_sku } %>
   </div>
 
-  <div class="stat-grid content-section">
-    <div class="stat-card stat-card--success">
-      <div class="stat-value"><%= @warehouse_sku.in_stock || "—" %></div>
-      <div class="stat-label">In Stock</div>
-    </div>
-    <div class="stat-card stat-card--attention">
-      <div class="stat-value"><%= @warehouse_sku.inbound || "—" %></div>
-      <div class="stat-label">Inbound</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value"><%= number_to_currency(@warehouse_sku.declared_unit_cost) %></div>
-      <div class="stat-label">Unit Cost</div>
-    </div>
-  </div>
-
-  <div class="two-col-equal content-section">
+  <div class="show-sidebar">
     <div box-="round">
-      <div class="kv-row"><span class="kv-label">Category</span><span><%= @warehouse_sku.category&.humanize || "—" %></span></div>
-      <% if @warehouse_sku.description.present? %>
-        <div is-="separator"></div>
-        <div><div class="detail-label">Description</div><div><%= @warehouse_sku.description %></div></div>
-      <% end %>
-      <% if @warehouse_sku.customs_description.present? %>
-        <div is-="separator"></div>
-        <div><div class="detail-label">Customs</div><div><%= @warehouse_sku.customs_description %></div></div>
-      <% end %>
-    </div>
-
-    <div box-="round">
-      <% if @warehouse_sku.country_of_origin.present? %>
-        <div class="kv-row"><span class="kv-label">Country of Origin</span><span><%= @warehouse_sku.country_of_origin %></span></div>
-        <div is-="separator"></div>
-      <% end %>
-      <% if @warehouse_sku.hs_code.present? %>
-        <div class="kv-row"><span class="kv-label">HS Code</span><code><%= @warehouse_sku.hs_code %></code></div>
-        <div is-="separator"></div>
-      <% end %>
-      <% if @warehouse_sku.average_po_cost.present? %>
-        <div class="kv-row"><span class="kv-label">Avg PO Cost</span><span><%= number_to_currency(@warehouse_sku.average_po_cost) %></span></div>
-        <div is-="separator"></div>
-      <% end %>
-      <% if @warehouse_sku.actual_cost_to_hc.present? %>
-        <div class="kv-row"><span class="kv-label">Actual Cost to HC</span><span><%= number_to_currency(@warehouse_sku.actual_cost_to_hc) %></span></div>
-        <div is-="separator"></div>
-      <% end %>
-      <div class="kv-row"><span class="kv-label">Zenventory ID</span><code><%= @warehouse_sku.zenventory_id || "—" %></code></div>
+      <strong>Inventory</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">In Stock</span>
+        <span style="font-weight: bold;"><%= @warehouse_sku.in_stock || "—" %></span>
+        <span class="detail-label">Inbound</span>
+        <span style="font-weight: bold;"><%= @warehouse_sku.inbound || "—" %></span>
+        <span class="detail-label">Unit Cost</span>
+        <span style="font-weight: bold;"><%= number_to_currency(@warehouse_sku.declared_unit_cost) %></span>
+      </div>
     </div>
   </div>
-
-  <div class="content-section">
-    <h2 class="section-heading">Recent Orders</h2>
-    <% if @recent_orders.any? %>
-      <div box-="round">
-        <% @recent_orders.each_with_index do |order, i| %>
-          <% line_item = order.line_items.find_by(sku_id: @warehouse_sku.id) %>
-          <div class="order-row">
-            <div class="order-row-left">
-              <%= link_to order.hc_id, warehouse_order_path(order), class: "mono fw-medium" %>
-              <% status_variant = { "draft" => "background2", "dispatched" => "blue", "mailed" => "green", "canceled" => "red", "errored" => "red" }[order.aasm_state] || "background2" %>
-              <span is-="badge" variant-="<%= status_variant %>"><%= order.humanized_state %></span>
-              <span class="order-row-name" title="<%= order.address&.name_line %>"><%= order.address&.name_line %></span>
-            </div>
-            <div class="order-row-right">
-              <span class="order-row-qty"><%= line_item&.quantity || 0 %> units</span>
-              <% if order.tracking_number.present? %>
-                <%= link_to order.tracking_url, target: "_blank", class: "resource-card-meta" do %>
-                  <%= order.pretty_via %> ↗
-                <% end %>
-              <% else %>
-                <span class="resource-card-meta">No tracking</span>
-              <% end %>
-              <span class="order-row-age"><%= time_ago_in_words(order.created_at) %> ago</span>
-              <% admin_tool do %>
-                <details is-="popover" position-="bottom baseline-right">
-                  <summary tabindex="0" size-="small">⋯</summary>
-                  <column gap-="0">
-                    <a href="<%= warehouse_order_path(order) %>">👁 View</a>
-                    <% unless order.mailed? || order.canceled? %>
-                      <a href="<%= edit_warehouse_order_path(order) %>">✎ Edit</a>
-                    <% end %>
-                    <% if order.zenventory_url.present? %>
-                      <a href="<%= order.zenventory_url %>" target="_blank">↗ Zenventory</a>
-                    <% end %>
-                    <% if order.tracking_url.present? %>
-                      <a href="<%= order.tracking_url %>" target="_blank">📍 Track Package</a>
-                    <% end %>
-                  </column>
-                </details>
-              <% end %>
-            </div>
-          </div>
-          <% if i < @recent_orders.size - 1 %>
-            <div is-="separator"></div>
-          <% end %>
-        <% end %>
-      </div>
-    <% else %>
-      <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-        <h3 style="margin: 0;">📦 No orders yet</h3>
-        <p style="color: var(--foreground2);">Theseus orders containing this SKU will appear here.</p>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="content-section">
-    <h2 class="section-heading">Purchase Orders</h2>
-    <% if @recent_purchase_orders.any? %>
-      <div box-="round">
-        <% @recent_purchase_orders.each_with_index do |po, i| %>
-          <% line_item = po.line_items.find_by(sku_id: @warehouse_sku.id) %>
-          <div class="order-row">
-            <div class="order-row-left">
-              <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
-              <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[po.status] || "background2" %>
-              <span is-="badge" variant-="<%= status_variant %>"><%= po.humanized_state %></span>
-              <span class="resource-card-meta"><%= po.supplier_name %></span>
-            </div>
-            <div class="order-row-right">
-              <div class="po-row-stat">
-                <div class="fw-medium"><%= line_item&.quantity || 0 %> units</div>
-                <div class="resource-card-meta"><%= number_to_currency(line_item&.unit_cost) %>/ea</div>
-              </div>
-              <span class="order-row-age"><%= time_ago_in_words(po.created_at) %> ago</span>
-              <% admin_tool do %>
-                <details is-="popover" position-="bottom baseline-right">
-                  <summary tabindex="0" size-="small">⋯</summary>
-                  <column gap-="0">
-                    <a href="<%= warehouse_purchase_order_path(po) %>">👁 View</a>
-                    <% unless po.completed? %>
-                      <a href="<%= edit_warehouse_purchase_order_path(po) %>">✎ Edit</a>
-                    <% end %>
-                    <% if po.zenventory_id.present? %>
-                      <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= po.zenventory_id %>" target="_blank">⎘ Zenv PDF</a>
-                    <% end %>
-                  </column>
-                </details>
-              <% end %>
-            </div>
-          </div>
-          <% if i < @recent_purchase_orders.size - 1 %>
-            <div is-="separator"></div>
-          <% end %>
-        <% end %>
-      </div>
-    <% else %>
-      <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-        <h3 style="margin: 0;">📦 No purchase orders yet</h3>
-        <p style="color: var(--foreground2);">Purchase orders for this SKU will appear here.</p>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="back-link">
-    <a href="<%= warehouse_skus_path %>" size-="small">← Back to SKUs</a>
-  </div>
-
-  <%= render partial: "admin_inspector", locals: { record: @warehouse_sku } %>
 </div>

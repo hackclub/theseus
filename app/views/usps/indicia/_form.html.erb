@@ -11,9 +11,9 @@
   <% end %>
 
   <div box-="round" style="margin-bottom: 1lh;">
-    <strong style="display: block; padding: 0.5lh 1ch;">Postage</strong>
+    <strong>Postage</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 1ch;">
+    <div style="margin-top: 0.5lh;">
       <row gap-="2">
         <div style="flex: 1;">
           <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Postage</label>
@@ -38,9 +38,9 @@
   </div>
 
   <div box-="round" style="margin-bottom: 1lh;">
-    <strong style="display: block; padding: 0.5lh 1ch;">Dimensions</strong>
+    <strong>Dimensions</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 1ch;">
+    <div style="margin-top: 0.5lh;">
       <row gap-="2">
         <div style="flex: 1;">
           <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Weight (oz)</label>
@@ -68,16 +68,16 @@
   </div>
 
   <div box-="round" style="margin-bottom: 1lh;">
-    <strong style="display: block; padding: 0.5lh 1ch;">Raw Response</strong>
+    <strong>Raw Response</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 1ch;">
+    <div style="margin-top: 0.5lh;">
       <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Raw USPS response</label>
       <textarea name="usps_indicium[raw_usps_response]" rows="4" style="width: 100%;"><%= usps_indicium.raw_usps_response %></textarea>
     </div>
   </div>
 
   <row gap-="1" align-="center" style="justify-content: flex-end;">
-    <a href="<%= usps_indicia_path %>" style="color: var(--foreground2);">Cancel</a>
+    <a href="<%= usps_indicia_path %>" style="color: var(--foreground2); text-decoration: none;">Cancel</a>
     <button type="submit" variant-="green"><%= usps_indicium.persisted? ? "Update Indicium" : "Create Indicium" %></button>
   </row>
 <% end %>

@@ -14,7 +14,7 @@ class Views::Warehouse::Batches::New < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "page-toolbar") do
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: warehouse_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "New Warehouse Batch" }
@@ -26,7 +26,6 @@ class Views::Warehouse::Batches::New < Views::Base
     div(class: "show-layout") do
       div(class: "show-main") do
         form_with(model: @batch, url: warehouse_batches_path, scope: :batch) do |f|
-          # Template & Title
           div("box-": "round", style: "margin-bottom: 1lh;") do
             strong { "Batch Details" }
             div("is-": "separator")
@@ -49,11 +48,10 @@ class Views::Warehouse::Batches::New < Views::Base
                 label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Title" }
                 input(type: "text", name: "batch[warehouse_user_facing_title]", style: "width: 100%;")
               end
-              p(style: "color: var(--foreground2); font-size: 0.9em;") { "Optional — shown on the order list" }
+              p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0;") { "Optional — shown on the order list" }
             end
           end
 
-          # Addresses (CSV)
           div("box-": "round", style: "margin-bottom: 1lh;") do
             strong { "Addresses" }
             div("is-": "separator")
@@ -67,10 +65,8 @@ class Views::Warehouse::Batches::New < Views::Base
             end
           end
 
-          # Tags
           tag_picker(f)
 
-          # Actions
           row("gap-": "1", "align-": "center", style: "margin-top: 1lh;") do
             a(href: warehouse_batches_path) { "Cancel" }
             button(type: "submit", "variant-": "green") { "✓ Create Batch" }
@@ -80,11 +76,11 @@ class Views::Warehouse::Batches::New < Views::Base
 
       div(class: "show-sidebar") do
         div("box-": "round") do
-          strong { "Help" }
+          strong { "Info" }
           div("is-": "separator")
           div(style: "margin-top: 0.5lh; color: var(--foreground2);") do
-            p(style: "margin: 0 0 0.5lh;") { "Select a template, upload a CSV of addresses, and optionally add tags." }
-            p(style: "margin: 0;") { "The CSV must include columns that map to address fields." }
+            p(style: "margin: 0 0 0.5lh;") { "Upload a CSV of addresses, map the columns, and create orders in bulk." }
+            p(style: "margin: 0;") { "Each address becomes one warehouse order using the selected template." }
           end
         end
       end
@@ -120,7 +116,7 @@ class Views::Warehouse::Batches::New < Views::Base
             option(value: tag, selected: @batch.tags&.include?(tag)) { tag }
           end
         end
-        p(style: "color: var(--foreground2); font-size: 0.9em;") { "Select from common tags or create your own" }
+        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0;") { "Select from common tags or create your own" }
       end
     end
   end

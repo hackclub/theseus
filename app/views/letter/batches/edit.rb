@@ -13,25 +13,22 @@ class Views::Letter::Batches::Edit < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    # Header
     div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
-        strong(style: "font-size: 1.15em;") { "Edit Letter Batch" }
+        strong(style: "font-size: 1.15em;") { "Edit Batch" }
       end
     end
 
-    # Two-column layout
     div(class: "show-layout") do
       div(class: "show-main") do
         error_messages
 
         form_with(model: @batch, url: letter_batch_path(@batch), scope: :letter_batch, method: :patch) do |f|
-          # Letter Specs
           div("box-": "round", style: "margin-bottom: 1lh;") do
             strong { "Letter Specs" }
             div("is-": "separator")
-            div(style: "padding: 1lh 1ch;") do
+            div(style: "margin-top: 0.5lh;") do
               div(
                 data_svelte_component: "letter-attributes-picker",
                 data_form_scope: "letter_batch",
@@ -44,22 +41,19 @@ class Views::Letter::Batches::Edit < Views::Base
             end
           end
 
-          # Sender & Postage
           div("box-": "round", style: "margin-bottom: 1lh;") do
             strong { "Sender & Postage" }
             div("is-": "separator")
-            div(style: "padding: 1lh 1ch;") do
+            div(style: "margin-top: 0.5lh;") do
               sender_fields(f)
             end
           end
 
-          # Tags
           tag_picker(f)
 
-          # Actions
           row("gap-": "1", style: "margin-top: 1lh;") do
             button(type: "submit", "variant-": "green") { "✓ Update Batch" }
-            a(href: letter_batch_path(@batch)) { button("size-": "small") { "Cancel" } }
+            a(href: letter_batch_path(@batch)) { button { "Cancel" } }
           end
         end
       end
@@ -75,12 +69,11 @@ class Views::Letter::Batches::Edit < Views::Base
   def error_messages
     return unless @batch.errors.any?
 
-    div("box-": "square", class: "tui-banner tui-banner-error", style: "margin-bottom: 1lh;") do
-      strong { "[!] Hey, slight issue:" }
-      ul(class: "error-list") do
-        @batch.errors.each do |error|
-          li { error.full_message }
-        end
+    div("box-": "round", style: "margin-bottom: 1lh; border-color: var(--red);") do
+      strong(style: "color: var(--red);") { "#{@batch.errors.count} #{"error".pluralize(@batch.errors.count)} prevented saving" }
+      div("is-": "separator")
+      ul(style: "margin: 0.5lh 0 0; padding-left: 2ch;") do
+        @batch.errors.full_messages.each { |msg| li { msg } }
       end
     end
   end
@@ -142,18 +135,18 @@ class Views::Letter::Batches::Edit < Views::Base
   end
 
   def batch_info_card
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    div("box-": "round") do
       strong { "Batch Info" }
       div("is-": "separator")
-      div(class: "detail-grid") do
+      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+        span(class: "detail-label") { "Status" }
+        span { render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch) }
+
         span(class: "detail-label") { "Letters" }
         span { @batch.letters.count.to_s }
 
         span(class: "detail-label") { "Addresses" }
         span { @batch.addresses.count.to_s }
-
-        span(class: "detail-label") { "Status" }
-        span { render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch) }
       end
     end
   end

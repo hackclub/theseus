@@ -1,4 +1,5 @@
-<tr id="<%= dom_id payment_account %>" style="border-bottom: 1px solid var(--background2);">
-  <td style="padding: 0.5lh 1ch;"><a href="<%= usps_payment_account_path(payment_account) %>"><%= payment_account.display_name %></a></td>
-  <td style="padding: 0.5lh 1ch;"><span is-="badge" variant-="background2"><%= payment_account.account_type %></span></td>
+<tr id="<%= dom_id payment_account %>">
+  <td><a href="<%= usps_payment_account_path(payment_account) %>" style="text-decoration: none;"><strong><%= payment_account.display_name %></strong></a></td>
+  <td><span is-="badge" variant-="background2"><%= payment_account.account_type %></span></td>
+  <td style="color: var(--foreground2);"><%= payment_account.usps_mailer_id&.name || "—" %></td>
 </tr>

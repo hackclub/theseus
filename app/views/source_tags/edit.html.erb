@@ -1,12 +1,10 @@
 <% content_for :title, "Edit #{@source_tag.name}" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= source_tag_path(@source_tag) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @source_tag.name %></a>
     <strong style="font-size: 1.15em;">Edit Source Tag</strong>
-    <code style="color: var(--foreground2);"><%= @source_tag.slug %></code>
   </row>
-  <span class="toolbar-spacer"></span>
 </div>
 
 <div class="show-layout">

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Views::Letter::Batches::Show < Views::Base
-  include Phlex::Rails::Helpers::TimeAgoInWords
+  include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::NumberToCurrency
 
   def initialize(batch:)
@@ -9,16 +9,34 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def view_template
-    # Header
+    header_toolbar
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        details_box
+        letters_table if @batch.letters.any?
+        addresses_table if @batch.addresses.any?
+      end
+      div(class: "show-sidebar") do
+        actions_box
+        stats_box
+      end
+    end
+  end
+
+  private
+
+  def header_toolbar
     div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
-      row("gap-": "1", "align-": "center") do
-        if @batch.tags.any?
-          render Components::Shared::Tags.new(tags: @batch.tags)
+      if @batch.tags.any?
+        row("gap-": "1", "align-": "center") do
+          @batch.tags.compact_blank.each do |tag|
+            span("is-": "badge", "variant-": "background2") { tag }
+          end
         end
       end
       span(class: "toolbar-spacer")
@@ -29,41 +47,20 @@ class Views::Letter::Batches::Show < Views::Base
             button("variant-": "green", "size-": "small") { "▶ Process" }
           end
         end
-        form(method: :post, action: letter_batch_path(@batch), style: "display: inline;") do
-          input(type: :hidden, name: :_method, value: :delete)
-          input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
+        form_with(url: letter_batch_path(@batch), method: :delete, data: { turbo_confirm: "Delete this batch?" }, class: "form-inline") do
           button(type: "submit", "variant-": "red", "size-": "small") { "✕" }
         end
       end
     end
-
-    # Two-column layout
-    div(class: "show-layout") do
-      div(class: "show-main") do
-        batch_details
-        letters_section if @batch.letters.any?
-        addresses_section if @batch.addresses.any?
-      end
-
-      div(class: "show-sidebar") do
-        actions_sidebar if @batch.processed?
-        batch_stats
-      end
-    end
   end
 
-  private
-
-  def batch_details
+  def details_box
     div("box-": "round", style: "margin-bottom: 1lh;") do
       strong { "Details" }
       div("is-": "separator")
-      div(class: "detail-grid") do
-        span(class: "detail-label") { "Status" }
-        span { render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch) }
-
+      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
         span(class: "detail-label") { "Origin" }
-        span { @batch.origin }
+        span { @batch.origin || "—" }
 
         span(class: "detail-label") { "Dimensions" }
         span { "#{@batch.letter_width}\" × #{@batch.letter_height}\", #{@batch.letter_weight} oz" }
@@ -75,52 +72,60 @@ class Views::Letter::Batches::Show < Views::Base
         span { @batch.letter_return_address&.display_name || "—" }
 
         span(class: "detail-label") { "Mailing Date" }
-        span { @batch.letter_mailing_date&.strftime("%b %-d, %Y") || "Not set" }
+        span { @batch.letter_mailing_date&.strftime("%b %-d, %Y") || "—" }
 
         span(class: "detail-label") { "Created" }
-        span { "#{time_ago_in_words(@batch.created_at)} ago" }
+        span { @batch.created_at.strftime("%b %-d, %Y %H:%M") }
       end
     end
   end
 
-  def actions_sidebar
+  def actions_box
     div("box-": "round", style: "margin-bottom: 1lh;") do
       strong { "Actions" }
       div("is-": "separator")
-      column("gap-": "1") do
-        if @batch.pdf_label.attached?
-          a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", style: "width: 100%;") do
-            button("variant-": "green", style: "width: 100%;") { "⬇ View Labels PDF" }
+      div(style: "margin-top: 0.5lh;") do
+        if @batch.processed?
+          if @batch.pdf_label.attached?
+            a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", style: "display: block; margin-bottom: 0.5lh;") do
+              button("variant-": "green", style: "width: 100%;") { "⬇ View Labels PDF" }
+            end
           end
-        end
 
-        form(method: :post, action: mark_printed_letter_batch_path(@batch)) do
-          input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-          button(type: "submit", style: "width: 100%;") { "✓ Mark All Printed" }
-        end
+          form_with(url: mark_printed_letter_batch_path(@batch), method: :post) do
+            button(type: "submit", style: "width: 100%; margin-bottom: 0.5lh;") { "✓ Mark All Printed" }
+          end
 
-        form(method: :post, action: mark_mailed_letter_batch_path(@batch)) do
-          input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-          button(type: "submit", style: "width: 100%;") { "◇ Mark All Mailed" }
-        end
+          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post) do
+            button(type: "submit", style: "width: 100%; margin-bottom: 0.5lh;") { "✉ Mark All Mailed" }
+          end
 
-        a(href: regen_letter_batch_path(@batch), style: "width: 100%;") do
-          button("size-": "small", style: "width: 100%;") { "⟳ Regenerate Labels" }
+          a(href: regenerate_form_letter_batch_path(@batch), style: "display: block;") do
+            button("size-": "small", style: "width: 100%;") { "⟳ Regenerate Labels" }
+          end
+        elsif @batch.fields_mapped?
+          a(href: process_confirm_letter_batch_path(@batch), style: "display: block;") do
+            button("variant-": "green", style: "width: 100%;") { "▶ Process Batch" }
+          end
+        elsif @batch.awaiting_field_mapping?
+          a(href: map_fields_letter_batch_path(@batch), style: "display: block;") do
+            button("variant-": "green", style: "width: 100%;") { "⇉ Map Fields" }
+          end
         end
       end
     end
   end
 
-  def batch_stats
+  def stats_box
     div("box-": "round", style: "margin-bottom: 1lh;") do
       strong { "Stats" }
       div("is-": "separator")
-      div(class: "detail-grid") do
+      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
         span(class: "detail-label") { "Letters" }
-        span { @batch.letters.count.to_s }
+        span { helpers.number_with_delimiter(@batch.letters.count) }
 
         span(class: "detail-label") { "Addresses" }
-        span { @batch.addresses.count.to_s }
+        span { helpers.number_with_delimiter(@batch.addresses.count) }
 
         if @batch.processed?
           span(class: "detail-label") { "Total Postage" }
@@ -130,54 +135,66 @@ class Views::Letter::Batches::Show < Views::Base
     end
   end
 
-  def letters_section
+  def letters_table
     div("box-": "round", style: "margin-bottom: 1lh;") do
-      strong { "Letters (#{@batch.letters.count})" }
+      strong { "Letters" }
+      span(style: "color: var(--foreground2); margin-left: 1ch;") { "(#{@batch.letters.count})" }
       div("is-": "separator")
-      table(class: "data-table") do
+      table do
         thead do
           tr do
-            %w[ID Recipient Status Postage].each { |h| th { h } }
+            th { "ID" }
+            th { "Recipient" }
+            th { "Postage" }
+            th { "Status" }
           end
         end
         tbody do
           @batch.letters.includes(:address).limit(100).each do |letter|
             tr do
-              td { a(href: letter_path(letter)) { letter.public_id } }
-              td { plain "#{letter.address&.first_name} #{letter.address&.last_name}" }
+              td do
+                a(href: letter_path(letter), style: "text-decoration: none; color: var(--foreground0);") { letter.public_id }
+              end
+              td { plain [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ").presence || "—" }
+              td(style: "color: var(--foreground2);") { plain letter.postage_type&.humanize || "—" }
               td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
-              td { plain letter.postage_type || "—" }
             end
           end
         end
       end
       if @batch.letters.count > 100
-        div(style: "padding: 0.5lh 1ch; color: var(--foreground2);") do
-          plain "Showing first 100 of #{@batch.letters.count} letters"
+        div(style: "padding: 0.5lh 0; color: var(--foreground2);") do
+          plain "Showing first 100 of #{helpers.number_with_delimiter(@batch.letters.count)} letters"
         end
       end
     end
   end
 
-  def addresses_section
+  def addresses_table
     div("box-": "round", style: "margin-bottom: 1lh;") do
-      strong { "Addresses (#{@batch.addresses.count})" }
+      strong { "Addresses" }
+      span(style: "color: var(--foreground2); margin-left: 1ch;") { "(#{@batch.addresses.count})" }
       div("is-": "separator")
-      table(class: "data-table") do
+      table do
         thead do
           tr do
-            %w[Name Address City State ZIP Country].each { |h| th { h } }
+            th { "Name" }
+            th { "Address" }
+            th { "City" }
+            th { "State" }
+            th { "ZIP" }
+            th { "Country" }
           end
         end
         tbody do
           @batch.addresses.limit(100).each do |addr|
             tr do
-              td { "#{addr.first_name} #{addr.last_name}" }
-              td { "#{addr.line_1}#{addr.line_2.present? ? ", #{addr.line_2}" : ""}" }
-              td { addr.city || "—" }
-              td { addr.state || "—" }
-              td { addr.postal_code || "—" }
-              td { addr.country || "—" }
+              td { plain "#{addr.first_name} #{addr.last_name}" }
+              td { plain "#{addr.line_1}#{addr.line_2.present? ? ", #{addr.line_2}" : ""}" }
+              td { plain addr.city || "—" }
+              td { plain addr.state || "—" }
+              td { plain addr.postal_code || "—" }
+              td { plain addr.country || "—" }
             end
           end
         end

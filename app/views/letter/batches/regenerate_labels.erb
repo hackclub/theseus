@@ -11,7 +11,7 @@
       <div box-="round" style="margin-bottom: 1lh;">
         <strong>Template Selection</strong>
         <div is-="separator"></div>
-        <div style="padding: 1lh 1ch;">
+        <div style="margin-top: 0.5lh;">
           <div class="form-field-lg">
             <%= f.label :template_cycle, "Templates to use:", class: "date-field-label" %>
             <%= f.hidden_field :template_cycle, id: "selected_template", value: params[:template] %>
@@ -23,7 +23,7 @@
       <div box-="round" style="margin-bottom: 1lh;">
         <strong>Options</strong>
         <div is-="separator"></div>
-        <div style="padding: 1lh 1ch;">
+        <div style="margin-top: 0.5lh;">
           <label class="form-check-label">
             <%= f.check_box :include_qr_code, checked: true %>
             <span>Include QR Code</span>
@@ -33,16 +33,16 @@
 
       <row gap-="1" style="margin-top: 1lh;">
         <button type="submit" variant-="green">⟳ Regenerate Labels</button>
-        <a href="<%= letter_batch_path(@batch) %>"><button size-="small">Cancel</button></a>
+        <a href="<%= letter_batch_path(@batch) %>"><button>Cancel</button></a>
       </row>
     <% end %>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round" style="margin-bottom: 1lh;">
+    <div box-="round">
       <strong>Batch Info</strong>
       <div is-="separator"></div>
-      <div class="detail-grid">
+      <div class="detail-grid" style="margin-top: 0.5lh;">
         <span class="detail-label">Letters</span>
         <span><%= @batch.letters.count %></span>
         <span class="detail-label">Addresses</span>

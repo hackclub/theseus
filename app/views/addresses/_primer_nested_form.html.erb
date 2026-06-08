@@ -1,83 +1,61 @@
 <%
-  def country_flag(code)
-    return "" if code.blank?
-    code.upcase.chars.map { |c| (c.ord + 127397).chr(Encoding::UTF_8) }.join
-  end
-
-  countries_with_flags = Address.countries_for_select.map do |code, name|
-    {
-      code: code,
-      name: name,
-      flag: country_flag(code),
-      display: "#{country_flag(code)}  #{name}",
-      filter: "#{code}#{code}#{code} #{name}"
-    }
-  end
+  countries_for_select = Address.countries_for_select.map { |code, name|
+    flag = code.blank? ? "" : code.upcase.chars.map { |c| (c.ord + 127397).chr(Encoding::UTF_8) }.join
+    [code, "#{flag}  #{name}"]
+  }
 
   top_codes = %w[US CA]
-  top_countries = top_codes.map { |code| countries_with_flags.find { |c| c[:code] == code } }.compact
-  other_countries = countries_with_flags.reject { |c| top_codes.include?(c[:code]) }
-  all_ordered = top_countries + other_countries
+  top = countries_for_select.select { |code, _| top_codes.include?(code) }.sort_by { |code, _| top_codes.index(code) }
+  rest = countries_for_select.reject { |code, _| top_codes.include?(code) }
+  all_ordered = top + rest
 %>
 
 <%= form.fields_for :address do |a| %>
-  <% form_id = "address-form-#{SecureRandom.hex(4)}" %>
   <% current_country = a.object&.country %>
-  <% current_entry = countries_with_flags.find { |c| c[:code] == current_country } %>
 
-  <div id="<%= form_id %>" class="address-form">
-    <%# Row 1: Name %>
-    <div class="two-col-equal">
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">First name <span style="color: var(--red);">*</span></label>
-        <input type="text" name="<%= a.field_name(:first_name) %>" value="<%= a.object&.first_name %>" required style="width: 100%;">
-      </div>
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Last name</label>
-        <input type="text" name="<%= a.field_name(:last_name) %>" value="<%= a.object&.last_name %>" style="width: 100%;">
-      </div>
+  <row gap-="2" style="margin-bottom: 0.5lh;">
+    <div style="flex: 1;">
+      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">First name <span style="color: var(--red);">*</span></label>
+      <input type="text" name="<%= a.field_name(:first_name) %>" value="<%= a.object&.first_name %>" required style="width: 100%;">
     </div>
+    <div style="flex: 1;">
+      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Last name</label>
+      <input type="text" name="<%= a.field_name(:last_name) %>" value="<%= a.object&.last_name %>" style="width: 100%;">
+    </div>
+  </row>
 
-    <%# Row 2: Street address %>
-    <div style="margin-bottom: 1lh;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Street address <span style="color: var(--red);">*</span></label>
-      <input type="text" name="<%= a.field_name(:line_1) %>" value="<%= a.object&.line_1 %>" required style="width: 100%;">
-    </div>
+  <div style="margin-bottom: 0.5lh;">
+    <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Street address <span style="color: var(--red);">*</span></label>
+    <input type="text" name="<%= a.field_name(:line_1) %>" value="<%= a.object&.line_1 %>" required style="width: 100%;">
+  </div>
 
-    <%# Row 3: Apt/Suite %>
-    <div style="margin-bottom: 1lh;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Apt, suite, unit, etc.</label>
-      <input type="text" name="<%= a.field_name(:line_2) %>" value="<%= a.object&.line_2 %>" style="width: 100%;">
-      <span style="color: var(--foreground2); font-size: 0.9em;">Optional</span>
-    </div>
+  <div style="margin-bottom: 0.5lh;">
+    <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Apt, suite, unit</label>
+    <input type="text" name="<%= a.field_name(:line_2) %>" value="<%= a.object&.line_2 %>" style="width: 100%;">
+  </div>
 
-    <%# Row 4: City / State / Postal %>
-    <div class="address-form-city-row">
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">City <span style="color: var(--red);">*</span></label>
-        <input type="text" name="<%= a.field_name(:city) %>" value="<%= a.object&.city %>" required style="width: 100%;">
-      </div>
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">State <span style="color: var(--red);">*</span></label>
-        <input type="text" name="<%= a.field_name(:state) %>" value="<%= a.object&.state %>" required style="width: 100%;">
-      </div>
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Postal code <span style="color: var(--red);">*</span></label>
-        <input type="text" name="<%= a.field_name(:postal_code) %>" value="<%= a.object&.postal_code %>" required style="width: 100%;">
-      </div>
+  <row gap-="2" style="margin-bottom: 0.5lh;">
+    <div style="flex: 2;">
+      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">City <span style="color: var(--red);">*</span></label>
+      <input type="text" name="<%= a.field_name(:city) %>" value="<%= a.object&.city %>" required style="width: 100%;">
     </div>
+    <div style="flex: 1;">
+      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">State <span style="color: var(--red);">*</span></label>
+      <input type="text" name="<%= a.field_name(:state) %>" value="<%= a.object&.state %>" required style="width: 100%;">
+    </div>
+    <div style="flex: 1;">
+      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Postal code <span style="color: var(--red);">*</span></label>
+      <input type="text" name="<%= a.field_name(:postal_code) %>" value="<%= a.object&.postal_code %>" required style="width: 100%;">
+    </div>
+  </row>
 
-    <%# Row 5: Country %>
-    <div class="address-form-country">
-      <label class="date-field-label">
-        Country <span style="color: var(--red);">*</span>
-      </label>
-      <select name="<%= a.field_name(:country) %>" required style="width: 100%;">
-        <option value="">Select country...</option>
-        <% all_ordered.each do |country| %>
-          <option value="<%= country[:code] %>" <%= "selected" if country[:code] == current_country %>><%= country[:display] %></option>
-        <% end %>
-      </select>
-    </div>
+  <div style="margin-bottom: 0.5lh;">
+    <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Country <span style="color: var(--red);">*</span></label>
+    <select name="<%= a.field_name(:country) %>" required style="width: 100%;">
+      <option value="">Select country…</option>
+      <% all_ordered.each do |code, display| %>
+        <option value="<%= code %>" <%= "selected" if code == current_country %>><%= display %></option>
+      <% end %>
+    </select>
   </div>
 <% end %>

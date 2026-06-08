@@ -1,6 +1,6 @@
 <% content_for :title, "New SKU" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
     <strong style="font-size: 1.15em;">New SKU</strong>
@@ -16,8 +16,7 @@
       <strong>Help</strong>
       <div is-="separator"></div>
       <div style="margin-top: 0.5lh; color: var(--foreground2);">
-        <p style="margin: 0 0 0.5lh;">Fill in the SKU code, name, and cost details.</p>
-        <p style="margin: 0;">AI-enabled SKUs can be selected by the AI ordering service.</p>
+        Fill in the SKU code, name, and cost details. AI-enabled SKUs can be selected by the AI ordering service.
       </div>
     </div>
   </div>

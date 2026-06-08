@@ -1,6 +1,6 @@
 <% content_for :title, @usps_mailer_id.name %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= usps_mailer_ids_path %>" style="text-decoration: none; color: var(--foreground2);">← Mailer IDs</a>
     <strong style="font-size: 1.15em;"><%= @usps_mailer_id.name %></strong>
@@ -16,32 +16,32 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round">
-      <strong style="display: block; padding: 0.5lh 1ch;">Details</strong>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Details</strong>
       <div is-="separator"></div>
-      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+      <div class="detail-grid" style="margin-top: 0.5lh;">
         <span class="detail-label">Name</span>
         <span><%= @usps_mailer_id.name %></span>
         <span class="detail-label">CRID</span>
-        <code><%= @usps_mailer_id.crid %></code>
+        <span><code><%= @usps_mailer_id.crid %></code></span>
         <span class="detail-label">MID</span>
-        <code><%= @usps_mailer_id.mid %></code>
-      </div>
-    </div>
-  </div>
-
-  <div class="show-sidebar">
-    <div box-="round">
-      <strong style="display: block; padding: 0.5lh 1ch;">Actions</strong>
-      <div is-="separator"></div>
-      <div style="padding: 0.5lh 1ch;">
-        <a href="<%= edit_usps_mailer_id_path(@usps_mailer_id) %>" style="display: block; text-align: center; margin-bottom: 0.5lh;">✎ Edit Mailer ID</a>
-        <%= form_with url: usps_mailer_id_path(@usps_mailer_id), method: :delete, data: { turbo_confirm: "Delete this mailer ID?" } do %>
-          <button type="submit" variant-="red" style="width: 100%;">✕ Delete</button>
-        <% end %>
+        <span><code><%= @usps_mailer_id.mid %></code></span>
       </div>
     </div>
 
     <%= render partial: "admin_inspector", locals: { record: @usps_mailer_id } %>
+  </div>
+
+  <div class="show-sidebar">
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Actions</strong>
+      <div is-="separator"></div>
+      <div style="margin-top: 0.5lh;">
+        <a href="<%= edit_usps_mailer_id_path(@usps_mailer_id) %>"><button style="width: 100%; margin-bottom: 0.5lh;">✎ Edit Mailer ID</button></a>
+        <%= form_with url: usps_mailer_id_path(@usps_mailer_id), method: :delete, data: { turbo_confirm: "Delete this mailer ID?" } do %>
+          <button type="submit" variant-="red" size-="small" style="width: 100%;">✕ Delete</button>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>

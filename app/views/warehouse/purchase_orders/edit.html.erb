@@ -1,6 +1,6 @@
 <% content_for :title, "Edit Purchase Order #{@purchase_order.order_number.presence || "##{@purchase_order.id}"}" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= warehouse_purchase_order_path(@purchase_order) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></a>
     <strong style="font-size: 1.15em;">Edit Purchase Order</strong>

@@ -1,6 +1,6 @@
 <% content_for :title, "Tag: #{@tag}" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= tags_path %>" style="text-decoration: none; color: var(--foreground2);">← Tags</a>
     <strong style="font-size: 1.15em;"><%= @tag %></strong>
@@ -36,19 +36,17 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <!-- Stats -->
     <row gap-="2" style="margin-bottom: 1lh;">
       <div box-="round" style="flex: 1; text-align: center; padding: 1lh 1ch;">
-        <div style="font-size: 1.5em; font-weight: bold;"><%= @warehouse_order_count %></div>
+        <div style="font-size: 1.5em; font-weight: bold;"><%= number_with_delimiter(@warehouse_order_count) %></div>
         <div style="color: var(--foreground2);">Warehouse Orders</div>
       </div>
       <div box-="round" style="flex: 1; text-align: center; padding: 1lh 1ch;">
-        <div style="font-size: 1.5em; font-weight: bold;"><%= @letter_count %></div>
+        <div style="font-size: 1.5em; font-weight: bold;"><%= number_with_delimiter(@letter_count) %></div>
         <div style="color: var(--foreground2);">Letters</div>
       </div>
     </row>
 
-    <!-- Costs side by side -->
     <row gap-="2" style="margin-bottom: 1lh;">
       <div box-="round" style="flex: 1;">
         <strong>Letter Costs</strong>

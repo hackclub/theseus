@@ -1,29 +1,29 @@
-<div box-="round">
-  <table style="width: 100%; border-collapse: collapse;">
+<div box-="round" style="margin-bottom: 1lh;">
+  <strong>Addresses</strong>
+  <div is-="separator"></div>
+  <table style="width: 100%;">
     <thead>
-      <tr style="border-bottom: 1px solid var(--background3);">
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Name</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Address</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">City</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">State</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Postal Code</th>
-        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Country</th>
+      <tr>
+        <th style="text-align: left;">Name</th>
+        <th style="text-align: left;">Address</th>
+        <th style="text-align: left;">City</th>
+        <th style="text-align: left;">State</th>
+        <th style="text-align: left;">Postal Code</th>
+        <th style="text-align: left;">Country</th>
       </tr>
     </thead>
     <tbody>
       <% addresses.each do |address| %>
-        <tr style="border-bottom: 1px solid var(--background2);">
-          <td style="padding: 0.5lh 1ch;"><%= "#{address.first_name} #{address.last_name}" %></td>
-          <td style="padding: 0.5lh 1ch;">
+        <tr>
+          <td style="padding: 0.25lh 1ch;"><%= "#{address.first_name} #{address.last_name}" %></td>
+          <td style="padding: 0.25lh 1ch;">
             <%= address.line_1 %>
-            <% if address.line_2.present? %>
-              <br><%= address.line_2 %>
-            <% end %>
+            <% if address.line_2.present? %><br><%= address.line_2 %><% end %>
           </td>
-          <td style="padding: 0.5lh 1ch;"><%= address.city %></td>
-          <td style="padding: 0.5lh 1ch;"><%= address.state %></td>
-          <td style="padding: 0.5lh 1ch; font-family: monospace;"><%= address.postal_code %></td>
-          <td style="padding: 0.5lh 1ch;"><%= address.country %></td>
+          <td style="padding: 0.25lh 1ch;"><%= address.city %></td>
+          <td style="padding: 0.25lh 1ch;"><%= address.state %></td>
+          <td style="padding: 0.25lh 1ch;"><code><%= address.postal_code %></code></td>
+          <td style="padding: 0.25lh 1ch;"><%= address.country %></td>
         </tr>
       <% end %>
     </tbody>

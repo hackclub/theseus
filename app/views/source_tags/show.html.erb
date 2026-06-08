@@ -1,13 +1,13 @@
 <% content_for :title, @source_tag.name %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= source_tags_path %>" style="text-decoration: none; color: var(--foreground2);">← Source Tags</a>
     <strong style="font-size: 1.15em;"><%= @source_tag.name %></strong>
     <code style="color: var(--foreground2);"><%= @source_tag.slug %></code>
   </row>
   <span class="toolbar-spacer"></span>
-  <a href="<%= edit_source_tag_path(@source_tag) %>"><button size-="small">✎ Edit</button></a>
+  <a href="<%= edit_source_tag_path(@source_tag) %>">✎ Edit</a>
 </div>
 
 <div class="show-layout">
@@ -22,6 +22,8 @@
         <span><%= @source_tag.name %></span>
         <span class="detail-label">Owner</span>
         <span><%= @source_tag.owner.presence || "—" %></span>
+        <span class="detail-label">Created</span>
+        <span><%= @source_tag.created_at.strftime("%b %d, %Y %H:%M") %></span>
       </div>
     </div>
   </div>
@@ -31,8 +33,8 @@
       <strong>Actions</strong>
       <div is-="separator"></div>
       <div style="margin-top: 0.5lh;">
-        <a href="<%= edit_source_tag_path(@source_tag) %>"><button style="width: 100%; margin-bottom: 0.5lh;">✎ Edit</button></a>
-        <%= form_with url: source_tag_path(@source_tag), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this source tag?" }, class: "form-inline" do %>
+        <a href="<%= edit_source_tag_path(@source_tag) %>" style="text-decoration: none;"><button style="width: 100%; margin-bottom: 0.5lh;">✎ Edit</button></a>
+        <%= form_with url: source_tag_path(@source_tag), method: :delete, data: { turbo_confirm: "Delete this source tag?" }, class: "form-inline" do %>
           <button type="submit" variant-="red" size-="small" style="width: 100%;">✕ Delete</button>
         <% end %>
       </div>

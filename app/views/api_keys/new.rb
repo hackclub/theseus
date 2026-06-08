@@ -2,27 +2,25 @@
 
 class Views::APIKeys::New < Views::Base
   include Phlex::Rails::Helpers::FormWith
+
   def initialize(api_key:)
     @api_key = api_key
   end
 
   def view_template
-    # Header
-    div(class: "page-toolbar") do
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
         strong(style: "font-size: 1.15em;") { "New API Key" }
       end
-      span(class: "toolbar-spacer")
     end
 
     div(class: "show-layout") do
-      # Form
       div(class: "show-main") do
         div("box-": "round") do
           strong { "Details" }
           div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
+          div(style: "margin-top: 0.5lh;") do
             form_with model: api_key, url: api_keys_path, local: true do |f|
               div(style: "margin-bottom: 1lh;") do
                 label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Name" }
@@ -54,12 +52,11 @@ class Views::APIKeys::New < Views::Base
         end
       end
 
-      # Sidebar info
       div(class: "show-sidebar") do
         div("box-": "round") do
           strong { "About API Keys" }
           div("is-": "separator")
-          div(style: "margin-top: 0.5lh; color: var(--foreground2); font-size: 0.9em;") do
+          div(style: "margin-top: 0.5lh; color: var(--foreground2);") do
             p(style: "margin: 0 0 0.5lh;") { "API keys grant programmatic access to the system." }
             p(style: "margin: 0;") { "PII access should only be enabled when the integration specifically needs address data." }
           end

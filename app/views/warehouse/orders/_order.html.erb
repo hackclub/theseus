@@ -1,34 +1,13 @@
-<div class="index-card">
-  <div class="index-card-header">
-    <row gap-="1" align-="center">
-      <a href="<%= warehouse_order_path(order) %>" class="mono index-card-title"><%= order.hc_id %></a>
-      <% if order.user_facing_title.present? %>
-        <span>·</span>
-        <span><%= order.user_facing_title %></span>
-      <% end %>
-      <%= render 'warehouse/orders/status_badge', order: order %>
-    </row>
-  </div>
-
-  <% if order.tags.present? %>
-    <row gap-="1" style="margin-top: 0.25lh;">
-      <% order.tags.compact_blank.each do |tag| %>
-        <span is-="badge" variant-="background2" style="font-size: smaller;"><%= tag %></span>
-      <% end %>
-    </row>
-  <% end %>
-
-  <div class="detail-grid" style="margin-top: 0.5lh;">
-    <span class="detail-label">Recipient</span>
-    <span>
-      <span class="fw-medium"><%= order.address&.name_line || "—" %></span>
-      <span style="color: var(--foreground2);"><%= order.recipient_email %></span>
-    </span>
-    <span class="detail-label">Cost</span>
-    <span>
-      <span style="color: var(--foreground2);">Labor:</span> <%= number_to_currency(order.labor_cost) %>
-      <span style="color: var(--foreground2);">Contents:</span> <%= number_to_currency(order.contents_actual_cost_to_hc) %>
-      <span style="color: var(--foreground2);">Postage:</span> <%= order.postage_cost.present? ? number_to_currency(order.postage_cost) : "—" %>
-    </span>
-  </div>
-</div>
+<tr id="<%= dom_id order %>">
+  <td style="padding: 0.25lh 1ch;">
+    <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
+    <% if order.user_facing_title.present? %>
+      <span class="row-tag"><%= order.user_facing_title %></span>
+    <% end %>
+  </td>
+  <td style="padding: 0.25lh 1ch;"><%= order.address&.name_line || "—" %></td>
+  <td style="padding: 0.25lh 1ch; color: var(--foreground2);"><%= order.recipient_email %></td>
+  <td style="padding: 0.25lh 1ch;">
+    <%= render 'warehouse/orders/status_badge', order: order %>
+  </td>
+</tr>

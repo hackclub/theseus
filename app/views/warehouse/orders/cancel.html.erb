@@ -21,7 +21,7 @@
         <div style="margin-top: 0.5lh;">
           <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Reason for cancellation</label>
           <textarea name="cancellation_reason" rows="3" required style="width: 100%;"></textarea>
-          <span style="color: var(--foreground2); font-size: smaller;">Visible to AGH crew</span>
+          <span style="color: var(--foreground2); font-size: 0.85em;">Visible to AGH crew</span>
         </div>
       </div>
 
@@ -40,9 +40,9 @@
         <span class="detail-label">ID</span>
         <span><%= @warehouse_order.hc_id %></span>
         <span class="detail-label">Status</span>
-        <span><%= @warehouse_order.humanized_state %></span>
+        <span><%= render 'warehouse/orders/status_badge', order: @warehouse_order %></span>
         <span class="detail-label">Recipient</span>
-        <span><%= @warehouse_order.address&.name_line %></span>
+        <span><%= @warehouse_order.address&.name_line || "—" %></span>
         <span class="detail-label">Items</span>
         <span><%= @warehouse_order.line_items.sum(&:quantity) %> units</span>
       </div>

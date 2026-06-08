@@ -8,7 +8,7 @@ class Views::Warehouse::Batches::Process < Views::Base
   end
 
   def view_template
-    div(class: "page-toolbar") do
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       row("gap-": "1", "align-": "center") do
         a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Process Warehouse Batch" }
@@ -17,22 +17,20 @@ class Views::Warehouse::Batches::Process < Views::Base
 
     div(class: "show-layout") do
       div(class: "show-main") do
-        div("box-": "square", style: "margin-bottom: 1lh;") do
+        div("box-": "square", class: "tui-banner", style: "margin-bottom: 1lh;") do
           plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
         end
 
-        # Line Items
         div("box-": "round", style: "margin-bottom: 1lh;") do
           strong { "Template: #{@batch.warehouse_template.name}" }
           div("is-": "separator")
           div(style: "margin-top: 0.5lh;") do
             @batch.warehouse_template.line_items.each do |line_item|
-              div { "#{line_item.quantity}x #{line_item.sku.name}" }
+              div { "#{line_item.quantity}× #{line_item.sku.name}" }
             end
           end
         end
 
-        # Cost Breakdown
         div("box-": "round", style: "margin-bottom: 1lh;") do
           strong { "Cost Breakdown" }
           div("is-": "separator")
@@ -43,6 +41,9 @@ class Views::Warehouse::Batches::Process < Views::Base
             span { number_to_currency(@batch.labor_cost) }
             span(class: "detail-label") { "Postage" }
             span(style: "color: var(--foreground2);") { "TBD" }
+          end
+          div("is-": "separator", style: "margin: 0.5lh 0;")
+          div(class: "detail-grid") do
             span(class: "detail-label") { "Total (est.)" }
             strong { "~#{number_to_currency(@batch.total_cost)}" }
           end
@@ -56,7 +57,7 @@ class Views::Warehouse::Batches::Process < Views::Base
           div(style: "margin-top: 0.5lh;") do
             form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
               input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-              button(type: "submit", "variant-": "green", style: "width: 100%;") { "▶ do it!" }
+              button(type: "submit", "variant-": "green", style: "width: 100%;") { "▶ Process Batch" }
             end
             div(style: "margin-top: 0.5lh;") do
               a(href: warehouse_batch_path(@batch), style: "color: var(--foreground2);") { "Cancel" }

@@ -1,98 +1,94 @@
 <div id="<%= dom_id batch %>" class="show-layout">
   <div class="show-main">
-    <div box-="round">
-      <div style="padding: 1lh 2ch;">
-        <row gap-="1" align-="center">
-          <strong><%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %></strong>
-          <%= render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch) %>
-        </row>
-      </div>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Details</strong>
       <div is-="separator"></div>
-      <div style="padding: 1lh 2ch;">
-        <% if batch.tags.any? %>
-          <div style="margin-bottom: 0.5lh;">
-            <%= render 'shared/tags', tags: batch.tags %>
-          </div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">Created</span>
+        <span><%= batch.created_at.strftime("%b %d, %Y %H:%M") %></span>
+        <% if batch.csv.attached? %>
+          <span class="detail-label">CSV</span>
+          <span><%= batch.csv.filename %></span>
         <% end %>
-
-        <row gap-="2">
-          <div style="flex: 1;">
-            <div box-="round">
-              <strong>Batch Information</strong>
-              <div is-="separator"></div>
-              <div class="detail-grid">
-                <span class="detail-label">Created</span>
-                <span><%= batch.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
-                <% if batch.csv.attached? %>
-                  <span class="detail-label">CSV File</span>
-                  <span><%= batch.csv.filename %></span>
-                <% end %>
-                <span class="detail-label">Address Count</span>
-                <span><%= batch.addresses.count %></span>
-                <% if batch.is_a?(Letter::Batch) %>
-                  <span class="detail-label">Dimensions</span>
-                  <span><%= batch.letter_width %>" × <%= batch.letter_height %>"</span>
-                  <span class="detail-label">Weight</span>
-                  <span><%= batch.letter_weight %> oz</span>
-                <% end %>
-                <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
-                  <span class="detail-label">Template</span>
-                  <span><%= batch.warehouse_template.name %></span>
-                <% end %>
-              </div>
-            </div>
-          </div>
-
-          <div style="flex: 1;">
-            <div box-="round">
-              <strong>Cost Information</strong>
-              <div is-="separator"></div>
-              <div class="detail-grid">
-                <% if batch.is_a?(Warehouse::Batch) %>
-                  <span class="detail-label">Contents</span>
-                  <span><%= number_to_currency(batch.contents_cost) %></span>
-                  <span class="detail-label">Labor</span>
-                  <span><%= number_to_currency(batch.labor_cost) %></span>
-                  <span class="detail-label">Shipping</span>
-                  <span><%= number_to_currency(batch.postage_cost) %></span>
-                <% end %>
-                <span class="detail-label" style="font-weight: 600;">Total Cost</span>
-                <span style="font-weight: 600;"><%= number_to_currency(batch.total_cost) %></span>
-              </div>
-            </div>
-          </div>
-        </row>
-
-        <% if batch.is_a?(Letter::Batch) && batch.labels_pdf.attached? %>
-          <div style="margin-top: 1lh;">
-            <div box-="round">
-              <strong>Letter Labels</strong>
-              <div is-="separator"></div>
-              <row gap-="1" align-="center">
-                <span style="flex: 1;">PDF labels are available for this batch.</span>
-                <a href="<%= rails_blob_path(batch.labels_pdf, disposition: "attachment") %>" target="_blank" size-="small" variant-="green">↓ Download PDF</a>
-              </row>
-            </div>
-          </div>
+        <span class="detail-label">Addresses</span>
+        <span><%= batch.addresses.count %></span>
+        <% if batch.is_a?(Letter::Batch) %>
+          <span class="detail-label">Dimensions</span>
+          <span><%= batch.letter_width %> × <%= batch.letter_height %> in</span>
+          <span class="detail-label">Weight</span>
+          <span><%= batch.letter_weight %> oz</span>
+        <% end %>
+        <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
+          <span class="detail-label">Template</span>
+          <span><%= batch.warehouse_template.name %></span>
         <% end %>
       </div>
+      <% if batch.tags.any? %>
+        <div is-="separator" style="margin-top: 0.5lh;"></div>
+        <div style="margin-top: 0.5lh;">
+          <%= render 'shared/tags', tags: batch.tags %>
+        </div>
+      <% end %>
     </div>
+
+    <% if batch.is_a?(Warehouse::Batch) %>
+      <div box-="round" style="margin-bottom: 1lh;">
+        <strong>Costs</strong>
+        <div is-="separator"></div>
+        <div class="detail-grid" style="margin-top: 0.5lh;">
+          <span class="detail-label">Contents</span>
+          <span><%= number_to_currency(batch.contents_cost) %></span>
+          <span class="detail-label">Labor</span>
+          <span><%= number_to_currency(batch.labor_cost) %></span>
+          <span class="detail-label">Shipping</span>
+          <span><%= number_to_currency(batch.postage_cost) %></span>
+          <span class="detail-label" style="font-weight: bold;">Total</span>
+          <span style="font-weight: bold;"><%= number_to_currency(batch.total_cost) %></span>
+        </div>
+      </div>
+    <% elsif batch.respond_to?(:total_cost) %>
+      <div box-="round" style="margin-bottom: 1lh;">
+        <strong>Cost</strong>
+        <div is-="separator"></div>
+        <div class="detail-grid" style="margin-top: 0.5lh;">
+          <span class="detail-label">Total</span>
+          <span style="font-weight: bold;"><%= number_to_currency(batch.total_cost) %></span>
+        </div>
+      </div>
+    <% end %>
+
+    <% if batch.is_a?(Letter::Batch) && batch.labels_pdf.attached? %>
+      <div box-="round" style="margin-bottom: 1lh;">
+        <strong>Labels</strong>
+        <div is-="separator"></div>
+        <row gap-="1" align-="center" style="margin-top: 0.5lh;">
+          <span style="color: var(--foreground2);">PDF labels available</span>
+          <span class="toolbar-spacer"></span>
+          <a href="<%= rails_blob_path(batch.labels_pdf, disposition: "attachment") %>" target="_blank"><button size-="small" variant-="green">↓ Download PDF</button></a>
+        </row>
+      </div>
+    <% end %>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <div box-="round" style="margin-bottom: 1lh;">
       <strong>Actions</strong>
       <div is-="separator"></div>
-      <% case batch.aasm_state %>
-      <% when "awaiting_field_mapping" %>
-        <% map_path = batch.is_a?(Letter::Batch) ? map_fields_letter_batch_path(batch) : map_fields_warehouse_batch_path(batch) %>
-        <a href="<%= map_path %>" variant-="green" style="display: block; text-align: center;">☰ Map Fields</a>
-      <% when "fields_mapped" %>
-        <% process_path = batch.is_a?(Letter::Batch) ? process_confirm_letter_batch_path(batch) : process_confirm_warehouse_batch_path(batch) %>
-        <a href="<%= process_path %>" variant-="green" style="display: block; text-align: center;">▶ Process Batch</a>
-      <% when "processed" %>
-        <p class="detail-label" style="margin: 0;">This batch has been processed.</p>
-      <% end %>
+      <div style="margin-top: 0.5lh;">
+        <% case batch.aasm_state %>
+        <% when "awaiting_field_mapping" %>
+          <% map_path = batch.is_a?(Letter::Batch) ? map_fields_letter_batch_path(batch) : map_fields_warehouse_batch_path(batch) %>
+          <a href="<%= map_path %>"><button variant-="green" style="width: 100%;">☰ Map Fields</button></a>
+        <% when "fields_mapped" %>
+          <% process_path = batch.is_a?(Letter::Batch) ? process_confirm_letter_batch_path(batch) : process_confirm_warehouse_batch_path(batch) %>
+          <a href="<%= process_path %>"><button variant-="green" style="width: 100%;">▶ Process Batch</button></a>
+        <% when "processed" %>
+          <div style="text-align: center; padding: 1lh 0; color: var(--green);">
+            <span style="font-size: 2em;">✓</span>
+            <div style="margin-top: 0.5lh;"><strong>Processed</strong></div>
+          </div>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

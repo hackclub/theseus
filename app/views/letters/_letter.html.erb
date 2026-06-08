@@ -1,27 +1,14 @@
-<div id="<%= dom_id letter %>" class="index-card">
-  <div class="index-card-header">
-    <a href="<%= letter_path(letter) %>" class="index-card-title">
-      <% if letter.user_facing_title.present? %>
-        <%= letter.user_facing_title %>
-      <% else %>
-        <%= letter.public_id %> to <%= letter.address.name_line %>
-      <% end %>
-    </a>
-    <% badge_variant = { pending: "background2", printed: "blue", mailed: "green", received: "green", canceled: "yellow", errored: "red" }[letter.aasm_state.to_sym] || "background2" %>
-    <span is-="badge" variant-="<%= badge_variant %>"><%= letter.aasm_state.humanize %></span>
-  </div>
-
-  <div class="index-card-meta">
-    <span>From: <%= letter.return_address.present? ? letter.return_address_name_line : 'N/A' %></span>
-    <span><%= time_ago_in_words(letter.created_at) %> ago</span>
-    <span><%= letter.height %>" x <%= letter.width %>"</span>
-  </div>
-
-  <% if letter.tags.present? %>
-    <div class="index-card-tags">
-      <% letter.tags.compact_blank.each do |tag| %>
-        <span is-="badge" variant-="background2"><%= tag %></span>
-      <% end %>
-    </div>
-  <% end %>
-</div>
+<tr id="<%= dom_id letter %>">
+  <td style="padding: 0.25lh 1ch;">
+    <a href="<%= letter_path(letter) %>" style="font-weight: bold; text-decoration: none;"><%= letter.public_id %></a>
+    <% if letter.user_facing_title.present? %>
+      <span class="row-tag"><%= letter.user_facing_title %></span>
+    <% end %>
+  </td>
+  <td style="padding: 0.25lh 1ch;"><%= letter.created_at.strftime(letter.created_at.year == Date.current.year ? "%b %d" : "%b %d, %Y") %></td>
+  <td style="padding: 0.25lh 1ch;"><%= letter.address&.name_line || "—" %></td>
+  <td style="padding: 0.25lh 1ch; color: var(--foreground2);"><%= letter.origin_label %></td>
+  <td style="padding: 0.25lh 1ch;">
+    <%= render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) %>
+  </td>
+</tr>

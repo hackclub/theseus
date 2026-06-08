@@ -1,39 +1,37 @@
-<div box-="round">
-  <div style="padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">
-    <div class="li-row">
-      <span class="li-col-name col-header">SKU</span>
-      <span class="li-col-num col-header">Qty</span>
-      <span class="li-col-cost col-header">Cost to HC</span>
-      <span class="li-col-cost col-header">Declared</span>
-    </div>
-  </div>
-
-  <% order.line_items.each do |li| %>
-    <div style="padding: 1lh 1ch; border-bottom: 1px solid var(--background3);">
-      <div class="li-row">
-        <div class="li-col-name">
-          <%= link_to li.sku.name, warehouse_sku_path(li.sku), class: "fw-medium" %>
-          <span class="mono kv-label"><%= li.sku.sku %></span>
-        </div>
-        <span class="li-col-num fw-medium"><%= li.quantity %></span>
-        <span class="li-col-cost kv-label"><%= number_to_currency(li.sku.actual_cost_to_hc) %></span>
-        <span class="li-col-cost kv-label">
+<table style="width: 100%; margin-top: 0.5lh;">
+  <thead>
+    <tr>
+      <th style="text-align: left;">SKU</th>
+      <th style="text-align: right;">Qty</th>
+      <th style="text-align: right;">Cost to HC</th>
+      <th style="text-align: right;">Declared</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% order.line_items.each do |li| %>
+      <tr>
+        <td style="padding: 0.25lh 1ch;">
+          <a href="<%= warehouse_sku_path(li.sku) %>" style="text-decoration: none;"><%= li.sku.name %></a>
+          <span style="color: var(--foreground2);"> (<code><%= li.sku.sku %></code>)</span>
+        </td>
+        <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= li.quantity %></td>
+        <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
+        <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;">
           <% if li.sku.declared_unit_cost.zero? %>
-            <span class="text-danger fw-semibold" title="This SKU has no cost data! It will block dispatch.">⚠ $0.00</span>
+            <span style="color: var(--red);" title="No cost data — will block dispatch">⚠ $0.00</span>
           <% else %>
             <%= number_to_currency(li.sku.declared_unit_cost) %>
           <% end %>
-        </span>
-      </div>
-    </div>
-  <% end %>
-
-  <div style="padding: 1lh 1ch;">
-    <div class="li-row fw-semibold">
-      <span class="li-col-name">Total</span>
-      <span class="li-col-num"></span>
-      <span class="li-col-cost"><%= number_to_currency(order.contents_actual_cost_to_hc) %></span>
-      <span class="li-col-cost"><%= number_to_currency(order.contents_declared_unit_cost) %></span>
-    </div>
-  </div>
-</div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+  <tfoot>
+    <tr style="font-weight: bold;">
+      <td style="padding: 0.25lh 1ch;">Total</td>
+      <td></td>
+      <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(order.contents_actual_cost_to_hc) %></td>
+      <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(order.contents_declared_unit_cost) %></td>
+    </tr>
+  </tfoot>
+</table>

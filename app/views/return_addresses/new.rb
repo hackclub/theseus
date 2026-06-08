@@ -26,7 +26,9 @@ class Views::ReturnAddresses::New < Views::Base
         div("box-": "round") do
           strong { "Info" }
           div("is-": "separator")
-          p(style: "color: var(--foreground2); margin: 0;") { "Return addresses appear as the sender on outgoing mail." }
+          div(style: "margin-top: 0.5lh; color: var(--foreground2);") do
+            p(style: "margin: 0;") { "Return addresses appear as the sender on outgoing mail." }
+          end
         end
       end
     end

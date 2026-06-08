@@ -1,25 +1,30 @@
 <% content_for :title, "Template Previews" %>
 
 <div class="page-toolbar">
-  <row gap-="1" align-="center">
-    <strong style="font-size: 1.15em;">Letter Template Previews</strong>
-  </row>
+  <strong style="font-size: 1.15em;">Letter Template Previews</strong>
+  <span class="toolbar-spacer"></span>
 </div>
 
-<div box-="round">
-  <% @templates.each_with_index do |template, i| %>
-    <% if i > 0 %><div is-="separator"></div><% end %>
-    <div style="padding: 0.5lh 0;">
-      <row gap-="1" align-="center">
-        <div style="flex: 1; min-width: 0;">
-          <div style="font-weight: 500;"><%= template.to_s.split("::").last.humanize %></div>
-          <code class="detail-label"><%= template %></code>
-        </div>
-        <row gap-="1">
-          <a href="<%= template_preview_path(template) %>" size-="small" target="_blank">⎘ Preview PDF</a>
-          <a href="<%= template_preview_path(template, qr: true) %>" size-="small" target="_blank">⎘ With QR</a>
-        </row>
-      </row>
-    </div>
-  <% end %>
-</div>
+<table>
+  <thead>
+    <tr>
+      <th>Template</th>
+      <th>Class</th>
+      <th style="text-align: right;">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @templates.each do |template| %>
+      <tr>
+        <td><a href="<%= template_preview_path(template) %>" target="_blank" style="text-decoration: none; color: var(--foreground0); font-weight: 500;"><%= template.to_s.split("::").last.humanize %></a></td>
+        <td><code style="color: var(--foreground2);"><%= template %></code></td>
+        <td style="text-align: right;">
+          <row gap-="1" style="justify-content: flex-end;">
+            <a href="<%= template_preview_path(template) %>" target="_blank">⎘ PDF</a>
+            <a href="<%= template_preview_path(template, qr: true) %>" target="_blank">⎘ With QR</a>
+          </row>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

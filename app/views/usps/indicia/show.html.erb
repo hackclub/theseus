@@ -1,6 +1,6 @@
 <% content_for :title, "Indicium #{@usps_indicium.public_id}" %>
 
-<div class="page-toolbar">
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
   <row gap-="1" align-="center">
     <a href="<%= usps_indicia_path %>" style="text-decoration: none; color: var(--foreground2);">← Indicia</a>
     <strong style="font-size: 1.15em;">Indicium</strong>
@@ -17,25 +17,29 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round">
-      <strong style="display: block; padding: 0.5lh 1ch;">Postage Details</strong>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Postage Details</strong>
       <div is-="separator"></div>
-      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+      <div class="detail-grid" style="margin-top: 0.5lh;">
         <span class="detail-label">Postage</span>
-        <span style="font-weight: 500;"><%= number_to_currency(@usps_indicium.postage) %></span>
+        <span><%= number_to_currency(@usps_indicium.postage) %></span>
+        <span class="detail-label">Fees</span>
+        <span><%= @usps_indicium.fees ? number_to_currency(@usps_indicium.fees) : "—" %></span>
+        <span class="detail-label">Total Cost</span>
+        <span><%= number_to_currency(@usps_indicium.cost) %></span>
         <span class="detail-label">Mailing Date</span>
-        <span><%= @usps_indicium.mailing_date %></span>
+        <span><%= @usps_indicium.mailing_date&.strftime("%b %d, %Y") || "—" %></span>
         <span class="detail-label">USPS SKU</span>
-        <code><%= @usps_indicium.usps_sku %></code>
+        <span><code><%= @usps_indicium.usps_sku || "—" %></code></span>
         <span class="detail-label">Category</span>
-        <span><%= @usps_indicium.processing_category %></span>
+        <span><%= @usps_indicium.processing_category || "—" %></span>
       </div>
     </div>
 
-    <div box-="round" style="margin-top: 1lh;">
-      <strong style="display: block; padding: 0.5lh 1ch;">Dimensions</strong>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Dimensions</strong>
       <div is-="separator"></div>
-      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+      <div class="detail-grid" style="margin-top: 0.5lh;">
         <span class="detail-label">Weight</span>
         <span><%= @usps_indicium.postage_weight %> oz</span>
         <span class="detail-label">Length</span>
@@ -48,20 +52,20 @@
         <span><%= @usps_indicium.nonmachinable ? "Yes" : "No" %></span>
       </div>
     </div>
+
+    <%= render partial: "admin_inspector", locals: { record: @usps_indicium } %>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
-      <strong style="display: block; padding: 0.5lh 1ch;">Actions</strong>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Actions</strong>
       <div is-="separator"></div>
-      <div style="padding: 0.5lh 1ch;">
-        <a href="<%= edit_usps_indicium_path(@usps_indicium) %>" style="display: block; text-align: center; margin-bottom: 0.5lh;">✎ Edit Indicium</a>
+      <div style="margin-top: 0.5lh;">
+        <a href="<%= edit_usps_indicium_path(@usps_indicium) %>"><button style="width: 100%; margin-bottom: 0.5lh;">✎ Edit Indicium</button></a>
         <%= form_with url: usps_indicium_path(@usps_indicium), method: :delete, data: { turbo_confirm: "Delete this indicium?" } do %>
-          <button type="submit" variant-="red" style="width: 100%;">✕ Delete</button>
+          <button type="submit" variant-="red" size-="small" style="width: 100%;">✕ Delete</button>
         <% end %>
       </div>
     </div>
-
-    <%= render partial: "admin_inspector", locals: { record: @usps_indicium } %>
   </div>
 </div>

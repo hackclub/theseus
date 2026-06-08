@@ -13,10 +13,11 @@
   <div box-="round">
     <strong>Details</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 1ch;">
+    <div style="margin-top: 0.5lh;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Slug</label>
-        <input type="text" name="source_tag[slug]" value="<%= source_tag.slug %>" style="width: 100%;">
+        <input type="text" name="source_tag[slug]" value="<%= source_tag.slug %>" autofocus style="width: 100%;">
+        <p style="color: var(--foreground2); font-size: 0.85em; margin: 0.25lh 0 0;">Short identifier for programmatic use</p>
       </div>
 
       <div style="margin-bottom: 1lh;">
@@ -30,7 +31,7 @@
       </div>
 
       <row gap-="1" align-="center">
-        <button type="submit" variant-="green"><%= source_tag.persisted? ? "✓ Update Source Tag" : "✓ Create Source Tag" %></button>
+        <button type="submit" variant-="green"><%= source_tag.persisted? ? "✓ Update" : "✓ Create" %></button>
         <% if source_tag.persisted? %>
           <a href="<%= source_tag_path(source_tag) %>"><button type="button">Cancel</button></a>
         <% else %>

@@ -1,42 +1,39 @@
 <% content_for :title, "Tasks" %>
 
 <div class="page-toolbar">
-  <row gap-="1" align-="center">
-    <strong style="font-size: 1.15em;">Your Tasks</strong>
-    <%= render Components::Shared::Jumpcode.new(path: tasks_path) %>
-  </row>
-  <div class="toolbar-spacer"></div>
-  <%= button_to refresh_tasks_path, method: :post do %>
-    <button type="button" size-="small">⟳ Refresh</button>
+  <strong style="font-size: 1.15em;">Your Tasks</strong>
+  <%= render Components::Shared::Jumpcode.new(path: tasks_path) %>
+  <span class="toolbar-spacer"></span>
+  <%= form_with url: refresh_tasks_path, method: :post, class: "form-inline" do %>
+    <button type="submit" size-="small">⟳ Refresh</button>
   <% end %>
 </div>
 
 <% if @tasks.empty? %>
   <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-    <h2 style="margin: 0;">✓ All clear!</h2>
-    <p style="color: var(--foreground2);">No tasks right now.</p>
+    <div style="font-size: 2em; color: var(--green);">✓</div>
+    <strong>All clear!</strong>
+    <p style="color: var(--foreground2); margin: 0.25lh 0 0;">No tasks right now.</p>
   </div>
 <% else %>
   <% @tasks.group_by { |task| task[:type] }.each do |type, tasks| %>
-    <div style="margin-top: 1lh;">
-      <div box-="round">
-        <strong><%= type %></strong>
-        <div is-="separator"></div>
-        <% tasks.each_with_index do |task, i| %>
-          <% if i > 0 %><div is-="separator"></div><% end %>
-          <div style="padding: 0.5lh 0;">
-            <row gap-="1" align-="center">
-              <div style="flex: 1;">
-                <span style="font-weight: 500;"><%= task[:name] %></span>
-                <% if task[:subtitle] %>
-                  <span class="detail-label">(<%= task[:subtitle] %>)</span>
-                <% end %>
-              </div>
-              <a href="<%= task[:link] %>" size-="small">Go →</a>
-            </row>
-          </div>
-        <% end %>
-      </div>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong><%= type %></strong>
+      <div is-="separator"></div>
+      <% tasks.each_with_index do |task, i| %>
+        <% if i > 0 %><div is-="separator"></div><% end %>
+        <div style="padding: 0.5lh 0;">
+          <row gap-="1" align-="center">
+            <div style="flex: 1;">
+              <span style="font-weight: 500;"><%= task[:name] %></span>
+              <% if task[:subtitle] %>
+                <span style="color: var(--foreground2);">(<%= task[:subtitle] %>)</span>
+              <% end %>
+            </div>
+            <a href="<%= task[:link] %>"><button size-="small">Go →</button></a>
+          </row>
+        </div>
+      <% end %>
     </div>
   <% end %>
 <% end %>

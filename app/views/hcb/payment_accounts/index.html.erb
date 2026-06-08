@@ -6,7 +6,7 @@
   </row>
   <span class="toolbar-spacer"></span>
   <% if current_user.hcb_connected? %>
-    <a href="<%= new_hcb_payment_account_path %>" variant-="green">+ Add Organization</a>
+    <a href="<%= new_hcb_payment_account_path %>"><button variant-="green">+ Add Organization</button></a>
   <% end %>
 </div>
 
@@ -14,45 +14,42 @@
   <div class="show-layout">
     <div class="show-main">
       <% if @payment_accounts.any? %>
-        <div box-="round">
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="border-bottom: 1px solid var(--foreground2);">
-                <th style="text-align: left; padding: 0.5lh 1ch;">Organization</th>
-                <th style="text-align: left; padding: 0.5lh 1ch;">Added</th>
+        <table>
+          <thead>
+            <tr>
+              <th>Organization</th>
+              <th>Added</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @payment_accounts.each do |account| %>
+              <tr>
+                <td><a href="<%= hcb_payment_account_path(account) %>" style="text-decoration: none;"><strong><%= account.organization_name %></strong></a></td>
+                <td style="color: var(--foreground2);"><%= account.created_at.strftime("%b %d, %Y") %></td>
               </tr>
-            </thead>
-            <tbody>
-              <% @payment_accounts.each do |account| %>
-                <tr style="border-bottom: 1px solid var(--background2);">
-                  <td style="padding: 0.5lh 1ch;"><a href="<%= hcb_payment_account_path(account) %>"><%= account.organization_name %></a></td>
-                  <td style="padding: 0.5lh 1ch; color: var(--foreground2);"><%= time_ago_in_words(account.created_at) %> ago</td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
+            <% end %>
+          </tbody>
+        </table>
       <% else %>
         <div box-="round" style="text-align: center; padding: 2lh 2ch;">
           <strong>No organizations linked yet</strong>
-          <p style="color: var(--foreground2); margin: 0;">Add one to start paying for postage.</p>
-          <a href="<%= new_hcb_payment_account_path %>" style="margin-top: 0.5lh; display: inline-block;">Add Organization</a>
+          <div style="color: var(--foreground2); margin-top: 0.25lh;">Add one to start paying for postage.</div>
         </div>
       <% end %>
     </div>
 
     <div class="show-sidebar">
-      <div box-="round">
-        <strong style="display: block; padding: 0.5lh 1ch;">Account Status</strong>
+      <div box-="round" style="margin-bottom: 1lh;">
+        <strong>Account Status</strong>
         <div is-="separator"></div>
-        <div style="padding: 0.5lh 1ch;">
+        <div style="margin-top: 0.5lh;">
           <row gap-="1" align-="center">
             <span style="color: var(--green);">✓</span>
             <span style="font-weight: 500; color: var(--green);">HCB Connected</span>
           </row>
-          <p style="color: var(--foreground2); margin: 0.5lh 0 0 0;">
+          <div style="color: var(--foreground2); margin-top: 0.5lh;">
             Your account is linked to HCB. You can pay for postage using any of your organizations' funds.
-          </p>
+          </div>
         </div>
       </div>
     </div>
@@ -60,7 +57,7 @@
 <% else %>
   <div box-="round" style="text-align: center; padding: 2lh 2ch; max-width: 60ch; margin: 2lh auto;">
     <strong style="font-size: 1.15em;">🔗 Connect to HCB</strong>
-    <p style="color: var(--foreground2);">Link your HCB account to pay for postage directly from your organization's funds.</p>
-    <a href="<%= new_hcb_oauth_connection_path %>" variant-="green">Connect HCB Account</a>
+    <div style="color: var(--foreground2); margin-top: 0.5lh; margin-bottom: 1lh;">Link your HCB account to pay for postage directly from your organization's funds.</div>
+    <a href="<%= new_hcb_oauth_connection_path %>"><button variant-="green">Connect HCB Account</button></a>
   </div>
 <% end %>

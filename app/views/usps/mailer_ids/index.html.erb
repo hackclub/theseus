@@ -3,36 +3,34 @@
 <div class="page-toolbar">
   <row gap-="1" align-="center">
     <strong style="font-size: 1.15em;">CRID / Mailer ID Pairs</strong>
-    <span style="color: var(--foreground2);"><%= @usps_mailer_ids.count %> registered</span>
+    <span style="color: var(--foreground2);"><%= number_with_delimiter(@usps_mailer_ids.count) %> registered</span>
   </row>
   <span class="toolbar-spacer"></span>
-  <a href="<%= new_usps_mailer_id_path %>" variant-="green">+ New Mailer ID</a>
+  <a href="<%= new_usps_mailer_id_path %>"><button variant-="green">+ New Mailer ID</button></a>
 </div>
 
 <% if @usps_mailer_ids.any? %>
-  <div box-="round">
-    <table style="width: 100%; border-collapse: collapse;">
-      <thead>
-        <tr style="border-bottom: 1px solid var(--foreground2);">
-          <th style="text-align: left; padding: 0.5lh 1ch;">Name</th>
-          <th style="text-align: left; padding: 0.5lh 1ch;">CRID</th>
-          <th style="text-align: left; padding: 0.5lh 1ch;">MID</th>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>CRID</th>
+        <th>MID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @usps_mailer_ids.each do |mid| %>
+        <tr>
+          <td><a href="<%= usps_mailer_id_path(mid) %>" style="text-decoration: none;"><strong><%= mid.name %></strong></a></td>
+          <td><code><%= mid.crid %></code></td>
+          <td><code><%= mid.mid %></code></td>
         </tr>
-      </thead>
-      <tbody>
-        <% @usps_mailer_ids.each do |mid| %>
-          <tr style="border-bottom: 1px solid var(--background2);">
-            <td style="padding: 0.5lh 1ch;"><a href="<%= usps_mailer_id_path(mid) %>"><%= mid.name %></a></td>
-            <td style="padding: 0.5lh 1ch;"><code><%= mid.crid %></code></td>
-            <td style="padding: 0.5lh 1ch;"><code><%= mid.mid %></code></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+      <% end %>
+    </tbody>
+  </table>
 <% else %>
   <div box-="round" style="text-align: center; padding: 2lh 2ch;">
     <strong>No mailer IDs yet</strong>
-    <p style="color: var(--foreground2); margin: 0;"><a href="<%= new_usps_mailer_id_path %>">Add one</a></p>
+    <div style="color: var(--foreground2); margin-top: 0.25lh;"><a href="<%= new_usps_mailer_id_path %>">Add one</a></div>
   </div>
 <% end %>

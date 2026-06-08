@@ -1,150 +1,125 @@
 <% content_for :title, "Purchase Order #{@purchase_order.order_number.presence || "##{@purchase_order.id}"}" %>
 
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <div class="page-title-group">
-        <h1 class="page-title font-mono">
-          <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %>
-        </h1>
-        <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[@purchase_order.status] || "background2" %>
-        <span is-="badge" variant-="<%= status_variant %>"><%= @purchase_order.humanized_state %></span>
-      </div>
-      <p class="page-subtitle"><%= @purchase_order.supplier_name %></p>
-    </div>
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_purchase_orders_path %>" style="text-decoration: none; color: var(--foreground2);">← Purchase Orders</a>
+    <strong style="font-size: 1.15em;"><%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></strong>
+    <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[@purchase_order.status] || "background2" %>
+    <span is-="badge" variant-="<%= status_variant %>"><%= @purchase_order.humanized_state %></span>
+  </row>
+  <row gap-="1" align-="center">
+    <span style="color: var(--foreground2);"><%= @purchase_order.supplier_name %></span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <row gap-="1" align-="center">
+    <% if policy(@purchase_order).send_to_zenventory? && @purchase_order.may_mark_open? %>
+      <%= form_with url: send_to_zenventory_warehouse_purchase_order_path(@purchase_order), method: :post, class: "form-inline" do %>
+        <button type="submit" variant-="green">↑ Send to Zenventory</button>
+      <% end %>
+    <% end %>
+    <% if policy(@purchase_order).edit? %>
+      <a href="<%= edit_warehouse_purchase_order_path(@purchase_order) %>">✎ Edit</a>
+    <% end %>
+    <% if @purchase_order.zenventory_url.present? %>
+      <a href="<%= @purchase_order.zenventory_url %>" target="_blank">↗ Zenventory</a>
+    <% end %>
+  </row>
+</div>
 
-    <div class="page-actions">
-      <% if policy(@purchase_order).send_to_zenventory? && @purchase_order.may_mark_open? %>
-        <%= form_with url: send_to_zenventory_warehouse_purchase_order_path(@purchase_order), method: :post, class: "form-inline" do %>
-          <button type="submit" variant-="green">↑ Send to Zenventory</button>
+<div class="show-layout">
+  <div class="show-main">
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Details</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">Supplier</span>
+        <span><%= @purchase_order.supplier_name %></span>
+        <% if @purchase_order.supplier_id.present? %>
+          <span class="detail-label">Supplier ID</span>
+          <span><code><%= @purchase_order.supplier_id %></code></span>
         <% end %>
-      <% end %>
-      <% if policy(@purchase_order).edit? %>
-        <a href="<%= edit_warehouse_purchase_order_path(@purchase_order) %>">✎ Edit</a>
-      <% end %>
-      <% if @purchase_order.zenventory_url.present? %>
-        <a href="<%= @purchase_order.zenventory_url %>" target="_blank">↗ Zenventory</a>
-      <% end %>
-    </div>
-  </div>
-
-  <div class="stat-grid content-section">
-    <div class="stat-card">
-      <div class="stat-value"><%= @purchase_order.line_items.sum(&:quantity) %></div>
-      <div class="stat-label">Total Units</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value"><%= number_to_currency(@purchase_order.total_cost) %></div>
-      <div class="stat-label">Total Cost</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value"><%= @purchase_order.line_items.count %></div>
-      <div class="stat-label">Line Items</div>
-    </div>
-  </div>
-
-  <div class="two-col-equal content-section">
-    <div box-="round">
-      <div style="padding: 1lh 1ch;">
-        <div class="kv-row"><span class="kv-label">Supplier</span><span><%= @purchase_order.supplier_name %></span></div>
+        <span class="detail-label">Created</span>
+        <span><%= @purchase_order.created_at.strftime("%b %d, %Y %H:%M") %></span>
+        <span class="detail-label">Created by</span>
+        <span><%= @purchase_order.user&.email || "—" %></span>
+        <% if @purchase_order.order_number.present? %>
+          <span class="detail-label">Order Number</span>
+          <span><code><%= @purchase_order.order_number %></code></span>
+        <% end %>
+        <% if @purchase_order.required_by_date.present? %>
+          <span class="detail-label">Required by</span>
+          <span><%= @purchase_order.required_by_date.strftime("%b %d, %Y") %></span>
+        <% end %>
+        <span class="detail-label">Zenventory ID</span>
+        <span><code><%= @purchase_order.zenventory_id || "—" %></code></span>
       </div>
-      <% if @purchase_order.supplier_id.present? %>
-        <div is-="separator"></div>
-        <div style="padding: 1lh 1ch;">
-          <div class="kv-row"><span class="kv-label">Supplier ID</span><code><%= @purchase_order.supplier_id %></code></div>
-        </div>
-      <% end %>
-      <% if @purchase_order.required_by_date.present? %>
-        <div is-="separator"></div>
-        <div style="padding: 1lh 1ch;">
-          <div class="kv-row"><span class="kv-label">Required By</span><span><%= @purchase_order.required_by_date.strftime("%B %d, %Y") %></span></div>
-        </div>
-      <% end %>
       <% if @purchase_order.notes.present? %>
-        <div is-="separator"></div>
-        <div style="padding: 1lh 1ch;">
-          <div><div class="detail-label">Notes</div><div><%= simple_format(@purchase_order.notes) %></div></div>
+        <div is-="separator" style="margin-top: 0.5lh;"></div>
+        <div style="margin-top: 0.5lh;">
+          <span class="detail-label">Notes</span>
+          <div style="margin-top: 0.25lh;"><%= simple_format(@purchase_order.notes) %></div>
         </div>
       <% end %>
     </div>
 
-    <div box-="round">
-      <div style="padding: 1lh 1ch;">
-        <div class="kv-row"><span class="kv-label">Created By</span><span><%= @purchase_order.user&.email %></span></div>
-      </div>
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Line Items</strong>
       <div is-="separator"></div>
-      <div style="padding: 1lh 1ch;">
-        <div class="kv-row"><span class="kv-label">Created At</span><span><%= @purchase_order.created_at.strftime("%B %d, %Y at %I:%M %p") %></span></div>
-      </div>
-      <% if @purchase_order.order_number.present? %>
-        <div is-="separator"></div>
-        <div style="padding: 1lh 1ch;">
-          <div class="kv-row"><span class="kv-label">Order Number</span><code><%= @purchase_order.order_number %></code></div>
-        </div>
-      <% end %>
+      <table style="width: 100%; margin-top: 0.5lh;">
+        <thead>
+          <tr>
+            <th style="text-align: left;">SKU</th>
+            <th style="text-align: right;">Quantity</th>
+            <th style="text-align: right;">Unit Cost</th>
+            <th style="text-align: right;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @purchase_order.line_items.each do |li| %>
+            <tr>
+              <td style="padding: 0.25lh 1ch;">
+                <a href="<%= warehouse_sku_path(li.sku) %>" style="text-decoration: none;"><%= li.sku.name %></a>
+                <span style="color: var(--foreground2);"> (<code><%= li.sku.sku %></code>)</span>
+              </td>
+              <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= li.quantity %></td>
+              <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(li.unit_cost) %></td>
+              <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency((li.unit_cost || 0) * li.quantity) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr style="font-weight: bold;">
+            <td style="padding: 0.25lh 1ch;">Total</td>
+            <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= @purchase_order.line_items.sum(&:quantity) %></td>
+            <td></td>
+            <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(@purchase_order.total_cost) %></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <%= render partial: "admin_inspector", locals: { record: @purchase_order } %>
+  </div>
+
+  <div class="show-sidebar">
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Actions</strong>
       <div is-="separator"></div>
-      <div style="padding: 1lh 1ch;">
-        <div class="kv-row"><span class="kv-label">Zenventory ID</span><code><%= @purchase_order.zenventory_id || "—" %></code></div>
+      <div style="margin-top: 0.5lh;">
+        <% if policy(@purchase_order).sync? %>
+          <%= form_with url: sync_warehouse_purchase_order_path(@purchase_order), method: :post, class: "form-inline" do %>
+            <button type="submit" size-="small" style="width: 100%; margin-bottom: 0.5lh;">⟳ Sync from Zenventory</button>
+          <% end %>
+        <% end %>
+        <% if @purchase_order.zenventory_id.present? %>
+          <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= @purchase_order.zenventory_id %>" target="_blank" style="display: block; margin-bottom: 0.5lh;"><button size-="small" style="width: 100%;">⎘ Download PDF</button></a>
+        <% end %>
+        <% if policy(@purchase_order).destroy? %>
+          <%= form_with url: warehouse_purchase_order_path(@purchase_order), method: :delete, data: { turbo_confirm: "Delete this purchase order?" }, class: "form-inline" do %>
+            <button type="submit" variant-="red" size-="small" style="width: 100%;">✕ Delete</button>
+          <% end %>
+        <% end %>
       </div>
     </div>
   </div>
-
-  <div class="content-section">
-    <h2 class="section-heading">Line Items</h2>
-    <div box-="round">
-      <div style="padding: 0.5lh 1ch; color: var(--foreground2);">
-        <div class="li-row">
-          <span class="li-col-name col-header">SKU</span>
-          <span class="li-col-num col-header">Quantity</span>
-          <span class="li-col-num col-header">Unit Cost</span>
-          <span class="li-col-num col-header">Line Total</span>
-        </div>
-      </div>
-
-      <% @purchase_order.line_items.each do |li| %>
-        <div is-="separator"></div>
-        <div style="padding: 1lh 1ch;">
-          <div class="li-row">
-            <span class="li-col-name">
-              <%= link_to li.sku.name, warehouse_sku_path(li.sku), class: "fw-medium" %>
-              <span class="mono kv-label ml-2"><%= li.sku.sku %></span>
-            </span>
-            <span class="li-col-num fw-medium"><%= li.quantity %></span>
-            <span class="li-col-num kv-label"><%= number_to_currency(li.unit_cost) %></span>
-            <span class="li-col-num fw-medium"><%= number_to_currency((li.unit_cost || 0) * li.quantity) %></span>
-          </div>
-        </div>
-      <% end %>
-
-      <div is-="separator"></div>
-      <div style="padding: 1lh 1ch;">
-        <div class="kv-row fw-semibold">
-          <span>Total</span>
-          <span><%= number_to_currency(@purchase_order.total_cost) %></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer-actions">
-    <% if policy(@purchase_order).sync? %>
-      <%= form_with url: sync_warehouse_purchase_order_path(@purchase_order), method: :post, class: "form-inline" do %>
-        <button type="submit" size-="small">⟳ Sync from Zenventory</button>
-      <% end %>
-    <% end %>
-    <% if @purchase_order.zenventory_id.present? %>
-      <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= @purchase_order.zenventory_id %>" size-="small" target="_blank">⎘ Download PDF</a>
-    <% end %>
-    <% if policy(@purchase_order).destroy? %>
-      <%= form_with url: warehouse_purchase_order_path(@purchase_order), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this purchase order?" }, class: "form-inline" do %>
-        <button type="submit" variant-="red" size-="small">✕ Delete</button>
-      <% end %>
-    <% end %>
-  </div>
-
-  <div class="back-link">
-    <a href="<%= warehouse_purchase_orders_path %>" size-="small">← Back to Purchase Orders</a>
-  </div>
-
-  <%= render partial: "admin_inspector", locals: { record: @purchase_order } %>
 </div>

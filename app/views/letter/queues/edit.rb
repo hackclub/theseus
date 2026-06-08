@@ -29,7 +29,7 @@ class Views::Letter::Queues::Edit < Views::Base
             span(class: "detail-label") { "Type" }
             span { "Batch" }
             span(class: "detail-label") { "Created" }
-            span { @queue.created_at.strftime("%b %d, %Y") }
+            span { @queue.created_at.strftime("%b %-d, %Y") }
             span(class: "detail-label") { "Letters" }
             span { @queue.letters.count.to_s }
           end
