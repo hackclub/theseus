@@ -771,7 +771,6 @@
 .ml-2 { margin-left: 8px; }
 .mt-2 { margin-top: 8px; }
 .pt-2 { padding-top: 8px; }
-.py-2 { padding: 8px 0; }
 
 // Order collection row header
 .order-collection-header {
@@ -1226,14 +1225,6 @@
   gap: 4px;
 }
 
-// Filter bar (variant with 16px bottom margin)
-.filter-bar-sm {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-}
 
 // Rates table (postage info sidebar)
 .rates-table {
@@ -1322,14 +1313,6 @@
   width: 100%;
 }
 
-// Stats label row
-.stats-label-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-}
 
 // Edit info dl (definition list in letter edit sidebar)
 .edit-info-dl {
@@ -2049,57 +2032,6 @@
   vertical-align: middle;
 }
 
-.jumpcode-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: var(--fontStack-monospace);
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: var(--bgColor-muted);
-  color: var(--fgColor-muted);
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.jumpcode-prefix {
-  font-size: 10px;
-  opacity: 0.6;
-}
-
-.jumpcode-help-trigger {
-  font-size: 11px;
-  color: var(--fgColor-muted);
-  cursor: pointer;
-  opacity: 0.5;
-}
-
-.jumpcode-dialog-body {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--fgColor-default);
-}
-
-.jumpcode-dialog-p {
-  margin: 0 0 12px 0;
-}
-
-.jumpcode-dialog-p--last {
-  margin: 0;
-  color: var(--fgColor-muted);
-  font-size: 13px;
-}
-
-.jumpcode-code {
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--bgColor-muted);
-  font-family: var(--fontStack-monospace);
-}
 
 // API key detail
 .api-key-token {
@@ -2194,27 +2126,6 @@
   gap: 4px;
 }
 
-.pagination-link {
-  padding: 6px 10px;
-  border-radius: 6px;
-  text-decoration: none;
-  color: var(--fgColor-accent);
-  font-size: 14px;
-}
-
-.pagination-current {
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: var(--bgColor-accent-emphasis);
-  color: var(--fgColor-onEmphasis);
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.pagination-gap {
-  padding: 6px 4px;
-  color: var(--fgColor-muted);
-}
 
 // Public ID
 .public-id {
