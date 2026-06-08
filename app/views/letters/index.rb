@@ -50,7 +50,7 @@ class Views::Letters::Index < Views::Base
 
     row("gap-": "1", style: "margin-bottom: 1lh; flex-wrap: wrap;") do
       stat_pill("Pending", counts[:pending], "yellow", "pending")
-      stat_pill("Printed", counts[:printed], "background2", "printed")
+      stat_pill("Printed", counts[:printed], nil, "printed")
       stat_pill("Mailed", counts[:mailed], "blue", "mailed")
       stat_pill("Received", counts[:received], "green", "received")
     end
@@ -59,16 +59,17 @@ class Views::Letters::Index < Views::Base
   def stat_pill(label, count, variant, filter_status)
     is_active = status == filter_status
     href = is_active ? letters_path(origin: origin, search: search, user_id: user_id) : letters_path(origin: origin, search: search, user_id: user_id, status: filter_status)
-    a(href: href, style: "text-decoration: none;") do
-      span("is-": "badge", "variant-": is_active ? variant : "background2") do
-        strong { count.to_s }
-        plain " #{label}"
+    a(href: href, style: "text-decoration: none; color: var(--foreground#{is_active ? '0' : '2'});") do
+      strong { count.to_s }
+      plain " #{label}"
+      if is_active
+        plain " ×"
       end
     end
   end
 
   def filters_section
-    row("gap-": "1", "align-": "center", style: "margin-bottom: 1lh; flex-wrap: wrap;") do
+    row("gap-": "2", "align-": "center", style: "margin-bottom: 1lh; flex-wrap: wrap;") do
       form_tag(letters_path, method: :get) do
         hidden_field_tag(:status, status) if status.present?
         hidden_field_tag(:origin, origin) if origin.present?
@@ -87,7 +88,7 @@ class Views::Letters::Index < Views::Base
       origin_filter_section
 
       if search.present? || status.present? || origin.present? || user_id.present?
-        a(href: letters_path, style: "color: var(--foreground2);") { "× Clear" }
+        a(href: letters_path, style: "text-decoration: none; color: var(--foreground2);") { "× Clear" }
       end
     end
   end
@@ -104,10 +105,8 @@ class Views::Letters::Index < Views::Base
       is_active = origin == o[:key]
       a(
         href: letters_path(origin: o[:key], search: search, status: status, user_id: user_id),
-        style: "text-decoration: none; #{'font-weight: bold; color: var(--foreground0);' if is_active}"
-      ) do
-        span("is-": "badge", "variant-": is_active ? "foreground0" : "background2") { o[:label] }
-      end
+        style: "text-decoration: none; color: var(--foreground#{is_active ? '0' : '2'}); #{'font-weight: bold;' if is_active}"
+      ) { o[:label] }
     end
   end
 
