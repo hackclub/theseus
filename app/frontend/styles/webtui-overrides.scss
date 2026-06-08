@@ -172,99 +172,102 @@
   }
 
   /* ── Lickable glass buttons — the candy in the terminal ──
-   * These deliberately break the TUI aesthetic. Rounded, chunky,
-   * glossy pills. The one skeuomorphic indulgence.
+   * Completely overrides WebTUI's button stripe pattern.
+   * Rounded, glossy pills with proper glass gradient.
    */
-  button, input[type=submit] {
-    border-radius: 8px;
+  button:not([box-]),
+  input[type=submit] {
+    border-radius: 8px !important;
     height: 2lh;
     padding: 0 2ch;
     font-weight: 500;
     transition: all 0.15s ease;
-    background-color: var(--button-primary);
+    background-color: var(--mapped-primary, var(--button-primary, var(--foreground0))) !important;
+    color: var(--mapped-secondary, var(--button-secondary, var(--background0)));
     background-image: linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.50) 0%,
-      rgba(255, 255, 255, 0.18) 45%,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.15) 45%,
       rgba(255, 255, 255, 0) 50%,
       rgba(0, 0, 0, 0.03) 55%,
       rgba(0, 0, 0, 0.06) 100%
-    );
+    ) !important;
     box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.4),
+      inset 0 1px 1px rgba(255, 255, 255, 0.35),
       0 1px 3px rgba(0, 0, 0, 0.12);
 
     &:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.5),
+        inset 0 1px 1px rgba(255, 255, 255, 0.45),
         0 3px 8px rgba(0, 0, 0, 0.18);
       background-image: linear-gradient(
         to bottom,
-        rgba(255, 255, 255, 0.60) 0%,
-        rgba(255, 255, 255, 0.25) 45%,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.22) 45%,
         rgba(255, 255, 255, 0) 50%,
         rgba(0, 0, 0, 0.02) 55%,
         rgba(0, 0, 0, 0.04) 100%
-      );
+      ) !important;
     }
 
+    /* kill WebTUI's primary/secondary swap on :active — just darken */
     &:active:not(:disabled) {
+      --mapped-primary: var(--button-primary, var(--foreground0));
+      --mapped-secondary: var(--button-secondary, var(--background0));
       transform: translateY(0.5px);
       box-shadow:
-        inset 0 2px 4px rgba(0, 0, 0, 0.12),
-        0 1px 2px rgba(0, 0, 0, 0.08);
+        inset 0 2px 4px rgba(0, 0, 0, 0.15);
       background-image: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.04) 0%,
+        rgba(0, 0, 0, 0.06) 0%,
         rgba(0, 0, 0, 0.02) 45%,
         rgba(0, 0, 0, 0) 50%,
-        rgba(255, 255, 255, 0.04) 55%,
-        rgba(255, 255, 255, 0.08) 100%
-      );
+        rgba(255, 255, 255, 0.03) 55%,
+        rgba(255, 255, 255, 0.06) 100%
+      ) !important;
     }
 
-    /* small buttons: same glass, just compact */
     &[size-="small"] {
       height: 1.25lh;
       padding: 0 1ch;
       font-size: 0.85em;
-      border-radius: 6px;
+      border-radius: 6px !important;
     }
   }
 
-  /* ── Colored buttons — action = color ── */
+  /* ── Colored buttons ── */
   button[variant-="green"], input[type=submit][variant-="green"] { --button-primary: var(--green); --button-secondary: var(--background0); }
   button[variant-="red"], input[type=submit][variant-="red"] { --button-primary: var(--red); --button-secondary: var(--background0); }
   button[variant-="yellow"], input[type=submit][variant-="yellow"] { --button-primary: var(--yellow); --button-secondary: var(--background0); }
   button[variant-="blue"], input[type=submit][variant-="blue"] { --button-primary: var(--blue); --button-secondary: var(--background0); }
 
-  /* ── Dark theme: subtler glass, deeper shadows ── */
+  /* ── Dark theme: subtler glass ── */
   [data-webtui-theme^="gruvbox-dark"] {
-    button, input[type=submit] {
+    button:not([box-]), input[type=submit] {
       box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12),
         0 2px 4px rgba(0, 0, 0, 0.3);
       background-image: linear-gradient(
         to bottom,
-        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0.20) 0%,
         rgba(255, 255, 255, 0.06) 45%,
         rgba(255, 255, 255, 0) 50%,
         rgba(0, 0, 0, 0.06) 55%,
         rgba(0, 0, 0, 0.14) 100%
-      );
+      ) !important;
       &:hover:not(:disabled) {
         box-shadow:
-          inset 0 1px 1px rgba(255, 255, 255, 0.22),
+          inset 0 1px 1px rgba(255, 255, 255, 0.18),
           0 4px 10px rgba(0, 0, 0, 0.35);
         background-image: linear-gradient(
           to bottom,
-          rgba(255, 255, 255, 0.30) 0%,
+          rgba(255, 255, 255, 0.28) 0%,
           rgba(255, 255, 255, 0.10) 45%,
           rgba(255, 255, 255, 0) 50%,
           rgba(0, 0, 0, 0.04) 55%,
           rgba(0, 0, 0, 0.10) 100%
-        );
+        ) !important;
       }
     }
   }
