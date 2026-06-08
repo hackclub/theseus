@@ -126,28 +126,26 @@ class Components::Letters::Form < Components::Base
   end
 
   def mailing_date_field(f)
-    div(class: "form-field") do
-      label(class: "date-field-label", for: "letter_mailing_date") { "Mailing date" }
-      div(class: "mt-1") do
-        input(
-          type: "date",
-          name: "letter[mailing_date]",
-          id: "letter_mailing_date",
-          value: (letter.mailing_date || letter.default_mailing_date)&.iso8601,
-          min: letter.new_record? ? Date.current.iso8601 : nil,
-          class: "date-field w-full"
-        )
-      end
-      div(class: "quick-date-row") do
+    div(style: "margin-bottom: 1lh;") do
+      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Mailing date" }
+      input(
+        type: "date",
+        name: "letter[mailing_date]",
+        id: "letter_mailing_date",
+        value: (letter.mailing_date || letter.default_mailing_date)&.iso8601,
+        min: letter.new_record? ? Date.current.iso8601 : nil,
+        style: "width: 20ch;"
+      )
+      row("gap-": "1", style: "margin-top: 0.5lh;") do
         button(
           type: "button",
-          class: "quick-date-btn",
-          data_mailing_date: Date.tomorrow.iso8601
+          data_mailing_date: Date.tomorrow.iso8601,
+          style: "font-size: 0.85em;"
         ) { "Tomorrow" }
         button(
           type: "button",
-          class: "quick-date-btn",
-          data_mailing_date: Date.current.next_occurring(:monday).iso8601
+          data_mailing_date: Date.current.next_occurring(:monday).iso8601,
+          style: "font-size: 0.85em;"
         ) { "Next Monday" }
       end
     end
@@ -169,94 +167,53 @@ class Components::Letters::Form < Components::Base
       current_entry = countries.find { |c| c[:code] == current_country }
       form_id = "address-form-#{SecureRandom.hex(4)}"
 
-      div(id: form_id, class: "address-form") do
-        # Name
-        div(class: "form-grid") do
-          field_group(label: "First name") do
-            input(
-              type: "text",
-              name: a.field_name(:first_name),
-              value: a.object&.first_name,
-              required: true,
-              style: "width: 100%;"
-            )
+      div(id: form_id) do
+        # Name row
+        row("gap-": "2") do
+          div(style: "flex: 1;") do
+            field_group(label: "First name") do
+              input(type: "text", name: a.field_name(:first_name), value: a.object&.first_name, required: true, style: "width: 100%;")
+            end
           end
-          field_group(label: "Last name") do
-            input(
-              type: "text",
-              name: a.field_name(:last_name),
-              value: a.object&.last_name,
-              style: "width: 100%;"
-            )
+          div(style: "flex: 1;") do
+            field_group(label: "Last name") do
+              input(type: "text", name: a.field_name(:last_name), value: a.object&.last_name, style: "width: 100%;")
+            end
           end
         end
 
-        # Street
         field_group(label: "Street address") do
-          input(
-            type: "text",
-            name: a.field_name(:line_1),
-            value: a.object&.line_1,
-            required: true,
-            style: "width: 100%;"
-          )
+          input(type: "text", name: a.field_name(:line_1), value: a.object&.line_1, required: true, style: "width: 100%;")
         end
 
-        field_group(label: "Apt, suite, unit, etc.", caption: "Optional") do
-          input(
-            type: "text",
-            name: a.field_name(:line_2),
-            value: a.object&.line_2,
-            style: "width: 100%;"
-          )
+        field_group(label: "Apt, suite, unit", caption: "Optional") do
+          input(type: "text", name: a.field_name(:line_2), value: a.object&.line_2, style: "width: 100%;")
         end
 
-        # City / State / Postal
-        div(class: "address-form-city-row") do
-          field_group(label: "City") do
-            input(
-              type: "text",
-              name: a.field_name(:city),
-              value: a.object&.city,
-              required: true,
-              style: "width: 100%;"
-            )
+        # City / State / Postal row
+        row("gap-": "2") do
+          div(style: "flex: 2;") do
+            field_group(label: "City") do
+              input(type: "text", name: a.field_name(:city), value: a.object&.city, required: true, style: "width: 100%;")
+            end
           end
-          field_group(label: "State") do
-            input(
-              type: "text",
-              name: a.field_name(:state),
-              value: a.object&.state,
-              required: true,
-              style: "width: 100%;"
-            )
+          div(style: "flex: 1;") do
+            field_group(label: "State") do
+              input(type: "text", name: a.field_name(:state), value: a.object&.state, required: true, style: "width: 100%;")
+            end
           end
-          field_group(label: "Postal code") do
-            input(
-              type: "text",
-              name: a.field_name(:postal_code),
-              value: a.object&.postal_code,
-              required: true,
-              style: "width: 100%;"
-            )
+          div(style: "flex: 1;") do
+            field_group(label: "Postal code") do
+              input(type: "text", name: a.field_name(:postal_code), value: a.object&.postal_code, required: true, style: "width: 100%;")
+            end
           end
         end
 
-        # Country
-        div(class: "address-form-country") do
-          field_group(label: "Country") do
-            select(
-              name: a.field_name(:country),
-              id: "#{form_id}_country",
-              style: "width: 100%;"
-            ) do
-              option(value: "") { "Select a country..." }
-              all_ordered.each do |country|
-                option(
-                  value: country[:code],
-                  selected: country[:code] == current_country
-                ) { country[:display] }
-              end
+        field_group(label: "Country") do
+          select(name: a.field_name(:country), id: "#{form_id}_country", style: "width: 100%;") do
+            option(value: "") { "Select a country..." }
+            all_ordered.each do |country|
+              option(value: country[:code], selected: country[:code] == current_country) { country[:display] }
             end
           end
         end
@@ -298,85 +255,50 @@ class Components::Letters::Form < Components::Base
     addresses = ReturnAddress.shared.or(ReturnAddress.owned_by(current_user))
 
     # Return address
-    div(class: "form-field-lg") do
-      label(class: "date-field-label", for: "letter_return_address_id") { "Return address" }
-      div(class: "mt-1") do
-        select(
-          name: "letter[return_address_id]",
-          id: "letter_return_address_id",
-          class: "form-select"
-        ) do
-          option(value: "") { "Select a return address..." }
-          addresses.each do |addr|
-            option(
-              value: addr.id,
-              selected: addr.id == letter.return_address_id
-            ) { addr.display_name }
-          end
+    field_group(label: "Return address") do
+      select(name: "letter[return_address_id]", id: "letter_return_address_id", style: "width: 100%;") do
+        option(value: "") { "Select a return address..." }
+        addresses.each do |addr|
+          option(value: addr.id, selected: addr.id == letter.return_address_id) { addr.display_name }
         end
       end
-      p(class: "form-hint") do
+      span(style: "display: block; margin-top: 0.25lh; font-size: 0.85em;") do
         a(href: return_addresses_path(from_letter: true)) { "Manage return addresses" }
       end
     end
 
     field_group(label: "Custom return name", caption: "Leave blank to use the return address name") do
-      input(
-        type: "text",
-        name: "letter[return_address_name]",
-        value: letter.return_address_name,
-        style: "width: 100%;"
-      )
+      input(type: "text", name: "letter[return_address_name]", value: letter.return_address_name, style: "width: 100%;")
     end
 
     # Postage type (hidden by default, shown by JS for US addresses)
-    div(id: "postage-options", class: "form-field-lg", style: "display: none;") do
-      div do
-        label(class: "date-field-label") { "Postage type" }
-        div(class: "radio-row") do
-          label(class: "radio-option") do
-            input(
-              type: "radio", name: "letter[postage_type]",
-              value: "stamps",
-              checked: letter.postage_type == "stamps" || letter.postage_type.blank?
-            )
-            plain " Stamps"
-          end
-          label(class: "radio-option") do
-            input(
-              type: "radio", name: "letter[postage_type]",
-              value: "indicia",
-              checked: letter.postage_type == "indicia"
-            )
-            plain " Indicia (Metered)"
-          end
+    div(id: "postage-options", style: "display: none; margin-bottom: 1lh;") do
+      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Postage type" }
+      row("gap-": "2") do
+        label do
+          input(type: "radio", name: "letter[postage_type]", value: "stamps", checked: letter.postage_type == "stamps" || letter.postage_type.blank?)
+          plain " Stamps"
         end
-        p(class: "form-hint") { "Indicia is slightly cheaper for standard letters" }
+        label do
+          input(type: "radio", name: "letter[postage_type]", value: "indicia", checked: letter.postage_type == "indicia")
+          plain " Indicia (Metered)"
+        end
       end
+      span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") { "Indicia is slightly cheaper for standard letters" }
     end
 
     # Mailer ID
-    div(class: "form-field-lg") do
-      label(class: "date-field-label", for: "letter_usps_mailer_id_id") { "USPS Mailer ID" }
-      div(class: "mt-1") do
-        select(
-          name: "letter[usps_mailer_id_id]",
-          id: "letter_usps_mailer_id_id",
-          class: "form-select"
-        ) do
-          option(value: "") { "Select a mailer ID..." }
-          USPS::MailerId.all.each do |m|
-            option(
-              value: m.id,
-              selected: m.id == (letter.usps_mailer_id_id || USPS::MailerId.first&.id)
-            ) { m.name }
-          end
+    field_group(label: "USPS Mailer ID") do
+      select(name: "letter[usps_mailer_id_id]", id: "letter_usps_mailer_id_id", style: "width: 100%;") do
+        option(value: "") { "Select a mailer ID..." }
+        USPS::MailerId.all.each do |m|
+          option(value: m.id, selected: m.id == (letter.usps_mailer_id_id || USPS::MailerId.first&.id)) { m.name }
         end
       end
     end
 
-    div("box-": "square", class: "tui-banner tui-banner-warning", style: "margin-top: 1lh;") do
-      plain "[!] Please leave the mailer ID at the default if you're mailing from HQ — otherwise talk to Nora (it has USPS implications)."
+    div("box-": "square", class: "tui-banner tui-banner-warning", style: "margin-top: 0.5lh;") do
+      plain "[!] Leave the mailer ID at the default if mailing from HQ."
     end
   end
 
@@ -394,20 +316,17 @@ class Components::Letters::Form < Components::Base
             var returnAddresses = #{address_data.to_json};
 
             function updatePostageOptions() {
-              var selectedId = returnAddressSelect.value;
-              if (!selectedId) {
-                postageOptions.style.display = 'none';
-                return;
-              }
-
-              var existingHidden = postageOptions.querySelector('input[type="hidden"][name="letter[postage_type]"]');
-              if (existingHidden) existingHidden.remove();
-
-              var selectedAddress = returnAddresses.find(function(ra) { return ra.id.toString() === selectedId; });
-              var isUS = selectedAddress && selectedAddress.country === 'US';
-
-              if (isUS) {
-                postageOptions.style.display = 'block';
+    field_group(label: "Tags") do
+      select(name: "letter[tags][]", multiple: true, style: "width: 100%; min-height: 3lh;") do
+        available_tags.each do |tag|
+          option(value: tag, selected: letter.tags&.include?(tag)) { tag }
+        end
+      end
+      span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") do
+        plain "Select from common tags or create your own"
+      end
+    end
+  end
                 if (!document.querySelector('input[name="letter[postage_type]"]:checked')) {
                   stampsRadio.checked = true;
                 }
@@ -436,18 +355,15 @@ class Components::Letters::Form < Components::Base
   end
 
   def tag_picker(f)
-    div(class: "form-field-lg") do
-      label(class: "date-field-label") { "Tags" }
-      select(
-        name: "letter[tags][]",
-        multiple: true,
-        class: "selectize-tags w-full"
-      ) do
+    field_group(label: "Tags") do
+      select(name: "letter[tags][]", multiple: true, style: "width: 100%; min-height: 3lh;") do
         available_tags.each do |tag|
           option(value: tag, selected: letter.tags&.include?(tag)) { tag }
         end
       end
-      p(class: "form-hint") { "Select from common tags or create your own" }
+      span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") do
+        plain "Select from common tags or create your own"
+      end
     end
   end
 end
