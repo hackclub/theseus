@@ -1,76 +1,75 @@
 <% content_for :title, "Buy Indicia - #{@letter.public_id}" %>
 
-<div class="page-container--xs">
-  <h1 class="page-title content-section">Buy Indicia</h1>
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <row gap-="1" align-="center">
+    <a href="<%= letter_path(@letter) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @letter.public_id %></a>
+    <strong style="font-size: 1.15em;">Buy Indicia</strong>
+  </row>
+</div>
 
-  <div class="content-section">
-    <h2 class="section-heading">Letter Details</h2>
-    <div box-="round">
-      <div style="padding: 1lh 2ch;">
-        <div class="detail-grid">
-          <div>
-            <div class="detail-label">Recipient</div>
-            <div class="fw-medium"><%= @letter.address.name_line %></div>
-          </div>
-          <div>
-            <div class="detail-label">Destination</div>
-            <div><%= @letter.address.city %>, <%= @letter.address.state %></div>
-          </div>
-          <div>
-            <div class="detail-label">Dimensions</div>
-            <div><%= @letter.height %>" x <%= @letter.width %>"</div>
-          </div>
-          <div>
-            <div class="detail-label">Weight</div>
-            <div><%= @letter.weight %> oz</div>
-          </div>
-        </div>
+<div class="show-layout">
+  <div class="show-main">
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Letter Details</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid">
+        <span class="detail-label">Recipient</span>
+        <span style="font-weight: 500;"><%= @letter.address.name_line %></span>
+        <span class="detail-label">Destination</span>
+        <span><%= @letter.address.city %>, <%= @letter.address.state %></span>
+        <span class="detail-label">Dimensions</span>
+        <span><%= @letter.height %>" x <%= @letter.width %>"</span>
+        <span class="detail-label">Weight</span>
+        <span><%= @letter.weight %> oz</span>
       </div>
+      <% if @letter.non_machinable? %>
+        <div is-="separator"></div>
+        <span is-="badge" variant-="yellow">⚠ Non-machinable surcharge applies</span>
+      <% end %>
     </div>
-    <% if @letter.non_machinable? %>
-      <div box-="square" class="tui-banner tui-banner-warning" style="margin-top: 1lh;">[⚠] Non-machinable surcharge applies</div>
-    <% end %>
-  </div>
 
-  <div class="content-section">
-    <h2 class="section-heading">Purchase Postage</h2>
     <div box-="round">
-      <div style="padding: 1lh 2ch;">
-        <%= form_with(url: buy_indicia_letter_path(@letter), method: :post) do |form| %>
+      <strong>Purchase Postage</strong>
+      <div is-="separator"></div>
+      <%= form_with(url: buy_indicia_letter_path(@letter), method: :post) do |form| %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">USPS Payment Account</label>
+          <select name="usps_payment_account_id" required style="width: 100%;">
+            <option value="">Select account...</option>
+            <% USPS::PaymentAccount.all.each do |account| %>
+              <option value="<%= account.id %>" <%= "selected" if account.id == USPS::PaymentAccount.first&.id %>><%= account.name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <% if current_user.hcb_payment_accounts.any? %>
           <div style="margin-bottom: 1lh;">
-            <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">USPS Payment Account</label>
-            <select name="usps_payment_account_id" required style="width: 100%;">
-              <option value="">Select account...</option>
-              <% USPS::PaymentAccount.all.each do |account| %>
-                <option value="<%= account.id %>" <%= "selected" if account.id == USPS::PaymentAccount.first&.id %>><%= account.name %></option>
+            <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Pay with HCB Organization</label>
+            <select name="hcb_payment_account_id" required style="width: 100%;">
+              <option value="">Select organization...</option>
+              <% current_user.hcb_payment_accounts.each do |account| %>
+                <option value="<%= account.id %>"><%= account.organization_name %></option>
               <% end %>
             </select>
           </div>
-
-          <% if current_user.hcb_payment_accounts.any? %>
-            <div style="margin-bottom: 1lh;">
-              <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Pay with HCB Organization</label>
-              <select name="hcb_payment_account_id" required style="width: 100%;">
-                <option value="">Select organization...</option>
-                <% current_user.hcb_payment_accounts.each do |account| %>
-                  <option value="<%= account.id %>"><%= account.organization_name %></option>
-                <% end %>
-              </select>
-            </div>
-          <% else %>
-            <div box-="square" class="tui-banner tui-banner-info" style="margin-bottom: 1lh;">[ℹ] <%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to pay for postage.</div>
-          <% end %>
-
-          <div class="page-actions">
-            <a href="<%= letter_path(@letter) %>">Cancel</a>
-            <button type="submit" variant-="green" <%= "disabled" if current_user.hcb_payment_accounts.empty? %>>✓ Buy Indicia</button>
-          </div>
+        <% else %>
+          <div box-="square" style="margin-bottom: 1lh; color: var(--foreground2);">[ℹ] <%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to pay for postage.</div>
         <% end %>
-      </div>
+
+        <row gap-="1" align-="center">
+          <div style="flex: 1;"></div>
+          <a href="<%= letter_path(@letter) %>">Cancel</a>
+          <button type="submit" variant-="green" <%= "disabled" if current_user.hcb_payment_accounts.empty? %>>✓ Buy Indicia</button>
+        </row>
+      <% end %>
     </div>
   </div>
 
-  <div class="back-link">
-    <a href="<%= letter_path(@letter) %>">← Back to letter</a>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong>Info</strong>
+      <div is-="separator"></div>
+      <p style="color: var(--foreground2); margin: 0;">Purchasing indicia buys USPS postage for this letter. The cost is charged to the selected HCB organization.</p>
+    </div>
   </div>
 </div>

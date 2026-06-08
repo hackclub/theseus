@@ -13,49 +13,59 @@ class Views::Letter::Batches::Edit < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "page-container") do
-      div(class: "page-header") do
-        a(href: letter_batch_path(@batch), style: "color: var(--foreground2);") { "← Back" }
-        h1(class: "page-title") { "Edit Letter Batch ##{@batch.id}" }
+    # Header
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      row("gap-": "1", "align-": "center") do
+        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
+        strong(style: "font-size: 1.15em;") { "Edit Letter Batch" }
+      end
+    end
+
+    # Two-column layout
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        error_messages
+
+        form_with(model: @batch, url: letter_batch_path(@batch), scope: :letter_batch, method: :patch) do |f|
+          # Letter Specs
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Letter Specs" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              div(
+                data_svelte_component: "letter-attributes-picker",
+                data_form_scope: "letter_batch",
+                data_is_batch: "true",
+                data_initial_width: @batch.letter_width.to_s,
+                data_initial_height: @batch.letter_height.to_s,
+                data_initial_weight: (@batch.letter_weight || 1).to_s,
+                data_initial_processing_category: (@batch.letter_processing_category || "letter").to_s
+              )
+            end
+          end
+
+          # Sender & Postage
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Sender & Postage" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              sender_fields(f)
+            end
+          end
+
+          # Tags
+          tag_picker(f)
+
+          # Actions
+          row("gap-": "1", style: "margin-top: 1lh;") do
+            button(type: "submit", "variant-": "green") { "✓ Update Batch" }
+            a(href: letter_batch_path(@batch)) { button("size-": "small") { "Cancel" } }
+          end
+        end
       end
 
-      error_messages
-
-      form_with(model: @batch, url: letter_batch_path(@batch), scope: :letter_batch, method: :patch) do |f|
-        # Letter Specs
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h2(style: "margin: 0; padding: 1lh 1ch 0;") { "Letter Specs" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            div(
-              data_svelte_component: "letter-attributes-picker",
-              data_form_scope: "letter_batch",
-              data_is_batch: "true",
-              data_initial_width: @batch.letter_width.to_s,
-              data_initial_height: @batch.letter_height.to_s,
-              data_initial_weight: (@batch.letter_weight || 1).to_s,
-              data_initial_processing_category: (@batch.letter_processing_category || "letter").to_s
-            )
-          end
-        end
-
-        # Sender & Postage
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h2(style: "margin: 0; padding: 1lh 1ch 0;") { "Sender & Postage" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            sender_fields(f)
-          end
-        end
-
-        # Tags
-        tag_picker(f)
-
-        # Actions
-        div(class: "page-actions") do
-          a(href: letter_batch_path(@batch)) { button("size-": "small") { "Cancel" } }
-          button(type: "submit", "variant-": "green") { "✓ Update Batch" }
-        end
+      div(class: "show-sidebar") do
+        batch_info_card
       end
     end
   end
@@ -128,6 +138,23 @@ class Views::Letter::Batches::Edit < Views::Base
         end
       end
       p(class: "form-hint") { "Select from common tags or create your own" }
+    end
+  end
+
+  def batch_info_card
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Batch Info" }
+      div("is-": "separator")
+      div(class: "detail-grid") do
+        span(class: "detail-label") { "Letters" }
+        span { @batch.letters.count.to_s }
+
+        span(class: "detail-label") { "Addresses" }
+        span { @batch.addresses.count.to_s }
+
+        span(class: "detail-label") { "Status" }
+        span { render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch) }
+      end
     end
   end
 end

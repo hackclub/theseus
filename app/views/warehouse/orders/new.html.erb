@@ -1,11 +1,25 @@
-<% content_for :title, "New order" %>
+<% content_for :title, "New Order" %>
 
-<div class="page-container--narrow">
-  <h1 class="page-title content-section">New order</h1>
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_orders_path %>" style="text-decoration: none; color: var(--foreground2);">← Orders</a>
+    <strong style="font-size: 1.15em;">New Order</strong>
+  </row>
+</div>
 
-  <%= render "form", warehouse_order: @warehouse_order %>
+<div class="show-layout">
+  <div class="show-main">
+    <%= render "form", warehouse_order: @warehouse_order %>
+  </div>
 
-  <div class="back-link">
-    <a href="<%= warehouse_orders_path %>">← Back to orders</a>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong>Info</strong>
+      <div is-="separator"></div>
+      <div style="margin-top: 0.5lh; color: var(--foreground2);">
+        <p style="margin: 0 0 0.5lh;">Orders are sent to the warehouse for fulfillment. The recipient will receive a shipping notification email when it ships.</p>
+        <p style="margin: 0;">Items must be in inventory to be included in an order.</p>
+      </div>
+    </div>
   </div>
 </div>

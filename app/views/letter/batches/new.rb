@@ -13,61 +13,71 @@ class Views::Letter::Batches::New < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "page-container") do
-      div(class: "page-header") do
-        a(href: letter_batches_path, style: "color: var(--foreground2);") { "← Back" }
-        h1(class: "page-title") { "New Letter Batch" }
+    # Header
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      row("gap-": "1", "align-": "center") do
+        a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
+        strong(style: "font-size: 1.15em;") { "New Letter Batch" }
+      end
+    end
+
+    # Two-column layout
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        error_messages
+
+        form_with(model: @batch, url: letter_batches_path, scope: :letter_batch) do |f|
+          # Letter Specs
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Letter Specs" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              div(
+                data_svelte_component: "letter-attributes-picker",
+                data_form_scope: "letter_batch",
+                data_is_batch: "true",
+                data_initial_weight: "1",
+                data_initial_processing_category: "letter"
+              )
+            end
+          end
+
+          # Sender & Postage
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Sender & Postage" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              sender_fields(f)
+            end
+          end
+
+          # Addresses (CSV)
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Addresses" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              address_fields = (Address.column_names - %w[id created_at updated_at batch_id]) + %w[rubber_stamps]
+              div(
+                data_svelte_component: "batch-csv-mapper",
+                data_address_fields: address_fields.to_json,
+                data_form_field_name: "letter_batch[addresses_data]"
+              )
+            end
+          end
+
+          # Tags
+          tag_picker(f)
+
+          # Actions
+          row("gap-": "1", style: "margin-top: 1lh;") do
+            button(type: "submit", "variant-": "green") { "✓ Create Batch" }
+            a(href: letter_batches_path) { button("size-": "small") { "Cancel" } }
+          end
+        end
       end
 
-      error_messages
-
-      form_with(model: @batch, url: letter_batches_path, scope: :letter_batch) do |f|
-        # Letter Specs
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h2(style: "margin: 0; padding: 1lh 1ch 0;") { "Letter Specs" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            div(
-              data_svelte_component: "letter-attributes-picker",
-              data_form_scope: "letter_batch",
-              data_is_batch: "true",
-              data_initial_weight: "1",
-              data_initial_processing_category: "letter"
-            )
-          end
-        end
-
-        # Sender & Postage
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h2(style: "margin: 0; padding: 1lh 1ch 0;") { "Sender & Postage" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            sender_fields(f)
-          end
-        end
-
-        # Addresses (CSV)
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h2(style: "margin: 0; padding: 1lh 1ch 0;") { "Addresses" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            address_fields = (Address.column_names - %w[id created_at updated_at batch_id]) + %w[rubber_stamps]
-            div(
-              data_svelte_component: "batch-csv-mapper",
-              data_address_fields: address_fields.to_json,
-              data_form_field_name: "letter_batch[addresses_data]"
-            )
-          end
-        end
-
-        # Tags
-        tag_picker(f)
-
-        # Actions
-        div(class: "page-actions") do
-          a(href: letter_batches_path) { button("size-": "small") { "Cancel" } }
-          button(type: "submit", "variant-": "green") { "✓ Create Batch" }
-        end
+      div(class: "show-sidebar") do
+        batch_info_card
       end
     end
   end
@@ -149,6 +159,18 @@ class Views::Letter::Batches::New < Views::Base
         end
       end
       p(class: "form-hint") { "Select from common tags or create your own" }
+    end
+  end
+
+  def batch_info_card
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "About Batches" }
+      div("is-": "separator")
+      div(style: "padding: 0.5lh 0;") do
+        p(style: "color: var(--foreground2); margin: 0;") do
+          plain "Upload a CSV of addresses and configure letter specs. After creating, you'll map CSV columns to address fields, then process to generate labels."
+        end
+      end
     end
   end
 end

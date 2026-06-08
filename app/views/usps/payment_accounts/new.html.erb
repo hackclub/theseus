@@ -1,9 +1,10 @@
 <% content_for :title, "New Payment Account" %>
 
-<div class="page-container--xs">
-  <h1 class="page-title content-section">New USPS Payment Account</h1>
-  <%= render "form", usps_payment_account: @usps_payment_account %>
-  <div class="back-link">
-    <a href="<%= usps_payment_accounts_path %>">← Back to payment accounts</a>
-  </div>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= usps_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← Payment Accounts</a>
+    <strong style="font-size: 1.15em;">New USPS Payment Account</strong>
+  </row>
 </div>
+
+<%= render "form", usps_payment_account: @usps_payment_account %>

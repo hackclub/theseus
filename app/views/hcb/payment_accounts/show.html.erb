@@ -1,19 +1,28 @@
 <% content_for :title, "#{@payment_account.organization_name} - HCB" %>
 
-<div class="page-container--narrow">
-  <h1 class="page-title content-section"><%= @payment_account.organization_name %></h1>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= hcb_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← HCB Accounts</a>
+    <strong style="font-size: 1.15em;"><%= @payment_account.organization_name %></strong>
+  </row>
+</div>
 
-  <h2 class="section-heading">Organization Details</h2>
-  <div box-="round" style="margin-bottom: 2lh;">
-    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-      <div class="kv-row"><span class="kv-label">Organization ID</span><code><%= @payment_account.organization_id %></code></div>
-    </div>
-    <div style="padding: 0.5lh 1ch;">
-      <div class="kv-row"><span class="kv-label">Added</span><span><%= @payment_account.created_at.strftime("%B %d, %Y") %></span></div>
+<div class="show-layout">
+  <div class="show-main">
+    <div box-="round">
+      <strong style="display: block; padding: 0.5lh 1ch;">Organization Details</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+        <span class="detail-label">Organization</span>
+        <span><%= @payment_account.organization_name %></span>
+        <span class="detail-label">Organization ID</span>
+        <code><%= @payment_account.organization_id %></code>
+        <span class="detail-label">Added</span>
+        <span><%= @payment_account.created_at.strftime("%B %d, %Y") %></span>
+      </div>
     </div>
   </div>
 
-  <div class="back-link">
-    <a href="<%= hcb_payment_accounts_path %>">← Back to HCB accounts</a>
+  <div class="show-sidebar">
   </div>
 </div>

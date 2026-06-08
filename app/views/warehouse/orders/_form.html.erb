@@ -10,31 +10,34 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Order Details</h2>
-    <div style="padding: 1lh 1ch;">
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Order Details</strong>
+    <div is-="separator"></div>
+    <div style="margin-top: 0.5lh;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Short title (shown to recipient)</label>
         <input type="text" name="warehouse_order[user_facing_title]" value="<%= warehouse_order.user_facing_title %>" style="width: 100%;" autofocus>
       </div>
 
-      <div style="margin-bottom: 1lh;">
+      <div>
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Recipient email</label>
         <input type="email" name="warehouse_order[recipient_email]" value="<%= warehouse_order.recipient_email %>" style="width: 100%;">
       </div>
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Shipping Address</h2>
-    <div style="padding: 1lh 1ch;">
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Shipping Address</strong>
+    <div is-="separator"></div>
+    <div style="margin-top: 0.5lh;">
       <%= render 'addresses/primer_nested_form', form: form %>
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Contents</h2>
-    <div style="padding: 1lh 1ch;">
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Contents</strong>
+    <div is-="separator"></div>
+    <div style="margin-top: 0.5lh;">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: current_user&.is_admin? ? :all : :in_inventory,
@@ -44,9 +47,10 @@
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Options</h2>
-    <div style="padding: 1lh 1ch;">
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Options</strong>
+    <div is-="separator"></div>
+    <div style="margin-top: 0.5lh;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Internal notes</label>
         <textarea name="warehouse_order[internal_notes]" rows="3" style="width: 100%;"><%= warehouse_order.internal_notes %></textarea>
@@ -62,8 +66,8 @@
 
   <%= render 'shared/primer_tag_picker', form: form, taggable: warehouse_order %>
 
-  <div class="page-actions">
-    <a href="<%= warehouse_orders_path %>">Cancel</a>
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_order.persisted? ? warehouse_order_path(warehouse_order) : warehouse_orders_path %>">Cancel</a>
     <button type="submit" variant-="green">✓ <%= warehouse_order.persisted? ? "Update Order" : "Create Order" %></button>
-  </div>
+  </row>
 <% end %>

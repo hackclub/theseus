@@ -5,6 +5,10 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
 
   def type_label = "Batch"
 
+  def type_badge
+    span("is-": "badge", "variant-": "blue") { "Batch" }
+  end
+
   def edit_queue_path
     edit_letter_queue_path(queue)
   end
@@ -13,39 +17,25 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
     letter_queue_path(queue, **params)
   end
 
-  # --- Make Batch ---
+  # --- Sidebar: Make Batch ---
 
   def make_batch_section
-    return unless letter_counts.fetch("queued", 0) > 0
-
-    render_make_batch_dialog
-  end
-
-  def render_make_batch_dialog
     queued_count = letter_counts.fetch("queued", 0)
+    return unless queued_count > 0
 
-    div(class: "content-section") do
-      details(id: "make-batch-dialog") do
-        summary do
-          button("variant-": "green") { "⊞ Make Batch" }
-        end
+    details(id: "make-batch-dialog") do
+      summary(style: "list-style: none;") do
+        button("variant-": "green", style: "width: 100%;") { "⊞ Make Batch" }
+      end
 
-        div("box-": "round", style: "margin-top: 1lh; padding: 1lh 2ch;") do
-          h3(style: "margin: 0;") { "Make Batch" }
-          p(style: "color: var(--foreground2);") { "Create a batch from queued letters" }
-          div("is-": "separator")
-
-          form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
-            div(style: "margin-bottom: 1lh;") do
-              label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "How many letters to batch?" }
-              input(type: "text", name: "limit", style: "width: 100%;")
-              small(style: "color: var(--foreground2);") { "Leave blank to batch all #{queued_count} queued letters" }
-            end
-
-            row( "gap-": "1", style: "justify-content: flex-end;") do
-              button(type: "submit", "variant-": "green") { "✓ Make Batch" }
-            end
+      div(style: "margin-top: 0.5lh;") do
+        form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
+          div(style: "margin-bottom: 0.5lh;") do
+            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "How many letters?" }
+            input(type: "text", name: "limit", style: "width: 100%;")
+            small(style: "color: var(--foreground2);") { "Blank = all #{queued_count}" }
           end
+          button(type: "submit", "variant-": "green", style: "width: 100%;") { "✓ Create Batch" }
         end
       end
     end
@@ -56,29 +46,27 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
   def batches_section
     return unless batches.any?
 
-    collapsible_section("Batches", batches.count) do
-      div("box-": "round") do
-        batches.each_with_index do |batch, i|
-          batch_row(batch)
-          div("is-": "separator") unless i == batches.size - 1
-        end
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Batches" }
+      span(style: "color: var(--foreground2); margin-left: 1ch;") { "(#{batches.count})" }
+      div("is-": "separator")
+
+      batches.each_with_index do |batch, i|
+        batch_row(batch)
+        div("is-": "separator") unless i == batches.size - 1
       end
     end
   end
 
   def batch_row(batch)
-    div(class: "queue-batch-row") do
-      a(href: letter_batch_path(batch), class: "accent-link") do
-        "Batch ##{batch.id}"
-      end
-      span(class: "text-sm kv-label") do
+    row("gap-": "2", "align-": "center", style: "padding: 0.5lh 0;") do
+      a(href: letter_batch_path(batch), style: "text-decoration: none;") { "Batch ##{batch.id}" }
+      span(style: "color: var(--foreground2);") do
         "#{batch.letters.size} #{"letter".pluralize(batch.letters.size)}"
       end
       render Components::Shared::StatusBadge.new(status: batch.aasm_state, type: :batch)
-      span(class: "flex-1")
-      span(class: "text-sm kv-label") do
-        batch.created_at.strftime("%b %d, %Y")
-      end
+      span(style: "flex: 1;")
+      span(style: "color: var(--foreground2);") { batch.created_at.strftime("%b %d, %Y") }
     end
   end
 end

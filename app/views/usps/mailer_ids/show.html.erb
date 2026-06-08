@@ -1,31 +1,47 @@
 <% content_for :title, @usps_mailer_id.name %>
 
-<div class="page-container--narrow">
-  <div class="page-header">
-    <h1 class="page-title"><%= @usps_mailer_id.name %></h1>
-    <div class="page-actions">
-      <a href="<%= edit_usps_mailer_id_path(@usps_mailer_id) %>">✎ Edit</a>
-      <%= form_with url: usps_mailer_id_path(@usps_mailer_id), method: :delete, data: { turbo_confirm: "Delete this mailer ID?" }, class: "form-inline" do %>
-        <button type="submit" variant-="red">✕ Delete</button>
-      <% end %>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= usps_mailer_ids_path %>" style="text-decoration: none; color: var(--foreground2);">← Mailer IDs</a>
+    <strong style="font-size: 1.15em;"><%= @usps_mailer_id.name %></strong>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <row gap-="1" align-="center">
+    <a href="<%= edit_usps_mailer_id_path(@usps_mailer_id) %>">✎ Edit</a>
+    <%= form_with url: usps_mailer_id_path(@usps_mailer_id), method: :delete, data: { turbo_confirm: "Delete this mailer ID?" }, class: "form-inline" do %>
+      <button type="submit" variant-="red" size-="small">✕</button>
+    <% end %>
+  </row>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <div box-="round">
+      <strong style="display: block; padding: 0.5lh 1ch;">Details</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+        <span class="detail-label">Name</span>
+        <span><%= @usps_mailer_id.name %></span>
+        <span class="detail-label">CRID</span>
+        <code><%= @usps_mailer_id.crid %></code>
+        <span class="detail-label">MID</span>
+        <code><%= @usps_mailer_id.mid %></code>
+      </div>
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-      <div class="kv-row"><span class="kv-label">Name</span><span><%= @usps_mailer_id.name %></span></div>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong style="display: block; padding: 0.5lh 1ch;">Actions</strong>
+      <div is-="separator"></div>
+      <div style="padding: 0.5lh 1ch;">
+        <a href="<%= edit_usps_mailer_id_path(@usps_mailer_id) %>" style="display: block; text-align: center; margin-bottom: 0.5lh;">✎ Edit Mailer ID</a>
+        <%= form_with url: usps_mailer_id_path(@usps_mailer_id), method: :delete, data: { turbo_confirm: "Delete this mailer ID?" } do %>
+          <button type="submit" variant-="red" style="width: 100%;">✕ Delete</button>
+        <% end %>
+      </div>
     </div>
-    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-      <div class="kv-row"><span class="kv-label">CRID</span><code><%= @usps_mailer_id.crid %></code></div>
-    </div>
-    <div style="padding: 0.5lh 1ch;">
-      <div class="kv-row"><span class="kv-label">MID</span><code><%= @usps_mailer_id.mid %></code></div>
-    </div>
-  </div>
 
-  <%= render partial: "admin_inspector", locals: { record: @usps_mailer_id } %>
-
-  <div class="back-link">
-    <a href="<%= usps_mailer_ids_path %>">← Back to mailer IDs</a>
+    <%= render partial: "admin_inspector", locals: { record: @usps_mailer_id } %>
   </div>
 </div>

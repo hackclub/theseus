@@ -1,54 +1,62 @@
 <% content_for :title, @usps_payment_account.display_name %>
 
-<div class="page-container--narrow">
-  <div class="page-header">
-    <div>
-      <div class="page-title-group">
-        <h1 class="page-title"><%= @usps_payment_account.display_name %></h1>
-        <span is-="badge" variant-="background2"><%= @usps_payment_account.account_type %></span>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= usps_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← Payment Accounts</a>
+    <strong style="font-size: 1.15em;"><%= @usps_payment_account.display_name %></strong>
+    <span is-="badge" variant-="background2"><%= @usps_payment_account.account_type %></span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <row gap-="1" align-="center">
+    <a href="<%= edit_usps_payment_account_path(@usps_payment_account) %>">✎ Edit</a>
+    <%= form_with url: usps_payment_account_path(@usps_payment_account), method: :delete, data: { turbo_confirm: "Delete this payment account?" }, class: "form-inline" do %>
+      <button type="submit" variant-="red" size-="small">✕</button>
+    <% end %>
+  </row>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <div box-="round">
+      <strong style="display: block; padding: 0.5lh 1ch;">Account Details</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+        <span class="detail-label">Name</span>
+        <span><%= @usps_payment_account.name %></span>
+        <span class="detail-label">Account Type</span>
+        <span><%= @usps_payment_account.account_type %></span>
+        <% if @usps_payment_account.account_number.present? %>
+          <span class="detail-label">Account Number</span>
+          <code><%= @usps_payment_account.account_number %></code>
+        <% end %>
+        <% if @usps_payment_account.permit_number.present? %>
+          <span class="detail-label">Permit Number</span>
+          <code><%= @usps_payment_account.permit_number %></code>
+        <% end %>
+        <% if @usps_payment_account.permit_zip.present? %>
+          <span class="detail-label">Permit ZIP</span>
+          <code><%= @usps_payment_account.permit_zip %></code>
+        <% end %>
+        <span class="detail-label">Manifest MID</span>
+        <code><%= @usps_payment_account.manifest_mid || "—" %></code>
+        <span class="detail-label">Mailer ID</span>
+        <span><%= @usps_payment_account.usps_mailer_id&.display_name || "—" %></span>
       </div>
-    </div>
-    <div class="page-actions">
-      <a href="<%= edit_usps_payment_account_path(@usps_payment_account) %>">✎ Edit</a>
-      <%= form_with url: usps_payment_account_path(@usps_payment_account), method: :delete, data: { turbo_confirm: "Delete this payment account?" }, class: "form-inline" do %>
-        <button type="submit" variant-="red">✕ Delete</button>
-      <% end %>
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-      <div class="kv-row"><span class="kv-label">Name</span><span><%= @usps_payment_account.name %></span></div>
-    </div>
-    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-      <div class="kv-row"><span class="kv-label">Account Type</span><span><%= @usps_payment_account.account_type %></span></div>
-    </div>
-    <% if @usps_payment_account.account_number.present? %>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Account Number</span><code><%= @usps_payment_account.account_number %></code></div>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong style="display: block; padding: 0.5lh 1ch;">Actions</strong>
+      <div is-="separator"></div>
+      <div style="padding: 0.5lh 1ch;">
+        <a href="<%= edit_usps_payment_account_path(@usps_payment_account) %>" style="display: block; text-align: center; margin-bottom: 0.5lh;">✎ Edit Account</a>
+        <%= form_with url: usps_payment_account_path(@usps_payment_account), method: :delete, data: { turbo_confirm: "Delete this payment account?" } do %>
+          <button type="submit" variant-="red" style="width: 100%;">✕ Delete</button>
+        <% end %>
       </div>
-    <% end %>
-    <% if @usps_payment_account.permit_number.present? %>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Permit Number</span><code><%= @usps_payment_account.permit_number %></code></div>
-      </div>
-    <% end %>
-    <% if @usps_payment_account.permit_zip.present? %>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Permit ZIP</span><code><%= @usps_payment_account.permit_zip %></code></div>
-      </div>
-    <% end %>
-    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-      <div class="kv-row"><span class="kv-label">Manifest MID</span><code><%= @usps_payment_account.manifest_mid || "—" %></code></div>
     </div>
-    <div style="padding: 0.5lh 1ch;">
-      <div class="kv-row"><span class="kv-label">Mailer ID</span><span><%= @usps_payment_account.usps_mailer_id&.display_name || "—" %></span></div>
-    </div>
-  </div>
 
-  <%= render partial: "admin_inspector", locals: { record: @usps_payment_account } %>
-
-  <div class="back-link">
-    <a href="<%= usps_payment_accounts_path %>">← Back to payment accounts</a>
+    <%= render partial: "admin_inspector", locals: { record: @usps_payment_account } %>
   </div>
 </div>

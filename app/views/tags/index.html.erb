@@ -1,38 +1,36 @@
 <% content_for :title, "Tags" %>
 
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <div class="page-title-group">
-        <h1 class="page-title">Tags</h1>
-        <%= render Components::Shared::Jumpcode.new(path: tags_path) %>
-      </div>
-      <p class="page-subtitle">Cost tracking and reporting by tag</p>
-    </div>
-    <%= form_with url: refresh_tags_path, method: :post, class: "form-inline" do %>
-      <button type="submit">↻ Refresh</button>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">Tags</strong>
+    <%= render Components::Shared::Jumpcode.new(path: tags_path) %>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <%= form_with url: refresh_tags_path, method: :post, class: "form-inline" do %>
+    <button type="submit" size-="small">↻ Refresh</button>
+  <% end %>
+</div>
+
+<div box-="square" class="tui-banner" style="margin-bottom: 1lh;">
+  This page is cached for performance. Hit refresh if you need fresh data.
+</div>
+
+<div box-="round" style="margin-bottom: 1lh;">
+  <strong>Common Tags</strong>
+  <div is-="separator"></div>
+  <div style="margin-top: 0.5lh; display: flex; flex-wrap: wrap; gap: 0.5lh 1ch;">
+    <% @common_tags.each do |tag| %>
+      <a href="<%= tag_stats_path(tag.tag) %>" style="text-decoration: none;"><span is-="badge" variant-="blue"><%= tag.tag %></span></a>
     <% end %>
   </div>
+</div>
 
-  <div box-="square" class="tui-banner" style="margin-bottom: 1lh;">
-    This page is cached for performance. Hit refresh if you need fresh data.
-  </div>
-
-  <div class="content-section">
-    <h2 class="section-heading">Common Tags</h2>
-    <div class="tags-row">
-      <% @common_tags.each do |tag| %>
-        <a href="<%= tag_stats_path(tag.tag) %>"><span is-="badge" variant-="blue"><%= tag.tag %></span></a>
-      <% end %>
-    </div>
-  </div>
-
-  <div>
-    <h2 class="section-heading">All Tags</h2>
-    <div class="tags-row">
-      <% @tags.each do |tag| %>
-        <a href="<%= tag_stats_path(tag) %>"><span is-="badge" variant-="background2"><%= tag %></span></a>
-      <% end %>
-    </div>
+<div box-="round">
+  <strong>All Tags</strong>
+  <div is-="separator"></div>
+  <div style="margin-top: 0.5lh; display: flex; flex-wrap: wrap; gap: 0.5lh 1ch;">
+    <% @tags.each do |tag| %>
+      <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span is-="badge" variant-="background2"><%= tag %></span></a>
+    <% end %>
   </div>
 </div>

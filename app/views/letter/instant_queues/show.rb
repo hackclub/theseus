@@ -5,6 +5,10 @@ class Views::Letter::InstantQueues::Show < Views::Letter::Queues::ShowBase
 
   def type_label = "Instant"
 
+  def type_badge
+    span("is-": "badge", "variant-": "green") { "Instant" }
+  end
+
   def edit_queue_path
     edit_letter_instant_queue_path(queue)
   end
@@ -13,41 +17,26 @@ class Views::Letter::InstantQueues::Show < Views::Letter::Queues::ShowBase
     letter_instant_queue_path(queue, **params)
   end
 
-  # --- Instant-specific details ---
+  # --- Instant-specific detail rows (inside detail-grid) ---
 
   def extra_queue_details
-    div("is-": "separator")
-    div(style: "padding: 1lh 1ch;") do
-      strong { "Template" }
-      div(class: "detail-value") { queue.template.presence || "—" }
-    end
+    span(class: "detail-label") { "Template" }
+    span { queue.template.presence || "—" }
 
-    div("is-": "separator")
-    div(style: "padding: 1lh 1ch;") do
-      strong { "Postage Type" }
-      div(class: "detail-value") { queue.postage_type&.humanize || "—" }
-    end
+    span(class: "detail-label") { "Postage Type" }
+    span { queue.postage_type&.humanize || "—" }
 
     if queue.usps_payment_account.present?
-      div("is-": "separator")
-      div(style: "padding: 1lh 1ch;") do
-        strong { "USPS Payment Account" }
-        div(class: "detail-value") { queue.usps_payment_account.display_name }
-      end
+      span(class: "detail-label") { "USPS Payment" }
+      span { queue.usps_payment_account.display_name }
     end
 
     if queue.hcb_payment_account.present?
-      div("is-": "separator")
-      div(style: "padding: 1lh 1ch;") do
-        strong { "HCB Payment Account" }
-        div(class: "detail-value") { queue.hcb_payment_account.organization_name }
-      end
+      span(class: "detail-label") { "HCB Payment" }
+      span { queue.hcb_payment_account.organization_name }
     end
 
-    div("is-": "separator")
-    div(style: "padding: 1lh 1ch;") do
-      strong { "QR Code" }
-      div(class: "detail-value") { queue.include_qr_code ? "Enabled" : "Disabled" }
-    end
+    span(class: "detail-label") { "QR Code" }
+    span { queue.include_qr_code ? "Enabled" : "Disabled" }
   end
 end

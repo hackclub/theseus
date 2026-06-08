@@ -14,27 +14,29 @@ class Views::Warehouse::Batches::New < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "page-container") do
-      div(class: "page-title-group mb-3") do
-        a(href: warehouse_batches_path, "size-": "small") { "← Back" }
-        h1(class: "page-title") { "New Warehouse Batch" }
+    div(class: "page-toolbar") do
+      row("gap-": "1", "align-": "center") do
+        a(href: warehouse_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
+        strong(style: "font-size: 1.15em;") { "New Warehouse Batch" }
       end
+    end
 
-      error_messages
+    error_messages
 
-      form_with(model: @batch, url: warehouse_batches_path, scope: :batch) do |f|
-        # Template & Title
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h2(style: "margin: 0;") { "Batch Details" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 0;") do
-            div(class: "form-field-lg") do
-              label(class: "date-field-label", for: "batch_warehouse_template_id") { "Template" }
-              div(class: "mt-1") do
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        form_with(model: @batch, url: warehouse_batches_path, scope: :batch) do |f|
+          # Template & Title
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Batch Details" }
+            div("is-": "separator")
+            div(style: "margin-top: 0.5lh;") do
+              div(style: "margin-bottom: 1lh;") do
+                label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;", for: "batch_warehouse_template_id") { "Template" }
                 select(
                   name: "batch[warehouse_template_id]",
                   id: "batch_warehouse_template_id",
-                  class: "select-field",
+                  style: "width: 100%;",
                   required: true
                 ) do
                   @allowed_templates.each do |template|
@@ -42,37 +44,48 @@ class Views::Warehouse::Batches::New < Views::Base
                   end
                 end
               end
-            end
 
-            div(style: "margin-bottom: 1lh;") do
-              label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Title" }
-              input(type: "text", name: "batch[warehouse_user_facing_title]", style: "width: 100%;")
+              div(style: "margin-bottom: 1lh;") do
+                label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Title" }
+                input(type: "text", name: "batch[warehouse_user_facing_title]", style: "width: 100%;")
+              end
+              p(style: "color: var(--foreground2); font-size: 0.9em;") { "Optional — shown on the order list" }
             end
-            p(style: "color: var(--foreground2); font-size: 0.9em;") { "Optional — shown on the order list" }
+          end
+
+          # Addresses (CSV)
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Addresses" }
+            div("is-": "separator")
+            div(style: "margin-top: 0.5lh;") do
+              address_fields = Address.column_names - %w[id created_at updated_at batch_id]
+              div(
+                data_svelte_component: "batch-csv-mapper",
+                data_address_fields: address_fields.to_json,
+                data_form_field_name: "batch[addresses_data]"
+              )
+            end
+          end
+
+          # Tags
+          tag_picker(f)
+
+          # Actions
+          row("gap-": "1", "align-": "center", style: "margin-top: 1lh;") do
+            a(href: warehouse_batches_path) { "Cancel" }
+            button(type: "submit", "variant-": "green") { "✓ Create Batch" }
           end
         end
+      end
 
-        # Addresses (CSV)
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h2(style: "margin: 0;") { "Addresses" }
+      div(class: "show-sidebar") do
+        div("box-": "round") do
+          strong { "Help" }
           div("is-": "separator")
-          div(style: "padding: 1lh 0;") do
-            address_fields = Address.column_names - %w[id created_at updated_at batch_id]
-            div(
-              data_svelte_component: "batch-csv-mapper",
-              data_address_fields: address_fields.to_json,
-              data_form_field_name: "batch[addresses_data]"
-            )
+          div(style: "margin-top: 0.5lh; color: var(--foreground2);") do
+            p(style: "margin: 0 0 0.5lh;") { "Select a template, upload a CSV of addresses, and optionally add tags." }
+            p(style: "margin: 0;") { "The CSV must include columns that map to address fields." }
           end
-        end
-
-        # Tags
-        tag_picker(f)
-
-        # Actions
-        div(class: "page-actions") do
-          a(href: warehouse_batches_path) { "Cancel" }
-          button(type: "submit", "variant-": "green") { "✓ Create Batch" }
         end
       end
     end
@@ -94,18 +107,21 @@ class Views::Warehouse::Batches::New < Views::Base
   end
 
   def tag_picker(f)
-    div(class: "form-field-lg") do
-      label(class: "date-field-label") { "Tags" }
-      select(
-        name: "batch[tags][]",
-        multiple: true,
-        class: "selectize-tags"
-      ) do
-        available_tags.each do |tag|
-          option(value: tag) { tag }
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Tags" }
+      div("is-": "separator")
+      div(style: "margin-top: 0.5lh;") do
+        select(
+          name: "batch[tags][]",
+          multiple: true,
+          class: "selectize-tags"
+        ) do
+          available_tags.each do |tag|
+            option(value: tag, selected: @batch.tags&.include?(tag)) { tag }
+          end
         end
+        p(style: "color: var(--foreground2); font-size: 0.9em;") { "Select from common tags or create your own" }
       end
-      p(class: "form-hint") { "Select from common tags or create your own" }
     end
   end
 end

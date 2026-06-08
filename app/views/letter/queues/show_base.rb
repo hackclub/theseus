@@ -15,14 +15,20 @@ class Views::Letter::Queues::ShowBase < Views::Base
   end
 
   def view_template
-    div(class: "page-container") do
-      header_section
-      stats_row
-      make_batch_section
-      letters_section
-      batches_section
-      queue_details_section
-      admin_inspector(queue)
+    header_section
+
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        queue_details_section
+        letters_section
+        batches_section
+        admin_inspector(queue)
+      end
+
+      div(class: "show-sidebar") do
+        actions_sidebar
+        stats_sidebar
+      end
     end
   end
 
@@ -33,63 +39,121 @@ class Views::Letter::Queues::ShowBase < Views::Base
   # --- Header ---
 
   def header_section
-    div(class: "page-header") do
-      div do
-        h1(class: "page-title") { queue.name }
-        p(class: "page-subtitle") do
-          plain "#{type_label} · #{queue.slug}"
-        end
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      row("gap-": "1", "align-": "center") do
+        a(href: letter_queues_path, style: "text-decoration: none; color: var(--foreground2);") { "← Queues" }
+        strong(style: "font-size: 1.15em;") { queue.name }
+        type_badge
+        queue_status_badge
       end
-
-      div(class: "page-actions") do
-        a(href: letter_queues_path, style: "color: var(--foreground2);") { "← Back to queues" }
-        a(href: edit_queue_path) do
-          button("size-": "small") { "✎ Edit" }
-        end
+      row("gap-": "1", "align-": "center") do
+        span(style: "color: var(--foreground2);") { queue.slug }
+      end
+      span(class: "toolbar-spacer")
+      row("gap-": "1", "align-": "center") do
+        a(href: edit_queue_path) { "✎ Edit" }
         admin_tool do
-          form_with(url: queue_show_path, method: :delete, class: "form-inline") do
-            button(type: "submit", "variant-": "red", "size-": "small") { "✕ Delete" }
+          form_with(url: queue_show_path, method: :delete, data: { turbo_confirm: "Delete this queue?" }, class: "form-inline") do
+            button(type: "submit", "variant-": "red", "size-": "small") { "✕" }
           end
         end
       end
     end
   end
 
-  # --- Stats Row ---
+  def type_badge
+    raise NotImplementedError
+  end
 
-  def stats_row
-    active_states = LETTER_STATES.select { |s| letter_counts.fetch(s, 0) > 0 }
-    return if active_states.empty?
+  def queue_status_badge
+    total = LETTER_STATES.sum { |s| letter_counts.fetch(s, 0) }
+    queued = letter_counts.fetch("queued", 0)
+    if total == 0
+      span("is-": "badge") { "Empty" }
+    elsif queued > 0
+      span("is-": "badge", "variant-": "blue") { "#{queued} queued" }
+    else
+      span("is-": "badge", "variant-": "green") { "Active" }
+    end
+  end
 
-    div(class: "filter-bar content-section") do
-      active_states.each do |state|
-        span("is-": "badge", "variant-": state_badge_variant(state)) do
-          "#{letter_counts[state]} #{state}"
+  # --- Queue Details ---
+
+  def queue_details_section
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Details" }
+      div("is-": "separator")
+      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+        admin_tool do
+          span(class: "detail-label") { "Owner" }
+          span { render_user_mention(queue.user) }
+        end
+
+        span(class: "detail-label") { "Dimensions" }
+        span { "#{queue.letter_width}\" × #{queue.letter_height}\" · #{queue.letter_weight} oz" }
+
+        span(class: "detail-label") { "Mailer ID" }
+        span { queue.letter_mailer_id&.display_name || "—" }
+
+        if queue.tags.any?
+          span(class: "detail-label") { "Tags" }
+          span do
+            queue.tags.each do |t|
+              span("is-": "badge") { t }
+              plain " "
+            end
+          end
+        end
+
+        extra_queue_details
+      end
+    end
+
+    # Return address
+    if queue.letter_return_address.present?
+      div("box-": "round", style: "margin-bottom: 1lh;") do
+        strong { "Return Address" }
+        div("is-": "separator")
+        div(style: "margin-top: 0.5lh;") do
+          render_address(queue)
         end
       end
     end
   end
 
-  # Hook for subclasses (e.g. make batch button + dialog)
-  def make_batch_section; end
+  # Hook for subclasses to add extra detail-grid rows
+  def extra_queue_details; end
 
   # --- Letters Section ---
 
   def letters_section
-    collapsible_section("Letters", letters.count, open: true) do
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      row("align-": "center") do
+        strong { "Letters" }
+        span(style: "color: var(--foreground2); margin-left: 1ch;") { "(#{letters.count})" } if letters.any?
+        span(style: "flex: 1;")
+        if search.present? || status.present?
+          a(href: queue_show_path, style: "color: var(--foreground2); font-size: 0.9em;") { "× Clear filters" }
+        end
+      end
+      div("is-": "separator")
+
       letters_filter_bar
+
       if letters.any?
-        div("box-": "round") do
-          letters.each do |letter|
-            letter_row(letter)
-            div("is-": "separator")
+        table(style: "width: 100%;") do
+          tbody do
+            letters.each do |letter|
+              letter_row(letter)
+            end
           end
         end
       else
-        div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
-          h3(style: "margin: 0;") { "No letters" }
+        div(style: "text-align: center; padding: 2lh 2ch; color: var(--foreground2);") do
           if search.present? || status.present?
-            p(style: "color: var(--foreground2);") { "Try adjusting your search or filters." }
+            plain "No letters match your filters."
+          else
+            plain "No letters yet."
           end
         end
       end
@@ -97,10 +161,9 @@ class Views::Letter::Queues::ShowBase < Views::Base
   end
 
   def letters_filter_bar
-    div(class: "filter-bar mb-3") do
-      # Search
-      div(class: "flex-1") do
-        form(action: queue_show_path, method: "get", class: "form-inline") do
+    row("gap-": "1", "align-": "center", style: "padding: 0.5lh 0;") do
+      div(style: "flex: 1;") do
+        form(action: queue_show_path, method: "get", style: "display: flex;") do
           input(type: "hidden", name: "status", value: status) if status.present?
           input(
             type: "text",
@@ -112,32 +175,24 @@ class Views::Letter::Queues::ShowBase < Views::Base
         end
       end
 
-      # Status toggles
-      div(class: "page-actions") do
-        LETTER_STATES.each do |state|
-          count = letter_counts.fetch(state, 0)
-          next if count == 0
+      LETTER_STATES.each do |state|
+        count = letter_counts.fetch(state, 0)
+        next if count == 0
 
-          is_active = status == state
-          href = if is_active
-                   queue_show_path(search: search)
-                 else
-                   queue_show_path(search: search, status: state)
-                 end
+        is_active = status == state
+        href = if is_active
+                 queue_show_path(search: search)
+               else
+                 queue_show_path(search: search, status: state)
+               end
 
-          if is_active
-            a(href: href) do
-              button("variant-": "green") { "#{count} #{state}" }
-            end
-          else
-            a(href: href, style: "color: var(--foreground2);") { "#{count} #{state}" }
+        if is_active
+          a(href: href, style: "text-decoration: none;") do
+            button("variant-": state_badge_variant(state), "size-": "small") { "#{count} #{state}" }
           end
+        else
+          a(href: href, style: "text-decoration: none; color: var(--foreground2);") { "#{count} #{state}" }
         end
-      end
-
-      # Clear filters
-      if search.present? || status.present?
-        a(href: queue_show_path, style: "color: var(--foreground2);") { "× Clear" }
       end
     end
   end
@@ -146,81 +201,58 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   def batches_section; end
 
-  # --- Queue Details ---
+  # Hook for subclasses (e.g. make batch button)
+  def make_batch_section; end
 
-  def queue_details_section
-    collapsible_section("Queue Details") do
-      div("box-": "round") do
-        admin_tool do
-          div(style: "padding: 1lh 1ch;") do
-            strong { "Owner" }
-            div(class: "detail-value") do
-              render_user_mention(queue.user)
-            end
-          end
-          div("is-": "separator")
+  # --- Sidebar ---
+
+  def actions_sidebar
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Actions" }
+      div("is-": "separator")
+      div(style: "margin-top: 0.5lh;") do
+        make_batch_section
+        a(href: edit_queue_path, style: "display: block; text-align: center; margin-top: 0.5lh;") do
+          button("size-": "small", style: "width: 100%;") { "✎ Edit Queue" }
         end
-
-        if queue.tags.any?
-          div(style: "padding: 1lh 1ch;") do
-            strong { "Tags" }
-            div(class: "detail-value tags-inline") do
-              queue.tags.each do |t|
-                span("is-": "badge") { t }
-              end
-            end
-          end
-          div("is-": "separator")
-        end
-
-        div(style: "padding: 1lh 1ch;") do
-          strong { "Return Address" }
-          div(class: "detail-value") do
-            if queue.letter_return_address.present?
-              render_address(queue)
-            else
-              span(class: "kv-label") { "No return address" }
-            end
-          end
-        end
-        div("is-": "separator")
-
-        div(style: "padding: 1lh 1ch;") do
-          strong { "Mailer ID" }
-          div(class: "detail-value") do
-            plain(queue.letter_mailer_id&.display_name || "No mailer ID")
-          end
-        end
-        div("is-": "separator")
-
-        div(style: "padding: 1lh 1ch;") do
-          strong { "Letter Specs" }
-          div(class: "detail-value") do
-            span { "#{queue.letter_width}\" × #{queue.letter_height}\" · #{queue.letter_weight} oz" }
-          end
-        end
-
-        extra_queue_details
       end
     end
   end
 
-  # Hook for subclasses to add extra detail rows
-  def extra_queue_details; end
+  def stats_sidebar
+    active_states = LETTER_STATES.select { |s| letter_counts.fetch(s, 0) > 0 }
+    return if active_states.empty?
+
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Stats" }
+      div("is-": "separator")
+      div(style: "margin-top: 0.5lh;") do
+        active_states.each do |state|
+          row("align-": "center", style: "justify-content: space-between; padding: 0.25lh 0;") do
+            span(style: "color: var(--foreground2);") { state.capitalize }
+            span("is-": "badge", "variant-": state_badge_variant(state)) { letter_counts[state].to_s }
+          end
+        end
+        div("is-": "separator", style: "margin: 0.5lh 0;")
+        row("align-": "center", style: "justify-content: space-between;") do
+          strong { "Total" }
+          strong { LETTER_STATES.sum { |s| letter_counts.fetch(s, 0) }.to_s }
+        end
+      end
+    end
+  end
 
   # --- Helpers ---
 
   def letter_row(letter)
-    div(class: "queue-letter-row") do
-      a(href: letter_path(letter), class: "queue-letter-id") { letter.public_id }
-      span(class: "flex-1") do
+    tr do
+      td { a(href: letter_path(letter), style: "text-decoration: none;") { letter.public_id } }
+      td do
         name = [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ")
         plain name.presence || "—"
       end
-      render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter)
-      span(class: "index-card-meta") do
-        letter.created_at.strftime("%b %d, %Y")
-      end
+      td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
+      td(style: "color: var(--foreground2); text-align: right;") { letter.created_at.strftime("%b %d, %Y") }
     end
   end
 
@@ -229,34 +261,13 @@ class Views::Letter::Queues::ShowBase < Views::Base
     name = q.letter_return_address_name.presence || addr.name
 
     div do
-      div { name } if name.present?
-      div { addr.line_1 }
-      div { addr.line_2 } if addr.line_2.present?
-      div { "#{addr.city}, #{addr.state} #{addr.postal_code}" }
-      div { addr.country }
-    end
-  end
-
-  def collapsible_section(title, count = nil, open: false)
-    details(class: "collapsible-section-mt", **( open ? { open: true } : {})) do
-      summary(class: "collapsible-summary collapsible-summary--flex") do
-        label_text = count ? "#{title} (#{count})" : title
-        h2(class: "section-heading-lg m-0") { label_text }
-        span(class: "kv-label") { "▼" }
+      div { strong { name } } if name.present?
+      div(style: "color: var(--foreground2);") do
+        div { addr.line_1 }
+        div { addr.line_2 } if addr.line_2.present?
+        div { "#{addr.city}, #{addr.state} #{addr.postal_code}" }
+        div { addr.country }
       end
-      div(class: "collapsible-body collapsible-body--padded") do
-        yield
-      end
-    end
-  end
-
-  def state_scheme(state)
-    case state
-    when "queued" then :secondary
-    when "pending" then :attention
-    when "printed" then :accent
-    when "mailed", "received" then :success
-    else :secondary
     end
   end
 
@@ -266,14 +277,13 @@ class Views::Letter::Queues::ShowBase < Views::Base
     when "pending" then "yellow"
     when "printed" then "blue"
     when "mailed", "received" then "green"
-    else nil
     end
   end
 
   def render_user_mention(user)
-    div(class: "user-info #{current_user == user ? 'current-user' : ''}") do
+    row("gap-": "1", "align-": "center") do
       if user.icon_url.present?
-        img(src: user.icon_url, width: 32, height: 32, class: "avatar", alt: "#{user.username}'s avatar")
+        img(src: user.icon_url, width: 20, height: 20, style: "border-radius: 50%;", alt: "")
       end
       span { user.username }
     end
@@ -281,15 +291,10 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   def admin_inspector(record)
     admin_tool do
-      details(class: "collapsible-section-mt") do
-        summary { "Inspect \"#{record.class.name.underscore}\" record" }
-        div(class: "inspector-border") do
-          details(class: "inspector-inner") do
-            summary { "View JSON" }
-            div(class: "inspector-scroll") do
-              pre(class: "inspector-pre") { JSON.pretty_generate(record.as_json) }
-            end
-          end
+      details(style: "margin-top: 1lh;") do
+        summary(style: "color: var(--foreground2); cursor: pointer;") { "Inspect #{record.class.name.underscore}" }
+        div("box-": "round", style: "margin-top: 0.5lh;") do
+          pre(style: "margin: 0; overflow-x: auto; font-size: 0.85em;") { JSON.pretty_generate(record.as_json) }
         end
       end
     end

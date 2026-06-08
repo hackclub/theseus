@@ -1,167 +1,167 @@
 <% content_for :title, "Problems" %>
 
-<div class="page-container">
-  <div class="page-title-group content-section">
-    <h1 class="page-title">Problems</h1>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">Problems</strong>
     <%= render Components::Shared::Jumpcode.new(path: problems_path) %>
+  </row>
+</div>
+
+<% if @blocking.empty? && @no_po_cost.empty? && @backordered.empty? && @stuck_orders.empty? %>
+  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+    <h2 style="margin: 0;">✓ No problems!</h2>
+    <p style="color: var(--foreground2);">Go take a nap or something.</p>
   </div>
+<% end %>
 
-  <% if @blocking.empty? && @no_po_cost.empty? && @backordered.empty? && @stuck_orders.empty? %>
-    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-      <h2 style="margin: 0;">✓ No problems!</h2>
-      <p style="color: var(--foreground2);">Go take a nap or something.</p>
-    </div>
-  <% end %>
-
-  <% if @blocking.any? %>
-    <div class="content-section-lg">
-      <div class="section-header">
-        <div class="section-title-group">
-          <h2 class="section-heading-lg">Dispatch Blockers</h2>
-          <span is-="badge" variant-="red">blocking</span>
-        </div>
-        <p class="section-desc">No cost data at all — orders with these SKUs will refuse to dispatch.</p>
-      </div>
-      <div box-="round">
-        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
-          <div class="problems-row">
-            <span class="problems-col-sku col-header">SKU</span>
-            <span class="problems-col-name col-header">Name</span>
-            <span class="problems-col-num col-header">In Stock</span>
-            <span class="problems-col-link col-header">Zenventory</span>
-          </div>
-        </div>
-        <% @blocking.each_with_index do |sku, i| %>
-          <% if i > 0 %><div is-="separator"></div><% end %>
-          <div style="padding: 0.5lh 1ch;">
-            <div class="problems-row">
-              <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
-              <span class="problems-col-name"><%= sku.name %></span>
-              <span class="problems-col-num"><%= sku.in_stock || "—" %></span>
-              <span class="problems-col-link">
+<% if @blocking.any? %>
+  <div style="margin-top: 1lh;">
+    <div box-="round">
+      <row gap-="1" align-="center">
+        <strong>Dispatch Blockers</strong>
+        <span is-="badge" variant-="red">blocking</span>
+      </row>
+      <p style="color: var(--foreground2); margin: 0.25lh 0 0;">No cost data at all — orders with these SKUs will refuse to dispatch.</p>
+      <div is-="separator"></div>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--background3);">
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">SKU</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Name</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">In Stock</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Zenventory</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @blocking.each do |sku| %>
+            <tr style="border-bottom: 1px solid var(--background2);">
+              <td style="padding: 0.5lh 1ch;"><code><%= link_to sku.sku, warehouse_sku_path(sku) %></code></td>
+              <td style="padding: 0.5lh 1ch;"><%= sku.name %></td>
+              <td style="padding: 0.5lh 1ch;"><%= sku.in_stock || "—" %></td>
+              <td style="padding: 0.5lh 1ch;">
                 <% if sku.zenventory_url %>
                   <%= link_to "view ↗", sku.zenventory_url, target: "_blank" %>
                 <% end %>
-              </span>
-            </div>
-          </div>
-        <% end %>
-      </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
-  <% end %>
+  </div>
+<% end %>
 
-  <% if @no_po_cost.any? %>
-    <div class="content-section-lg">
-      <div class="section-header">
-        <div class="section-title-group">
-          <h2 class="section-heading-lg">Missing PO Cost Data</h2>
-          <span is-="badge" variant-="yellow">degraded</span>
-        </div>
-        <p class="section-desc">No <code>average_po_cost</code> from Zenventory — covered by fallback but should be fixed.</p>
-      </div>
-      <div box-="round">
-        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
-          <div class="problems-row">
-            <span class="problems-col-sku col-header">SKU</span>
-            <span class="problems-col-name col-header">Name</span>
-            <span class="problems-col-num col-header">Cost</span>
-            <span class="problems-col-num col-header">Source</span>
-            <span class="problems-col-link col-header">Zenventory</span>
-          </div>
-        </div>
-        <% @no_po_cost.each_with_index do |sku, i| %>
-          <% if i > 0 %><div is-="separator"></div><% end %>
-          <div style="padding: 0.5lh 1ch;">
-            <div class="problems-row">
-              <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
-              <span class="problems-col-name"><%= sku.name %></span>
-              <span class="problems-col-num"><%= number_to_currency(sku.declared_unit_cost) %></span>
-              <span class="problems-col-num kv-label">
+<% if @no_po_cost.any? %>
+  <div style="margin-top: 1lh;">
+    <div box-="round">
+      <row gap-="1" align-="center">
+        <strong>Missing PO Cost Data</strong>
+        <span is-="badge" variant-="yellow">degraded</span>
+      </row>
+      <p style="color: var(--foreground2); margin: 0.25lh 0 0;">No <code>average_po_cost</code> from Zenventory — covered by fallback but should be fixed.</p>
+      <div is-="separator"></div>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--background3);">
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">SKU</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Name</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Cost</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Source</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Zenventory</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @no_po_cost.each do |sku| %>
+            <tr style="border-bottom: 1px solid var(--background2);">
+              <td style="padding: 0.5lh 1ch;"><code><%= link_to sku.sku, warehouse_sku_path(sku) %></code></td>
+              <td style="padding: 0.5lh 1ch;"><%= sku.name %></td>
+              <td style="padding: 0.5lh 1ch;"><%= number_to_currency(sku.declared_unit_cost) %></td>
+              <td style="padding: 0.5lh 1ch;" class="detail-label">
                 <%= sku.declared_unit_cost_override&.positive? ? "override" : "???" %>
-              </span>
-              <span class="problems-col-link">
+              </td>
+              <td style="padding: 0.5lh 1ch;">
                 <% if sku.zenventory_url %>
                   <%= link_to "view ↗", sku.zenventory_url, target: "_blank" %>
                 <% end %>
-              </span>
-            </div>
-          </div>
-        <% end %>
-      </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
-  <% end %>
+  </div>
+<% end %>
 
-  <% if @backordered.any? %>
-    <div class="content-section-lg">
-      <div class="section-header">
-        <div class="section-title-group">
-          <h2 class="section-heading-lg">Backordered Without Enough Inbound</h2>
-          <span is-="badge" variant-="yellow">warning</span>
-        </div>
-        <p class="section-desc">Oversold and not enough inbound stock to cover the deficit.</p>
-      </div>
-      <div box-="round">
-        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
-          <div class="problems-row">
-            <span class="problems-col-sku col-header">SKU</span>
-            <span class="problems-col-name col-header">Name</span>
-            <span class="problems-col-num col-header">In Stock</span>
-            <span class="problems-col-num col-header">Inbound</span>
-            <span class="problems-col-num col-header">Shortfall</span>
-          </div>
-        </div>
-        <% @backordered.each_with_index do |sku, i| %>
-          <% if i > 0 %><div is-="separator"></div><% end %>
-          <div style="padding: 0.5lh 1ch;">
-            <div class="problems-row">
-              <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
-              <span class="problems-col-name"><%= sku.name %></span>
-              <span class="problems-col-num text-danger fw-semibold"><%= sku.in_stock %></span>
-              <span class="problems-col-num"><%= sku.inbound || 0 %></span>
-              <span class="problems-col-num text-danger fw-semibold"><%= sku.in_stock.abs - (sku.inbound || 0) %></span>
-            </div>
-          </div>
-        <% end %>
-      </div>
+<% if @backordered.any? %>
+  <div style="margin-top: 1lh;">
+    <div box-="round">
+      <row gap-="1" align-="center">
+        <strong>Backordered Without Enough Inbound</strong>
+        <span is-="badge" variant-="yellow">warning</span>
+      </row>
+      <p style="color: var(--foreground2); margin: 0.25lh 0 0;">Oversold and not enough inbound stock to cover the deficit.</p>
+      <div is-="separator"></div>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--background3);">
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">SKU</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Name</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">In Stock</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Inbound</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Shortfall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @backordered.each do |sku| %>
+            <tr style="border-bottom: 1px solid var(--background2);">
+              <td style="padding: 0.5lh 1ch;"><code><%= link_to sku.sku, warehouse_sku_path(sku) %></code></td>
+              <td style="padding: 0.5lh 1ch;"><%= sku.name %></td>
+              <td style="padding: 0.5lh 1ch; color: var(--red); font-weight: 600;"><%= sku.in_stock %></td>
+              <td style="padding: 0.5lh 1ch;"><%= sku.inbound || 0 %></td>
+              <td style="padding: 0.5lh 1ch; color: var(--red); font-weight: 600;"><%= sku.in_stock.abs - (sku.inbound || 0) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
-  <% end %>
+  </div>
+<% end %>
 
-  <% if @stuck_orders.any? %>
-    <div class="content-section-lg">
-      <div class="section-header">
-        <div class="section-title-group">
-          <h2 class="section-heading-lg">Stuck Orders</h2>
-          <span is-="badge" variant-="red">blocking</span>
-        </div>
-        <p class="section-desc">Dispatched 2+ weeks ago, never marked mailed. Possible Zenventory sync issue.</p>
-      </div>
-      <div box-="round">
-        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
-          <div class="problems-row">
-            <span class="problems-col-sku col-header">Order</span>
-            <span class="problems-col-name col-header">Recipient</span>
-            <span class="problems-col-num col-header">Dispatched</span>
-            <span class="problems-col-num col-header">Age</span>
-            <span class="problems-col-link col-header">Zenventory</span>
-          </div>
-        </div>
-        <% @stuck_orders.each_with_index do |order, i| %>
-          <% if i > 0 %><div is-="separator"></div><% end %>
-          <div style="padding: 0.5lh 1ch;">
-            <div class="problems-row">
-              <code class="problems-col-sku"><%= link_to order.hc_id, warehouse_order_path(order) %></code>
-              <span class="problems-col-name"><%= order.recipient_email %></span>
-              <span class="problems-col-num"><%= order.dispatched_at.strftime("%b %d") %></span>
-              <span class="problems-col-num text-danger"><%= distance_of_time_in_words_to_now(order.dispatched_at) %></span>
-              <span class="problems-col-link">
+<% if @stuck_orders.any? %>
+  <div style="margin-top: 1lh;">
+    <div box-="round">
+      <row gap-="1" align-="center">
+        <strong>Stuck Orders</strong>
+        <span is-="badge" variant-="red">blocking</span>
+      </row>
+      <p style="color: var(--foreground2); margin: 0.25lh 0 0;">Dispatched 2+ weeks ago, never marked mailed. Possible Zenventory sync issue.</p>
+      <div is-="separator"></div>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--background3);">
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Order</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Recipient</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Dispatched</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Age</th>
+            <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Zenventory</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @stuck_orders.each do |order| %>
+            <tr style="border-bottom: 1px solid var(--background2);">
+              <td style="padding: 0.5lh 1ch;"><code><%= link_to order.hc_id, warehouse_order_path(order) %></code></td>
+              <td style="padding: 0.5lh 1ch;"><%= order.recipient_email %></td>
+              <td style="padding: 0.5lh 1ch;"><%= order.dispatched_at.strftime("%b %d") %></td>
+              <td style="padding: 0.5lh 1ch; color: var(--red);"><%= distance_of_time_in_words_to_now(order.dispatched_at) %></td>
+              <td style="padding: 0.5lh 1ch;">
                 <% if order.zenventory_url %>
                   <%= link_to "view ↗", order.zenventory_url, target: "_blank" %>
                 <% end %>
-              </span>
-            </div>
-          </div>
-        <% end %>
-      </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
-  <% end %>
-</div>
+  </div>
+<% end %>

@@ -1,27 +1,36 @@
 <% content_for :title, "USPS Payment Accounts" %>
 
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">USPS Payment Accounts</h1>
-      <p class="page-subtitle"><%= @usps_payment_accounts.count %> accounts</p>
-    </div>
-    <a href="<%= new_usps_payment_account_path %>" variant-="green">+ New Account</a>
-  </div>
-
-  <% if @usps_payment_accounts.any? %>
-    <div box-="round">
-      <% @usps_payment_accounts.each do |account| %>
-        <a href="<%= usps_payment_account_path(account) %>" class="resource-card link-reset" style="display: block; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-          <span class="resource-card-title"><%= account.display_name %></span>
-          <span is-="badge" variant-="background2"><%= account.account_type %></span>
-        </a>
-      <% end %>
-    </div>
-  <% else %>
-    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-      <h3 style="margin: 0;">No payment accounts yet</h3>
-      <p style="color: var(--foreground2);"><a href="<%= new_usps_payment_account_path %>">Add one</a></p>
-    </div>
-  <% end %>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">USPS Payment Accounts</strong>
+    <span style="color: var(--foreground2);"><%= @usps_payment_accounts.count %> accounts</span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <a href="<%= new_usps_payment_account_path %>" variant-="green">+ New Account</a>
 </div>
+
+<% if @usps_payment_accounts.any? %>
+  <div box-="round">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--foreground2);">
+          <th style="text-align: left; padding: 0.5lh 1ch;">Name</th>
+          <th style="text-align: left; padding: 0.5lh 1ch;">Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @usps_payment_accounts.each do |account| %>
+          <tr style="border-bottom: 1px solid var(--background2);">
+            <td style="padding: 0.5lh 1ch;"><a href="<%= usps_payment_account_path(account) %>"><%= account.display_name %></a></td>
+            <td style="padding: 0.5lh 1ch;"><span is-="badge" variant-="background2"><%= account.account_type %></span></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+    <strong>No payment accounts yet</strong>
+    <p style="color: var(--foreground2); margin: 0;"><a href="<%= new_usps_payment_account_path %>">Add one</a></p>
+  </div>
+<% end %>

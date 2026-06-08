@@ -1,45 +1,29 @@
 <% if record.batch.present? %>
-  <div class="content-section">
-    <h2 class="section-heading">Part of Batch</h2>
+  <div style="margin-top: 1lh;">
     <div box-="round">
-      <div style="padding: 1lh 2ch;">
-        <div class="kv-row">
-          <span class="fw-semibold"><%= record.batch.type.split('::').first.titleize %> Batch #<%= record.batch.id %></span>
-          <div class="page-actions">
-            <%= render Components::Shared::StatusBadge.new(status: record.batch.aasm.current_state, type: :batch) %>
-            <% batch_path = record.batch.is_a?(Letter::Batch) ? letter_batch_path(record.batch) : warehouse_batch_path(record.batch) %>
-            <a href="<%= batch_path %>" size-="small">View Batch →</a>
-          </div>
-        </div>
-      </div>
+      <row gap-="1" align-="center">
+        <strong><%= record.batch.type.split('::').first.titleize %> Batch #<%= record.batch.id %></strong>
+        <div style="flex: 1;"></div>
+        <%= render Components::Shared::StatusBadge.new(status: record.batch.aasm.current_state, type: :batch) %>
+        <% batch_path = record.batch.is_a?(Letter::Batch) ? letter_batch_path(record.batch) : warehouse_batch_path(record.batch) %>
+        <a href="<%= batch_path %>" size-="small">View Batch →</a>
+      </row>
       <div is-="separator"></div>
-      <div style="padding: 1lh 2ch;">
-        <div class="batch-info-grid">
-          <div>
-            <span class="kv-label">Created:</span>
-            <%= record.batch.created_at.strftime("%B %d, %Y") %>
-          </div>
-          <div>
-            <span class="kv-label">Items in Batch:</span>
-            <%= record.batch.addresses.count %>
-          </div>
-          <% if record.batch.is_a?(Letter::Batch) %>
-            <div>
-              <span class="kv-label">Dimensions:</span>
-              <%= record.batch.letter_width %>" × <%= record.batch.letter_height %>"
-            </div>
-            <div>
-              <span class="kv-label">Weight:</span>
-              <%= record.batch.letter_weight %> oz
-            </div>
-          <% end %>
-          <% if record.batch.is_a?(Warehouse::Batch) && record.batch.warehouse_template.present? %>
-            <div>
-              <span class="kv-label">Template:</span>
-              <%= record.batch.warehouse_template.name %>
-            </div>
-          <% end %>
-        </div>
+      <div class="detail-grid">
+        <span class="detail-label">Created</span>
+        <span><%= record.batch.created_at.strftime("%B %d, %Y") %></span>
+        <span class="detail-label">Items in Batch</span>
+        <span><%= record.batch.addresses.count %></span>
+        <% if record.batch.is_a?(Letter::Batch) %>
+          <span class="detail-label">Dimensions</span>
+          <span><%= record.batch.letter_width %>" × <%= record.batch.letter_height %>"</span>
+          <span class="detail-label">Weight</span>
+          <span><%= record.batch.letter_weight %> oz</span>
+        <% end %>
+        <% if record.batch.is_a?(Warehouse::Batch) && record.batch.warehouse_template.present? %>
+          <span class="detail-label">Template</span>
+          <span><%= record.batch.warehouse_template.name %></span>
+        <% end %>
       </div>
     </div>
   </div>

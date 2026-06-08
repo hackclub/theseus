@@ -6,18 +6,19 @@ class Views::Batches::Index < Views::Base
   end
 
   def view_template
-    div(class: "page-container") do
-      render Components::Shared::PageHeader.new(title: "Batches", subtitle: "#{@batches.count} batches") do |header|
-        header.with_actions do
-          a(href: new_batch_path) { "+ Upload CSV" }
-        end
+    div(class: "page-toolbar") do
+      row("gap-": "1", "align-": "center") do
+        strong(style: "font-size: 1.15em;") { "Batches" }
+        span(style: "color: var(--foreground2);") { "#{@batches.count} batches" }
       end
+      div(class: "toolbar-spacer")
+      a(href: new_batch_path, "size-": "small") { "+ Upload CSV" }
+    end
 
-      if @batches.any?
-        batches_grid
-      else
-        blankslate
-      end
+    if @batches.any?
+      batches_grid
+    else
+      blankslate
     end
   end
 
@@ -35,45 +36,29 @@ class Views::Batches::Index < Views::Base
   end
 
   def batch_row(batch)
-    div(class: "batch-index-row") do
-      # Left side: batch info
-      div(class: "batch-index-row-main") do
-        div(class: "batch-index-row-title") do
-          h3(class: "section-heading-lg") do
-            "#{batch.type.split('::').first.titleize} Batch ##{batch.id}"
-          end
+    row("gap-": "2", "align-": "center") do
+      div(style: "flex: 1; min-width: 0;") do
+        row("gap-": "1", "align-": "center") do
+          strong { "#{batch.type.split('::').first.titleize} Batch ##{batch.id}" }
           render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch)
         end
 
-        # Tags
         if batch.tags.any?
-          div(class: "mb-2") do
+          div(style: "margin-top: 0.25lh;") do
             render Components::Shared::Tags.new(tags: batch.tags)
           end
         end
 
-        # Metadata
-        div(class: "index-card-meta") do
-          span do
-            strong { "Type: " }
-            plain batch.type.split('::').first.titleize
-          end
-          span do
-            strong { "Created: " }
-            plain time_ago_in_words(batch.created_at)
-            plain " ago"
-          end
-          span do
-            strong { "Addresses: " }
-            plain batch.addresses.count
-          end
+        div(style: "color: var(--foreground2);") do
+          span { "#{batch.type.split('::').first.titleize}" }
+          plain " · "
+          span { "#{time_ago_in_words(batch.created_at)} ago" }
+          plain " · "
+          span { "#{batch.addresses.count} addresses" }
         end
       end
 
-      # Right side: action button
-      div(class: "batch-index-row-actions") do
-        a(href: batch_path(batch), "size-": "small") { "View Details →" }
-      end
+      a(href: batch_path(batch), "size-": "small") { "View →" }
     end
   end
 

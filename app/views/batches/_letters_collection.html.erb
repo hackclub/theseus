@@ -1,28 +1,29 @@
 <div box-="round">
-  <div style="padding: 0.5lh 2ch;">
-    <div class="batch-table-row">
-      <span class="batch-col-name col-header">Letter</span>
-      <span class="batch-col-md col-header">From</span>
-      <span class="batch-col-md col-header">Size</span>
-      <span class="batch-col-md col-header">Created</span>
-      <span class="batch-col-status col-header">Status</span>
-    </div>
-  </div>
-  <% letters.each do |letter| %>
-    <div is-="separator"></div>
-    <div style="padding: 0.5lh 2ch;">
-      <div class="batch-table-row">
-        <div class="batch-col-name">
-          <%= link_to letter.public_id, letter, class: "fw-medium" %>
-          <span class="kv-label text-sm"> to <%= letter.address.name_line %></span>
-        </div>
-        <span class="batch-col-md kv-label text-sm"><%= letter.return_address.present? ? letter.return_address_name_line : '—' %></span>
-        <span class="batch-col-md text-sm"><%= letter.height %>" × <%= letter.width %>"</span>
-        <span class="batch-col-md kv-label text-sm"><%= time_ago_in_words(letter.created_at) %> ago</span>
-        <span class="batch-col-status">
-          <%= render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) %>
-        </span>
-      </div>
-    </div>
-  <% end %>
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--background3);">
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Letter</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">From</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Size</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Created</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% letters.each do |letter| %>
+        <tr style="border-bottom: 1px solid var(--background2);">
+          <td style="padding: 0.5lh 1ch;">
+            <%= link_to letter.public_id, letter, style: "font-weight: 500;" %>
+            <span class="detail-label"> to <%= letter.address.name_line %></span>
+          </td>
+          <td style="padding: 0.5lh 1ch;" class="detail-label"><%= letter.return_address.present? ? letter.return_address_name_line : '—' %></td>
+          <td style="padding: 0.5lh 1ch;"><%= letter.height %>" × <%= letter.width %>"</td>
+          <td style="padding: 0.5lh 1ch;" class="detail-label"><%= time_ago_in_words(letter.created_at) %> ago</td>
+          <td style="padding: 0.5lh 1ch;">
+            <%= render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

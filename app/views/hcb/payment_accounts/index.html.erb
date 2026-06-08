@@ -1,60 +1,66 @@
 <% content_for :title, "HCB Payment Accounts" %>
 
-<div class="page-container">
-  <div class="page-header">
-    <h1 class="page-title">HCB Payment Accounts</h1>
-    <% if current_user.hcb_connected? %>
-      <a href="<%= new_hcb_payment_account_path %>" variant-="green">+ Add Organization</a>
-    <% end %>
-  </div>
-
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">HCB Payment Accounts</strong>
+  </row>
+  <span class="toolbar-spacer"></span>
   <% if current_user.hcb_connected? %>
-    <div class="two-col-layout">
-      <div>
-        <h2 class="section-heading">Your Organizations</h2>
-        <% if @payment_accounts.any? %>
-          <div box-="round">
-            <% @payment_accounts.each do |account| %>
-              <a href="<%= hcb_payment_account_path(account) %>" class="resource-card link-reset" style="display: block; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-                <div class="resource-card-info">
-                  <span class="resource-card-title"><%= account.organization_name %></span>
-                  <span class="resource-card-meta">Added <%= time_ago_in_words(account.created_at) %> ago</span>
-                </div>
-                <span style="color: var(--foreground2);">→</span>
-              </a>
-            <% end %>
-          </div>
-        <% else %>
-          <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-            <h3 style="margin: 0;">No organizations linked yet</h3>
-            <p style="color: var(--foreground2);">Add one to start paying for postage.</p>
-            <a href="<%= new_hcb_payment_account_path %>">Add Organization</a>
-          </div>
-        <% end %>
-      </div>
+    <a href="<%= new_hcb_payment_account_path %>" variant-="green">+ Add Organization</a>
+  <% end %>
+</div>
 
-      <div>
-        <h2 class="section-heading">Account Status</h2>
+<% if current_user.hcb_connected? %>
+  <div class="show-layout">
+    <div class="show-main">
+      <% if @payment_accounts.any? %>
         <div box-="round">
-          <div style="padding: 1lh 1ch;">
-            <div class="status-row">
-              <span style="color: var(--green);">✓</span>
-              <span class="fw-semibold" style="color: var(--green);">HCB Connected</span>
-            </div>
-            <p class="kv-label" style="margin: 0;">
-              Your account is linked to HCB. You can pay for postage using any of your organizations' funds.
-            </p>
-          </div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--foreground2);">
+                <th style="text-align: left; padding: 0.5lh 1ch;">Organization</th>
+                <th style="text-align: left; padding: 0.5lh 1ch;">Added</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @payment_accounts.each do |account| %>
+                <tr style="border-bottom: 1px solid var(--background2);">
+                  <td style="padding: 0.5lh 1ch;"><a href="<%= hcb_payment_account_path(account) %>"><%= account.organization_name %></a></td>
+                  <td style="padding: 0.5lh 1ch; color: var(--foreground2);"><%= time_ago_in_words(account.created_at) %> ago</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+          <strong>No organizations linked yet</strong>
+          <p style="color: var(--foreground2); margin: 0;">Add one to start paying for postage.</p>
+          <a href="<%= new_hcb_payment_account_path %>" style="margin-top: 0.5lh; display: inline-block;">Add Organization</a>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="show-sidebar">
+      <div box-="round">
+        <strong style="display: block; padding: 0.5lh 1ch;">Account Status</strong>
+        <div is-="separator"></div>
+        <div style="padding: 0.5lh 1ch;">
+          <row gap-="1" align-="center">
+            <span style="color: var(--green);">✓</span>
+            <span style="font-weight: 500; color: var(--green);">HCB Connected</span>
+          </row>
+          <p style="color: var(--foreground2); margin: 0.5lh 0 0 0;">
+            Your account is linked to HCB. You can pay for postage using any of your organizations' funds.
+          </p>
         </div>
       </div>
     </div>
-  <% else %>
-    <div class="page-container--center">
-      <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-        <h2 style="margin: 0;">🔗 Connect to HCB</h2>
-        <p style="color: var(--foreground2);">Link your HCB account to pay for postage directly from your organization's funds.</p>
-        <a href="<%= new_hcb_oauth_connection_path %>" variant-="green">Connect HCB Account</a>
-      </div>
-    </div>
-  <% end %>
-</div>
+  </div>
+<% else %>
+  <div box-="round" style="text-align: center; padding: 2lh 2ch; max-width: 60ch; margin: 2lh auto;">
+    <strong style="font-size: 1.15em;">🔗 Connect to HCB</strong>
+    <p style="color: var(--foreground2);">Link your HCB account to pay for postage directly from your organization's funds.</p>
+    <a href="<%= new_hcb_oauth_connection_path %>" variant-="green">Connect HCB Account</a>
+  </div>
+<% end %>

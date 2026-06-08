@@ -1,20 +1,25 @@
 <% content_for :title, "Template Previews" %>
 
-<div class="page-container">
-  <h1 class="page-title content-section">Letter Template Previews</h1>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">Letter Template Previews</strong>
+  </row>
+</div>
 
-  <div box-="round">
-    <% @templates.each do |template| %>
-      <div class="resource-card" style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="resource-card-info">
-          <span class="resource-card-title"><%= template.to_s.split("::").last.humanize %></span>
-          <code class="resource-card-meta"><%= template %></code>
+<div box-="round">
+  <% @templates.each_with_index do |template, i| %>
+    <% if i > 0 %><div is-="separator"></div><% end %>
+    <div style="padding: 0.5lh 0;">
+      <row gap-="1" align-="center">
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 500;"><%= template.to_s.split("::").last.humanize %></div>
+          <code class="detail-label"><%= template %></code>
         </div>
-        <div class="page-actions">
+        <row gap-="1">
           <a href="<%= template_preview_path(template) %>" size-="small" target="_blank">⎘ Preview PDF</a>
           <a href="<%= template_preview_path(template, qr: true) %>" size-="small" target="_blank">⎘ With QR</a>
-        </div>
-      </div>
-    <% end %>
-  </div>
+        </row>
+      </row>
+    </div>
+  <% end %>
 </div>

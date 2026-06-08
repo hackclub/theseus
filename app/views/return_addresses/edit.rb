@@ -6,16 +6,29 @@ class Views::ReturnAddresses::Edit < Views::Base
   end
 
   def view_template
-    div(class: "page-container--sm") do
-      h1(class: "page-title content-section") { "Edit Return Address" }
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      row("gap-": "1", "align-": "center") do
+        a(href: return_addresses_path, style: "text-decoration: none; color: var(--foreground2);") { "← Return Addresses" }
+        strong(style: "font-size: 1.15em;") { "Edit Return Address" }
+      end
+    end
 
-      div("box-": "round", style: "margin-bottom: 3lh;") do
-        h3(style: "margin: 0;") { "Address Details" }
-        div("is-": "separator")
-        render Components::ReturnAddresses::Form.new(return_address:)
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        div("box-": "round") do
+          strong { "Address Details" }
+          div("is-": "separator")
+          render Components::ReturnAddresses::Form.new(return_address:)
+        end
       end
 
-      render Components::Shared::BackButton.new(href: return_addresses_path)
+      div(class: "show-sidebar") do
+        div("box-": "round") do
+          strong { "Info" }
+          div("is-": "separator")
+          p(style: "color: var(--foreground2); margin: 0;") { "Return addresses appear as the sender on outgoing mail." }
+        end
+      end
     end
   end
 

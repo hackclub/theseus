@@ -1,14 +1,32 @@
-<% content_for :title, "Edit order #{@warehouse_order.hc_id}" %>
+<% content_for :title, "Edit Order #{@warehouse_order.hc_id}" %>
 
-<div class="page-container--narrow">
-  <div class="page-title-group content-section">
-    <h1 class="page-title">Edit order</h1>
-    <code class="mono"><%= @warehouse_order.hc_id %></code>
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: var(--foreground2);">← Order <%= @warehouse_order.hc_id %></a>
+    <strong style="font-size: 1.15em;">Edit Order</strong>
+    <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
+  </row>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <%= render "form", warehouse_order: @warehouse_order %>
   </div>
 
-  <%= render "form", warehouse_order: @warehouse_order %>
-
-  <div class="back-link">
-    <a href="<%= warehouse_order_path(@warehouse_order) %>">← Back to order</a>
+  <div class="show-sidebar">
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Order Info</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">ID</span>
+        <span><%= @warehouse_order.hc_id %></span>
+        <span class="detail-label">Created</span>
+        <span><%= @warehouse_order.created_at.strftime("%b %d, %Y") %></span>
+        <span class="detail-label">Status</span>
+        <span><%= @warehouse_order.humanized_state %></span>
+        <span class="detail-label">Created by</span>
+        <span><%= @warehouse_order.user&.email %></span>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,14 +1,28 @@
 <% content_for :title, "Edit Template" %>
 
-<div class="page-container--narrow">
-  <div class="page-title-group content-section">
-    <h1 class="page-title">Edit Template</h1>
-    <span class="kv-label"><%= @warehouse_template.name %></span>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_template_path(@warehouse_template) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @warehouse_template.name %></a>
+    <strong style="font-size: 1.15em;">Edit Template</strong>
+  </row>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <%= render "form", warehouse_template: @warehouse_template %>
   </div>
-
-  <%= render "form", warehouse_template: @warehouse_template %>
-
-  <div class="back-link">
-    <a href="<%= warehouse_template_path(@warehouse_template) %>" size-="small">← Back to template</a>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong>Template Info</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">Name</span>
+        <span><%= @warehouse_template.name %></span>
+        <span class="detail-label">Items</span>
+        <span><%= @warehouse_template.line_items.count %></span>
+        <span class="detail-label">Shared</span>
+        <span><%= @warehouse_template.public ? "Yes" : "No" %></span>
+      </div>
+    </div>
   </div>
 </div>

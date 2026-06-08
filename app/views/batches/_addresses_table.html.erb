@@ -1,30 +1,31 @@
 <div box-="round">
-  <div style="padding: 0.5lh 2ch;">
-    <div class="batch-table-row">
-      <span class="batch-col-name col-header">Name</span>
-      <span class="batch-col-addr col-header">Address</span>
-      <span class="batch-col-md col-header">City</span>
-      <span class="batch-col-sm col-header">State</span>
-      <span class="batch-col-md col-header">Postal Code</span>
-      <span class="batch-col-sm col-header">Country</span>
-    </div>
-  </div>
-  <% addresses.each do |address| %>
-    <div is-="separator"></div>
-    <div style="padding: 0.5lh 2ch;">
-      <div class="batch-table-row text-sm">
-        <span class="batch-col-name"><%= "#{address.first_name} #{address.last_name}" %></span>
-        <span class="batch-col-addr">
-          <%= address.line_1 %>
-          <% if address.line_2.present? %>
-            <br><%= address.line_2 %>
-          <% end %>
-        </span>
-        <span class="batch-col-md"><%= address.city %></span>
-        <span class="batch-col-sm"><%= address.state %></span>
-        <span class="batch-col-md mono"><%= address.postal_code %></span>
-        <span class="batch-col-sm"><%= address.country %></span>
-      </div>
-    </div>
-  <% end %>
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--background3);">
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Name</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Address</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">City</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">State</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Postal Code</th>
+        <th style="text-align: left; padding: 0.5lh 1ch; color: var(--foreground2);">Country</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% addresses.each do |address| %>
+        <tr style="border-bottom: 1px solid var(--background2);">
+          <td style="padding: 0.5lh 1ch;"><%= "#{address.first_name} #{address.last_name}" %></td>
+          <td style="padding: 0.5lh 1ch;">
+            <%= address.line_1 %>
+            <% if address.line_2.present? %>
+              <br><%= address.line_2 %>
+            <% end %>
+          </td>
+          <td style="padding: 0.5lh 1ch;"><%= address.city %></td>
+          <td style="padding: 0.5lh 1ch;"><%= address.state %></td>
+          <td style="padding: 0.5lh 1ch; font-family: monospace;"><%= address.postal_code %></td>
+          <td style="padding: 0.5lh 1ch;"><%= address.country %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

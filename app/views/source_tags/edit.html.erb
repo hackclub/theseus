@@ -1,14 +1,31 @@
-<% content_for :title, "Edit Source Tag" %>
+<% content_for :title, "Edit #{@source_tag.name}" %>
 
-<div class="page-container--xs">
-  <div class="page-title-group content-section">
-    <h1 class="page-title">Edit Source Tag</h1>
-    <code class="kv-label"><%= @source_tag.slug %></code>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= source_tag_path(@source_tag) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @source_tag.name %></a>
+    <strong style="font-size: 1.15em;">Edit Source Tag</strong>
+    <code style="color: var(--foreground2);"><%= @source_tag.slug %></code>
+  </row>
+  <span class="toolbar-spacer"></span>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <%= render "form", source_tag: @source_tag %>
   </div>
 
-  <%= render "form", source_tag: @source_tag %>
-
-  <div class="back-link">
-    <a href="<%= source_tag_path(@source_tag) %>">← Back to source tag</a>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong>Current Values</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">Slug</span>
+        <code><%= @source_tag.slug %></code>
+        <span class="detail-label">Name</span>
+        <span><%= @source_tag.name %></span>
+        <span class="detail-label">Owner</span>
+        <span><%= @source_tag.owner.presence || "—" %></span>
+      </div>
+    </div>
   </div>
 </div>

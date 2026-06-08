@@ -9,107 +9,139 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def view_template
-    div(class: "page-container--narrow") do
-      div(class: "page-header") do
-        a(href: letter_batch_path(@batch), style: "color: var(--foreground2);") { "← Back to batch" }
-        h1(class: "page-title") { "Process Letter Batch ##{@batch.id}" }
+    # Header
+    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      row("gap-": "1", "align-": "center") do
+        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
+        strong(style: "font-size: 1.15em;") { "Process Batch" }
       end
+    end
 
-      div("box-": "square", class: "tui-banner", style: "margin-bottom: 2lh;") do
-        plain "This will generate labels for #{helpers.pluralize(@batch.addresses.count, 'address')}."
-      end
-
-      form_with(model: @batch, url: process_letter_batch_path(@batch), method: :post, scope: :batch) do |f|
-        # Title
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Letter Details" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            div(style: "margin-bottom: 1lh;") do
-              label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Letter Title" }
-              input(type: "text", name: "batch[user_facing_title]", style: "width: 100%;")
-              p(class: "form-hint") { "Visible to recipients on their letters (e.g. \"Monthly Newsletter\")" }
-            end
-
-            # Mailing Date
-            div(class: "form-field-lg") do
-              label(class: "date-field-label", for: "batch_letter_mailing_date") { "Mailing Date" }
-              p(class: "form-hint mb-2") { "Select the date you plan to mail these letters." }
-              input(
-                type: "date",
-                name: "batch[letter_mailing_date]",
-                id: "batch_letter_mailing_date",
-                value: (@batch.letter_mailing_date || @batch.default_mailing_date).iso8601,
-                min: Date.current.iso8601,
-                required: true,
-                class: "date-field w-full"
-              )
-            end
-          end
+    # Two-column layout
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        div("box-": "square", class: "tui-banner", style: "margin-bottom: 1lh;") do
+          plain "This will generate labels for #{helpers.pluralize(@batch.addresses.count, 'address')}."
         end
 
-        # Templates
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Label Templates" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            p(class: "form-hint mb-2") { "Select multiple templates to cycle through them, or just one for all labels." }
-            template_select
-          end
-        end
-
-        # QR Code
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Options" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            label(class: "form-check-label form-field") do
-              input(type: "checkbox", name: "batch[include_qr_code]", value: "1", checked: true)
-              span { "Include QR code on labels" }
-            end
-            div do
-              label(class: "form-check-label") do
-                input(type: "checkbox", name: "batch[non_machinable]", value: "1", id: "batch_non_machinable")
-                span { "Non-machinable surcharge" }
+        form_with(model: @batch, url: process_letter_batch_path(@batch), method: :post, scope: :batch) do |f|
+          # Letter Details
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Letter Details" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              div(style: "margin-bottom: 1lh;") do
+                label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Letter Title" }
+                input(type: "text", name: "batch[user_facing_title]", style: "width: 100%;")
+                p(class: "form-hint") { "Visible to recipients on their letters (e.g. \"Monthly Newsletter\")" }
               end
-              p(class: "form-hint form-hint--indented") do
-                plain "Check this if the mail pieces are rigid, square, or otherwise non-machinable (e.g. envelopes containing circuit boards, pins, or other bulky items)."
+
+              div(class: "form-field-lg") do
+                label(class: "date-field-label", for: "batch_letter_mailing_date") { "Mailing Date" }
+                p(class: "form-hint mb-2") { "Select the date you plan to mail these letters." }
+                input(
+                  type: "date",
+                  name: "batch[letter_mailing_date]",
+                  id: "batch_letter_mailing_date",
+                  value: (@batch.letter_mailing_date || @batch.default_mailing_date).iso8601,
+                  min: Date.current.iso8601,
+                  required: true,
+                  class: "date-field w-full"
+                )
               end
             end
           end
-        end
 
-        # Postage
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Postage" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            postage_options
-            cost_info
+          # Templates
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Label Templates" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              p(class: "form-hint mb-2") { "Select multiple templates to cycle through them, or just one for all labels." }
+              template_select
+            end
+          end
+
+          # Options
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Options" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              label(class: "form-check-label form-field") do
+                input(type: "checkbox", name: "batch[include_qr_code]", value: "1", checked: true)
+                span { "Include QR code on labels" }
+              end
+              div do
+                label(class: "form-check-label") do
+                  input(type: "checkbox", name: "batch[non_machinable]", value: "1", id: "batch_non_machinable")
+                  span { "Non-machinable surcharge" }
+                end
+                p(class: "form-hint form-hint--indented") do
+                  plain "Check this if the mail pieces are rigid, square, or otherwise non-machinable (e.g. envelopes containing circuit boards, pins, or other bulky items)."
+                end
+              end
+            end
+          end
+
+          # Postage
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Postage" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              postage_options
+              cost_info
+            end
+          end
+
+          # Payment
+          div("box-": "round", style: "margin-bottom: 1lh;") do
+            strong { "Payment" }
+            div("is-": "separator")
+            div(style: "padding: 1lh 1ch;") do
+              payment_fields
+            end
+          end
+
+          # Submit
+          row("gap-": "1", style: "margin-top: 1lh;") do
+            button(type: "submit", "variant-": "green") { "▶ Generate Labels" }
+            a(href: letter_batch_path(@batch)) { button("size-": "small") { "Cancel" } }
           end
         end
 
-        # Payment Account
-        div("box-": "round", style: "margin-bottom: 2lh;") do
-          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Payment" }
-          div("is-": "separator")
-          div(style: "padding: 1lh 1ch;") do
-            payment_fields
-          end
-        end
-
-        # Submit
-        div(class: "page-actions") do
-          a(href: letter_batch_path(@batch)) { button("size-": "small") { "Cancel" } }
-          button(type: "submit", "variant-": "green") { "▶ Generate Labels" }
-        end
+        cost_update_script
       end
 
-      cost_update_script
+      div(class: "show-sidebar") do
+        batch_summary_card
+      end
     end
   end
 
   private
+
+  def batch_summary_card
+    div("box-": "round", style: "margin-bottom: 1lh;") do
+      strong { "Batch Summary" }
+      div("is-": "separator")
+      div(class: "detail-grid") do
+        span(class: "detail-label") { "Addresses" }
+        span { @batch.addresses.count.to_s }
+
+        span(class: "detail-label") { "Letters" }
+        span { @batch.letters.count.to_s }
+
+        span(class: "detail-label") { "Dimensions" }
+        span { "#{@batch.letter_width}\" × #{@batch.letter_height}\"" }
+
+        span(class: "detail-label") { "Weight" }
+        span { "#{@batch.letter_weight} oz" }
+
+        span(class: "detail-label") { "Return Address" }
+        span { @batch.letter_return_address&.display_name || "—" }
+      end
+    end
+  end
 
   def template_select
     standard_templates = SnailMail::PhlexService.templates_for_size(:standard)
@@ -142,7 +174,7 @@ class Views::Letter::Batches::Process < Views::Base
   def postage_options
     div(class: "postage-grid") do
       div do
-        h4(class: "section-heading") { "US Mail" }
+        strong { "US Mail" }
         div(class: "radio-group") do
           label(class: "form-check-label") do
             input(type: "radio", name: "batch[us_postage_type]", value: "stamps", checked: true)
@@ -155,7 +187,7 @@ class Views::Letter::Batches::Process < Views::Base
         end
       end
       div do
-        h4(class: "section-heading") { "International Mail" }
+        strong { "International Mail" }
         div(class: "radio-group") do
           label(class: "form-check-label") do
             input(type: "radio", name: "batch[intl_postage_type]", value: "stamps", checked: true)
@@ -173,16 +205,16 @@ class Views::Letter::Batches::Process < Views::Base
   def cost_info
     div(id: "cost-info", class: "cost-info") do
       div(class: "cost-grid") do
-        span(class: "kv-label") { "Total postage cost:" }
-        span(id: "total_postage_cost", class: "fw-semibold") { number_to_currency(@batch.postage_cost) }
+        span(class: "detail-label") { "Total postage cost:" }
+        span(id: "total_postage_cost") { number_to_currency(@batch.postage_cost) }
 
-        span(class: "kv-label") { "US cost difference:" }
+        span(class: "detail-label") { "US cost difference:" }
         span(id: "us_cost_difference") { number_to_currency(@batch.postage_cost_difference[:us]) }
 
-        span(class: "kv-label") { "International cost difference:" }
+        span(class: "detail-label") { "International cost difference:" }
         span(id: "intl_cost_difference") { number_to_currency(@batch.postage_cost_difference[:intl]) }
       end
-      div(id: "cost_explanation", class: "form-hint mt-3") do
+      div(id: "cost_explanation", style: "color: var(--foreground2); margin-top: 0.5lh;") do
         us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count
         intl_count = @batch.letters.joins(:address).where.not(addresses: { country: "US" }).count
         total_stamps = us_count + intl_count

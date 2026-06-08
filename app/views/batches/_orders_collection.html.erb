@@ -2,21 +2,21 @@
   <% orders.each_with_index do |order, i| %>
     <% if i > 0 %><div is-="separator"></div><% end %>
     <div style="padding: 0.5lh 2ch;">
-      <div class="resource-card">
-        <div class="resource-card-info flex-1">
-          <div class="order-collection-header">
-            <%= link_to order.hc_id, order, class: "mono fw-medium" %>
+      <row gap-="1" align-="center">
+        <div style="flex: 1; min-width: 0;">
+          <row gap-="1" align-="center">
+            <%= link_to order.hc_id, order, style: "font-weight: 500;" %>
             <span><%= order.user_facing_title %></span>
             <%= render 'warehouse/orders/status_badge', order: order %>
-          </div>
-          <span class="resource-card-meta"><%= order.address.name_line %> (<%= order.recipient_email %>)</span>
+          </row>
+          <div class="detail-label"><%= order.address.name_line %> (<%= order.recipient_email %>)</div>
           <% if order.tags.any? %>
-            <div class="mt-1">
+            <div style="margin-top: 0.25lh;">
               <%= render 'shared/tags', tags: order.tags %>
             </div>
           <% end %>
         </div>
-      </div>
+      </row>
     </div>
   <% end %>
 </div>

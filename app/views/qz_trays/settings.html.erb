@@ -4,13 +4,11 @@
   <%= vite_javascript_tag "qz_settings" %>
 <% end %>
 
-<div class="page-container--narrow">
-  <div class="content-section">
-    <h1 class="page-title">Print Settings</h1>
-    <p class="page-subtitle">
-      Powered by <%= link_to "QZ Tray", "https://qz.io/", target: "_blank" %>
-    </p>
-  </div>
-
-  <div id="dl_root"></div>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">Print Settings</strong>
+    <span style="color: var(--foreground2);">Powered by <%= link_to "QZ Tray", "https://qz.io/", target: "_blank" %></span>
+  </row>
 </div>
+
+<div id="dl_root"></div>

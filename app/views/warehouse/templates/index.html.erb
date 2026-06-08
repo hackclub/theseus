@@ -1,56 +1,50 @@
 <% content_for :title, "Order Templates" %>
 
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <div class="page-title-group">
-        <h1 class="page-title">Order Templates</h1>
-        <%= render Components::Shared::Jumpcode.new(path: warehouse_templates_path) %>
-      </div>
-      <p class="page-subtitle">Reusable order configurations</p>
-    </div>
-    <a href="<%= new_warehouse_template_path %>" variant-="green">+ New Template</a>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">Order Templates</strong>
+    <%= render Components::Shared::Jumpcode.new(path: warehouse_templates_path) %>
+  </row>
+  <row gap-="1" align-="center">
+    <span style="color: var(--foreground2);">Reusable order configurations</span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <a href="<%= new_warehouse_template_path %>" variant-="green" size-="small">+ New Template</a>
+</div>
+
+<% if current_user&.warehouse_templates&.any? %>
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Your Templates</strong>
+    <div is-="separator"></div>
+    <% current_user.warehouse_templates.each_with_index do |template, i| %>
+      <% if i > 0 %><div is-="separator"></div><% end %>
+      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5lh 0; display: flex; align-items: center; gap: 1ch;">
+        <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
+        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
+        <% if template.public %>
+          <span is-="badge" variant-="blue">Shared</span>
+        <% end %>
+        <%= render Components::Shared::PublicId.new(value: template.public_id) %>
+      </a>
+    <% end %>
   </div>
+<% end %>
 
-  <% if current_user&.warehouse_templates&.any? %>
-    <h2 class="section-heading">Your Templates</h2>
-    <div box-="round" style="margin-bottom: 2lh;">
-      <% current_user.warehouse_templates.each_with_index do |template, i| %>
-        <% if i > 0 %><div is-="separator"></div><% end %>
-        <a href="<%= warehouse_template_path(template) %>" class="resource-card link-reset" style="padding: 1lh 1ch; display: flex;">
-          <div>
-            <span class="resource-card-title"><%= template.name %></span>
-            <span class="resource-card-meta resource-card-meta--inline"><%= template.line_items.count %> items</span>
-          </div>
-          <div class="section-title-group">
-            <% if template.public %>
-              <span is-="badge" variant-="blue">Shared</span>
-            <% end %>
-            <%= render Components::Shared::PublicId.new(value: template.public_id) %>
-          </div>
-        </a>
-      <% end %>
-    </div>
-  <% end %>
-
-  <h2 class="section-heading">Public Templates</h2>
+<div box-="round">
+  <strong>Public Templates</strong>
+  <div is-="separator"></div>
   <% if Warehouse::Template.shared.any? %>
-    <div box-="round">
-      <% Warehouse::Template.shared.each_with_index do |template, i| %>
-        <% if i > 0 %><div is-="separator"></div><% end %>
-        <a href="<%= warehouse_template_path(template) %>" class="resource-card link-reset" style="padding: 1lh 1ch; display: flex;">
-          <div>
-            <span class="resource-card-title"><%= template.name %></span>
-            <span class="resource-card-meta resource-card-meta--inline"><%= template.line_items.count %> items</span>
-          </div>
-          <span class="resource-card-meta">by <%= template.user&.username || "unknown" %></span>
-        </a>
-      <% end %>
-    </div>
+    <% Warehouse::Template.shared.each_with_index do |template, i| %>
+      <% if i > 0 %><div is-="separator"></div><% end %>
+      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5lh 0; display: flex; align-items: center; gap: 1ch;">
+        <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
+        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
+        <span style="color: var(--foreground2);">by <%= template.user&.username || "unknown" %></span>
+      </a>
+    <% end %>
   <% else %>
-    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-      <h3 style="margin: 0;">No public templates yet</h3>
-      <p style="color: var(--foreground2);">Shared templates from other users will appear here.</p>
+    <div style="text-align: center; padding: 2lh 2ch; color: var(--foreground2);">
+      No public templates yet. Shared templates from other users will appear here.
     </div>
   <% end %>
 </div>

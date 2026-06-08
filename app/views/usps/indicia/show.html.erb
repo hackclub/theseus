@@ -1,63 +1,67 @@
 <% content_for :title, "Indicium #{@usps_indicium.public_id}" %>
 
-<div class="page-container--narrow">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Indicium</h1>
-      <p class="page-subtitle">
-        <%= render Components::Shared::PublicId.new(value: @usps_indicium.public_id) %>
-      </p>
-    </div>
-    <div class="page-actions">
-      <a href="<%= edit_usps_indicium_path(@usps_indicium) %>">✎ Edit</a>
-      <%= form_with url: usps_indicium_path(@usps_indicium), method: :delete, data: { turbo_confirm: "Delete this indicium?" }, class: "form-inline" do %>
-        <button type="submit" variant-="red">✕ Delete</button>
-      <% end %>
-    </div>
-  </div>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= usps_indicia_path %>" style="text-decoration: none; color: var(--foreground2);">← Indicia</a>
+    <strong style="font-size: 1.15em;">Indicium</strong>
+    <%= render Components::Shared::PublicId.new(value: @usps_indicium.public_id) %>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <row gap-="1" align-="center">
+    <a href="<%= edit_usps_indicium_path(@usps_indicium) %>">✎ Edit</a>
+    <%= form_with url: usps_indicium_path(@usps_indicium), method: :delete, data: { turbo_confirm: "Delete this indicium?" }, class: "form-inline" do %>
+      <button type="submit" variant-="red" size-="small">✕</button>
+    <% end %>
+  </row>
+</div>
 
-  <div class="content-section">
-    <h2 class="section-heading">Postage Details</h2>
+<div class="show-layout">
+  <div class="show-main">
     <div box-="round">
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Postage</span><span class="fw-semibold"><%= number_to_currency(@usps_indicium.postage) %></span></div>
+      <strong style="display: block; padding: 0.5lh 1ch;">Postage Details</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+        <span class="detail-label">Postage</span>
+        <span style="font-weight: 500;"><%= number_to_currency(@usps_indicium.postage) %></span>
+        <span class="detail-label">Mailing Date</span>
+        <span><%= @usps_indicium.mailing_date %></span>
+        <span class="detail-label">USPS SKU</span>
+        <code><%= @usps_indicium.usps_sku %></code>
+        <span class="detail-label">Category</span>
+        <span><%= @usps_indicium.processing_category %></span>
       </div>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Mailing Date</span><span><%= @usps_indicium.mailing_date %></span></div>
-      </div>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">USPS SKU</span><code><%= @usps_indicium.usps_sku %></code></div>
-      </div>
-      <div style="padding: 0.5lh 1ch;">
-        <div class="kv-row"><span class="kv-label">Processing Category</span><span><%= @usps_indicium.processing_category %></span></div>
+    </div>
+
+    <div box-="round" style="margin-top: 1lh;">
+      <strong style="display: block; padding: 0.5lh 1ch;">Dimensions</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="padding: 0.5lh 1ch;">
+        <span class="detail-label">Weight</span>
+        <span><%= @usps_indicium.postage_weight %> oz</span>
+        <span class="detail-label">Length</span>
+        <span><%= @usps_indicium.postage_length %>"</span>
+        <span class="detail-label">Height</span>
+        <span><%= @usps_indicium.postage_height %>"</span>
+        <span class="detail-label">Thickness</span>
+        <span><%= @usps_indicium.postage_thickness %>"</span>
+        <span class="detail-label">Non-machinable</span>
+        <span><%= @usps_indicium.nonmachinable ? "Yes" : "No" %></span>
       </div>
     </div>
   </div>
 
-  <div class="content-section">
-    <h2 class="section-heading">Dimensions</h2>
+  <div class="show-sidebar">
     <div box-="round">
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Weight</span><span><%= @usps_indicium.postage_weight %> oz</span></div>
-      </div>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Length</span><span><%= @usps_indicium.postage_length %>"</span></div>
-      </div>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Height</span><span><%= @usps_indicium.postage_height %>"</span></div>
-      </div>
-      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-        <div class="kv-row"><span class="kv-label">Thickness</span><span><%= @usps_indicium.postage_thickness %>"</span></div>
-      </div>
+      <strong style="display: block; padding: 0.5lh 1ch;">Actions</strong>
+      <div is-="separator"></div>
       <div style="padding: 0.5lh 1ch;">
-        <div class="kv-row"><span class="kv-label">Non-machinable</span><span><%= @usps_indicium.nonmachinable ? "Yes" : "No" %></span></div>
+        <a href="<%= edit_usps_indicium_path(@usps_indicium) %>" style="display: block; text-align: center; margin-bottom: 0.5lh;">✎ Edit Indicium</a>
+        <%= form_with url: usps_indicium_path(@usps_indicium), method: :delete, data: { turbo_confirm: "Delete this indicium?" } do %>
+          <button type="submit" variant-="red" style="width: 100%;">✕ Delete</button>
+        <% end %>
       </div>
     </div>
-  </div>
 
-  <%= render partial: "admin_inspector", locals: { record: @usps_indicium } %>
-
-  <div class="back-link">
-    <a href="<%= usps_indicia_path %>">← Back to indicia</a>
+    <%= render partial: "admin_inspector", locals: { record: @usps_indicium } %>
   </div>
 </div>

@@ -10,23 +10,21 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0; padding: 1lh 1ch;">Supplier Information</h2>
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Supplier Information</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 1ch;">
-      <div class="form-grid-wide">
-        <div style="margin-bottom: 1lh;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Supplier name <span style="color: var(--red);">*</span></label>
-          <input type="text" name="warehouse_purchase_order[supplier_name]" value="<%= purchase_order.supplier_name %>" placeholder="Enter supplier name" required style="width: 100%;">
-        </div>
-        <div style="margin-bottom: 1lh;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Supplier ID (optional)</label>
-          <input type="text" name="warehouse_purchase_order[supplier_id]" value="<%= purchase_order.supplier_id %>" placeholder="Zenventory supplier ID" style="width: 100%;">
-        </div>
+    <div style="margin-top: 0.5lh;">
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Supplier name <span style="color: var(--red);">*</span></label>
+        <input type="text" name="warehouse_purchase_order[supplier_name]" value="<%= purchase_order.supplier_name %>" placeholder="Enter supplier name" required style="width: 100%;">
       </div>
-      <div class="section-header">
-        <label class="date-field-label">Required by date</label>
-        <%= form.date_field :required_by_date, class: "date-field" %>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Supplier ID (optional)</label>
+        <input type="text" name="warehouse_purchase_order[supplier_id]" value="<%= purchase_order.supplier_id %>" placeholder="Zenventory supplier ID" style="width: 100%;">
+      </div>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Required by date</label>
+        <%= form.date_field :required_by_date, style: "width: 100%;" %>
       </div>
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Notes</label>
@@ -35,10 +33,10 @@
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0; padding: 1lh 1ch;">Line Items</h2>
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Line Items</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 1ch;">
+    <div style="margin-top: 0.5lh;">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: :enabled,
@@ -48,8 +46,8 @@
     </div>
   </div>
 
-  <div class="page-actions">
+  <row gap-="1" align-="center">
     <a href="<%= warehouse_purchase_orders_path %>">Cancel</a>
     <button type="submit" variant-="green">✓ <%= purchase_order.persisted? ? "Update Purchase Order" : "Create Purchase Order" %></button>
-  </div>
+  </row>
 <% end %>

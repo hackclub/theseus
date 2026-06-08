@@ -1,33 +1,32 @@
 <% content_for :title, "Source Tags" %>
 
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Source Tags</h1>
-      <p class="page-subtitle"><%= @source_tags.count %> source tags</p>
-    </div>
-    <a href="<%= new_source_tag_path %>"><button variant-="green">+ New Source Tag</button></a>
-  </div>
-
-  <% if @source_tags.any? %>
-    <div box-="round">
-      <% @source_tags.each_with_index do |source_tag, i| %>
-        <% if i > 0 %><div is-="separator"></div><% end %>
-        <a href="<%= source_tag_path(source_tag) %>" class="resource-card link-reset">
-          <div>
-            <span class="resource-card-title"><%= source_tag.name %></span>
-            <code class="resource-card-meta resource-card-meta--inline"><%= source_tag.slug %></code>
-          </div>
-          <% if source_tag.owner.present? %>
-            <span class="resource-card-meta"><%= source_tag.owner %></span>
-          <% end %>
-        </a>
-      <% end %>
-    </div>
-  <% else %>
-    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-      <h3 style="margin: 0;">🏷 No source tags yet</h3>
-      <p style="color: var(--foreground2);"><a href="<%= new_source_tag_path %>">Create one</a></p>
-    </div>
-  <% end %>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">Source Tags</strong>
+    <span style="color: var(--foreground2);"><%= @source_tags.count %> tags</span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <a href="<%= new_source_tag_path %>"><button variant-="green" size-="small">+ New Source Tag</button></a>
 </div>
+
+<% if @source_tags.any? %>
+  <div box-="round">
+    <% @source_tags.each_with_index do |source_tag, i| %>
+      <% if i > 0 %><div is-="separator"></div><% end %>
+      <a href="<%= source_tag_path(source_tag) %>" class="resource-card link-reset">
+        <div>
+          <span class="resource-card-title"><%= source_tag.name %></span>
+          <code class="resource-card-meta resource-card-meta--inline"><%= source_tag.slug %></code>
+        </div>
+        <% if source_tag.owner.present? %>
+          <span class="resource-card-meta"><%= source_tag.owner %></span>
+        <% end %>
+      </a>
+    <% end %>
+  </div>
+<% else %>
+  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+    <strong>🏷 No source tags yet</strong>
+    <p style="color: var(--foreground2); margin: 0.5lh 0 0;"><a href="<%= new_source_tag_path %>">Create one</a></p>
+  </div>
+<% end %>

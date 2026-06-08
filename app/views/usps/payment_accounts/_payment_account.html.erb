@@ -1,6 +1,4 @@
-<div id="<%= dom_id payment_account %>" class="index-card">
-  <div class="index-card-header">
-    <a href="<%= usps_payment_account_path(payment_account) %>" class="index-card-title"><%= payment_account.display_name %></a>
-    <span is-="badge" variant-="background2"><%= payment_account.account_type %></span>
-  </div>
-</div>
+<tr id="<%= dom_id payment_account %>" style="border-bottom: 1px solid var(--background2);">
+  <td style="padding: 0.5lh 1ch;"><a href="<%= usps_payment_account_path(payment_account) %>"><%= payment_account.display_name %></a></td>
+  <td style="padding: 0.5lh 1ch;"><span is-="badge" variant-="background2"><%= payment_account.account_type %></span></td>
+</tr>

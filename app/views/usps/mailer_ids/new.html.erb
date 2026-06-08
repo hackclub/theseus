@@ -1,9 +1,10 @@
 <% content_for :title, "New Mailer ID" %>
 
-<div class="page-container--xs">
-  <h1 class="page-title mb-3">New Mailer ID</h1>
-  <%= render "form", usps_mailer_id: @usps_mailer_id %>
-  <div class="back-link">
-    <a href="<%= usps_mailer_ids_path %>">← Back to mailer IDs</a>
-  </div>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= usps_mailer_ids_path %>" style="text-decoration: none; color: var(--foreground2);">← Mailer IDs</a>
+    <strong style="font-size: 1.15em;">New Mailer ID</strong>
+  </row>
 </div>
+
+<%= render "form", usps_mailer_id: @usps_mailer_id %>

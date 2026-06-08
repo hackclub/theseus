@@ -1,162 +1,104 @@
 <% content_for :title, "Purchase Orders" %>
 
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <div class="page-title-group">
-        <h1 class="page-title">Purchase Orders</h1>
-        <%= render Components::Shared::Jumpcode.new(path: warehouse_purchase_orders_path) %>
-      </div>
-      <p class="page-subtitle">
-        <%= @purchase_orders.count %> orders
-      </p>
-    </div>
-
-    <a href="<%= new_warehouse_purchase_order_path %>" variant-="green">+ New Purchase Order</a>
-  </div>
-
-  <% if @purchase_orders.any? %>
-    <% grouped = @purchase_orders.group_by(&:status) %>
-    <div class="stat-pill-grid" id="stats-container">
-      <% if grouped["draft"]&.any? %>
-        <button class="stat-pill-filter" data-filter="draft" data-scheme="secondary">
-          <div class="stat-pill-value"><%= grouped["draft"]&.count || 0 %></div>
-          <div class="stat-pill-label">Draft</div>
-        </button>
-      <% end %>
-      <% if grouped["open"]&.any? %>
-        <button class="stat-pill-filter" data-filter="open" data-scheme="accent">
-          <div class="stat-pill-value"><%= grouped["open"]&.count || 0 %></div>
-          <div class="stat-pill-label">Open</div>
-        </button>
-      <% end %>
-      <% if grouped["completed"]&.any? %>
-        <button class="stat-pill-filter" data-filter="completed" data-scheme="success">
-          <div class="stat-pill-value"><%= grouped["completed"]&.count || 0 %></div>
-          <div class="stat-pill-label">Completed</div>
-        </button>
-      <% end %>
-    </div>
-
-    <div box-="round">
-      <% @purchase_orders.each do |po|
-        status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[po.status] || "background2" %>
-        <div class="po-row" data-status="<%= po.status %>" style="padding: 1lh 1ch;">
-          <div class="po-row-layout">
-            <div class="po-row-info">
-              <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono" %>
-              <span is-="badge" variant-="<%= status_variant %>"><%= po.humanized_state %></span>
-              <span class="resource-card-meta"><%= po.supplier_name %></span>
-            </div>
-            <div class="po-row-stats">
-              <div class="po-row-stat">
-                <div class="fw-medium"><%= po.line_items.sum(&:quantity) %> units</div>
-                <div class="resource-card-meta"><%= number_to_currency(po.total_cost) %></div>
-              </div>
-              <% if po.required_by_date.present? %>
-                <div class="po-row-stat">
-                  <div class="detail-label">Required by</div>
-                  <div class="text-sm"><%= po.required_by_date.strftime("%b %d, %Y") %></div>
-                </div>
-              <% end %>
-              <div class="po-row-age">
-                <%= time_ago_in_words(po.created_at) %> ago
-              </div>
-              <% admin_tool do %>
-                <details is-="popover" position-="bottom baseline-right">
-                  <summary tabindex="0" size-="small">⋯</summary>
-                  <column gap-="0">
-                    <a href="<%= warehouse_purchase_order_path(po) %>">👁 View</a>
-                    <% if po.draft? %>
-                      <a href="<%= edit_warehouse_purchase_order_path(po) %>">✎ Edit</a>
-                    <% end %>
-                    <% if po.zenventory_id.present? %>
-                      <a href="<%= po.zenventory_url %>" target="_blank">↗ Zenventory</a>
-                      <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= po.zenventory_id %>" target="_blank">⎘ Zenv PDF</a>
-                    <% end %>
-                  </column>
-                </details>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  <% else %>
-    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-      <h3 style="margin: 0;">No purchase orders yet</h3>
-      <p style="color: var(--foreground2);">Create your first purchase order to get started.</p>
-      <a href="<%= new_warehouse_purchase_order_path %>">Create Purchase Order</a>
-    </div>
-  <% end %>
-
-  <div class="back-link">
-    <a href="<%= warehouse_skus_path %>" size-="small">← Back to SKUs</a>
-  </div>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
+    <strong style="font-size: 1.15em;">Purchase Orders</strong>
+    <%= render Components::Shared::Jumpcode.new(path: warehouse_purchase_orders_path) %>
+  </row>
+  <row gap-="1" align-="center">
+    <span style="color: var(--foreground2);"><%= @purchase_orders.count %> orders</span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <a href="<%= new_warehouse_purchase_order_path %>" variant-="green" size-="small">+ New Purchase Order</a>
 </div>
+
+<% if @purchase_orders.any? %>
+  <% grouped = @purchase_orders.group_by(&:status) %>
+  <div class="stat-filters" id="stats-container" style="margin-bottom: 1lh;">
+    <% if grouped["draft"]&.any? %>
+      <button class="stat-filter" data-filter="draft">
+        <span class="stat-count"><%= grouped["draft"]&.count || 0 %></span>
+        <span class="stat-label">Draft</span>
+      </button>
+    <% end %>
+    <% if grouped["open"]&.any? %>
+      <button class="stat-filter" data-filter="open">
+        <span class="stat-count"><%= grouped["open"]&.count || 0 %></span>
+        <span class="stat-label">Open</span>
+      </button>
+    <% end %>
+    <% if grouped["completed"]&.any? %>
+      <button class="stat-filter" data-filter="completed">
+        <span class="stat-count"><%= grouped["completed"]&.count || 0 %></span>
+        <span class="stat-label">Completed</span>
+      </button>
+    <% end %>
+  </div>
+
+  <div box-="round">
+    <% @purchase_orders.each_with_index do |po, i|
+      status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[po.status] || "background2" %>
+      <% if i > 0 %><div is-="separator"></div><% end %>
+      <div class="po-row" data-status="<%= po.status %>" style="padding: 0.5lh 0;">
+        <row gap-="1" align-="center">
+          <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
+          <span is-="badge" variant-="<%= status_variant %>"><%= po.humanized_state %></span>
+          <span style="color: var(--foreground2);"><%= po.supplier_name %></span>
+          <span style="flex: 1;"></span>
+          <span class="fw-medium"><%= po.line_items.sum(&:quantity) %> units</span>
+          <span style="color: var(--foreground2);"><%= number_to_currency(po.total_cost) %></span>
+          <% if po.required_by_date.present? %>
+            <span style="color: var(--foreground2);">due <%= po.required_by_date.strftime("%b %d") %></span>
+          <% end %>
+          <span style="color: var(--foreground2);"><%= time_ago_in_words(po.created_at) %> ago</span>
+          <% admin_tool do %>
+            <details is-="popover" position-="bottom baseline-right">
+              <summary tabindex="0" size-="small">⋯</summary>
+              <column gap-="0">
+                <a href="<%= warehouse_purchase_order_path(po) %>">👁 View</a>
+                <% if po.draft? %>
+                  <a href="<%= edit_warehouse_purchase_order_path(po) %>">✎ Edit</a>
+                <% end %>
+                <% if po.zenventory_id.present? %>
+                  <a href="<%= po.zenventory_url %>" target="_blank">↗ Zenventory</a>
+                  <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= po.zenventory_id %>" target="_blank">⎘ Zenv PDF</a>
+                <% end %>
+              </column>
+            </details>
+          <% end %>
+        </row>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+    <strong>No purchase orders yet</strong>
+    <div style="color: var(--foreground2); margin-top: 0.5lh;">Create your first purchase order to get started.</div>
+    <div style="margin-top: 1lh;"><a href="<%= new_warehouse_purchase_order_path %>">Create Purchase Order</a></div>
+  </div>
+<% end %>
 
 <script>
 (function() {
   let selectedStatus = null;
 
-  const bgColors = {
-    secondary: 'var(--background1)',
-    accent: 'var(--blue)',
-    success: 'var(--green)',
-    danger: 'var(--red)'
-  };
-  const borderColors = {
-    secondary: 'var(--background2)',
-    accent: 'var(--blue)',
-    success: 'var(--green)',
-    danger: 'var(--red)'
-  };
-
-  function getStatPills() {
-    return document.querySelectorAll('.stat-pill-filter');
-  }
-
-  function getRows() {
-    return document.querySelectorAll('.po-row');
-  }
-
-  function resetPill(pill) {
-    const scheme = pill.dataset.scheme;
-    pill.style.background = bgColors[scheme];
-    pill.style.borderColor = borderColors[scheme];
-    pill.style.boxShadow = 'none';
-  }
-
-  function setActivePill(pill) {
-    const scheme = pill.dataset.scheme;
-    pill.style.borderColor = 'var(--foreground0)';
-    pill.style.boxShadow = '0 0 0 1px var(--foreground0)';
-  }
+  function getFilters() { return document.querySelectorAll('.stat-filter'); }
+  function getRows() { return document.querySelectorAll('.po-row'); }
 
   function updateDisplay() {
     getRows().forEach(row => {
-      const status = row.dataset.status;
-      const matchesStatus = !selectedStatus || status === selectedStatus;
-      row.style.display = matchesStatus ? '' : 'none';
+      row.style.display = (!selectedStatus || row.dataset.status === selectedStatus) ? '' : 'none';
+    });
+    getFilters().forEach(f => {
+      f.style.outline = (f.dataset.filter === selectedStatus) ? '1px solid var(--foreground0)' : 'none';
     });
   }
 
   document.addEventListener('click', function(e) {
-    const pill = e.target.closest('.stat-pill-filter');
-    if (pill) {
-      const filter = pill.dataset.filter;
-      if (selectedStatus === filter) {
-        selectedStatus = null;
-        resetPill(pill);
-      } else {
-        getStatPills().forEach(p => {
-          if (p.dataset.filter !== filter) {
-            resetPill(p);
-          }
-        });
-        selectedStatus = filter;
-        setActivePill(pill);
-      }
+    const filter = e.target.closest('.stat-filter');
+    if (filter) {
+      selectedStatus = (selectedStatus === filter.dataset.filter) ? null : filter.dataset.filter;
       updateDisplay();
     }
   });

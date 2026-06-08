@@ -1,91 +1,90 @@
 <% content_for :title, "Tag: #{@tag}" %>
 
-<div class="page-container">
-  <div class="content-section">
-    <h1 class="page-title">
-      <span is-="badge" variant-="blue"><%= @tag %></span>
-    </h1>
-  </div>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= tags_path %>" style="text-decoration: none; color: var(--foreground2);">← Tags</a>
+    <strong style="font-size: 1.15em;"><%= @tag %></strong>
+    <span is-="badge" variant-="blue">Tag</span>
+  </row>
+  <span class="toolbar-spacer"></span>
+  <row gap-="1" align-="center">
+    <select name="time_period" id="time_period" style="margin: 0;">
+      <option value="all_time" <%= "selected" if @time_period == "all_time" %>>All-time</option>
+      <option value="ytd" <%= "selected" if @time_period == "ytd" %>>Year-to-date</option>
+      <option value="month" <%= "selected" if @time_period == "month" %>>Specific month</option>
+      <option value="last_week" <%= "selected" if @time_period == "last_week" %>>Last week</option>
+      <option value="last_month" <%= "selected" if @time_period == "last_month" %>>Last month</option>
+      <option value="last_year" <%= "selected" if @time_period == "last_year" %>>Last year</option>
+    </select>
+    <span id="year_selector" style="display: <%= @time_period.in?(%w[ytd month]) ? 'inline' : 'none' %>">
+      <select name="year" id="year">
+        <% @years.each do |y| %>
+          <option value="<%= y %>" <%= "selected" if y == @year %>><%= y %></option>
+        <% end %>
+      </select>
+    </span>
+    <span id="month_selector" style="display: <%= @time_period == 'month' ? 'inline' : 'none' %>">
+      <select name="month" id="month">
+        <% @months.each do |name, num| %>
+          <option value="<%= num %>" <%= "selected" if num == @month %>><%= name %></option>
+        <% end %>
+      </select>
+    </span>
+    <button size-="small" onclick="updateTimePeriod()">Go</button>
+  </row>
+</div>
 
-  <div class="content-section">
-    <div box-="round">
-      <div style="padding: 1lh 1ch;">
-        <div class="filter-bar">
-          <span class="kv-label">Showing:</span>
-          <select name="time_period" id="time_period">
-            <option value="all_time" <%= "selected" if @time_period == "all_time" %>>All-time</option>
-            <option value="ytd" <%= "selected" if @time_period == "ytd" %>>Year-to-date</option>
-            <option value="month" <%= "selected" if @time_period == "month" %>>Specific month</option>
-            <option value="last_week" <%= "selected" if @time_period == "last_week" %>>Last week</option>
-            <option value="last_month" <%= "selected" if @time_period == "last_month" %>>Last month</option>
-            <option value="last_year" <%= "selected" if @time_period == "last_year" %>>Last year</option>
-          </select>
+<div class="show-layout">
+  <div class="show-main">
+    <!-- Stats -->
+    <row gap-="2" style="margin-bottom: 1lh;">
+      <div box-="round" style="flex: 1; text-align: center; padding: 1lh 1ch;">
+        <div style="font-size: 1.5em; font-weight: bold;"><%= @warehouse_order_count %></div>
+        <div style="color: var(--foreground2);">Warehouse Orders</div>
+      </div>
+      <div box-="round" style="flex: 1; text-align: center; padding: 1lh 1ch;">
+        <div style="font-size: 1.5em; font-weight: bold;"><%= @letter_count %></div>
+        <div style="color: var(--foreground2);">Letters</div>
+      </div>
+    </row>
 
-          <span id="year_selector" style="display: <%= @time_period.in?(%w[ytd month]) ? 'inline' : 'none' %>">
-            <select name="year" id="year">
-              <% @years.each do |y| %>
-                <option value="<%= y %>" <%= "selected" if y == @year %>><%= y %></option>
-              <% end %>
-            </select>
-          </span>
-
-          <span id="month_selector" style="display: <%= @time_period == 'month' ? 'inline' : 'none' %>">
-            <select name="month" id="month">
-              <% @months.each do |name, num| %>
-                <option value="<%= num %>" <%= "selected" if num == @month %>><%= name %></option>
-              <% end %>
-            </select>
-          </span>
-
-          <button size-="small" onclick="updateTimePeriod()">Go</button>
+    <!-- Costs side by side -->
+    <row gap-="2" style="margin-bottom: 1lh;">
+      <div box-="round" style="flex: 1;">
+        <strong>Letter Costs</strong>
+        <div is-="separator"></div>
+        <div class="detail-grid" style="margin-top: 0.5lh;">
+          <span class="detail-label">Postage</span>
+          <span style="font-weight: 600;"><%= number_to_currency(@letter_postage_cost) %></span>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="filter-bar content-section">
-    <div box-="round">
-      <div style="padding: 1lh 1ch;">
-        <div class="stat-card">
-          <div class="stat-pill-value"><%= @warehouse_order_count %></div>
-          <div class="stat-pill-label">Warehouse Orders</div>
+      <div box-="round" style="flex: 1;">
+        <strong>Warehouse Costs</strong>
+        <div is-="separator"></div>
+        <div class="detail-grid" style="margin-top: 0.5lh;">
+          <span class="detail-label">Postage</span>
+          <span><%= number_to_currency(@warehouse_order_postage_cost) %></span>
+          <span class="detail-label">Labor</span>
+          <span><%= number_to_currency(@warehouse_order_labor_cost) %></span>
+          <span class="detail-label">Contents</span>
+          <span><%= number_to_currency(@warehouse_order_contents_cost) %></span>
+          <span class="detail-label" style="font-weight: 600;">Total</span>
+          <span style="font-weight: 600;"><%= number_to_currency(@warehouse_order_total_cost) %></span>
         </div>
       </div>
-    </div>
+    </row>
+  </div>
+
+  <div class="show-sidebar">
     <div box-="round">
-      <div style="padding: 1lh 1ch;">
-        <div class="stat-card">
-          <div class="stat-pill-value"><%= @letter_count %></div>
-          <div class="stat-pill-label">Letters</div>
-        </div>
+      <strong>Tag Info</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">Tag</span>
+        <span is-="badge" variant-="blue"><%= @tag %></span>
       </div>
     </div>
-  </div>
-
-  <div class="two-col-equal content-section">
-    <div>
-      <h2 class="section-heading">Letter Costs</h2>
-      <div box-="round">
-        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Postage</span><span class="fw-semibold"><%= number_to_currency(@letter_postage_cost) %></span></div>
-      </div>
-    </div>
-
-    <div>
-      <h2 class="section-heading">Warehouse Costs</h2>
-      <div box-="round">
-        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Postage</span><span><%= number_to_currency(@warehouse_order_postage_cost) %></span></div>
-        <div is-="separator"></div>
-        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Labor</span><span><%= number_to_currency(@warehouse_order_labor_cost) %></span></div>
-        <div is-="separator"></div>
-        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Contents</span><span><%= number_to_currency(@warehouse_order_contents_cost) %></span></div>
-        <div is-="separator"></div>
-        <div class="kv-row fw-semibold" style="padding: 0.5lh 1ch;"><span>Total</span><span><%= number_to_currency(@warehouse_order_total_cost) %></span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="back-link">
-    <a href="<%= tags_path %>">← Back to tags</a>
   </div>
 </div>
 

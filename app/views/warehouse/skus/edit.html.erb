@@ -1,14 +1,28 @@
 <% content_for :title, "Edit SKU #{@warehouse_sku.sku}" %>
 
-<div class="page-container--narrow">
-  <div class="page-title-group content-section">
-    <h1 class="page-title">Edit SKU</h1>
-    <code class="mono"><%= @warehouse_sku.sku %></code>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @warehouse_sku.sku %></a>
+    <strong style="font-size: 1.15em;">Edit SKU</strong>
+  </row>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <%= render "form", warehouse_sku: @warehouse_sku %>
   </div>
-
-  <%= render "form", warehouse_sku: @warehouse_sku %>
-
-  <div class="back-link">
-    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" size-="small">← Back to SKU</a>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong>SKU Info</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid" style="margin-top: 0.5lh;">
+        <span class="detail-label">SKU</span>
+        <span><code><%= @warehouse_sku.sku %></code></span>
+        <span class="detail-label">In Stock</span>
+        <span><%= @warehouse_sku.in_stock || "—" %></span>
+        <span class="detail-label">Status</span>
+        <span><%= @warehouse_sku.enabled ? "Enabled" : "Disabled" %></span>
+      </div>
+    </div>
   </div>
 </div>

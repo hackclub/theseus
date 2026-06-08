@@ -1,11 +1,24 @@
 <% content_for :title, "New SKU" %>
 
-<div class="page-container--narrow">
-  <h1 class="page-title content-section">New SKU</h1>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
+    <strong style="font-size: 1.15em;">New SKU</strong>
+  </row>
+</div>
 
-  <%= render "form", warehouse_sku: @warehouse_sku %>
-
-  <div class="back-link">
-    <a href="<%= warehouse_skus_path %>" size-="small">← Back to SKUs</a>
+<div class="show-layout">
+  <div class="show-main">
+    <%= render "form", warehouse_sku: @warehouse_sku %>
+  </div>
+  <div class="show-sidebar">
+    <div box-="round">
+      <strong>Help</strong>
+      <div is-="separator"></div>
+      <div style="margin-top: 0.5lh; color: var(--foreground2);">
+        <p style="margin: 0 0 0.5lh;">Fill in the SKU code, name, and cost details.</p>
+        <p style="margin: 0;">AI-enabled SKUs can be selected by the AI ordering service.</p>
+      </div>
+    </div>
   </div>
 </div>

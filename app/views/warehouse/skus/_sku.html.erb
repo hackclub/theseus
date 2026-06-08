@@ -1,46 +1,35 @@
-<div class="sku-card">
-  <div class="sku-card-layout">
-    <div>
-      <div class="page-title-group">
-        <a href="<%= warehouse_sku_path(sku) %>" class="mono fw-semibold"><%= sku.sku %></a>
-        <% if sku.in_stock.to_i > 0 %>
-          <span is-="badge" variant-="green">In stock</span>
-        <% elsif sku.in_stock.to_i < 0 %>
-          <% if sku.inbound.to_i >= sku.in_stock.abs %>
-            <span is-="badge" variant-="yellow">Backordered</span>
-          <% else %>
-            <span is-="badge" variant-="red">Backordered (!)</span>
-          <% end %>
-        <% else %>
-          <span is-="badge" variant-="background2">No inventory</span>
-        <% end %>
-        <% if sku.ai_enabled %>
-          <span is-="badge" variant-="blue">AI</span>
-        <% end %>
-        <% unless sku.enabled %>
-          <span is-="badge" variant-="background2">Disabled</span>
-        <% end %>
-      </div>
-      <div><%= sku.name %></div>
-      <% if sku.description.present? %>
-        <div class="resource-card-meta"><%= truncate(sku.description, length: 80) %></div>
+<div style="padding: 0.5lh 0;">
+  <row gap-="1" align-="center">
+    <a href="<%= warehouse_sku_path(sku) %>" class="mono fw-semibold"><%= sku.sku %></a>
+    <% if sku.in_stock.to_i > 0 %>
+      <span is-="badge" variant-="green">In stock</span>
+    <% elsif sku.in_stock.to_i < 0 %>
+      <% if sku.inbound.to_i >= sku.in_stock.abs %>
+        <span is-="badge" variant-="yellow">Backordered</span>
+      <% else %>
+        <span is-="badge" variant-="red">Backordered (!)</span>
       <% end %>
-    </div>
-    <div class="sku-card-stats">
-      <div>
-        <div class="fw-semibold"><%= sku.in_stock || "—" %></div>
-        <div class="resource-card-meta">in stock</div>
-      </div>
-      <div>
-        <div class="fw-semibold">
-          <% if sku.declared_unit_cost.zero? %>
-            <span class="text-danger" title="No cost data — will block dispatch">⚠ $0.00</span>
-          <% else %>
-            <%= number_to_currency(sku.declared_unit_cost) %>
-          <% end %>
-        </div>
-        <div class="resource-card-meta">unit cost</div>
-      </div>
-    </div>
-  </div>
+    <% else %>
+      <span is-="badge" variant-="background2">No inventory</span>
+    <% end %>
+    <% if sku.ai_enabled %>
+      <span is-="badge" variant-="blue">AI</span>
+    <% end %>
+    <% unless sku.enabled %>
+      <span is-="badge" variant-="background2">Disabled</span>
+    <% end %>
+    <span style="color: var(--foreground2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= sku.name %></span>
+    <span class="fw-semibold"><%= sku.in_stock || "—" %></span>
+    <span style="color: var(--foreground2);">in stock</span>
+    <span class="fw-semibold">
+      <% if sku.declared_unit_cost.zero? %>
+        <span style="color: var(--red);" title="No cost data — will block dispatch">⚠ $0.00</span>
+      <% else %>
+        <%= number_to_currency(sku.declared_unit_cost) %>
+      <% end %>
+    </span>
+  </row>
+  <% if sku.description.present? %>
+    <div style="color: var(--foreground2); margin-left: 2ch;"><%= truncate(sku.description, length: 80) %></div>
+  <% end %>
 </div>

@@ -1,88 +1,77 @@
-<div id="<%= dom_id batch %>" class="batch-layout">
-  <div>
+<div id="<%= dom_id batch %>" class="show-layout">
+  <div class="show-main">
     <div box-="round">
       <div style="padding: 1lh 2ch;">
-        <div class="kv-row">
-          <span class="col-header"><%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %></span>
+        <row gap-="1" align-="center">
+          <strong><%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %></strong>
           <%= render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch) %>
-        </div>
+        </row>
       </div>
       <div is-="separator"></div>
       <div style="padding: 1lh 2ch;">
         <% if batch.tags.any? %>
-          <div class="mb-2">
+          <div style="margin-bottom: 0.5lh;">
             <%= render 'shared/tags', tags: batch.tags %>
           </div>
         <% end %>
 
-        <div class="two-col-equal">
-          <div>
-            <h3 class="section-heading">Batch Information</h3>
+        <row gap-="2">
+          <div style="flex: 1;">
             <div box-="round">
-              <div style="padding: 0.5lh 2ch;">
-                <div class="kv-row"><span class="kv-label">Created</span><span><%= batch.created_at.strftime("%B %d, %Y at %I:%M %p") %></span></div>
-              </div>
-              <% if batch.csv.attached? %>
-                <div is-="separator"></div>
-                <div style="padding: 0.5lh 2ch;">
-                  <div class="kv-row"><span class="kv-label">CSV File</span><span><%= batch.csv.filename %></span></div>
-                </div>
-              <% end %>
+              <strong>Batch Information</strong>
               <div is-="separator"></div>
-              <div style="padding: 0.5lh 2ch;">
-                <div class="kv-row"><span class="kv-label">Address Count</span><span><%= batch.addresses.count %></span></div>
+              <div class="detail-grid">
+                <span class="detail-label">Created</span>
+                <span><%= batch.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+                <% if batch.csv.attached? %>
+                  <span class="detail-label">CSV File</span>
+                  <span><%= batch.csv.filename %></span>
+                <% end %>
+                <span class="detail-label">Address Count</span>
+                <span><%= batch.addresses.count %></span>
+                <% if batch.is_a?(Letter::Batch) %>
+                  <span class="detail-label">Dimensions</span>
+                  <span><%= batch.letter_width %>" × <%= batch.letter_height %>"</span>
+                  <span class="detail-label">Weight</span>
+                  <span><%= batch.letter_weight %> oz</span>
+                <% end %>
+                <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
+                  <span class="detail-label">Template</span>
+                  <span><%= batch.warehouse_template.name %></span>
+                <% end %>
               </div>
-              <% if batch.is_a?(Letter::Batch) %>
-                <div is-="separator"></div>
-                <div style="padding: 0.5lh 2ch;">
-                  <div class="kv-row"><span class="kv-label">Dimensions</span><span><%= batch.letter_width %>" × <%= batch.letter_height %>"</span></div>
-                </div>
-                <div is-="separator"></div>
-                <div style="padding: 0.5lh 2ch;">
-                  <div class="kv-row"><span class="kv-label">Weight</span><span><%= batch.letter_weight %> oz</span></div>
-                </div>
-              <% end %>
-              <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
-                <div is-="separator"></div>
-                <div style="padding: 0.5lh 2ch;">
-                  <div class="kv-row"><span class="kv-label">Template</span><span><%= batch.warehouse_template.name %></span></div>
-                </div>
-              <% end %>
             </div>
           </div>
 
-          <div>
-            <h3 class="section-heading">Cost Information</h3>
+          <div style="flex: 1;">
             <div box-="round">
-              <% if batch.is_a?(Warehouse::Batch) %>
-                <div style="padding: 0.5lh 2ch;">
-                  <div class="kv-row"><span class="kv-label">Contents</span><span class="mono"><%= number_to_currency(batch.contents_cost) %></span></div>
-                </div>
-                <div is-="separator"></div>
-                <div style="padding: 0.5lh 2ch;">
-                  <div class="kv-row"><span class="kv-label">Labor</span><span class="mono"><%= number_to_currency(batch.labor_cost) %></span></div>
-                </div>
-                <div is-="separator"></div>
-                <div style="padding: 0.5lh 2ch;">
-                  <div class="kv-row"><span class="kv-label">Shipping</span><span class="mono"><%= number_to_currency(batch.postage_cost) %></span></div>
-                </div>
-                <div is-="separator"></div>
-              <% end %>
-              <div style="padding: 0.5lh 2ch;">
-                <div class="kv-row"><span class="fw-semibold">Total Cost</span><span class="mono fw-semibold"><%= number_to_currency(batch.total_cost) %></span></div>
+              <strong>Cost Information</strong>
+              <div is-="separator"></div>
+              <div class="detail-grid">
+                <% if batch.is_a?(Warehouse::Batch) %>
+                  <span class="detail-label">Contents</span>
+                  <span><%= number_to_currency(batch.contents_cost) %></span>
+                  <span class="detail-label">Labor</span>
+                  <span><%= number_to_currency(batch.labor_cost) %></span>
+                  <span class="detail-label">Shipping</span>
+                  <span><%= number_to_currency(batch.postage_cost) %></span>
+                <% end %>
+                <span class="detail-label" style="font-weight: 600;">Total Cost</span>
+                <span style="font-weight: 600;"><%= number_to_currency(batch.total_cost) %></span>
               </div>
             </div>
           </div>
-        </div>
+        </row>
 
         <% if batch.is_a?(Letter::Batch) && batch.labels_pdf.attached? %>
-          <div class="mt-3">
-            <h3 class="section-heading">Letter Labels</h3>
-            <div class="info-card">
-              <div class="kv-row">
-                <span>PDF labels are available for this batch.</span>
+          <div style="margin-top: 1lh;">
+            <div box-="round">
+              <strong>Letter Labels</strong>
+              <div is-="separator"></div>
+              <row gap-="1" align-="center">
+                <span style="flex: 1;">PDF labels are available for this batch.</span>
                 <a href="<%= rails_blob_path(batch.labels_pdf, disposition: "attachment") %>" target="_blank" size-="small" variant-="green">↓ Download PDF</a>
-              </div>
+              </row>
             </div>
           </div>
         <% end %>
@@ -90,24 +79,20 @@
     </div>
   </div>
 
-  <div class="sticky-sidebar">
+  <div class="show-sidebar">
     <div box-="round">
-      <div style="padding: 1lh 2ch;">
-        <span class="col-header">Actions</span>
-      </div>
+      <strong>Actions</strong>
       <div is-="separator"></div>
-      <div style="padding: 1lh 2ch;">
-        <% case batch.aasm_state %>
-        <% when "awaiting_field_mapping" %>
-          <% map_path = batch.is_a?(Letter::Batch) ? map_fields_letter_batch_path(batch) : map_fields_warehouse_batch_path(batch) %>
-          <a href="<%= map_path %>" variant-="green" style="display: block; text-align: center;">☰ Map Fields</a>
-        <% when "fields_mapped" %>
-          <% process_path = batch.is_a?(Letter::Batch) ? process_confirm_letter_batch_path(batch) : process_confirm_warehouse_batch_path(batch) %>
-          <a href="<%= process_path %>" variant-="green" style="display: block; text-align: center;">▶ Process Batch</a>
-        <% when "processed" %>
-          <p class="kv-label mb-0">This batch has been processed.</p>
-        <% end %>
-      </div>
+      <% case batch.aasm_state %>
+      <% when "awaiting_field_mapping" %>
+        <% map_path = batch.is_a?(Letter::Batch) ? map_fields_letter_batch_path(batch) : map_fields_warehouse_batch_path(batch) %>
+        <a href="<%= map_path %>" variant-="green" style="display: block; text-align: center;">☰ Map Fields</a>
+      <% when "fields_mapped" %>
+        <% process_path = batch.is_a?(Letter::Batch) ? process_confirm_letter_batch_path(batch) : process_confirm_warehouse_batch_path(batch) %>
+        <a href="<%= process_path %>" variant-="green" style="display: block; text-align: center;">▶ Process Batch</a>
+      <% when "processed" %>
+        <p class="detail-label" style="margin: 0;">This batch has been processed.</p>
+      <% end %>
     </div>
   </div>
 </div>

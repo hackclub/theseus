@@ -1,20 +1,53 @@
-<div class="page-container--narrow">
-  <h1 class="page-title content-section">Regenerate Labels</h1>
-  <%= form_with(model: @batch, url: regenerate_labels_letter_batch_path(@batch), method: :post) do |f| %>
-    <div class="form-field-lg">
-      <%= f.label :template_cycle, "Templates to use:", class: "date-field-label" %>
-      <%= f.hidden_field :template_cycle, id: "selected_template", value: params[:template] %>
-      <%= render "shared/template_picker", multiple: true %>
+<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <row gap-="1" align-="center">
+    <a href="<%= letter_batch_path(@batch) %>" style="text-decoration: none; color: var(--foreground2);">← Batch #<%= @batch.id %></a>
+    <strong style="font-size: 1.15em;">Regenerate Labels</strong>
+  </row>
+</div>
+
+<div class="show-layout">
+  <div class="show-main">
+    <%= form_with(model: @batch, url: regenerate_labels_letter_batch_path(@batch), method: :post) do |f| %>
+      <div box-="round" style="margin-bottom: 1lh;">
+        <strong>Template Selection</strong>
+        <div is-="separator"></div>
+        <div style="padding: 1lh 1ch;">
+          <div class="form-field-lg">
+            <%= f.label :template_cycle, "Templates to use:", class: "date-field-label" %>
+            <%= f.hidden_field :template_cycle, id: "selected_template", value: params[:template] %>
+            <%= render "shared/template_picker", multiple: true %>
+          </div>
+        </div>
+      </div>
+
+      <div box-="round" style="margin-bottom: 1lh;">
+        <strong>Options</strong>
+        <div is-="separator"></div>
+        <div style="padding: 1lh 1ch;">
+          <label class="form-check-label">
+            <%= f.check_box :include_qr_code, checked: true %>
+            <span>Include QR Code</span>
+          </label>
+        </div>
+      </div>
+
+      <row gap-="1" style="margin-top: 1lh;">
+        <button type="submit" variant-="green">⟳ Regenerate Labels</button>
+        <a href="<%= letter_batch_path(@batch) %>"><button size-="small">Cancel</button></a>
+      </row>
+    <% end %>
+  </div>
+
+  <div class="show-sidebar">
+    <div box-="round" style="margin-bottom: 1lh;">
+      <strong>Batch Info</strong>
+      <div is-="separator"></div>
+      <div class="detail-grid">
+        <span class="detail-label">Letters</span>
+        <span><%= @batch.letters.count %></span>
+        <span class="detail-label">Addresses</span>
+        <span><%= @batch.addresses.count %></span>
+      </div>
     </div>
-    <div class="form-field-lg">
-      <label class="form-check-label">
-        <%= f.check_box :include_qr_code, checked: true %>
-        <span class="fw-semibold">Include QR Code</span>
-      </label>
-    </div>
-    <div class="page-actions">
-      <button type="submit" variant-="green">⟳ Regenerate Labels</button>
-      <a href="<%= letter_batch_path(@batch) %>"><button>Cancel</button></a>
-    </div>
-  <% end %>
+  </div>
 </div>

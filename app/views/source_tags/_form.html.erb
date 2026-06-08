@@ -10,7 +10,9 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 2lh;">
+  <div box-="round">
+    <strong>Details</strong>
+    <div is-="separator"></div>
     <div style="padding: 1lh 1ch;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Slug</label>
@@ -22,15 +24,19 @@
         <input type="text" name="source_tag[name]" value="<%= source_tag.name %>" style="width: 100%;">
       </div>
 
-      <div>
+      <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Owner</label>
         <input type="text" name="source_tag[owner]" value="<%= source_tag.owner %>" style="width: 100%;">
       </div>
-    </div>
-  </div>
 
-  <div class="page-actions">
-    <a href="<%= source_tags_path %>"><button type="button">Cancel</button></a>
-    <button type="submit" variant-="green">✓ <%= source_tag.persisted? ? "Update Source Tag" : "Create Source Tag" %></button>
+      <row gap-="1" align-="center">
+        <button type="submit" variant-="green"><%= source_tag.persisted? ? "✓ Update Source Tag" : "✓ Create Source Tag" %></button>
+        <% if source_tag.persisted? %>
+          <a href="<%= source_tag_path(source_tag) %>"><button type="button">Cancel</button></a>
+        <% else %>
+          <a href="<%= source_tags_path %>"><button type="button">Cancel</button></a>
+        <% end %>
+      </row>
+    </div>
   </div>
 <% end %>

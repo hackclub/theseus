@@ -10,10 +10,10 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0;">SKU Details</h2>
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>SKU Details</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 0;">
+    <div style="margin-top: 0.5lh;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">SKU code</label>
         <input type="text" name="warehouse_sku[sku]" value="<%= warehouse_sku.sku %>" style="width: 100%;">
@@ -31,10 +31,10 @@
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0;">Customs & Cost</h2>
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Customs & Cost</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 0;">
+    <div style="margin-top: 0.5lh;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Declared unit cost</label>
         <div style="display: flex; align-items: center; gap: 0.5ch;">
@@ -50,10 +50,10 @@
     </div>
   </div>
 
-  <div box-="round" style="margin-bottom: 2lh;">
-    <h2 style="margin: 0;">Inventory & Settings</h2>
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong>Inventory & Settings</strong>
     <div is-="separator"></div>
-    <div style="padding: 1lh 0;">
+    <div style="margin-top: 0.5lh;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">In stock</label>
         <input type="number" name="warehouse_sku[in_stock]" value="<%= warehouse_sku.in_stock %>" style="width: 100%;">
@@ -77,8 +77,8 @@
     </div>
   </div>
 
-  <div class="page-actions">
+  <row gap-="1" align-="center">
     <a href="<%= warehouse_skus_path %>">Cancel</a>
     <button type="submit" variant-="green">✓ <%= warehouse_sku.persisted? ? "Update SKU" : "Create SKU" %></button>
-  </div>
+  </row>
 <% end %>

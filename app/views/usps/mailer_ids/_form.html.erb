@@ -1,8 +1,8 @@
 <%= form_with(model: usps_mailer_id) do |form| %>
   <% if usps_mailer_id.errors.any? %>
-    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+    <div box-="square" style="margin-bottom: 1lh; color: var(--red);">
       [!] <strong><%= pluralize(usps_mailer_id.errors.count, "error") %>:</strong>
-      <ul class="error-box-list">
+      <ul style="margin: 0; padding-left: 2ch;">
         <% usps_mailer_id.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,27 +10,29 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 2lh;">
+  <div box-="round" style="margin-bottom: 1lh;">
+    <strong style="display: block; padding: 0.5lh 1ch;">Details</strong>
+    <div is-="separator"></div>
     <div style="padding: 1lh 1ch;">
       <div style="margin-bottom: 1lh;">
         <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Name</label>
         <input type="text" name="usps_mailer_id[name]" value="<%= usps_mailer_id.name %>" style="width: 100%;">
       </div>
-
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">CRID</label>
-        <input type="text" name="usps_mailer_id[crid]" value="<%= usps_mailer_id.crid %>" style="width: 100%;">
-      </div>
-
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">MID</label>
-        <input type="text" name="usps_mailer_id[mid]" value="<%= usps_mailer_id.mid %>" style="width: 100%;">
-      </div>
+      <row gap-="2">
+        <div style="flex: 1;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">CRID</label>
+          <input type="text" name="usps_mailer_id[crid]" value="<%= usps_mailer_id.crid %>" style="width: 100%;">
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">MID</label>
+          <input type="text" name="usps_mailer_id[mid]" value="<%= usps_mailer_id.mid %>" style="width: 100%;">
+        </div>
+      </row>
     </div>
   </div>
 
-  <div class="page-actions">
-    <a href="<%= usps_mailer_ids_path %>">Cancel</a>
-    <button type="submit" variant-="green">✓ <%= usps_mailer_id.persisted? ? "Update Mailer ID" : "Create Mailer ID" %></button>
-  </div>
+  <row gap-="1" align-="center" style="justify-content: flex-end;">
+    <a href="<%= usps_mailer_ids_path %>" style="color: var(--foreground2);">Cancel</a>
+    <button type="submit" variant-="green"><%= usps_mailer_id.persisted? ? "Update Mailer ID" : "Create Mailer ID" %></button>
+  </row>
 <% end %>

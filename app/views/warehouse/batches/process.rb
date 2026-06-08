@@ -8,52 +8,60 @@ class Views::Warehouse::Batches::Process < Views::Base
   end
 
   def view_template
-    div(class: "page-container--narrow") do
-      div(class: "page-title-group mb-3") do
-      a(href: warehouse_batch_path(@batch), "size-": "small") { "← Back to batch" }
-        h1(class: "page-title") { "Process Warehouse Batch ##{@batch.id}" }
+    div(class: "page-toolbar") do
+      row("gap-": "1", "align-": "center") do
+        a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
+        strong(style: "font-size: 1.15em;") { "Process Warehouse Batch" }
       end
+    end
 
-      div("box-": "square", style: "margin-bottom: 2lh;") do
-        plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
-      end
+    div(class: "show-layout") do
+      div(class: "show-main") do
+        div("box-": "square", style: "margin-bottom: 1lh;") do
+          plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
+        end
 
-      # Line Items
-      div("box-": "round", style: "margin-bottom: 2lh;") do
-        h3(style: "margin: 0;") { "Template: #{@batch.warehouse_template.name}" }
-        div("is-": "separator")
-        @batch.warehouse_template.line_items.each do |line_item|
-          div(class: "kv-row") do
-            span { "#{line_item.quantity}x #{line_item.sku.name}" }
+        # Line Items
+        div("box-": "round", style: "margin-bottom: 1lh;") do
+          strong { "Template: #{@batch.warehouse_template.name}" }
+          div("is-": "separator")
+          div(style: "margin-top: 0.5lh;") do
+            @batch.warehouse_template.line_items.each do |line_item|
+              div { "#{line_item.quantity}x #{line_item.sku.name}" }
+            end
+          end
+        end
+
+        # Cost Breakdown
+        div("box-": "round", style: "margin-bottom: 1lh;") do
+          strong { "Cost Breakdown" }
+          div("is-": "separator")
+          div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+            span(class: "detail-label") { "Contents" }
+            span { number_to_currency(@batch.contents_cost) }
+            span(class: "detail-label") { "Labor" }
+            span { number_to_currency(@batch.labor_cost) }
+            span(class: "detail-label") { "Postage" }
+            span(style: "color: var(--foreground2);") { "TBD" }
+            span(class: "detail-label") { "Total (est.)" }
+            strong { "~#{number_to_currency(@batch.total_cost)}" }
           end
         end
       end
 
-      # Cost Breakdown
-      div("box-": "round", style: "margin-bottom: 2lh;") do
-        h3(style: "margin: 0;") { "Cost Breakdown" }
-        div("is-": "separator")
-        dl(class: "detail-dl") do
-          dt { "Contents" }
-          dd { number_to_currency(@batch.contents_cost) }
-
-          dt { "Labor" }
-          dd { number_to_currency(@batch.labor_cost) }
-
-          dt { "Postage" }
-          dd(class: "kv-label") { "TBD" }
-
-          dt(class: "fw-semibold") { "Total (est.)" }
-          dd(class: "fw-semibold") { "~#{number_to_currency(@batch.total_cost)}" }
-        end
-      end
-
-      # Submit
-      div(class: "page-actions") do
-        a(href: warehouse_batch_path(@batch)) { "Cancel" }
-        form(method: :post, action: process_batch_warehouse_batch_path(@batch), class: "form-inline") do
-          input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-          button(type: "submit", "variant-": "green") { "▶ do it!" }
+      div(class: "show-sidebar") do
+        div("box-": "round") do
+          strong { "Confirm" }
+          div("is-": "separator")
+          div(style: "margin-top: 0.5lh;") do
+            form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
+              input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
+              button(type: "submit", "variant-": "green", style: "width: 100%;") { "▶ do it!" }
+            end
+            div(style: "margin-top: 0.5lh;") do
+              a(href: warehouse_batch_path(@batch), style: "color: var(--foreground2);") { "Cancel" }
+            end
+          end
         end
       end
     end

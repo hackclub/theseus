@@ -1,39 +1,42 @@
 <% content_for :title, "Tasks" %>
 
-<div class="page-container--narrow">
-  <div class="page-header">
-    <div class="page-title-group">
-      <h1 class="page-title">Your Tasks</h1>
-      <%= render Components::Shared::Jumpcode.new(path: tasks_path) %>
-    </div>
-    <%= button_to refresh_tasks_path, method: :post do %>
-      <button type="button" size-="small">⟳ Refresh</button>
-    <% end %>
-  </div>
+<div class="page-toolbar">
+  <row gap-="1" align-="center">
+    <strong style="font-size: 1.15em;">Your Tasks</strong>
+    <%= render Components::Shared::Jumpcode.new(path: tasks_path) %>
+  </row>
+  <div class="toolbar-spacer"></div>
+  <%= button_to refresh_tasks_path, method: :post do %>
+    <button type="button" size-="small">⟳ Refresh</button>
+  <% end %>
+</div>
 
-  <% if @tasks.empty? %>
-    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-      <h2 style="margin: 0;">✓ All clear!</h2>
-      <p style="color: var(--foreground2);">No tasks right now.</p>
-    </div>
-  <% else %>
-    <% @tasks.group_by { |task| task[:type] }.each do |type, tasks| %>
-      <div class="content-section">
-        <h2 class="section-heading-lg"><%= type %></h2>
-        <div box-="round">
-          <% tasks.each do |task| %>
-            <div class="task-row" style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
-              <div>
-                <span class="fw-medium"><%= task[:name] %></span>
+<% if @tasks.empty? %>
+  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+    <h2 style="margin: 0;">✓ All clear!</h2>
+    <p style="color: var(--foreground2);">No tasks right now.</p>
+  </div>
+<% else %>
+  <% @tasks.group_by { |task| task[:type] }.each do |type, tasks| %>
+    <div style="margin-top: 1lh;">
+      <div box-="round">
+        <strong><%= type %></strong>
+        <div is-="separator"></div>
+        <% tasks.each_with_index do |task, i| %>
+          <% if i > 0 %><div is-="separator"></div><% end %>
+          <div style="padding: 0.5lh 0;">
+            <row gap-="1" align-="center">
+              <div style="flex: 1;">
+                <span style="font-weight: 500;"><%= task[:name] %></span>
                 <% if task[:subtitle] %>
-                  <span class="resource-card-meta">(<%= task[:subtitle] %>)</span>
+                  <span class="detail-label">(<%= task[:subtitle] %>)</span>
                 <% end %>
               </div>
               <a href="<%= task[:link] %>" size-="small">Go →</a>
-            </div>
-          <% end %>
-        </div>
+            </row>
+          </div>
+        <% end %>
       </div>
-    <% end %>
+    </div>
   <% end %>
-</div>
+<% end %>
