@@ -150,6 +150,13 @@ class Views::Letters::Index < Views::Base
         a(href: letter_path(letter), style: "text-decoration: none; color: var(--foreground0);") do
           plain letter.public_id
         end
+        if letter.tags.present?
+          plain " "
+          letter.tags.first(2).compact_blank.each do |t|
+            span(style: "color: var(--foreground2); font-size: 0.8em;") { t }
+            plain " "
+          end
+        end
       end
       td(style: "color: var(--foreground2);") { plain letter.created_at.strftime("%b %d") }
       td do
