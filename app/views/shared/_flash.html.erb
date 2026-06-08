@@ -1,13 +1,17 @@
 <% flash.each do |type, message| %>
   <% next if message.blank? %>
-  <% scheme = case type.to_sym
-     when :success then :success
-     when :notice, :info then :default
-     when :warning then :warning
-     when :alert, :error, :danger then :danger
-     else :default
+  <% banner_class = case type.to_sym
+     when :success then "tui-banner-success"
+     when :notice, :info then "tui-banner-info"
+     when :warning then "tui-banner-warning"
+     when :alert, :error, :danger then "tui-banner-error"
+     else "tui-banner-info"
      end %>
-  <%= render Primer::Beta::Flash.new(scheme: scheme, mb: 3, dismissible: true, full: true) do %>
-    <%= message %>
-  <% end %>
+  <% prefix = case type.to_sym
+     when :success then "✓"
+     when :warning then "⚠"
+     when :alert, :error, :danger then "!"
+     else "ℹ"
+     end %>
+  <div box-="square" class="tui-banner <%= banner_class %>" style="margin-bottom: 1lh;">[<%= prefix %>] <%= message %></div>
 <% end %>

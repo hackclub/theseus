@@ -15,10 +15,7 @@ class Views::Warehouse::Batches::Index < Views::Base
         jumpcode_path: warehouse_batches_path
       ) do |header|
         header.with_actions do
-          render Primer::Beta::Button.new(tag: :a, href: new_warehouse_batch_path, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :plus)
-            "New Batch"
-          end
+          a(href: new_warehouse_batch_path, "variant-": "green") { "+ New Batch" }
         end
       end
 
@@ -33,11 +30,10 @@ class Views::Warehouse::Batches::Index < Views::Base
   private
 
   def batches_list
-    render Primer::Beta::BorderBox.new(padding: :condensed) do |box|
+    div("box-": "round") do
       @batches.each do |batch|
-        box.with_row do
-          batch_row(batch)
-        end
+        batch_row(batch)
+        div("is-": "separator") unless batch == @batches.last
       end
     end
   end
@@ -77,25 +73,16 @@ class Views::Warehouse::Batches::Index < Views::Base
       end
 
       div(class: "batch-index-row-actions") do
-        render Primer::Beta::Button.new(tag: :a, href: warehouse_batch_path(batch), scheme: :secondary, size: :small) do |btn|
-          btn.with_trailing_visual_icon(icon: :"arrow-right")
-          "View"
-        end
+        a(href: warehouse_batch_path(batch), "size-": "small") { "View →" }
       end
     end
   end
 
   def blankslate
-    render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :package)
-      bs.with_heading(tag: :h2) { "No warehouse batches yet" }
-      bs.with_description { "Create a batch to ship items to multiple addresses at once." }
-      bs.with_primary_action(href: new_warehouse_batch_path) do
-        render Primer::Beta::Button.new(scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :plus)
-          "New Batch"
-        end
-      end
+    div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+      h2(style: "margin: 0;") { "📦 No warehouse batches yet" }
+      p(style: "color: var(--foreground2);") { "Create a batch to ship items to multiple addresses at once." }
+      a(href: new_warehouse_batch_path, "variant-": "green") { "+ New Batch" }
     end
   end
 end

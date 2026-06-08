@@ -3,17 +3,11 @@
   <p class="page-subtitle content-section">Enter a Theseus ID or tracking number to look it up.</p>
   <%= form_with url: lookup_public_ids_path, method: :post do |f| %>
     <div class="lookup-form">
-      <%= render Primer::Alpha::TextField.new(
-        name: :id,
-        label: "ID",
-        placeholder: "e.g. ltr!abc123, 9400111...",
-        full_width: true,
-        autofocus: true
-      ) %>
-      <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-        btn.with_leading_visual_icon(icon: :search)
-        "Look up"
-      end %>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">ID</label>
+        <input type="text" name="id" placeholder="e.g. ltr!abc123, 9400111..." autofocus style="width: 100%;">
+      </div>
+      <button type="submit" variant-="green">⌕ Look up</button>
     </div>
   <% end %>
 </div>

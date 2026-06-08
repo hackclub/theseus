@@ -5,23 +5,23 @@
         <div class="page-title-group">
           <h1 class="page-title font-mono"><%= @warehouse_sku.sku %></h1>
           <% if @warehouse_sku.in_stock.to_i > 10 %>
-            <%= render(Primer::Beta::Label.new(scheme: :success, size: :large)) { "In stock" } %>
+            <span is-="badge" variant-="green">In stock</span>
           <% elsif @warehouse_sku.in_stock.to_i.between?(1, 10) %>
-            <%= render(Primer::Beta::Label.new(scheme: :attention, size: :large)) { "Low stock" } %>
+            <span is-="badge" variant-="yellow">Low stock</span>
           <% elsif @warehouse_sku.in_stock.to_i < 0 %>
             <% if @warehouse_sku.inbound.to_i >= @warehouse_sku.in_stock.abs %>
-              <%= render(Primer::Beta::Label.new(scheme: :attention, size: :large)) { "Backordered" } %>
+              <span is-="badge" variant-="yellow">Backordered</span>
             <% else %>
-              <%= render(Primer::Beta::Label.new(scheme: :danger, size: :large)) { "Backordered (!)" } %>
+              <span is-="badge" variant-="red">Backordered (!)</span>
             <% end %>
           <% else %>
-            <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :large)) { "No inventory" } %>
+            <span is-="badge" variant-="background2">No inventory</span>
           <% end %>
           <% if @warehouse_sku.ai_enabled %>
-            <%= render(Primer::Beta::Label.new(scheme: :accent, size: :large)) { "AI" } %>
+            <span is-="badge" variant-="blue">AI</span>
           <% end %>
           <% unless @warehouse_sku.enabled %>
-            <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :large)) { "Disabled" } %>
+            <span is-="badge" variant-="background2">Disabled</span>
           <% end %>
         </div>
         <p class="page-subtitle"><%= @warehouse_sku.name %></p>
@@ -29,17 +29,11 @@
 
       <div class="page-actions">
         <% admin_tool do %>
-          <%= render Primer::Beta::Button.new(tag: :a, href: edit_admin_warehouse_sku_path(@warehouse_sku), scheme: :primary, size: :medium) do |btn|
-            btn.with_leading_visual_icon(icon: :pencil)
-            "Edit"
-          end %>
+          <a href="<%= edit_admin_warehouse_sku_path(@warehouse_sku) %>" variant-="green" size-="small">✎ Edit</a>
         <% end %>
         <% if @warehouse_sku.zenventory_url.present? %>
           <% admin_tool do %>
-            <%= render Primer::Beta::Button.new(tag: :a, href: @warehouse_sku.zenventory_url, scheme: :secondary, size: :medium, target: "_blank") do |btn|
-              btn.with_leading_visual_icon(icon: :"link-external")
-              "Zenventory"
-            end %>
+            <a href="<%= @warehouse_sku.zenventory_url %>" target="_blank" size-="small">↗ Zenventory</a>
           <% end %>
         <% end %>
       </div>
@@ -62,167 +56,144 @@
   </div>
 
   <div class="two-col-equal content-section">
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_row do %>
-        <div class="kv-row"><span class="kv-label">Category</span><span><%= @warehouse_sku.category&.humanize || "—" %></span></div>
-      <% end
-      if @warehouse_sku.description.present?
-        box.with_row do %>
-          <div><div class="detail-label">Description</div><div><%= @warehouse_sku.description %></div></div>
-        <% end
-      end
-      if @warehouse_sku.customs_description.present?
-        box.with_row do %>
-          <div><div class="detail-label">Customs</div><div><%= @warehouse_sku.customs_description %></div></div>
-        <% end
-      end
-    end %>
+    <div box-="round">
+      <div class="kv-row"><span class="kv-label">Category</span><span><%= @warehouse_sku.category&.humanize || "—" %></span></div>
+      <% if @warehouse_sku.description.present? %>
+        <div is-="separator"></div>
+        <div><div class="detail-label">Description</div><div><%= @warehouse_sku.description %></div></div>
+      <% end %>
+      <% if @warehouse_sku.customs_description.present? %>
+        <div is-="separator"></div>
+        <div><div class="detail-label">Customs</div><div><%= @warehouse_sku.customs_description %></div></div>
+      <% end %>
+    </div>
 
-    <%= render Primer::Beta::BorderBox.new do |box|
-      if @warehouse_sku.country_of_origin.present?
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">Country of Origin</span><span><%= @warehouse_sku.country_of_origin %></span></div>
-        <% end
-      end
-      if @warehouse_sku.hs_code.present?
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">HS Code</span><code><%= @warehouse_sku.hs_code %></code></div>
-        <% end
-      end
-      if @warehouse_sku.average_po_cost.present?
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">Avg PO Cost</span><span><%= number_to_currency(@warehouse_sku.average_po_cost) %></span></div>
-        <% end
-      end
-      if @warehouse_sku.actual_cost_to_hc.present?
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">Actual Cost to HC</span><span><%= number_to_currency(@warehouse_sku.actual_cost_to_hc) %></span></div>
-        <% end
-      end
-      box.with_row do %>
-        <div class="kv-row"><span class="kv-label">Zenventory ID</span><code><%= @warehouse_sku.zenventory_id || "—" %></code></div>
-      <% end
-    end %>
+    <div box-="round">
+      <% if @warehouse_sku.country_of_origin.present? %>
+        <div class="kv-row"><span class="kv-label">Country of Origin</span><span><%= @warehouse_sku.country_of_origin %></span></div>
+        <div is-="separator"></div>
+      <% end %>
+      <% if @warehouse_sku.hs_code.present? %>
+        <div class="kv-row"><span class="kv-label">HS Code</span><code><%= @warehouse_sku.hs_code %></code></div>
+        <div is-="separator"></div>
+      <% end %>
+      <% if @warehouse_sku.average_po_cost.present? %>
+        <div class="kv-row"><span class="kv-label">Avg PO Cost</span><span><%= number_to_currency(@warehouse_sku.average_po_cost) %></span></div>
+        <div is-="separator"></div>
+      <% end %>
+      <% if @warehouse_sku.actual_cost_to_hc.present? %>
+        <div class="kv-row"><span class="kv-label">Actual Cost to HC</span><span><%= number_to_currency(@warehouse_sku.actual_cost_to_hc) %></span></div>
+        <div is-="separator"></div>
+      <% end %>
+      <div class="kv-row"><span class="kv-label">Zenventory ID</span><code><%= @warehouse_sku.zenventory_id || "—" %></code></div>
+    </div>
   </div>
 
   <div class="content-section">
     <h2 class="section-heading">Recent Orders</h2>
     <% if @recent_orders.any? %>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        @recent_orders.each do |order|
-          line_item = order.line_items.find_by(sku_id: @warehouse_sku.id)
-          box.with_row do %>
-            <div class="order-row">
-              <div class="order-row-left">
-                <%= link_to order.hc_id, warehouse_order_path(order), class: "mono fw-medium" %>
-                <% status_scheme = { "draft" => :secondary, "dispatched" => :accent, "mailed" => :success, "canceled" => :danger, "errored" => :danger }[order.aasm_state] || :secondary %>
-                <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :medium)) { order.humanized_state } %>
-                <span class="order-row-name" title="<%= order.address&.name_line %>"><%= order.address&.name_line %></span>
-              </div>
-              <div class="order-row-right">
-                <span class="order-row-qty"><%= line_item&.quantity || 0 %> units</span>
-                <% if order.tracking_number.present? %>
-                  <%= link_to order.tracking_url, target: "_blank", class: "resource-card-meta" do %>
-                    <%= order.pretty_via %> ↗
-                  <% end %>
-                <% else %>
-                  <span class="resource-card-meta">No tracking</span>
-                <% end %>
-                <span class="order-row-age"><%= time_ago_in_words(order.created_at) %> ago</span>
-                <% admin_tool do %>
-                  <%= render Primer::Alpha::ActionMenu.new do |menu|
-                    menu.with_show_button(icon: :"kebab-horizontal", "aria-label": "Actions", scheme: :invisible)
-                    menu.with_item(label: "View", href: warehouse_order_path(order)) do |item|
-                      item.with_leading_visual_icon(icon: :eye)
-                    end
-                    unless order.mailed? || order.canceled?
-                      menu.with_item(label: "Edit", href: edit_warehouse_order_path(order)) do |item|
-                        item.with_leading_visual_icon(icon: :pencil)
-                      end
-                    end
-                    if order.zenventory_url.present?
-                      menu.with_item(label: "Zenventory", href: order.zenventory_url, content_arguments: { target: "_blank" }) do |item|
-                        item.with_leading_visual_icon(icon: :"link-external")
-                      end
-                    end
-                    if order.tracking_url.present?
-                      menu.with_item(label: "Track Package", href: order.tracking_url, content_arguments: { target: "_blank" }) do |item|
-                        item.with_leading_visual_icon(icon: :location)
-                      end
-                    end
-                  end %>
-                <% end %>
-              </div>
+      <div box-="round">
+        <% @recent_orders.each_with_index do |order, i| %>
+          <% line_item = order.line_items.find_by(sku_id: @warehouse_sku.id) %>
+          <div class="order-row">
+            <div class="order-row-left">
+              <%= link_to order.hc_id, warehouse_order_path(order), class: "mono fw-medium" %>
+              <% status_variant = { "draft" => "background2", "dispatched" => "blue", "mailed" => "green", "canceled" => "red", "errored" => "red" }[order.aasm_state] || "background2" %>
+              <span is-="badge" variant-="<%= status_variant %>"><%= order.humanized_state %></span>
+              <span class="order-row-name" title="<%= order.address&.name_line %>"><%= order.address&.name_line %></span>
             </div>
-          <% end
-        end
-      end %>
+            <div class="order-row-right">
+              <span class="order-row-qty"><%= line_item&.quantity || 0 %> units</span>
+              <% if order.tracking_number.present? %>
+                <%= link_to order.tracking_url, target: "_blank", class: "resource-card-meta" do %>
+                  <%= order.pretty_via %> ↗
+                <% end %>
+              <% else %>
+                <span class="resource-card-meta">No tracking</span>
+              <% end %>
+              <span class="order-row-age"><%= time_ago_in_words(order.created_at) %> ago</span>
+              <% admin_tool do %>
+                <details is-="popover" position-="bottom baseline-right">
+                  <summary tabindex="0" size-="small">⋯</summary>
+                  <column gap-="0">
+                    <a href="<%= warehouse_order_path(order) %>">👁 View</a>
+                    <% unless order.mailed? || order.canceled? %>
+                      <a href="<%= edit_warehouse_order_path(order) %>">✎ Edit</a>
+                    <% end %>
+                    <% if order.zenventory_url.present? %>
+                      <a href="<%= order.zenventory_url %>" target="_blank">↗ Zenventory</a>
+                    <% end %>
+                    <% if order.tracking_url.present? %>
+                      <a href="<%= order.tracking_url %>" target="_blank">📍 Track Package</a>
+                    <% end %>
+                  </column>
+                </details>
+              <% end %>
+            </div>
+          </div>
+          <% if i < @recent_orders.size - 1 %>
+            <div is-="separator"></div>
+          <% end %>
+        <% end %>
+      </div>
     <% else %>
-      <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-        bs.with_visual_icon(icon: :package)
-        bs.with_heading(tag: :h3) { "No orders yet" }
-        bs.with_description { "Theseus orders containing this SKU will appear here." }
-      end %>
+      <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+        <h3 style="margin: 0;">📦 No orders yet</h3>
+        <p style="color: var(--foreground2);">Theseus orders containing this SKU will appear here.</p>
+      </div>
     <% end %>
   </div>
 
   <div class="content-section">
     <h2 class="section-heading">Purchase Orders</h2>
     <% if @recent_purchase_orders.any? %>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        @recent_purchase_orders.each do |po|
-          line_item = po.line_items.find_by(sku_id: @warehouse_sku.id)
-          box.with_row do %>
-            <div class="order-row">
-              <div class="order-row-left">
-                <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
-                <% status_scheme = { "draft" => :secondary, "open" => :accent, "completed" => :success, "deleted" => :danger }[po.status] || :secondary %>
-                <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :medium)) { po.humanized_state } %>
-                <span class="resource-card-meta"><%= po.supplier_name %></span>
-              </div>
-              <div class="order-row-right">
-                <div class="po-row-stat">
-                  <div class="fw-medium"><%= line_item&.quantity || 0 %> units</div>
-                  <div class="resource-card-meta"><%= number_to_currency(line_item&.unit_cost) %>/ea</div>
-                </div>
-                <span class="order-row-age"><%= time_ago_in_words(po.created_at) %> ago</span>
-                <% admin_tool do %>
-                  <%= render Primer::Alpha::ActionMenu.new do |menu|
-                    menu.with_show_button(icon: :"kebab-horizontal", "aria-label": "Actions", scheme: :invisible)
-                    menu.with_item(label: "View", href: warehouse_purchase_order_path(po)) do |item|
-                      item.with_leading_visual_icon(icon: :eye)
-                    end
-                    unless po.completed?
-                      menu.with_item(label: "Edit", href: edit_warehouse_purchase_order_path(po)) do |item|
-                        item.with_leading_visual_icon(icon: :pencil)
-                      end
-                    end
-                    if po.zenventory_id.present?
-                      menu.with_item(label: "Zenv PDF", href: "https://app.zenventory.com/printing/printpurchaseorder.php?poid=#{po.zenventory_id}", content_arguments: { target: "_blank" }) do |item|
-                        item.with_leading_visual_icon(icon: :"file")
-                      end
-                    end
-                  end %>
-                <% end %>
-              </div>
+      <div box-="round">
+        <% @recent_purchase_orders.each_with_index do |po, i| %>
+          <% line_item = po.line_items.find_by(sku_id: @warehouse_sku.id) %>
+          <div class="order-row">
+            <div class="order-row-left">
+              <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
+              <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[po.status] || "background2" %>
+              <span is-="badge" variant-="<%= status_variant %>"><%= po.humanized_state %></span>
+              <span class="resource-card-meta"><%= po.supplier_name %></span>
             </div>
-          <% end
-        end
-      end %>
+            <div class="order-row-right">
+              <div class="po-row-stat">
+                <div class="fw-medium"><%= line_item&.quantity || 0 %> units</div>
+                <div class="resource-card-meta"><%= number_to_currency(line_item&.unit_cost) %>/ea</div>
+              </div>
+              <span class="order-row-age"><%= time_ago_in_words(po.created_at) %> ago</span>
+              <% admin_tool do %>
+                <details is-="popover" position-="bottom baseline-right">
+                  <summary tabindex="0" size-="small">⋯</summary>
+                  <column gap-="0">
+                    <a href="<%= warehouse_purchase_order_path(po) %>">👁 View</a>
+                    <% unless po.completed? %>
+                      <a href="<%= edit_warehouse_purchase_order_path(po) %>">✎ Edit</a>
+                    <% end %>
+                    <% if po.zenventory_id.present? %>
+                      <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= po.zenventory_id %>" target="_blank">⎘ Zenv PDF</a>
+                    <% end %>
+                  </column>
+                </details>
+              <% end %>
+            </div>
+          </div>
+          <% if i < @recent_purchase_orders.size - 1 %>
+            <div is-="separator"></div>
+          <% end %>
+        <% end %>
+      </div>
     <% else %>
-      <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-        bs.with_visual_icon(icon: :archive)
-        bs.with_heading(tag: :h3) { "No purchase orders yet" }
-        bs.with_description { "Purchase orders for this SKU will appear here." }
-      end %>
+      <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+        <h3 style="margin: 0;">📦 No purchase orders yet</h3>
+        <p style="color: var(--foreground2);">Purchase orders for this SKU will appear here.</p>
+      </div>
     <% end %>
   </div>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_skus_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to SKUs"
-    end %>
+    <a href="<%= warehouse_skus_path %>" size-="small">← Back to SKUs</a>
   </div>
 
   <%= render partial: "admin_inspector", locals: { record: @warehouse_sku } %>

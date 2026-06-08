@@ -12,31 +12,33 @@ class Views::APIKeys::Index < Views::Base
           h1(class: "page-title") { "API Keys" }
           render Components::Shared::Jumpcode.new(path: api_keys_path)
         end
-        render Primer::Beta::Button.new(tag: :a, href: new_api_key_path, scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :key)
-          "Visit the locksmith!"
+        a(href: new_api_key_path) do
+          button("variant-": "green") { "🔑 Visit the locksmith!" }
         end
       end
 
       if api_keys.any?
-        render Primer::Beta::BorderBox.new do |box|
-          api_keys.each do |key|
-            box.with_row do
-              a(href: api_key_path(key), class: "api-key-row") do
-                div(class: "api-key-row-layout") do
-                  div(class: "flex-1") do
-                    div(class: "page-title-group mb-0") do
-                      span(class: "fw-semibold") { key.pretty_name }
-                      render Primer::Beta::Label.new(scheme: key.active? ? :success : :secondary) do
-                        key.active? ? "Active" : "Revoked"
-                      end
+        div("box-": "round") do
+          api_keys.each_with_index do |key, i|
+            div("is-": "separator") if i > 0
+            a(href: api_key_path(key), class: "api-key-row") do
+              div(class: "api-key-row-layout") do
+                div(class: "flex-1") do
+                  div(class: "page-title-group mb-0") do
+                    span(class: "fw-semibold") { key.pretty_name }
+                    span("is-": "badge", "variant-": key.active? ? "green" : "background2") do
+                      key.active? ? "Active" : "Revoked"
                     end
-                    span(class: "text-sm kv-label") { "Acts as: #{key.user.username}" }
                   end
+                  span(class: "text-sm kv-label") { "Acts as: #{key.user.username}" }
+                end
 
-                  div(class: "page-actions") do
-                    render(Primer::Beta::Label.new(scheme: :attention)) { "PII" } if key.pii
-                    render(Primer::Beta::Label.new(scheme: :danger)) { "Impersonate" } if key.may_impersonate?
+                div(class: "page-actions") do
+                  if key.pii
+                    span("is-": "badge", "variant-": "yellow") { "PII" }
+                  end
+                  if key.may_impersonate?
+                    span("is-": "badge", "variant-": "red") { "Impersonate" }
                   end
                 end
               end
@@ -44,11 +46,10 @@ class Views::APIKeys::Index < Views::Base
           end
         end
       else
-        render Primer::Beta::Blankslate.new(border: true) do |bs|
-          bs.with_visual_icon(icon: :key)
-          bs.with_heading(tag: :h2) { "No API keys yet" }
+        div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+          h2(style: "margin: 0;") { "🔑" }
+          h3(style: "margin: 0;") { "No API keys yet" }
         end
-      end
     end
   end
 

@@ -6,31 +6,25 @@
       <h1 class="page-title">CRID / Mailer ID Pairs</h1>
       <p class="page-subtitle"><%= @usps_mailer_ids.count %> registered</p>
     </div>
-    <%= render Primer::Beta::Button.new(tag: :a, href: new_usps_mailer_id_path, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :plus)
-      "New Mailer ID"
-    end %>
+    <a href="<%= new_usps_mailer_id_path %>" variant-="green">+ New Mailer ID</a>
   </div>
 
   <% if @usps_mailer_ids.any? %>
-    <%= render Primer::Beta::BorderBox.new do |box|
-      @usps_mailer_ids.each do |mid|
-        box.with_row do %>
-          <a href="<%= usps_mailer_id_path(mid) %>" class="resource-card link-reset">
-            <span class="resource-card-title"><%= mid.name %></span>
-            <div class="resource-card-meta mailer-id-codes">
-              <span>CRID: <code><%= mid.crid %></code></span>
-              <span>MID: <code><%= mid.mid %></code></span>
-            </div>
-          </a>
-        <% end
-      end
-    end %>
+    <div box-="round">
+      <% @usps_mailer_ids.each do |mid| %>
+        <a href="<%= usps_mailer_id_path(mid) %>" class="resource-card link-reset" style="display: block; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
+          <span class="resource-card-title"><%= mid.name %></span>
+          <div class="resource-card-meta mailer-id-codes">
+            <span>CRID: <code><%= mid.crid %></code></span>
+            <span>MID: <code><%= mid.mid %></code></span>
+          </div>
+        </a>
+      <% end %>
+    </div>
   <% else %>
-    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :id_badge)
-      bs.with_heading(tag: :h3) { "No mailer IDs yet" }
-      bs.with_primary_action(href: new_usps_mailer_id_path) { "Add one" }
-    end %>
+    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+      <h3 style="margin: 0;">No mailer IDs yet</h3>
+      <p style="color: var(--foreground2);"><a href="<%= new_usps_mailer_id_path %>">Add one</a></p>
+    </div>
   <% end %>
 </div>

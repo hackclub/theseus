@@ -11,33 +11,20 @@ class Components::Shared::TemplatePicker < Components::Base
   end
 
   def view_template
-    render Primer::Alpha::SelectPanel.new(
-      title: "Select template",
-      size: :large,
-      fetch_strategy: :local,
-      dynamic_label: true,
-      select_variant: :single,
-      form_arguments: { builder: form, name: name },
-      id: "template-picker-panel"
-    ) do |panel|
-      panel.with_show_button(scheme: :secondary, block: true) do |btn|
-        btn.with_leading_visual_icon(icon: :paintbrush)
-        if selected.present?
-          plain selected.to_s.titleize
-        else
-          span(class: "kv-label") { "Choose template..." }
-        end
-      end
-
-      templates.each do |tmpl|
-        info = tmpl[:info]
-        panel.with_item(
-          label: tmpl[:name].to_s.titleize,
-          content_arguments: { data: { value: tmpl[:name].to_s } },
-          data: { filter_string: "#{tmpl[:name]} #{info[:size]}" },
-          active: tmpl[:name].to_s == selected
-        ) do |item|
-          item.with_description { "#{info[:size].to_s.titleize}" }
+    div(style: "margin-bottom: 1lh;") do
+      select(
+        name: "#{form.object_name}[#{name}]",
+        id: "template-picker-select",
+        style: "width: 100%;"
+      ) do
+        option(value: "", disabled: true, selected: selected.blank?) { "Choose template..." }
+        templates.each do |tmpl|
+          tname = tmpl[:name].to_s
+          info = tmpl[:info]
+          option(
+            value: tname,
+            selected: tname == selected
+          ) { "#{tname.titleize} — #{info[:size].to_s.titleize}" }
         end
       end
     end

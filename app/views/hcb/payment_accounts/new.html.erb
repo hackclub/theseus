@@ -9,41 +9,30 @@
       <p class="page-subtitle mb-3">Choose which HCB organization to use for paying postage.</p>
 
       <%= form_with url: hcb_payment_accounts_path, method: :post do |f| %>
-        <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          @organizations.each do |org|
-            box.with_row do %>
-              <label class="radio-label-row">
-                <%= f.radio_button :organization_id, org.id, class: "accent-radio" %>
-                <span class="fw-medium"><%= org.name %></span>
-              </label>
-            <% end
-          end
-        end %>
+        <div box-="round" style="margin-bottom: 2lh;">
+          <% @organizations.each do |org| %>
+            <label class="radio-label-row" style="display: block; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
+              <%= f.radio_button :organization_id, org.id, class: "accent-radio" %>
+              <span class="fw-medium"><%= org.name %></span>
+            </label>
+          <% end %>
+        </div>
 
         <div class="page-actions">
-          <%= render Primer::Beta::Button.new(tag: :a, href: hcb_payment_accounts_path, scheme: :secondary) do
-            "Cancel"
-          end %>
-          <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :check)
-            "Add Organization"
-          end %>
+          <a href="<%= hcb_payment_accounts_path %>">Cancel</a>
+          <button type="submit" variant-="green">✓ Add Organization</button>
         </div>
       <% end %>
     </div>
   <% else %>
-    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :organization)
-      bs.with_heading(tag: :h3) { "No organizations available" }
-      bs.with_description { "You don't belong to any HCB organizations, or all your organizations are already linked." }
-      bs.with_primary_action(href: hcb_payment_accounts_path) { "Back" }
-    end %>
+    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+      <h3 style="margin: 0;">No organizations available</h3>
+      <p style="color: var(--foreground2);">You don't belong to any HCB organizations, or all your organizations are already linked.</p>
+      <a href="<%= hcb_payment_accounts_path %>">Back</a>
+    </div>
   <% end %>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: hcb_payment_accounts_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to HCB accounts"
-    end %>
+    <a href="<%= hcb_payment_accounts_path %>">← Back to HCB accounts</a>
   </div>
 </div>

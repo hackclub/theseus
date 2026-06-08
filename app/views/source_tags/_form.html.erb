@@ -1,49 +1,36 @@
 <%= form_with(model: source_tag) do |form| %>
   <% if source_tag.errors.any? %>
-    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
-      <strong><%= pluralize(source_tag.errors.count, "error") %>:</strong>
+    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+      <strong>[!] <%= pluralize(source_tag.errors.count, "error") %>:</strong>
       <ul class="error-list">
         <% source_tag.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    <% end %>
+    </div>
   <% end %>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_body do %>
-      <%= render Primer::Alpha::TextField.new(
-        name: "source_tag[slug]",
-        label: "Slug",
-        value: source_tag.slug,
-        full_width: true,
-        mb: 3
-      ) %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <div style="padding: 1lh 1ch;">
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Slug</label>
+        <input type="text" name="source_tag[slug]" value="<%= source_tag.slug %>" style="width: 100%;">
+      </div>
 
-      <%= render Primer::Alpha::TextField.new(
-        name: "source_tag[name]",
-        label: "Name",
-        value: source_tag.name,
-        full_width: true,
-        mb: 3
-      ) %>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Name</label>
+        <input type="text" name="source_tag[name]" value="<%= source_tag.name %>" style="width: 100%;">
+      </div>
 
-      <%= render Primer::Alpha::TextField.new(
-        name: "source_tag[owner]",
-        label: "Owner",
-        value: source_tag.owner,
-        full_width: true
-      ) %>
-    <% end %>
-  <% end %>
+      <div>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Owner</label>
+        <input type="text" name="source_tag[owner]" value="<%= source_tag.owner %>" style="width: 100%;">
+      </div>
+    </div>
+  </div>
 
   <div class="page-actions">
-    <%= render Primer::Beta::Button.new(tag: :a, href: source_tags_path, scheme: :secondary) do
-      "Cancel"
-    end %>
-    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :check)
-      source_tag.persisted? ? "Update Source Tag" : "Create Source Tag"
-    end %>
+    <a href="<%= source_tags_path %>"><button type="button">Cancel</button></a>
+    <button type="submit" variant-="green">✓ <%= source_tag.persisted? ? "Update Source Tag" : "Create Source Tag" %></button>
   </div>
 <% end %>

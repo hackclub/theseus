@@ -7,8 +7,8 @@
         <%= letter.public_id %> to <%= letter.address.name_line %>
       <% end %>
     </a>
-    <% status_scheme = { pending: :secondary, printed: :accent, mailed: :success, received: :done, canceled: :attention, errored: :danger }[letter.aasm_state.to_sym] || :secondary %>
-    <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :small)) { letter.aasm_state.humanize } %>
+    <% badge_variant = { pending: "background2", printed: "blue", mailed: "green", received: "green", canceled: "yellow", errored: "red" }[letter.aasm_state.to_sym] || "background2" %>
+    <span is-="badge" variant-="<%= badge_variant %>"><%= letter.aasm_state.humanize %></span>
   </div>
 
   <div class="index-card-meta">
@@ -20,7 +20,7 @@
   <% if letter.tags.present? %>
     <div class="index-card-tags">
       <% letter.tags.compact_blank.each do |tag| %>
-        <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { tag } %>
+        <span is-="badge" variant-="background2"><%= tag %></span>
       <% end %>
     </div>
   <% end %>

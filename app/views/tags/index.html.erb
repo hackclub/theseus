@@ -10,22 +10,19 @@
       <p class="page-subtitle">Cost tracking and reporting by tag</p>
     </div>
     <%= form_with url: refresh_tags_path, method: :post, class: "form-inline" do %>
-      <%= render Primer::Beta::Button.new(type: :submit, scheme: :secondary, size: :medium) do |btn|
-        btn.with_leading_visual_icon(icon: :sync)
-        "Refresh"
-      end %>
+      <button type="submit">↻ Refresh</button>
     <% end %>
   </div>
 
-  <%= render Primer::Beta::Flash.new(scheme: :default, mb: 3) do %>
+  <div box-="square" class="tui-banner" style="margin-bottom: 1lh;">
     This page is cached for performance. Hit refresh if you need fresh data.
-  <% end %>
+  </div>
 
   <div class="content-section">
     <h2 class="section-heading">Common Tags</h2>
     <div class="tags-row">
       <% @common_tags.each do |tag| %>
-        <%= render(Primer::Beta::Label.new(tag: :a, href: tag_stats_path(tag.tag), scheme: :accent, size: :large)) { tag.tag } %>
+        <a href="<%= tag_stats_path(tag.tag) %>"><span is-="badge" variant-="blue"><%= tag.tag %></span></a>
       <% end %>
     </div>
   </div>
@@ -34,7 +31,7 @@
     <h2 class="section-heading">All Tags</h2>
     <div class="tags-row">
       <% @tags.each do |tag| %>
-        <%= render(Primer::Beta::Label.new(tag: :a, href: tag_stats_path(tag), scheme: :secondary, size: :medium)) { tag } %>
+        <a href="<%= tag_stats_path(tag) %>"><span is-="badge" variant-="background2"><%= tag %></span></a>
       <% end %>
     </div>
   </div>

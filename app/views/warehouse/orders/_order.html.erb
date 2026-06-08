@@ -13,7 +13,7 @@
   <% if order.tags.present? %>
     <div class="tags-row">
       <% order.tags.compact_blank.each do |tag| %>
-        <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { tag } %>
+        <span is-="badge" variant-="background2" style="font-size: smaller;"><%= tag %></span>
       <% end %>
     </div>
   <% end %>

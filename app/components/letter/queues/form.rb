@@ -19,15 +19,15 @@ class Components::Letter::Queues::Form < Components::Base
       section_heading("The important part")
 
       div(class: "form-grid mb-3") do
-        render Primer::Alpha::TextField.new(
-          name: "letter_queue[name]", label: "Name",
-          value: queue.name, required: true, full_width: true
-        )
-        render Primer::Alpha::TextField.new(
-          name: "letter_queue[user_facing_title]", label: "Display Title",
-          value: queue.user_facing_title, full_width: true,
-          caption: "Optional title shown to users"
-        )
+        div(style: "margin-bottom: 1lh;") do
+          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Name *" }
+          input(type: :text, name: "letter_queue[name]", value: queue.name, required: true, style: "width: 100%;")
+        end
+        div(style: "margin-bottom: 1lh;") do
+          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Display Title" }
+          input(type: :text, name: "letter_queue[user_facing_title]", value: queue.user_facing_title, style: "width: 100%;")
+          span(style: "color: var(--foreground2); font-size: 0.9em;") { "Optional title shown to users" }
+        end
       end
 
       tag_picker(f)
@@ -74,29 +74,23 @@ class Components::Letter::Queues::Form < Components::Base
       )
 
       div(class: "form-field-lg") do
-        render Primer::Alpha::TextField.new(
-          name: "letter_queue[letter_return_address_name]",
-          label: "Custom return address name",
-          value: queue.letter_return_address_name, full_width: true,
-          caption: "Leave blank to use the address' default name"
-        )
+        label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Custom return address name" }
+        input(type: :text, name: "letter_queue[letter_return_address_name]", value: queue.letter_return_address_name, style: "width: 100%;")
+        span(style: "color: var(--foreground2); font-size: 0.9em;") { "Leave blank to use the address' default name" }
       end
 
       # Admin slug
       admin_tool do
         div(class: "form-field-lg") do
-          render Primer::Alpha::TextField.new(
-            name: "letter_queue[slug]", label: "Slug",
-            value: queue.slug, full_width: true
-          )
+          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Slug" }
+          input(type: :text, name: "letter_queue[slug]", value: queue.slug, style: "width: 100%;")
         end
       end
 
       # Submit
       div(class: "mt-4") do
-        render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :check)
-          queue.new_record? ? "Create Queue" : "Update Queue"
+        button(type: :submit, "variant-": "green") do
+          plain(queue.new_record? ? "✓ Create Queue" : "✓ Update Queue")
         end
       end
     end

@@ -1,77 +1,55 @@
 <%= form_with(model: purchase_order, url: purchase_order.persisted? ? warehouse_purchase_order_path(purchase_order) : warehouse_purchase_orders_path) do |form| %>
   <% if purchase_order.errors.any? %>
-    <%= render Primer::Beta::Flash.new(scheme: :danger, full: true, mb: 3) do %>
+    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
       <strong><%= pluralize(purchase_order.errors.count, "error") %> prevented saving:</strong>
       <ul class="error-list">
         <% purchase_order.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    <% end %>
+    </div>
   <% end %>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Supplier Information<% end %>
-    <% end %>
-    <% box.with_body do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch;">Supplier Information</h2>
+    <div is-="separator"></div>
+    <div style="padding: 1lh 1ch;">
       <div class="form-grid-wide">
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "warehouse_purchase_order[supplier_name]",
-            label: "Supplier name",
-            value: purchase_order.supplier_name,
-            full_width: true,
-            required: true,
-            placeholder: "Enter supplier name"
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Supplier name <span style="color: var(--red);">*</span></label>
+          <input type="text" name="warehouse_purchase_order[supplier_name]" value="<%= purchase_order.supplier_name %>" placeholder="Enter supplier name" required style="width: 100%;">
         </div>
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "warehouse_purchase_order[supplier_id]",
-            label: "Supplier ID (optional)",
-            value: purchase_order.supplier_id,
-            full_width: true,
-            placeholder: "Zenventory supplier ID"
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Supplier ID (optional)</label>
+          <input type="text" name="warehouse_purchase_order[supplier_id]" value="<%= purchase_order.supplier_id %>" placeholder="Zenventory supplier ID" style="width: 100%;">
         </div>
       </div>
       <div class="section-header">
         <label class="date-field-label">Required by date</label>
         <%= form.date_field :required_by_date, class: "date-field" %>
       </div>
-      <%= render Primer::Alpha::TextArea.new(
-        name: "warehouse_purchase_order[notes]",
-        label: "Notes",
-        value: purchase_order.notes,
-        rows: 3,
-        full_width: true,
-        placeholder: "Add any notes for this purchase order..."
-      ) %>
-    <% end %>
-  <% end %>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Notes</label>
+        <textarea name="warehouse_purchase_order[notes]" rows="3" placeholder="Add any notes for this purchase order..." style="width: 100%;"><%= purchase_order.notes %></textarea>
+      </div>
+    </div>
+  </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Line Items<% end %>
-    <% end %>
-    <% box.with_body do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch;">Line Items</h2>
+    <div is-="separator"></div>
+    <div style="padding: 1lh 1ch;">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: :enabled,
         show_unit_cost: true,
         add_button_text: "Add Item"
       ) %>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 
   <div class="page-actions">
-    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_purchase_orders_path, scheme: :secondary) do
-      "Cancel"
-    end %>
-    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :check)
-      purchase_order.persisted? ? "Update Purchase Order" : "Create Purchase Order"
-    end %>
+    <a href="<%= warehouse_purchase_orders_path %>">Cancel</a>
+    <button type="submit" variant-="green">✓ <%= purchase_order.persisted? ? "Update Purchase Order" : "Create Purchase Order" %></button>
   </div>
 <% end %>

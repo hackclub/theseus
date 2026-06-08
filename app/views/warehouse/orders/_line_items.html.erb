@@ -1,15 +1,15 @@
-<%= render Primer::Beta::BorderBox.new do |box|
-  box.with_header do %>
+<div box-="round">
+  <div style="padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">
     <div class="li-row">
       <span class="li-col-name col-header">SKU</span>
       <span class="li-col-num col-header">Qty</span>
       <span class="li-col-cost col-header">Cost to HC</span>
       <span class="li-col-cost col-header">Declared</span>
     </div>
-  <% end
+  </div>
 
-  order.line_items.each do |li|
-    box.with_row do %>
+  <% order.line_items.each do |li| %>
+    <div style="padding: 1lh 1ch; border-bottom: 1px solid var(--background3);">
       <div class="li-row">
         <div class="li-col-name">
           <%= link_to li.sku.name, warehouse_sku_path(li.sku), class: "fw-medium" %>
@@ -19,21 +19,21 @@
         <span class="li-col-cost kv-label"><%= number_to_currency(li.sku.actual_cost_to_hc) %></span>
         <span class="li-col-cost kv-label">
           <% if li.sku.declared_unit_cost.zero? %>
-            <span class="text-danger fw-semibold" title="This SKU has no cost data! It will block dispatch."><%= render Primer::Beta::Octicon.new(icon: :alert, size: :small) %> $0.00</span>
+            <span class="text-danger fw-semibold" title="This SKU has no cost data! It will block dispatch.">⚠ $0.00</span>
           <% else %>
             <%= number_to_currency(li.sku.declared_unit_cost) %>
           <% end %>
         </span>
       </div>
-    <% end
-  end
+    </div>
+  <% end %>
 
-  box.with_footer do %>
+  <div style="padding: 1lh 1ch;">
     <div class="li-row fw-semibold">
       <span class="li-col-name">Total</span>
       <span class="li-col-num"></span>
       <span class="li-col-cost"><%= number_to_currency(order.contents_actual_cost_to_hc) %></span>
       <span class="li-col-cost"><%= number_to_currency(order.contents_declared_unit_cost) %></span>
     </div>
-  <% end
-end %>
+  </div>
+</div>

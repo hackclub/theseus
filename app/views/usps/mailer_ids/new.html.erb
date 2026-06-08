@@ -4,9 +4,6 @@
   <h1 class="page-title mb-3">New Mailer ID</h1>
   <%= render "form", usps_mailer_id: @usps_mailer_id %>
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: usps_mailer_ids_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to mailer IDs"
-    end %>
+    <a href="<%= usps_mailer_ids_path %>">← Back to mailer IDs</a>
   </div>
 </div>

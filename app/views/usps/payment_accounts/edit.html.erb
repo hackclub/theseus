@@ -7,9 +7,6 @@
   </div>
   <%= render "form", usps_payment_account: @usps_payment_account %>
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: usps_payment_account_path(@usps_payment_account), scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to account"
-    end %>
+    <a href="<%= usps_payment_account_path(@usps_payment_account) %>">← Back to account</a>
   </div>
 </div>

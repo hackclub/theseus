@@ -3,99 +3,89 @@
 <div class="page-container">
   <div class="content-section">
     <h1 class="page-title">
-      <%= render(Primer::Beta::Label.new(scheme: :accent, size: :large)) { @tag } %>
+      <span is-="badge" variant-="blue"><%= @tag %></span>
     </h1>
   </div>
 
   <div class="content-section">
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_body do %>
+    <div box-="round">
+      <div style="padding: 1lh 1ch;">
         <div class="filter-bar">
           <span class="kv-label">Showing:</span>
-          <%= render Primer::Alpha::Select.new(name: "time_period", label: "Time period", visually_hide_label: true, id: "time_period") do |select|
-            select.with_option(value: "all_time", label: "All-time", selected: @time_period == "all_time")
-            select.with_option(value: "ytd", label: "Year-to-date", selected: @time_period == "ytd")
-            select.with_option(value: "month", label: "Specific month", selected: @time_period == "month")
-            select.with_option(value: "last_week", label: "Last week", selected: @time_period == "last_week")
-            select.with_option(value: "last_month", label: "Last month", selected: @time_period == "last_month")
-            select.with_option(value: "last_year", label: "Last year", selected: @time_period == "last_year")
-          end %>
+          <select name="time_period" id="time_period">
+            <option value="all_time" <%= "selected" if @time_period == "all_time" %>>All-time</option>
+            <option value="ytd" <%= "selected" if @time_period == "ytd" %>>Year-to-date</option>
+            <option value="month" <%= "selected" if @time_period == "month" %>>Specific month</option>
+            <option value="last_week" <%= "selected" if @time_period == "last_week" %>>Last week</option>
+            <option value="last_month" <%= "selected" if @time_period == "last_month" %>>Last month</option>
+            <option value="last_year" <%= "selected" if @time_period == "last_year" %>>Last year</option>
+          </select>
 
           <span id="year_selector" style="display: <%= @time_period.in?(%w[ytd month]) ? 'inline' : 'none' %>">
-            <%= render Primer::Alpha::Select.new(name: "year", label: "Year", visually_hide_label: true, id: "year") do |select|
-              @years.each do |y|
-                select.with_option(value: y.to_s, label: y.to_s, selected: y == @year)
-              end
-            end %>
+            <select name="year" id="year">
+              <% @years.each do |y| %>
+                <option value="<%= y %>" <%= "selected" if y == @year %>><%= y %></option>
+              <% end %>
+            </select>
           </span>
 
           <span id="month_selector" style="display: <%= @time_period == 'month' ? 'inline' : 'none' %>">
-            <%= render Primer::Alpha::Select.new(name: "month", label: "Month", visually_hide_label: true, id: "month") do |select|
-              @months.each do |name, num|
-                select.with_option(value: num.to_s, label: name, selected: num == @month)
-              end
-            end %>
+            <select name="month" id="month">
+              <% @months.each do |name, num| %>
+                <option value="<%= num %>" <%= "selected" if num == @month %>><%= name %></option>
+              <% end %>
+            </select>
           </span>
 
-          <%= render Primer::Beta::Button.new(scheme: :secondary, size: :small, tag: :button, "onclick": "updateTimePeriod()") { "Go" } %>
+          <button size-="small" onclick="updateTimePeriod()">Go</button>
         </div>
-      <% end
-    end %>
+      </div>
+    </div>
   </div>
 
   <div class="filter-bar content-section">
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_body do %>
+    <div box-="round">
+      <div style="padding: 1lh 1ch;">
         <div class="stat-card">
           <div class="stat-pill-value"><%= @warehouse_order_count %></div>
           <div class="stat-pill-label">Warehouse Orders</div>
         </div>
-      <% end
-    end %>
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_body do %>
+      </div>
+    </div>
+    <div box-="round">
+      <div style="padding: 1lh 1ch;">
         <div class="stat-card">
           <div class="stat-pill-value"><%= @letter_count %></div>
           <div class="stat-pill-label">Letters</div>
         </div>
-      <% end
-    end %>
+      </div>
+    </div>
   </div>
 
   <div class="two-col-equal content-section">
     <div>
       <h2 class="section-heading">Letter Costs</h2>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">Postage</span><span class="fw-semibold"><%= number_to_currency(@letter_postage_cost) %></span></div>
-        <% end
-      end %>
+      <div box-="round">
+        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Postage</span><span class="fw-semibold"><%= number_to_currency(@letter_postage_cost) %></span></div>
+      </div>
     </div>
 
     <div>
       <h2 class="section-heading">Warehouse Costs</h2>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">Postage</span><span><%= number_to_currency(@warehouse_order_postage_cost) %></span></div>
-        <% end
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">Labor</span><span><%= number_to_currency(@warehouse_order_labor_cost) %></span></div>
-        <% end
-        box.with_row do %>
-          <div class="kv-row"><span class="kv-label">Contents</span><span><%= number_to_currency(@warehouse_order_contents_cost) %></span></div>
-        <% end
-        box.with_footer do %>
-          <div class="kv-row fw-semibold"><span>Total</span><span><%= number_to_currency(@warehouse_order_total_cost) %></span></div>
-        <% end
-      end %>
+      <div box-="round">
+        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Postage</span><span><%= number_to_currency(@warehouse_order_postage_cost) %></span></div>
+        <div is-="separator"></div>
+        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Labor</span><span><%= number_to_currency(@warehouse_order_labor_cost) %></span></div>
+        <div is-="separator"></div>
+        <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Contents</span><span><%= number_to_currency(@warehouse_order_contents_cost) %></span></div>
+        <div is-="separator"></div>
+        <div class="kv-row fw-semibold" style="padding: 0.5lh 1ch;"><span>Total</span><span><%= number_to_currency(@warehouse_order_total_cost) %></span></div>
+      </div>
     </div>
   </div>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: tags_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to tags"
-    end %>
+    <a href="<%= tags_path %>">← Back to tags</a>
   </div>
 </div>
 

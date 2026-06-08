@@ -12,14 +12,8 @@ class Views::Batches::Show < Views::Base
         subtitle: "#{pluralize(@batch.addresses.count, @batch.type.split('::').first.downcase)}"
       ) do |header|
         header.with_actions do
-          render Primer::Beta::Button.new(tag: :a, href: batches_path, scheme: :secondary, size: :small) do |btn|
-            btn.with_leading_visual_icon(icon: :"arrow-left")
-            "Back to batches"
-          end
-          render Primer::Beta::Button.new(tag: :a, href: edit_batch_path(@batch), scheme: :secondary, size: :small) do |btn|
-            btn.with_leading_visual_icon(icon: :pencil)
-            "Edit"
-          end
+          a(href: batches_path, "size-": "small") { "← Back to batches" }
+          a(href: edit_batch_path(@batch), "size-": "small") { "✎ Edit" }
         end
       end
 
@@ -79,15 +73,11 @@ class Views::Batches::Show < Views::Base
     div(class: "danger-zone") do
       h3 { "Danger Zone" }
       p(class: "danger-zone-desc") { "This action cannot be undone." }
-      render Primer::Beta::Button.new(
-        tag: :button,
-        scheme: :danger,
-        form: "delete-batch-form",
-        type: :submit
-      ) do |btn|
-        btn.with_leading_visual_icon(icon: :trash)
-        "Delete this batch"
-      end
+      button(
+        type: :submit,
+        "variant-": "red",
+        form: "delete-batch-form"
+      ) { "✕ Delete this batch" }
       form(id: "delete-batch-form", method: :post, action: batch_path(@batch), class: "form-inline") do
         input(type: :hidden, name: :_method, value: :delete)
         input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)

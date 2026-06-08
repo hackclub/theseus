@@ -1,21 +1,19 @@
 <% if record.batch.present? %>
   <div class="content-section">
     <h2 class="section-heading">Part of Batch</h2>
-    <%= render Primer::Beta::BorderBox.new do |box| %>
-      <% box.with_header do %>
+    <div box-="round">
+      <div style="padding: 1lh 2ch;">
         <div class="kv-row">
           <span class="fw-semibold"><%= record.batch.type.split('::').first.titleize %> Batch #<%= record.batch.id %></span>
           <div class="page-actions">
             <%= render Components::Shared::StatusBadge.new(status: record.batch.aasm.current_state, type: :batch) %>
             <% batch_path = record.batch.is_a?(Letter::Batch) ? letter_batch_path(record.batch) : warehouse_batch_path(record.batch) %>
-            <%= render Primer::Beta::Button.new(tag: :a, href: batch_path, scheme: :secondary, size: :small) do |btn|
-              btn.with_trailing_visual_icon(icon: :arrow_right)
-              "View Batch"
-            end %>
+            <a href="<%= batch_path %>" size-="small">View Batch →</a>
           </div>
         </div>
-      <% end %>
-      <% box.with_body do %>
+      </div>
+      <div is-="separator"></div>
+      <div style="padding: 1lh 2ch;">
         <div class="batch-info-grid">
           <div>
             <span class="kv-label">Created:</span>
@@ -42,7 +40,7 @@
             </div>
           <% end %>
         </div>
-      <% end %>
-    <% end %>
+      </div>
+    </div>
   </div>
 <% end %>

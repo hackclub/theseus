@@ -1,94 +1,69 @@
 <%= form_with(model: warehouse_order) do |form| %>
   <% if warehouse_order.errors.any? %>
-    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
-      <strong>Hey, slight issue:</strong>
+    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+      [!] <strong>Hey, slight issue:</strong>
       <ul class="error-list">
         <% warehouse_order.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    <% end %>
+    </div>
   <% end %>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Order Details<% end %>
-    <% end %>
-    <% box.with_body do %>
-      <%= render Primer::Alpha::TextField.new(
-        name: "warehouse_order[user_facing_title]",
-        label: "Short title (shown to recipient)",
-        value: warehouse_order.user_facing_title,
-        full_width: true,
-        mb: 3,
-        autofocus: true
-      ) %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Order Details</h2>
+    <div style="padding: 1lh 1ch;">
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Short title (shown to recipient)</label>
+        <input type="text" name="warehouse_order[user_facing_title]" value="<%= warehouse_order.user_facing_title %>" style="width: 100%;" autofocus>
+      </div>
 
-      <%= render Primer::Alpha::TextField.new(
-        name: "warehouse_order[recipient_email]",
-        label: "Recipient email",
-        value: warehouse_order.recipient_email,
-        input_type: :email,
-        full_width: true
-      ) %>
-    <% end %>
-  <% end %>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Recipient email</label>
+        <input type="email" name="warehouse_order[recipient_email]" value="<%= warehouse_order.recipient_email %>" style="width: 100%;">
+      </div>
+    </div>
+  </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Shipping Address<% end %>
-    <% end %>
-    <% box.with_body do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Shipping Address</h2>
+    <div style="padding: 1lh 1ch;">
       <%= render 'addresses/primer_nested_form', form: form %>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Contents<% end %>
-    <% end %>
-    <% box.with_body do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Contents</h2>
+    <div style="padding: 1lh 1ch;">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: current_user&.is_admin? ? :all : :in_inventory,
         show_unit_cost: false,
         add_button_text: "Add Item"
       ) %>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Options<% end %>
-    <% end %>
-    <% box.with_body do %>
-      <%= render Primer::Alpha::TextArea.new(
-        name: "warehouse_order[internal_notes]",
-        label: "Internal notes",
-        value: warehouse_order.internal_notes,
-        rows: 3,
-        full_width: true,
-        mb: 3
-      ) %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">Options</h2>
+    <div style="padding: 1lh 1ch;">
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Internal notes</label>
+        <textarea name="warehouse_order[internal_notes]" rows="3" style="width: 100%;"><%= warehouse_order.internal_notes %></textarea>
+      </div>
 
-      <%= render Primer::Alpha::CheckBox.new(
-        name: "warehouse_order[notify_on_dispatch]",
-        label: "Send the recipient a \"sent to warehouse\" email",
-        caption: "They'll get an email when it ships regardless",
-        checked: warehouse_order.notify_on_dispatch
-      ) %>
-    <% end %>
-  <% end %>
+      <label>
+        <input type="checkbox" name="warehouse_order[notify_on_dispatch]" value="1" <%= "checked" if warehouse_order.notify_on_dispatch %>>
+        Send the recipient a "sent to warehouse" email
+        <span style="display: block; color: var(--foreground2); font-size: smaller;">They'll get an email when it ships regardless</span>
+      </label>
+    </div>
+  </div>
 
   <%= render 'shared/primer_tag_picker', form: form, taggable: warehouse_order %>
 
   <div class="page-actions">
-    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_orders_path, scheme: :secondary) do
-      "Cancel"
-    end %>
-    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :check)
-      warehouse_order.persisted? ? "Update Order" : "Create Order"
-    end %>
+    <a href="<%= warehouse_orders_path %>">Cancel</a>
+    <button type="submit" variant-="green">✓ <%= warehouse_order.persisted? ? "Update Order" : "Create Order" %></button>
   </div>
 <% end %>

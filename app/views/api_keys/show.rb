@@ -13,7 +13,7 @@ class Views::APIKeys::Show < Views::Base
         div do
           div(class: "page-title-group") do
             h1(class: "page-title") { api_key.pretty_name }
-            render Primer::Beta::Label.new(scheme: api_key.active? ? :success : :secondary) do
+            span("is-": "badge", "variant-": api_key.active? ? "green" : "background2") do
               api_key.active? ? "Active" : "Revoked"
             end
           end
@@ -21,36 +21,39 @@ class Views::APIKeys::Show < Views::Base
         end
       end
 
-      render Primer::Beta::BorderBox.new(mb: 3) do |box|
-        box.with_header { "Secret Key" }
-        box.with_body do
+      div("box-": "round", style: "margin-bottom: 1lh;") do
+        h3(style: "margin: 0;") { "Secret Key" }
+        div("is-": "separator")
+        div(style: "padding: 1lh 1ch;") do
           div(class: "kv-row") do
             code(
               class: "api-key-token",
               data_copy_to_clipboard: api_key.token
             ) { api_key.token }
 
-            render Primer::Beta::IconButton.new(
-              icon: :copy,
-              aria: { label: "Copy to clipboard" },
-              data_copy_to_clipboard: api_key.token
-            )
+            button(
+              "size-": "small",
+              data_copy_to_clipboard: api_key.token,
+              aria: { label: "Copy to clipboard" }
+            ) { "⎘" }
           end
           p(class: "api-key-secret-hint") { "Keep this secret. Don't share it with anyone." }
         end
       end
 
-      render Primer::Beta::BorderBox.new(mb: 3) do |box|
-        box.with_header { "Permissions" }
-        box.with_row do
-          pii_color = api_key.pii ? "var(--fgColor-success)" : "var(--fgColor-muted)"
+      div("box-": "round", style: "margin-bottom: 1lh;") do
+        h3(style: "margin: 0;") { "Permissions" }
+        div("is-": "separator")
+        div do
+          pii_color = api_key.pii ? "var(--green)" : "var(--foreground2)"
           div(class: "api-key-perm-row#{api_key.pii ? ' api-key-perm-row--active-success' : ''}") do
             span(class: "fw-semibold", style: "color: #{pii_color};") { api_key.pii ? "✓" : "✗" }
             span(class: "fw-medium") { "PII Access" }
           end
         end
-        box.with_row do
-          imp_color = api_key.may_impersonate? ? "var(--fgColor-danger)" : "var(--fgColor-muted)"
+        div("is-": "separator")
+        div do
+          imp_color = api_key.may_impersonate? ? "var(--red)" : "var(--foreground2)"
           div(class: "api-key-perm-row#{api_key.may_impersonate? ? ' api-key-perm-row--active-danger' : ''}") do
             span(class: "fw-semibold", style: "color: #{imp_color};") { api_key.may_impersonate? ? "✓" : "✗" }
             span(class: "fw-medium") { "Can Impersonate" }
@@ -59,8 +62,8 @@ class Views::APIKeys::Show < Views::Base
       end
 
       if api_key.revoked?
-        render Primer::Beta::Flash.new(scheme: :warning, mb: 3) do
-          strong { "Revoked on #{api_key.revoked_at.strftime('%B %d, %Y at %l:%M %p')}" }
+        div("box-": "square", class: "tui-banner tui-banner-warning", style: "margin-bottom: 1lh;") do
+          strong { "⚠ Revoked on #{api_key.revoked_at.strftime('%B %d, %Y at %l:%M %p')}" }
         end
       end
 
@@ -78,27 +81,29 @@ class Views::APIKeys::Show < Views::Base
   attr_reader :api_key
 
   def render_revoke_dialog
-    render Primer::Alpha::Dialog.new(
-      title: "Revoking #{api_key.pretty_name}...",
-      subtitle: "That which thou canst not undo.",
-      size: :large,
-      id: "revoke-dialog"
-    ) do |dialog|
-      dialog.with_show_button(scheme: :danger) do |btn|
-        btn.with_leading_visual_icon(icon: :x)
-        plain "Revoke Key"
-      end
-
-      form_with url: revoke_api_key_path(api_key), method: :post, local: true do |f|
-        render(Primer::Alpha::Dialog::Body.new) do
-          render(Primer::Alpha::Banner.new(icon: :alert, scheme: :danger, description: "Are you sure you want to revoke this key? Everything that relies on it will unceremoniously break.")) { "This is irreversible and painful!" }
+    dialog(id: "revoke-dialog", "size-": "large", "position-": "center", "container-": "fill") do
+      tag("column", "box-": "round", "shear-": "top") do
+        tag("row", "align-": "center between") do
+          span("is-": "badge", "variant-": "background0") { "Revoking #{api_key.pretty_name}..." }
+          button("size-": "small", "variant-": "foreground0", onclick: "this.closest('dialog').close()") { "×" }
         end
+        p(style: "color: var(--foreground2); margin: 0 0 1lh;") { "That which thou canst not undo." }
+        div("is-": "separator")
 
-        render(Primer::Alpha::Dialog::Footer.new(show_divider: true)) do
-          render(Primer::Beta::Button.new(data: { "close-dialog-id": "revoke-dialog" })) { "Cancel" }
-          render(Primer::Beta::Button.new(scheme: :danger, type: :submit)) { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
+        form_with url: revoke_api_key_path(api_key), method: :post, local: true do |f|
+          div("box-": "square", class: "tui-banner tui-banner-error", style: "margin: 1lh 0;") do
+            plain "⚠ This is irreversible and painful! Are you sure you want to revoke this key? Everything that relies on it will unceremoniously break."
+          end
+
+          div("is-": "separator")
+          tag("row", "gap-": "1", style: "justify-content: flex-end; padding: 1lh 0;") do
+            button(onclick: "document.getElementById('revoke-dialog').close()") { "Cancel" }
+            button("variant-": "red", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
+          end
         end
       end
     end
+
+    button("variant-": "red", onclick: "document.getElementById('revoke-dialog').showModal()") { "× Revoke Key" }
   end
 end

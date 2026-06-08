@@ -1,49 +1,36 @@
 <%= form_with(model: usps_mailer_id) do |form| %>
   <% if usps_mailer_id.errors.any? %>
-    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
-      <strong><%= pluralize(usps_mailer_id.errors.count, "error") %>:</strong>
+    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+      [!] <strong><%= pluralize(usps_mailer_id.errors.count, "error") %>:</strong>
       <ul class="error-box-list">
         <% usps_mailer_id.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    <% end %>
+    </div>
   <% end %>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_body do %>
-      <%= render Primer::Alpha::TextField.new(
-        name: "usps_mailer_id[name]",
-        label: "Name",
-        value: usps_mailer_id.name,
-        full_width: true,
-        mb: 3
-      ) %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <div style="padding: 1lh 1ch;">
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Name</label>
+        <input type="text" name="usps_mailer_id[name]" value="<%= usps_mailer_id.name %>" style="width: 100%;">
+      </div>
 
-      <%= render Primer::Alpha::TextField.new(
-        name: "usps_mailer_id[crid]",
-        label: "CRID",
-        value: usps_mailer_id.crid,
-        full_width: true,
-        mb: 3
-      ) %>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">CRID</label>
+        <input type="text" name="usps_mailer_id[crid]" value="<%= usps_mailer_id.crid %>" style="width: 100%;">
+      </div>
 
-      <%= render Primer::Alpha::TextField.new(
-        name: "usps_mailer_id[mid]",
-        label: "MID",
-        value: usps_mailer_id.mid,
-        full_width: true
-      ) %>
-    <% end %>
-  <% end %>
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">MID</label>
+        <input type="text" name="usps_mailer_id[mid]" value="<%= usps_mailer_id.mid %>" style="width: 100%;">
+      </div>
+    </div>
+  </div>
 
   <div class="page-actions">
-    <%= render Primer::Beta::Button.new(tag: :a, href: usps_mailer_ids_path, scheme: :secondary) do
-      "Cancel"
-    end %>
-    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :check)
-      usps_mailer_id.persisted? ? "Update Mailer ID" : "Create Mailer ID"
-    end %>
+    <a href="<%= usps_mailer_ids_path %>">Cancel</a>
+    <button type="submit" variant-="green">✓ <%= usps_mailer_id.persisted? ? "Update Mailer ID" : "Create Mailer ID" %></button>
   </div>
 <% end %>

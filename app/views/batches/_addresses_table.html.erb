@@ -1,5 +1,5 @@
-<%= render Primer::Beta::BorderBox.new do |box| %>
-  <% box.with_header do %>
+<div box-="round">
+  <div style="padding: 0.5lh 2ch;">
     <div class="batch-table-row">
       <span class="batch-col-name col-header">Name</span>
       <span class="batch-col-addr col-header">Address</span>
@@ -8,9 +8,10 @@
       <span class="batch-col-md col-header">Postal Code</span>
       <span class="batch-col-sm col-header">Country</span>
     </div>
-  <% end %>
+  </div>
   <% addresses.each do |address| %>
-    <% box.with_row do %>
+    <div is-="separator"></div>
+    <div style="padding: 0.5lh 2ch;">
       <div class="batch-table-row text-sm">
         <span class="batch-col-name"><%= "#{address.first_name} #{address.last_name}" %></span>
         <span class="batch-col-addr">
@@ -24,6 +25,6 @@
         <span class="batch-col-md mono"><%= address.postal_code %></span>
         <span class="batch-col-sm"><%= address.country %></span>
       </div>
-    <% end %>
+    </div>
   <% end %>
-<% end %>
+</div>

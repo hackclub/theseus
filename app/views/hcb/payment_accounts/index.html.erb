@@ -4,10 +4,7 @@
   <div class="page-header">
     <h1 class="page-title">HCB Payment Accounts</h1>
     <% if current_user.hcb_connected? %>
-      <%= render Primer::Beta::Button.new(tag: :a, href: new_hcb_payment_account_path, scheme: :primary) do |btn|
-        btn.with_leading_visual_icon(icon: :plus)
-        "Add Organization"
-      end %>
+      <a href="<%= new_hcb_payment_account_path %>" variant-="green">+ Add Organization</a>
     <% end %>
   </div>
 
@@ -16,52 +13,48 @@
       <div>
         <h2 class="section-heading">Your Organizations</h2>
         <% if @payment_accounts.any? %>
-          <%= render Primer::Beta::BorderBox.new do |box|
-            @payment_accounts.each do |account|
-              box.with_row do %>
-                <a href="<%= hcb_payment_account_path(account) %>" class="resource-card link-reset">
-                  <div class="resource-card-info">
-                    <span class="resource-card-title"><%= account.organization_name %></span>
-                    <span class="resource-card-meta">Added <%= time_ago_in_words(account.created_at) %> ago</span>
-                  </div>
-                  <%= render Primer::Beta::Octicon.new(icon: :chevron_right, color: :muted) %>
-                </a>
-              <% end
-            end
-          end %>
+          <div box-="round">
+            <% @payment_accounts.each do |account| %>
+              <a href="<%= hcb_payment_account_path(account) %>" class="resource-card link-reset" style="display: block; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
+                <div class="resource-card-info">
+                  <span class="resource-card-title"><%= account.organization_name %></span>
+                  <span class="resource-card-meta">Added <%= time_ago_in_words(account.created_at) %> ago</span>
+                </div>
+                <span style="color: var(--foreground2);">→</span>
+              </a>
+            <% end %>
+          </div>
         <% else %>
-          <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-            bs.with_visual_icon(icon: :organization)
-            bs.with_heading(tag: :h3) { "No organizations linked yet" }
-            bs.with_description { "Add one to start paying for postage." }
-            bs.with_primary_action(href: new_hcb_payment_account_path) { "Add Organization" }
-          end %>
+          <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+            <h3 style="margin: 0;">No organizations linked yet</h3>
+            <p style="color: var(--foreground2);">Add one to start paying for postage.</p>
+            <a href="<%= new_hcb_payment_account_path %>">Add Organization</a>
+          </div>
         <% end %>
       </div>
 
       <div>
         <h2 class="section-heading">Account Status</h2>
-        <%= render Primer::Beta::BorderBox.new do |box|
-          box.with_body do %>
+        <div box-="round">
+          <div style="padding: 1lh 1ch;">
             <div class="status-row">
-              <%= render Primer::Beta::Octicon.new(icon: :"check-circle", color: :success) %>
-              <span class="fw-semibold text-success">HCB Connected</span>
+              <span style="color: var(--green);">✓</span>
+              <span class="fw-semibold" style="color: var(--green);">HCB Connected</span>
             </div>
-            <p class="kv-label m-0">
+            <p class="kv-label" style="margin: 0;">
               Your account is linked to HCB. You can pay for postage using any of your organizations' funds.
             </p>
-          <% end
-        end %>
+          </div>
+        </div>
       </div>
     </div>
   <% else %>
     <div class="page-container--center">
-      <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-        bs.with_visual_icon(icon: :link)
-        bs.with_heading(tag: :h2) { "Connect to HCB" }
-        bs.with_description { "Link your HCB account to pay for postage directly from your organization's funds." }
-        bs.with_primary_action(href: new_hcb_oauth_connection_path) { "Connect HCB Account" }
-      end %>
+      <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+        <h2 style="margin: 0;">🔗 Connect to HCB</h2>
+        <p style="color: var(--foreground2);">Link your HCB account to pay for postage directly from your organization's funds.</p>
+        <a href="<%= new_hcb_oauth_connection_path %>" variant-="green">Connect HCB Account</a>
+      </div>
     </div>
   <% end %>
 </div>

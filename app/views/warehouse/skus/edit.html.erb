@@ -9,9 +9,6 @@
   <%= render "form", warehouse_sku: @warehouse_sku %>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_sku_path(@warehouse_sku), scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to SKU"
-    end %>
+    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" size-="small">← Back to SKU</a>
   </div>
 </div>

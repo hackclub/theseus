@@ -25,14 +25,8 @@ class Components::StaticPages::APIDocs < Components::Base
   end
 
   def api_key_button
-    render(Primer::Beta::Button.new(
-      size: :small,
-      href: new_api_key_path,
-      target: "_blank",
-      tag: :a,
-    )) do |c|
-      c.with_leading_visual_icon(icon: :key)
-      "make one right now!"
+    a(href: new_api_key_path, target: "_blank") do
+      button("size-": "small") { "🔑 make one right now!" }
     end
   end
 
@@ -41,7 +35,7 @@ class Components::StaticPages::APIDocs < Components::Base
       class: "api-docs-copy-btn",
       onclick: safe("let b=this;fetch('#{api_docs_path(format: :md)}').then(r=>r.text()).then(t=>navigator.clipboard.writeText(t)).then(()=>{b.querySelector('span').textContent='Copied!';setTimeout(()=>b.querySelector('span').textContent='Copy LLM-friendly version as Markdown',2000)})")
     ) do
-      render Primer::Beta::Octicon.new(icon: :copy, size: :small)
+      span { "⎘" }
       span { "Copy LLM-friendly version as Markdown" }
     end
   end

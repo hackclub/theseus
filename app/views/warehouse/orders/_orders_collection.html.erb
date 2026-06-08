@@ -1,40 +1,38 @@
-<%= render Primer::Beta::BorderBox.new do |box|
-  box.with_header do %>
+<div box-="round">
+  <div style="padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);">
     <div class="li-row">
       <span class="li-col-name col-header">Order</span>
       <span class="collection-col col-header">Recipient</span>
       <span class="collection-col-sm col-header">Status</span>
     </div>
-  <% end
+  </div>
 
-  orders.each do |order|
-    box.with_row do %>
-      <a href="<%= warehouse_order_path(order) %>" class="collection-link">
-        <div class="collection-link-main">
-          <div class="section-title-group mb-1">
-            <span class="mono fw-semibold text-accent"><%= order.hc_id %></span>
-            <% if order.user_facing_title.present? %>
-              <span>·</span>
-              <span class="order-row-name"><%= order.user_facing_title %></span>
-            <% end %>
-          </div>
-          <div class="resource-card-meta mt-1">
-            <%= order.created_at.strftime("%b %d, %Y") %>
-            <% if order.tags.present? %>
-              · <%= render 'shared/tags', tags: order.tags %>
-            <% end %>
-          </div>
+  <% orders.each do |order| %>
+    <a href="<%= warehouse_order_path(order) %>" class="collection-link" style="display: block; padding: 1lh 1ch; border-bottom: 1px solid var(--background3);">
+      <div class="collection-link-main">
+        <div class="section-title-group mb-1">
+          <span class="mono fw-semibold text-accent"><%= order.hc_id %></span>
+          <% if order.user_facing_title.present? %>
+            <span>·</span>
+            <span class="order-row-name"><%= order.user_facing_title %></span>
+          <% end %>
         </div>
-        <div class="collection-link-side">
-          <div class="collection-col">
-            <div class="fw-medium"><%= order.address&.name_line || "—" %></div>
-            <div class="resource-card-meta"><%= order.recipient_email %></div>
-          </div>
-          <div class="collection-col-sm">
-            <%= render 'warehouse/orders/status_badge', order: order %>
-          </div>
+        <div class="resource-card-meta mt-1">
+          <%= order.created_at.strftime("%b %d, %Y") %>
+          <% if order.tags.present? %>
+            · <%= render 'shared/tags', tags: order.tags %>
+          <% end %>
         </div>
-      </a>
-    <% end
-  end
-end %>
+      </div>
+      <div class="collection-link-side">
+        <div class="collection-col">
+          <div class="fw-medium"><%= order.address&.name_line || "—" %></div>
+          <div class="resource-card-meta"><%= order.recipient_email %></div>
+        </div>
+        <div class="collection-col-sm">
+          <%= render 'warehouse/orders/status_badge', order: order %>
+        </div>
+      </div>
+    </a>
+  <% end %>
+</div>

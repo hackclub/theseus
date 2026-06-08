@@ -1,1 +1,1 @@
-<%= render(Primer::Beta::Label.new(tag: :a, href: tag_stats_path(tag), scheme: :secondary, size: :medium)) { tag } %>
+<a href="<%= tag_stats_path(tag) %>"><span is-="badge" variant-="background2"><%= tag %></span></a>

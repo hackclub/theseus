@@ -35,22 +35,13 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
       div(class: "page-actions") do
         if include_non_inventory
-          render Primer::Beta::Button.new(tag: :a, href: warehouse_skus_path, scheme: :secondary, size: :small) do |btn|
-            btn.with_leading_visual_icon(icon: :filter)
-            "Show inventory only"
-          end
+          a(href: warehouse_skus_path, "size-": "small") { "Show inventory only" }
         else
-          render Primer::Beta::Button.new(tag: :a, href: warehouse_skus_path(include_non_inventory: true), scheme: :secondary, size: :small) do |btn|
-            btn.with_leading_visual_icon(icon: :filter)
-            "Show all SKUs"
-          end
+          a(href: warehouse_skus_path(include_non_inventory: true), "size-": "small") { "Show all SKUs" }
         end
 
         admin_tool(element: "span") do
-          render Primer::Beta::Button.new(tag: :a, href: new_admin_warehouse_sku_path, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :plus)
-            "New SKU"
-          end
+          a(href: new_admin_warehouse_sku_path, "variant-": "green") { "+ New SKU" }
         end
       end
     end
@@ -58,13 +49,11 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
   def search_section
     div(class: "content-section") do
-      render Primer::Alpha::TextField.new(
+      input(
+        type: "text",
         name: "sku_search",
-        label: "Search SKUs",
-        visually_hide_label: true,
-        placeholder: "Search by SKU, name, or description...",
-        leading_visual: { icon: :search },
-        full_width: true
+        placeholder: "⌕ Search by SKU, name, or description...",
+        style: "width: 100%;"
       )
     end
   end
@@ -112,33 +101,19 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
   def render_grouped_view
     div(class: "view-toolbar") do
-      render Primer::Beta::Button.new(
-        scheme: :invisible,
-        size: :small,
+      button(
+        "size-": "small",
         id: "expand-all-btn"
-      ) do |btn|
-        btn.with_leading_visual_icon(icon: :"unfold")
-        "Expand all"
-      end
-      render Primer::Beta::Button.new(
-        scheme: :invisible,
-        size: :small,
+      ) { "Expand all" }
+      button(
+        "size-": "small",
         id: "collapse-all-btn"
-      ) do |btn|
-        btn.with_leading_visual_icon(icon: :"fold")
-        "Collapse all"
-      end
-      render Primer::Beta::Button.new(
-        scheme: :invisible,
-        size: :small,
-        tag: :a,
-        href: warehouse_skus_path(include_non_inventory: include_non_inventory, view: 'flat')
-      ) do |btn|
-        btn.with_leading_visual_icon(icon: :"list-unordered")
-        "Flat view"
-      end
+      ) { "Collapse all" }
+      a(
+        href: warehouse_skus_path(include_non_inventory: include_non_inventory, view: 'flat'),
+        "size-": "small"
+      ) { "Flat view" }
     end
-
     warehouse_skus.group_by(&:category).each do |category, skus|
       render_category_section(category, skus)
     end
@@ -147,48 +122,15 @@ class Views::Warehouse::SKUs::Index < Views::Base
   def render_flat_view
     div(class: "view-toolbar--spread") do
       div(class: "page-actions") do
-        render Primer::Beta::Button.new(
-          scheme: :secondary,
-          size: :small,
-          class: "sort-btn",
-          data: { sort: "sku" }
-        ) do |btn|
-          "Sort: SKU"
-        end
-        render Primer::Beta::Button.new(
-          scheme: :secondary,
-          size: :small,
-          class: "sort-btn",
-          data: { sort: "name" }
-        ) do |btn|
-          "Sort: Name"
-        end
-        render Primer::Beta::Button.new(
-          scheme: :secondary,
-          size: :small,
-          class: "sort-btn",
-          data: { sort: "cost" }
-        ) do |btn|
-          "Sort: Cost"
-        end
-        render Primer::Beta::Button.new(
-          scheme: :secondary,
-          size: :small,
-          class: "sort-btn",
-          data: { sort: "stock" }
-        ) do |btn|
-          "Sort: Stock"
-        end
+        button("size-": "small", class: "sort-btn", data: { sort: "sku" }) { "Sort: SKU" }
+        button("size-": "small", class: "sort-btn", data: { sort: "name" }) { "Sort: Name" }
+        button("size-": "small", class: "sort-btn", data: { sort: "cost" }) { "Sort: Cost" }
+        button("size-": "small", class: "sort-btn", data: { sort: "stock" }) { "Sort: Stock" }
       end
-      render Primer::Beta::Button.new(
-        scheme: :invisible,
-        size: :small,
-        tag: :a,
-        href: warehouse_skus_path(include_non_inventory: include_non_inventory)
-      ) do |btn|
-        btn.with_leading_visual_icon(icon: :"package")
-        "Grouped view"
-      end
+      a(
+        href: warehouse_skus_path(include_non_inventory: include_non_inventory),
+        "size-": "small"
+      ) { "📦 Grouped view" }
     end
 
     div(class: "flat-table-wrapper") do
@@ -229,7 +171,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
               td(class: "flat-table-td flat-table-td--right-muted") { sku.inbound&.to_s || "—" }
               td(class: "flat-table-td flat-table-td--right") { helpers.number_to_currency(sku.declared_unit_cost) }
               td(class: "flat-table-td") do
-                render(Primer::Beta::Label.new(scheme: get_badge_scheme(sku), size: :medium)) { get_badge_text(sku) }
+                span("is-": "badge", "variant-": get_badge_variant(sku)) { get_badge_text(sku) }
               end
               td(class: "flat-table-td flat-table-td--center") do
                 render_sku_actions(sku)
@@ -488,32 +430,31 @@ class Views::Warehouse::SKUs::Index < Views::Base
     ) do
       summary(class: "sku-category-summary") do
         div(class: "category-info") do
-          render Primer::Beta::Octicon.new(icon: category_icon(category), size: :small, color: :muted)
+          span { category_icon(category) }
           span(class: "category-name") { category&.humanize || "Uncategorized" }
-          render(Primer::Beta::Counter.new(count: skus.count, scheme: :secondary, id: "counter-#{category}"))
+          span("is-": "badge", "variant-": "background2") { skus.count.to_s }
         end
         div(class: "page-actions", id: "status-labels-#{category}") do
           if in_stock > 0
-            render(Primer::Beta::Label.new(scheme: :success, size: :medium, id: "label-in-stock-#{category}")) { "#{in_stock} in stock" }
+            span("is-": "badge", "variant-": "green", id: "label-in-stock-#{category}") { "#{in_stock} in stock" }
           end
           if backordered > 0
-            render(Primer::Beta::Label.new(scheme: :danger, size: :medium, id: "label-backordered-#{category}")) { "#{backordered} backordered" }
+            span("is-": "badge", "variant-": "red", id: "label-backordered-#{category}") { "#{backordered} backordered" }
           end
         end
       end
 
       div(class: "sku-category-body") do
-        render Primer::Beta::BorderBox.new(padding: :condensed) do |box|
+        div("box-": "round") do
           skus.sort_by { |s| [s.in_stock.to_i > 0 ? 0 : 1, s.sku] }.each do |sku|
             search_text = [sku.sku, sku.name, sku.description].compact.join(" ").downcase
             stock_status = get_stock_status(sku)
-            box.with_row(classes: "sku-row", data: { search: search_text, status: stock_status }) do
+            div(class: "sku-row", data: { search: search_text, status: stock_status }) do
               render_sku_row(sku)
             end
           end
         end
       end
-    end
   end
 
   def render_sku_row(sku)
@@ -522,8 +463,8 @@ class Views::Warehouse::SKUs::Index < Views::Base
         div(class: "sku-row-badges") do
           a(href: warehouse_sku_path(sku), class: "sku-link") { sku.sku }
           stock_badge(sku)
-          render(Primer::Beta::Label.new(scheme: :accent, size: :medium)) { "AI enabled" } if sku.ai_enabled
-          render(Primer::Beta::Label.new(scheme: :secondary, size: :medium)) { "Disabled" } unless sku.enabled
+          span("is-": "badge", "variant-": "blue") { "AI enabled" } if sku.ai_enabled
+          span("is-": "badge", "variant-": "background2") { "Disabled" } unless sku.enabled
         end
         div(class: "sku-row-name") { sku.name }
         if sku.description.present? && sku.description != sku.name
@@ -562,15 +503,15 @@ class Views::Warehouse::SKUs::Index < Views::Base
     end
   end
 
-  def get_badge_scheme(sku)
+  def get_badge_variant(sku)
     if sku.in_stock.to_i > 10
-      :success
+      "green"
     elsif sku.in_stock.to_i.between?(1, 10)
-      :attention
+      "yellow"
     elsif sku.in_stock.to_i < 0
-      :danger
+      "red"
     else
-      :secondary
+      "background2"
     end
   end
 
@@ -588,37 +529,30 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
   def stock_badge(sku)
     if sku.in_stock.to_i > 10
-      render(Primer::Beta::Label.new(scheme: :success, size: :medium)) { "In stock" }
+      span("is-": "badge", "variant-": "green") { "In stock" }
     elsif sku.in_stock.to_i.between?(1, 10)
-      render(Primer::Beta::Label.new(scheme: :attention, size: :medium)) { "Low stock" }
+      span("is-": "badge", "variant-": "yellow") { "Low stock" }
     elsif sku.in_stock.to_i < 0
       if sku.inbound.to_i >= sku.in_stock.abs
-        render(Primer::Beta::Label.new(scheme: :attention, size: :medium)) { "Backordered" }
+        span("is-": "badge", "variant-": "yellow") { "Backordered" }
       else
-        render(Primer::Beta::Label.new(scheme: :danger, size: :medium)) { "Backordered, no inbound!" }
+        span("is-": "badge", "variant-": "red") { "Backordered, no inbound!" }
       end
     else
-      render(Primer::Beta::Label.new(scheme: :secondary, size: :medium)) { "No inventory" }
+      span("is-": "badge", "variant-": "background2") { "No inventory" }
     end
   end
 
   def render_sku_actions(sku)
-    render Primer::Alpha::ActionMenu.new do |menu|
-      menu.with_show_button(icon: :"kebab-horizontal", "aria-label": "Actions", scheme: :invisible)
-
-      menu.with_item(label: "View details", href: warehouse_sku_path(sku)) do |item|
-        item.with_leading_visual_icon(icon: :eye)
-      end
-
-      if sku.zenventory_url.present?
-        menu.with_item(label: "Open in Zenventory", href: sku.zenventory_url, content_arguments: { target: "_blank" }) do |item|
-          item.with_leading_visual_icon(icon: :"link-external")
+    tag("details", "is-": "popover", "position-": "bottom baseline-right") do
+      tag("summary", tabindex: "0", "size-": "small") { "⋯" }
+      tag("column", "gap-": "0") do
+        a(href: warehouse_sku_path(sku)) { "👁 View details" }
+        if sku.zenventory_url.present?
+          a(href: sku.zenventory_url, target: "_blank") { "↗ Open in Zenventory" }
         end
-      end
-
-      if current_user&.is_admin?
-        menu.with_item(label: "Edit", href: edit_admin_warehouse_sku_path(sku)) do |item|
-          item.with_leading_visual_icon(icon: :pencil)
+        if current_user&.is_admin?
+          a(href: edit_admin_warehouse_sku_path(sku)) { "✎ Edit" }
         end
       end
     end
@@ -626,16 +560,16 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
   def category_icon(category)
     {
-      "sticker" => :"note",
-      "poster" => :"image",
-      "card" => :"credit-card",
-      "flyer" => :"file",
-      "other_printed_material" => :file,
-      "hardware" => :"cpu",
-      "book" => :"book",
-      "swag" => :"gift",
-      "grant" => :"mortar-board",
-      "prize" => :"trophy"
-    }[category.to_s] || :archive
+      "sticker" => "📝",
+      "poster" => "🖼",
+      "card" => "💳",
+      "flyer" => "⎘",
+      "other_printed_material" => "⎘",
+      "hardware" => "⚙",
+      "book" => "📖",
+      "swag" => "🎁",
+      "grant" => "🎓",
+      "prize" => "🏆"
+    }[category.to_s] || "📦"
   end
 end

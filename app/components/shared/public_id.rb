@@ -14,7 +14,7 @@ class Components::Shared::PublicId < Components::Base
     ) do
       plain @value
       whitespace
-      render Primer::Beta::Octicon.new(icon: :copy, size: :small, color: :muted)
+      plain "⎘"
     end
   end
 end

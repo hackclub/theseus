@@ -1,9 +1,10 @@
 <div class="mt-4">
-  <%= render Primer::Beta::BorderBox.new do |box| %>
-    <% box.with_header do %>
+  <div box-="round">
+    <div style="padding: 1lh 2ch;">
       <span class="col-header">Letter Batch Preview</span>
-    <% end %>
-    <% box.with_body do %>
+    </div>
+    <div is-="separator"></div>
+    <div style="padding: 1lh 2ch;">
       <div class="two-col-equal mb-3">
         <div>
           <h3 class="section-heading">From</h3>
@@ -42,24 +43,15 @@
               <div class="detail-label">Generated on <%= batch.pdf_label.created_at.strftime("%B %d, %Y at %I:%M %p") %></div>
             </div>
             <div class="page-actions">
-              <%= render Primer::Beta::Button.new(tag: :a, href: rails_blob_path(batch.pdf_label, disposition: "attachment"), scheme: :primary, size: :small) do |btn|
-                btn.with_leading_visual_icon(icon: :download)
-                "Download PDF"
-              end %>
+              <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>" size-="small" variant-="green">↓ Download PDF</a>
               <% if batch.letters.any? && batch.letters.all?(&:pending?) %>
                 <%= button_to mark_printed_letter_batch_path(batch), method: :post, data: { confirm: "Mark all letters as printed?" } do %>
-                  <%= render Primer::Beta::Button.new(type: :button, scheme: :outline, size: :small) do |btn|
-                    btn.with_leading_visual_icon(icon: :check)
-                    "Mark All Printed"
-                  end %>
+                  <button type="button" size-="small">✓ Mark All Printed</button>
                 <% end %>
               <% end %>
               <% if batch.letters.any? && batch.letters.any?(&:printed?) %>
                 <%= button_to mark_mailed_letter_batch_path(batch), method: :post, data: { confirm: "Mark all letters as mailed?" } do %>
-                  <%= render Primer::Beta::Button.new(type: :button, scheme: :outline, size: :small) do |btn|
-                    btn.with_leading_visual_icon(icon: :mail)
-                    "Mark All Mailed"
-                  end %>
+                  <button type="button" size-="small">✉ Mark All Mailed</button>
                 <% end %>
               <% end %>
             </div>
@@ -70,6 +62,6 @@
           <p class="kv-label mb-0">No labels have been generated yet.</p>
         </div>
       <% end %>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 </div>

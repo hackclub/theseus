@@ -5,59 +5,50 @@
     <div>
       <div class="page-title-group">
         <h1 class="page-title"><%= @usps_payment_account.display_name %></h1>
-        <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :large)) { @usps_payment_account.account_type } %>
+        <span is-="badge" variant-="background2"><%= @usps_payment_account.account_type %></span>
       </div>
     </div>
     <div class="page-actions">
-      <%= render Primer::Beta::Button.new(tag: :a, href: edit_usps_payment_account_path(@usps_payment_account), scheme: :secondary, size: :medium) do |btn|
-        btn.with_leading_visual_icon(icon: :pencil)
-        "Edit"
-      end %>
+      <a href="<%= edit_usps_payment_account_path(@usps_payment_account) %>">✎ Edit</a>
       <%= form_with url: usps_payment_account_path(@usps_payment_account), method: :delete, data: { turbo_confirm: "Delete this payment account?" }, class: "form-inline" do %>
-        <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :medium) do |btn|
-          btn.with_leading_visual_icon(icon: :trash)
-          "Delete"
-        end %>
+        <button type="submit" variant-="red">✕ Delete</button>
       <% end %>
     </div>
   </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
-    box.with_row do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
       <div class="kv-row"><span class="kv-label">Name</span><span><%= @usps_payment_account.name %></span></div>
-    <% end
-    box.with_row do %>
+    </div>
+    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
       <div class="kv-row"><span class="kv-label">Account Type</span><span><%= @usps_payment_account.account_type %></span></div>
-    <% end
-    if @usps_payment_account.account_number.present?
-      box.with_row do %>
+    </div>
+    <% if @usps_payment_account.account_number.present? %>
+      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
         <div class="kv-row"><span class="kv-label">Account Number</span><code><%= @usps_payment_account.account_number %></code></div>
-      <% end
-    end
-    if @usps_payment_account.permit_number.present?
-      box.with_row do %>
+      </div>
+    <% end %>
+    <% if @usps_payment_account.permit_number.present? %>
+      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
         <div class="kv-row"><span class="kv-label">Permit Number</span><code><%= @usps_payment_account.permit_number %></code></div>
-      <% end
-    end
-    if @usps_payment_account.permit_zip.present?
-      box.with_row do %>
+      </div>
+    <% end %>
+    <% if @usps_payment_account.permit_zip.present? %>
+      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
         <div class="kv-row"><span class="kv-label">Permit ZIP</span><code><%= @usps_payment_account.permit_zip %></code></div>
-      <% end
-    end
-    box.with_row do %>
+      </div>
+    <% end %>
+    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
       <div class="kv-row"><span class="kv-label">Manifest MID</span><code><%= @usps_payment_account.manifest_mid || "—" %></code></div>
-    <% end
-    box.with_row do %>
+    </div>
+    <div style="padding: 0.5lh 1ch;">
       <div class="kv-row"><span class="kv-label">Mailer ID</span><span><%= @usps_payment_account.usps_mailer_id&.display_name || "—" %></span></div>
-    <% end
-  end %>
+    </div>
+  </div>
 
   <%= render partial: "admin_inspector", locals: { record: @usps_payment_account } %>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: usps_payment_accounts_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to payment accounts"
-    end %>
+    <a href="<%= usps_payment_accounts_path %>">← Back to payment accounts</a>
   </div>
 </div>

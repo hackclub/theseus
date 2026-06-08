@@ -37,10 +37,7 @@ class Views::Warehouse::Orders::Index < Views::Base
         end
       end
 
-      render Primer::Beta::Button.new(tag: :a, href: new_warehouse_order_path, scheme: :primary) do |btn|
-        btn.with_leading_visual_icon(icon: :plus)
-        "New Order"
-      end
+      a(href: new_warehouse_order_path, "variant-": "green") { "+ New Order" }
     end
   end
 
@@ -97,14 +94,12 @@ class Views::Warehouse::Orders::Index < Views::Base
           hidden_field_tag(:origin, origin) if origin.present?
           hidden_field_tag(:state, state) if state.present?
           hidden_field_tag(:user_id, user_id) if user_id.present?
-          render Primer::Alpha::TextField.new(
+          input(
+            type: "text",
             name: "search",
-            label: "Search",
-            visually_hide_label: true,
             placeholder: "Search by ID, email, name, or title...",
             value: search,
-            leading_visual: { icon: :search },
-            full_width: true
+            style: "width: 100%;"
           )
         end
       end
@@ -121,16 +116,10 @@ class Views::Warehouse::Orders::Index < Views::Base
 
       has_filters = search.present? || state.present? || user_id.present? || origin.present?
       if has_filters
-        render Primer::Beta::Button.new(
-          tag: :a,
+        a(
           href: warehouse_orders_path,
-          scheme: :invisible,
-          size: :small
-        ) do |btn|
-          btn.with_leading_visual_icon(icon: :x)
-          "Clear filters"
-        end
-      end
+          style: "font-size: smaller;"
+        ) { "× Clear filters" }
     end
   end
 
@@ -145,23 +134,19 @@ class Views::Warehouse::Orders::Index < Views::Base
     div(class: "origin-filter") do
       origins.each do |o|
         is_active = origin == o[:key]
-        render Primer::Beta::Button.new(
-          tag: :a,
+        a_style = is_active ? "font-weight: bold;" : ""
+        a(
           href: warehouse_orders_path(origin: o[:key], search: search, state: state, user_id: user_id),
-          scheme: is_active ? :secondary : :invisible,
-          size: :medium
-        ) do |btn|
-          btn.with_leading_visual_icon(icon: o[:icon])
-          o[:label]
-        end
+          style: a_style
+        ) { o[:label] }
       end
     end
   end
 
   def orders_list
     if warehouse_orders.any?
-      render Primer::Beta::BorderBox.new do |box|
-        box.with_header do
+      div("box-": "round") do
+        div(style: "padding: 1lh 1ch; border-bottom: 1px solid var(--foreground2);") do
           div(class: "order-header-row") do
             span(class: "fw-semibold") { "Order" }
             div(class: "order-header-side") do
@@ -173,23 +158,21 @@ class Views::Warehouse::Orders::Index < Views::Base
         end
 
         warehouse_orders.each do |order|
-          box.with_row do
+          div(style: "padding: 1lh 1ch; border-bottom: 1px solid var(--background3);") do
             render_order_row(order)
           end
         end
       end
     else
-      render Primer::Beta::Blankslate.new(border: true) do |bs|
-        bs.with_visual_icon(icon: :package)
-        bs.with_heading(tag: :h2) { "No orders found" }
+      div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+        h2(style: "margin: 0;") { "📦 No orders found" }
         if search.present? || state.present?
-          bs.with_description { "Try adjusting your search or filters." }
+          p(style: "color: var(--foreground2);") { "Try adjusting your search or filters." }
         else
-          bs.with_description { "Create your first order to get started." }
-          bs.with_primary_action(href: new_warehouse_order_path) { "New Order" }
+          p(style: "color: var(--foreground2);") { "Create your first order to get started." }
+          a(href: new_warehouse_order_path, "variant-": "green") { "+ New Order" }
         end
       end
-    end
   end
 
   def render_order_row(order)
@@ -232,21 +215,21 @@ class Views::Warehouse::Orders::Index < Views::Base
 
   def render_tags(tags)
     tags.compact_blank.each do |tag|
-      render(Primer::Beta::Label.new(scheme: :secondary, size: :medium)) { tag }
+      span("is-": "badge", "variant-": "background2") { tag }
     end
   end
 
   def status_label(order)
-    scheme = case order.aasm_state.to_sym
-             when :draft then :secondary
-             when :dispatched then :accent
-             when :mailed then :success
-             when :errored then :danger
-             when :canceled then :attention
-             else :secondary
-             end
+    variant = case order.aasm_state.to_sym
+              when :draft then "background2"
+              when :dispatched then "blue"
+              when :mailed then "green"
+              when :errored then "red"
+              when :canceled then "yellow"
+              else "background2"
+              end
 
-    render(Primer::Beta::Label.new(scheme: scheme, size: :medium)) { order.humanized_state }
+    span("is-": "badge", "variant-": variant) { order.humanized_state }
   end
 
   def pagination_section

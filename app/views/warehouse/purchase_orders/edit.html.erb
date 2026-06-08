@@ -4,8 +4,8 @@
   <div class="content-section">
     <div class="page-title-group">
       <h1 class="page-title">Edit Purchase Order</h1>
-      <% status_scheme = { "draft" => :secondary, "open" => :accent, "completed" => :success, "deleted" => :danger }[@purchase_order.status] || :secondary %>
-      <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :large)) { @purchase_order.humanized_state } %>
+      <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[@purchase_order.status] || "background2" %>
+      <span is-="badge" variant-="<%= status_variant %>"><%= @purchase_order.humanized_state %></span>
     </div>
     <p class="page-subtitle">
       <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %> · <%= @purchase_order.supplier_name %>

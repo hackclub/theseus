@@ -100,7 +100,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
           "aria-label": "Remove item",
           "@click": "removeItem(item._index)"
         ) do
-          render Primer::Beta::Octicon.new(icon: :trash, size: :small)
+          plain "✕"
         end
       end
     end
@@ -110,7 +110,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
     div(class: "li-editor-empty", "x-show": "visibleItems().length === 0") do
       div(class: "text-center") do
         div(class: "li-editor-empty-icon") do
-          render Primer::Beta::Octicon.new(icon: :package, size: :medium)
+          plain "📦"
         end
         h3(class: "li-editor-empty-title") { "No items added" }
         p(class: "li-editor-empty-text") { "Click the button below to add SKUs." }
@@ -121,55 +121,40 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   # SKU Select Panel
 
   def add_item_panel
-    render sku_select_panel do |panel|
-      render_add_button(panel)
-      render_sku_groups(panel)
-    end
-  end
-
-  def sku_select_panel
-    Primer::Alpha::SelectPanel.new(
-      title: "Add SKU",
-      size: :large,
-      fetch_strategy: :local,
-      dynamic_label: false,
-      select_variant: :none,
-      id: "sku-select-panel"
-    )
-  end
-
-  def render_add_button(panel)
-    panel.with_show_button(scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :plus)
-      @add_button_text
-    end
-  end
-
-  def render_sku_groups(panel)
-    skus_by_category.each do |category, category_skus|
-      render_category_header(panel, category)
-      category_skus.each { |sku| render_sku_item(panel, sku, category) }
-    end
-  end
-
-  def render_category_header(panel, category)
-    panel.with_item(
-      label: (category || "uncategorized").to_s.humanize,
-      disabled: true
-    )
-  end
-
-  def render_sku_item(panel, sku, category)
-    panel.with_item(
-      label: sku.name,
-      content_arguments: {
-        "@click": add_item_js(sku),
-        "data-filter-string": "#{sku.sku} #{sku.name} #{category}"
-      }
-    ) do |item|
-      item.with_description do
-        code { sku.sku }
-        plain sku_description_text(sku)
+    details("is-": "popover", "position-": "bottom baseline-left", id: "sku-select-panel") do
+      summary(tabindex: "0") do
+        button("variant-": "green", type: "button") { "+ #{@add_button_text}" }
+      end
+      tag("column", "gap-": "0", style: "max-height: 40lh; overflow-y: auto;") do
+        div(style: "padding: 0.5lh 1ch;") do
+          input(
+            type: "text",
+            placeholder: "Filter SKUs...",
+            style: "width: 100%;",
+            "x-ref": "skuFilter",
+            "x-on:input.debounce.150ms": "filterSkus($event.target.value)"
+          )
+        end
+        div(id: "sku-select-list") do
+          skus_by_category.each do |category, category_skus|
+            div(style: "padding: 0.25lh 1ch; color: var(--foreground2); font-weight: bold;") do
+              plain (category || "uncategorized").to_s.humanize
+            end
+            category_skus.each do |sku|
+              a(
+                href: "#",
+                style: "display: block; padding: 0.25lh 1ch;",
+                "data-filter-string": "#{sku.sku} #{sku.name} #{category}",
+                "@click.prevent": add_item_js(sku)
+              ) do
+                strong { sku.name }
+                plain " "
+                code { sku.sku }
+                plain sku_description_text(sku)
+              end
+            end
+          end
+        end
       end
     end
   end
@@ -208,20 +193,15 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   def sku_filter_script
     script do
       raw <<~JS.html_safe
-        function setupSkuFilter() {
-          var panel = document.getElementById('sku-select-panel');
-          if (!panel) return;
-          panel.filterFn = function(item, query) {
-            var q = query.toLowerCase().trim();
-            if (!q) return true;
-            var content = item.querySelector('[data-filter-string]');
-            var str = content ? content.getAttribute('data-filter-string').toLowerCase() : '';
-            return str.includes(q);
-          };
-        }
-        setupSkuFilter();
-        if (window.customElements) {
-          window.customElements.whenDefined('select-panel').then(setupSkuFilter);
+        function filterSkus(query) {
+          var list = document.getElementById('sku-select-list');
+          if (!list) return;
+          var q = query.toLowerCase().trim();
+          list.querySelectorAll('a[data-filter-string]').forEach(function(item) {
+            if (!q) { item.style.display = ''; return; }
+            var str = item.getAttribute('data-filter-string').toLowerCase();
+            item.style.display = str.includes(q) ? '' : 'none';
+          });
         }
       JS
     end
@@ -301,10 +281,10 @@ class Components::Warehouse::LineItemsEditor < Components::Base
         },
         visibleItems() { return this.items.filter(i => !i._destroy); },
         stockStyle(stock) {
-          if (stock == null) return 'background: var(--bgColor-muted); color: var(--fgColor-muted);';
-          if (stock <= 0) return 'background: var(--bgColor-danger-muted); color: var(--fgColor-danger); border-color: var(--borderColor-danger-emphasis);';
-          if (stock < 10) return 'background: var(--bgColor-attention-muted); color: var(--fgColor-attention); border-color: var(--borderColor-attention-emphasis);';
-          return 'background: var(--bgColor-success-muted); color: var(--fgColor-success); border-color: var(--borderColor-success-emphasis);';
+          if (stock == null) return 'background: var(--background2); color: var(--foreground2);';
+          if (stock <= 0) return 'background: var(--background1); color: var(--red);';
+          if (stock < 10) return 'background: var(--background1); color: var(--yellow);';
+          return 'background: var(--background1); color: var(--green);';
         }
       }
     JS

@@ -42,10 +42,7 @@ class Components::Batches::Form < Components::Base
         end
 
         div(class: "pt-2") do
-          render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :upload)
-            "Upload CSV"
-          end
+          button(type: :submit, "variant-": "green") { "↑ Upload CSV" }
         end
       end
     end

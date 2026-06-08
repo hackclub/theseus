@@ -1,29 +1,22 @@
 <%= form_with(model: usps_indicium) do |form| %>
   <% if usps_indicium.errors.any? %>
-    <%= render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do %>
-      <strong><%= pluralize(usps_indicium.errors.count, "error") %>:</strong>
+    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+      [!] <strong><%= pluralize(usps_indicium.errors.count, "error") %>:</strong>
       <ul class="error-list">
         <% usps_indicium.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    <% end %>
+    </div>
   <% end %>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Postage<% end %>
-    <% end %>
-    <% box.with_body do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 0.5lh 1ch; border-bottom: 1px solid var(--foreground2);">Postage</h2>
+    <div style="padding: 1lh 1ch;">
       <div class="form-grid content-section">
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "usps_indicium[postage]",
-            label: "Postage",
-            value: usps_indicium.postage,
-            full_width: true,
-            leading_visual: { text: "$" }
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Postage</label>
+          <input type="text" name="usps_indicium[postage]" value="<%= usps_indicium.postage %>" style="width: 100%;">
         </div>
         <div>
           <label class="date-field-label">Mailing Date</label>
@@ -31,97 +24,57 @@
         </div>
       </div>
       <div class="form-grid">
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "usps_indicium[usps_sku]",
-            label: "USPS SKU",
-            value: usps_indicium.usps_sku,
-            full_width: true
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">USPS SKU</label>
+          <input type="text" name="usps_indicium[usps_sku]" value="<%= usps_indicium.usps_sku %>" style="width: 100%;">
         </div>
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "usps_indicium[processing_category]",
-            label: "Processing category",
-            value: usps_indicium.processing_category,
-            full_width: true
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Processing category</label>
+          <input type="text" name="usps_indicium[processing_category]" value="<%= usps_indicium.processing_category %>" style="width: 100%;">
         </div>
       </div>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Dimensions<% end %>
-    <% end %>
-    <% box.with_body do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 0.5lh 1ch; border-bottom: 1px solid var(--foreground2);">Dimensions</h2>
+    <div style="padding: 1lh 1ch;">
       <div class="form-grid content-section">
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "usps_indicium[postage_weight]",
-            label: "Weight (oz)",
-            value: usps_indicium.postage_weight,
-            full_width: true
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Weight (oz)</label>
+          <input type="text" name="usps_indicium[postage_weight]" value="<%= usps_indicium.postage_weight %>" style="width: 100%;">
         </div>
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "usps_indicium[postage_length]",
-            label: "Length (in)",
-            value: usps_indicium.postage_length,
-            full_width: true
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Length (in)</label>
+          <input type="text" name="usps_indicium[postage_length]" value="<%= usps_indicium.postage_length %>" style="width: 100%;">
         </div>
       </div>
       <div class="form-grid content-section">
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "usps_indicium[postage_height]",
-            label: "Height (in)",
-            value: usps_indicium.postage_height,
-            full_width: true
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Height (in)</label>
+          <input type="text" name="usps_indicium[postage_height]" value="<%= usps_indicium.postage_height %>" style="width: 100%;">
         </div>
-        <div>
-          <%= render Primer::Alpha::TextField.new(
-            name: "usps_indicium[postage_thickness]",
-            label: "Thickness (in)",
-            value: usps_indicium.postage_thickness,
-            full_width: true
-          ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Thickness (in)</label>
+          <input type="text" name="usps_indicium[postage_thickness]" value="<%= usps_indicium.postage_thickness %>" style="width: 100%;">
         </div>
       </div>
-      <%= render Primer::Alpha::CheckBox.new(
-        name: "usps_indicium[nonmachinable]",
-        label: "Non-machinable",
-        checked: usps_indicium.nonmachinable
-      ) %>
-    <% end %>
-  <% end %>
+      <label><input type="checkbox" name="usps_indicium[nonmachinable]" value="1" <%= "checked" if usps_indicium.nonmachinable %>> Non-machinable</label>
+    </div>
+  </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Raw Response<% end %>
-    <% end %>
-    <% box.with_body do %>
-      <%= render Primer::Alpha::TextArea.new(
-        name: "usps_indicium[raw_usps_response]",
-        label: "Raw USPS response",
-        value: usps_indicium.raw_usps_response,
-        rows: 4,
-        full_width: true
-      ) %>
-    <% end %>
-  <% end %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 0.5lh 1ch; border-bottom: 1px solid var(--foreground2);">Raw Response</h2>
+    <div style="padding: 1lh 1ch;">
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Raw USPS response</label>
+        <textarea name="usps_indicium[raw_usps_response]" rows="4" style="width: 100%;"><%= usps_indicium.raw_usps_response %></textarea>
+      </div>
+    </div>
+  </div>
 
   <div class="page-actions">
-    <%= render Primer::Beta::Button.new(tag: :a, href: usps_indicia_path, scheme: :secondary) do
-      "Cancel"
-    end %>
-    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :check)
-      usps_indicium.persisted? ? "Update Indicium" : "Create Indicium"
-    end %>
+    <a href="<%= usps_indicia_path %>">Cancel</a>
+    <button type="submit" variant-="green">✓ <%= usps_indicium.persisted? ? "Update Indicium" : "Create Indicium" %></button>
   </div>
 <% end %>

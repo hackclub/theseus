@@ -9,10 +9,7 @@ class Views::Batches::Index < Views::Base
     div(class: "page-container") do
       render Components::Shared::PageHeader.new(title: "Batches", subtitle: "#{@batches.count} batches") do |header|
         header.with_actions do
-          render Primer::Beta::Button.new(tag: :a, href: new_batch_path, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :plus)
-            "Upload CSV"
-          end
+          a(href: new_batch_path) { "+ Upload CSV" }
         end
       end
 
@@ -29,11 +26,10 @@ class Views::Batches::Index < Views::Base
   attr_reader :batches
 
   def batches_grid
-    render Primer::Beta::BorderBox.new(padding: :condensed) do |box|
-      @batches.each do |batch|
-        box.with_row do
-          batch_row(batch)
-        end
+    div("box-": "round") do
+      @batches.each_with_index do |batch, i|
+        div("is-": "separator") if i > 0
+        div(style: "padding: 0.5lh 2ch;") { batch_row(batch) }
       end
     end
   end
@@ -76,25 +72,16 @@ class Views::Batches::Index < Views::Base
 
       # Right side: action button
       div(class: "batch-index-row-actions") do
-        render Primer::Beta::Button.new(tag: :a, href: batch_path(batch), scheme: :secondary, size: :small) do |btn|
-          btn.with_trailing_visual_icon(icon: :arrow_right)
-          "View Details"
-        end
+        a(href: batch_path(batch), "size-": "small") { "View Details →" }
       end
     end
   end
 
   def blankslate
-    render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :inbox)
-      bs.with_heading(tag: :h2) { "No batches yet" }
-      bs.with_description { "Get started by uploading a CSV file." }
-      bs.with_primary_action(href: new_batch_path) do
-        render Primer::Beta::Button.new(scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :plus)
-          "Upload CSV"
-        end
-      end
+    div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+      h2(style: "margin: 0;") { "No batches yet" }
+      p(style: "color: var(--foreground2);") { "Upload a CSV to create your first batch." }
+      a(href: new_batch_path) { "+ Upload CSV" }
     end
   end
 end

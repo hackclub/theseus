@@ -7,8 +7,8 @@
         <h1 class="page-title font-mono">
           <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %>
         </h1>
-        <% status_scheme = { "draft" => :secondary, "open" => :accent, "completed" => :success, "deleted" => :danger }[@purchase_order.status] || :secondary %>
-        <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :large)) { @purchase_order.humanized_state } %>
+        <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[@purchase_order.status] || "background2" %>
+        <span is-="badge" variant-="<%= status_variant %>"><%= @purchase_order.humanized_state %></span>
       </div>
       <p class="page-subtitle"><%= @purchase_order.supplier_name %></p>
     </div>
@@ -16,23 +16,14 @@
     <div class="page-actions">
       <% if policy(@purchase_order).send_to_zenventory? && @purchase_order.may_mark_open? %>
         <%= form_with url: send_to_zenventory_warehouse_purchase_order_path(@purchase_order), method: :post, class: "form-inline" do %>
-          <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary, size: :medium) do |btn|
-            btn.with_leading_visual_icon(icon: :upload)
-            "Send to Zenventory"
-          end %>
+          <button type="submit" variant-="green">↑ Send to Zenventory</button>
         <% end %>
       <% end %>
       <% if policy(@purchase_order).edit? %>
-        <%= render Primer::Beta::Button.new(tag: :a, href: edit_warehouse_purchase_order_path(@purchase_order), scheme: :secondary, size: :medium) do |btn|
-          btn.with_leading_visual_icon(icon: :pencil)
-          "Edit"
-        end %>
+        <a href="<%= edit_warehouse_purchase_order_path(@purchase_order) %>">✎ Edit</a>
       <% end %>
       <% if @purchase_order.zenventory_url.present? %>
-        <%= render Primer::Beta::Button.new(tag: :a, href: @purchase_order.zenventory_url, scheme: :secondary, size: :medium, target: "_blank") do |btn|
-          btn.with_leading_visual_icon(icon: :"link-external")
-          "Zenventory"
-        end %>
+        <a href="<%= @purchase_order.zenventory_url %>" target="_blank">↗ Zenventory</a>
       <% end %>
     </div>
   </div>
@@ -53,59 +44,66 @@
   </div>
 
   <div class="two-col-equal content-section">
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_row do %>
+    <div box-="round">
+      <div style="padding: 1lh 1ch;">
         <div class="kv-row"><span class="kv-label">Supplier</span><span><%= @purchase_order.supplier_name %></span></div>
-      <% end
-      if @purchase_order.supplier_id.present?
-        box.with_row do %>
+      </div>
+      <% if @purchase_order.supplier_id.present? %>
+        <div is-="separator"></div>
+        <div style="padding: 1lh 1ch;">
           <div class="kv-row"><span class="kv-label">Supplier ID</span><code><%= @purchase_order.supplier_id %></code></div>
-        <% end
-      end
-      if @purchase_order.required_by_date.present?
-        box.with_row do %>
+        </div>
+      <% end %>
+      <% if @purchase_order.required_by_date.present? %>
+        <div is-="separator"></div>
+        <div style="padding: 1lh 1ch;">
           <div class="kv-row"><span class="kv-label">Required By</span><span><%= @purchase_order.required_by_date.strftime("%B %d, %Y") %></span></div>
-        <% end
-      end
-      if @purchase_order.notes.present?
-        box.with_row do %>
+        </div>
+      <% end %>
+      <% if @purchase_order.notes.present? %>
+        <div is-="separator"></div>
+        <div style="padding: 1lh 1ch;">
           <div><div class="detail-label">Notes</div><div><%= simple_format(@purchase_order.notes) %></div></div>
-        <% end
-      end
-    end %>
+        </div>
+      <% end %>
+    </div>
 
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_row do %>
+    <div box-="round">
+      <div style="padding: 1lh 1ch;">
         <div class="kv-row"><span class="kv-label">Created By</span><span><%= @purchase_order.user&.email %></span></div>
-      <% end
-      box.with_row do %>
+      </div>
+      <div is-="separator"></div>
+      <div style="padding: 1lh 1ch;">
         <div class="kv-row"><span class="kv-label">Created At</span><span><%= @purchase_order.created_at.strftime("%B %d, %Y at %I:%M %p") %></span></div>
-      <% end
-      if @purchase_order.order_number.present?
-        box.with_row do %>
+      </div>
+      <% if @purchase_order.order_number.present? %>
+        <div is-="separator"></div>
+        <div style="padding: 1lh 1ch;">
           <div class="kv-row"><span class="kv-label">Order Number</span><code><%= @purchase_order.order_number %></code></div>
-        <% end
-      end
-      box.with_row do %>
+        </div>
+      <% end %>
+      <div is-="separator"></div>
+      <div style="padding: 1lh 1ch;">
         <div class="kv-row"><span class="kv-label">Zenventory ID</span><code><%= @purchase_order.zenventory_id || "—" %></code></div>
-      <% end
-    end %>
+      </div>
+    </div>
   </div>
 
   <div class="content-section">
     <h2 class="section-heading">Line Items</h2>
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_header do %>
+    <div box-="round">
+      <div style="padding: 0.5lh 1ch; color: var(--foreground2);">
         <div class="li-row">
           <span class="li-col-name col-header">SKU</span>
           <span class="li-col-num col-header">Quantity</span>
           <span class="li-col-num col-header">Unit Cost</span>
           <span class="li-col-num col-header">Line Total</span>
         </div>
-      <% end
+      </div>
 
-      @purchase_order.line_items.each do |li|
-        box.with_row do %>
+      <% @purchase_order.line_items.each do |li| %>
+        <div is-="separator"></div>
+        <div style="padding: 1lh 1ch;">
           <div class="li-row">
             <span class="li-col-name">
               <%= link_to li.sku.name, warehouse_sku_path(li.sku), class: "fw-medium" %>
@@ -115,48 +113,37 @@
             <span class="li-col-num kv-label"><%= number_to_currency(li.unit_cost) %></span>
             <span class="li-col-num fw-medium"><%= number_to_currency((li.unit_cost || 0) * li.quantity) %></span>
           </div>
-        <% end
-      end
+        </div>
+      <% end %>
 
-      box.with_footer do %>
+      <div is-="separator"></div>
+      <div style="padding: 1lh 1ch;">
         <div class="kv-row fw-semibold">
           <span>Total</span>
           <span><%= number_to_currency(@purchase_order.total_cost) %></span>
         </div>
-      <% end
-    end %>
+      </div>
+    </div>
   </div>
 
   <div class="footer-actions">
     <% if policy(@purchase_order).sync? %>
       <%= form_with url: sync_warehouse_purchase_order_path(@purchase_order), method: :post, class: "form-inline" do %>
-        <%= render Primer::Beta::Button.new(type: :submit, scheme: :secondary, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :sync)
-          "Sync from Zenventory"
-        end %>
+        <button type="submit" size-="small">⟳ Sync from Zenventory</button>
       <% end %>
     <% end %>
     <% if @purchase_order.zenventory_id.present? %>
-      <%= render Primer::Beta::Button.new(tag: :a, href: "https://app.zenventory.com/printing/printpurchaseorder.php?poid=#{@purchase_order.zenventory_id}", scheme: :secondary, size: :small, target: "_blank") do |btn|
-        btn.with_leading_visual_icon(icon: :file)
-        "Download PDF"
-      end %>
+      <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= @purchase_order.zenventory_id %>" size-="small" target="_blank">⎘ Download PDF</a>
     <% end %>
     <% if policy(@purchase_order).destroy? %>
       <%= form_with url: warehouse_purchase_order_path(@purchase_order), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this purchase order?" }, class: "form-inline" do %>
-        <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :trash)
-          "Delete"
-        end %>
+        <button type="submit" variant-="red" size-="small">✕ Delete</button>
       <% end %>
     <% end %>
   </div>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_purchase_orders_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to Purchase Orders"
-    end %>
+    <a href="<%= warehouse_purchase_orders_path %>" size-="small">← Back to Purchase Orders</a>
   </div>
 
   <%= render partial: "admin_inspector", locals: { record: @purchase_order } %>

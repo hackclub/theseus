@@ -9,38 +9,25 @@
       <code class="kv-label"><%= @source_tag.slug %></code>
     </div>
     <div class="page-actions">
-      <%= render Primer::Beta::Button.new(tag: :a, href: edit_source_tag_path(@source_tag), scheme: :secondary, size: :medium) do |btn|
-        btn.with_leading_visual_icon(icon: :pencil)
-        "Edit"
-      end %>
+      <a href="<%= edit_source_tag_path(@source_tag) %>"><button size-="small">✎ Edit</button></a>
     </div>
   </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
-    box.with_row do %>
-      <div class="kv-row"><span class="kv-label">Slug</span><code><%= @source_tag.slug %></code></div>
-    <% end
-    box.with_row do %>
-      <div class="kv-row"><span class="kv-label">Name</span><span><%= @source_tag.name %></span></div>
-    <% end
-    box.with_row do %>
-      <div class="kv-row"><span class="kv-label">Owner</span><span><%= @source_tag.owner.presence || "—" %></span></div>
-    <% end
-  end %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Slug</span><code><%= @source_tag.slug %></code></div>
+    <div is-="separator"></div>
+    <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Name</span><span><%= @source_tag.name %></span></div>
+    <div is-="separator"></div>
+    <div class="kv-row" style="padding: 0.5lh 1ch;"><span class="kv-label">Owner</span><span><%= @source_tag.owner.presence || "—" %></span></div>
+  </div>
 
   <div class="footer-actions">
     <%= form_with url: source_tag_path(@source_tag), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this source tag?" }, class: "form-inline" do %>
-      <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :small) do |btn|
-        btn.with_leading_visual_icon(icon: :trash)
-        "Delete"
-      end %>
+      <button type="submit" variant-="red" size-="small">✕ Delete</button>
     <% end %>
   </div>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: source_tags_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to source tags"
-    end %>
+    <a href="<%= source_tags_path %>">← Back to source tags</a>
   </div>
 </div>

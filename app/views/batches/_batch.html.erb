@@ -1,13 +1,14 @@
 <div id="<%= dom_id batch %>" class="batch-layout">
   <div>
-    <%= render Primer::Beta::BorderBox.new do |box| %>
-      <% box.with_header do %>
+    <div box-="round">
+      <div style="padding: 1lh 2ch;">
         <div class="kv-row">
           <span class="col-header"><%= batch.type.split('::').first.titleize %> Batch #<%= batch.id %></span>
           <%= render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch) %>
         </div>
-      <% end %>
-      <% box.with_body do %>
+      </div>
+      <div is-="separator"></div>
+      <div style="padding: 1lh 2ch;">
         <% if batch.tags.any? %>
           <div class="mb-2">
             <%= render 'shared/tags', tags: batch.tags %>
@@ -17,52 +18,60 @@
         <div class="two-col-equal">
           <div>
             <h3 class="section-heading">Batch Information</h3>
-            <%= render Primer::Beta::BorderBox.new do |info_box| %>
-              <% info_box.with_row do %>
+            <div box-="round">
+              <div style="padding: 0.5lh 2ch;">
                 <div class="kv-row"><span class="kv-label">Created</span><span><%= batch.created_at.strftime("%B %d, %Y at %I:%M %p") %></span></div>
-              <% end %>
+              </div>
               <% if batch.csv.attached? %>
-                <% info_box.with_row do %>
+                <div is-="separator"></div>
+                <div style="padding: 0.5lh 2ch;">
                   <div class="kv-row"><span class="kv-label">CSV File</span><span><%= batch.csv.filename %></span></div>
-                <% end %>
+                </div>
               <% end %>
-              <% info_box.with_row do %>
+              <div is-="separator"></div>
+              <div style="padding: 0.5lh 2ch;">
                 <div class="kv-row"><span class="kv-label">Address Count</span><span><%= batch.addresses.count %></span></div>
-              <% end %>
+              </div>
               <% if batch.is_a?(Letter::Batch) %>
-                <% info_box.with_row do %>
+                <div is-="separator"></div>
+                <div style="padding: 0.5lh 2ch;">
                   <div class="kv-row"><span class="kv-label">Dimensions</span><span><%= batch.letter_width %>" × <%= batch.letter_height %>"</span></div>
-                <% end %>
-                <% info_box.with_row do %>
+                </div>
+                <div is-="separator"></div>
+                <div style="padding: 0.5lh 2ch;">
                   <div class="kv-row"><span class="kv-label">Weight</span><span><%= batch.letter_weight %> oz</span></div>
-                <% end %>
+                </div>
               <% end %>
               <% if batch.is_a?(Warehouse::Batch) && batch.warehouse_template.present? %>
-                <% info_box.with_row do %>
+                <div is-="separator"></div>
+                <div style="padding: 0.5lh 2ch;">
                   <div class="kv-row"><span class="kv-label">Template</span><span><%= batch.warehouse_template.name %></span></div>
-                <% end %>
+                </div>
               <% end %>
-            <% end %>
+            </div>
           </div>
 
           <div>
             <h3 class="section-heading">Cost Information</h3>
-            <%= render Primer::Beta::BorderBox.new do |cost_box| %>
+            <div box-="round">
               <% if batch.is_a?(Warehouse::Batch) %>
-                <% cost_box.with_row do %>
+                <div style="padding: 0.5lh 2ch;">
                   <div class="kv-row"><span class="kv-label">Contents</span><span class="mono"><%= number_to_currency(batch.contents_cost) %></span></div>
-                <% end %>
-                <% cost_box.with_row do %>
+                </div>
+                <div is-="separator"></div>
+                <div style="padding: 0.5lh 2ch;">
                   <div class="kv-row"><span class="kv-label">Labor</span><span class="mono"><%= number_to_currency(batch.labor_cost) %></span></div>
-                <% end %>
-                <% cost_box.with_row do %>
+                </div>
+                <div is-="separator"></div>
+                <div style="padding: 0.5lh 2ch;">
                   <div class="kv-row"><span class="kv-label">Shipping</span><span class="mono"><%= number_to_currency(batch.postage_cost) %></span></div>
-                <% end %>
+                </div>
+                <div is-="separator"></div>
               <% end %>
-              <% cost_box.with_row do %>
+              <div style="padding: 0.5lh 2ch;">
                 <div class="kv-row"><span class="fw-semibold">Total Cost</span><span class="mono fw-semibold"><%= number_to_currency(batch.total_cost) %></span></div>
-              <% end %>
-            <% end %>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -72,41 +81,33 @@
             <div class="info-card">
               <div class="kv-row">
                 <span>PDF labels are available for this batch.</span>
-                <%= render Primer::Beta::Button.new(tag: :a, href: rails_blob_path(batch.labels_pdf, disposition: "attachment"), target: "_blank", scheme: :primary, size: :small) do |btn|
-                  btn.with_leading_visual_icon(icon: :download)
-                  "Download PDF"
-                end %>
+                <a href="<%= rails_blob_path(batch.labels_pdf, disposition: "attachment") %>" target="_blank" size-="small" variant-="green">↓ Download PDF</a>
               </div>
             </div>
           </div>
         <% end %>
-      <% end %>
-    <% end %>
+      </div>
+    </div>
   </div>
 
   <div class="sticky-sidebar">
-    <%= render Primer::Beta::BorderBox.new do |box| %>
-      <% box.with_header do %>
+    <div box-="round">
+      <div style="padding: 1lh 2ch;">
         <span class="col-header">Actions</span>
-      <% end %>
-      <% box.with_body do %>
+      </div>
+      <div is-="separator"></div>
+      <div style="padding: 1lh 2ch;">
         <% case batch.aasm_state %>
         <% when "awaiting_field_mapping" %>
           <% map_path = batch.is_a?(Letter::Batch) ? map_fields_letter_batch_path(batch) : map_fields_warehouse_batch_path(batch) %>
-          <%= render Primer::Beta::Button.new(tag: :a, href: map_path, scheme: :primary, block: true) do |btn|
-            btn.with_leading_visual_icon(icon: :list_unordered)
-            "Map Fields"
-          end %>
+          <a href="<%= map_path %>" variant-="green" style="display: block; text-align: center;">☰ Map Fields</a>
         <% when "fields_mapped" %>
           <% process_path = batch.is_a?(Letter::Batch) ? process_confirm_letter_batch_path(batch) : process_confirm_warehouse_batch_path(batch) %>
-          <%= render Primer::Beta::Button.new(tag: :a, href: process_path, scheme: :primary, block: true) do |btn|
-            btn.with_leading_visual_icon(icon: :play)
-            "Process Batch"
-          end %>
+          <a href="<%= process_path %>" variant-="green" style="display: block; text-align: center;">▶ Process Batch</a>
         <% when "processed" %>
           <p class="kv-label mb-0">This batch has been processed.</p>
         <% end %>
-      <% end %>
-    <% end %>
+      </div>
+    </div>
   </div>
 </div>

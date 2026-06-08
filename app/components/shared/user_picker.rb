@@ -13,28 +13,35 @@ class Components::Shared::UserPicker < Components::Base
     return unless current_user&.is_admin?
 
     div(id: "user-picker-container") do
-      render Primer::Alpha::SelectPanel.new(
-        title: "Filter by user",
-        size: :medium,
-        fetch_strategy: :local,
-        select_variant: :single,
-        id: "user-picker-panel"
-      ) do |panel|
-        panel.with_show_button(scheme: :secondary, size: :medium) do |btn|
+      details("is-": "popover", "position-": "bottom baseline-left") do
+        summary(tabindex: "0", "size-": "small") do
           if selected_user
-            btn.with_leading_visual_icon(icon: :person) unless selected_user.icon_url.present?
             if selected_user.icon_url.present?
-              render Primer::Beta::Avatar.new(src: selected_user.icon_url, alt: selected_user.email, size: 16, mr: 2)
+              img(src: selected_user.icon_url, alt: selected_user.email, style: "width: 2ch; height: 1lh; vertical-align: middle; margin-right: 0.5ch;")
+            else
+              plain "👤 "
             end
             plain display_name(selected_user)
           else
-            btn.with_leading_visual_icon(icon: :people)
-            "All users"
+            plain "👤 All users"
+          end
+          plain " ▾"
+        end
+        tag("column", "gap-": "0") do
+          a(href: path_builder.call(nil), style: selected_user_id.blank? ? "font-weight: bold;" : nil) do
+            plain "👤 All users"
+          end
+          sorted_users.each do |user|
+            a(href: path_builder.call(user.id), style: user.id == selected_user_id ? "font-weight: bold;" : nil) do
+              if user.icon_url.present?
+                img(src: user.icon_url, alt: user.email, style: "width: 2ch; height: 1lh; vertical-align: middle; margin-right: 0.5ch;")
+              else
+                plain "👤 "
+              end
+              plain display_name(user)
+            end
           end
         end
-
-        all_users_item(panel)
-        user_items(panel)
       end
     end
   end
@@ -48,36 +55,8 @@ class Components::Shared::UserPicker < Components::Base
     @selected_user = selected_user_id.present? ? users.find { |u| u.id == selected_user_id } : nil
   end
 
-  def all_users_item(panel)
-    panel.with_item(
-      label: "All users",
-      href: path_builder.call(nil),
-      active: selected_user_id.blank?
-    ) do |item|
-      item.with_leading_visual_icon(icon: :people)
-      item.with_description { "Show from everyone" }
-    end
-  end
-
-  def user_items(panel)
-    sorted_users = users.sort_by { |u| [u.id == current_user&.id ? 0 : 1, display_name(u).downcase] }
-    sorted_users.each do |user|
-      panel.with_item(
-        label: display_name(user),
-        href: path_builder.call(user.id),
-        data: { filter_string: "#{user.email} #{user.username}" },
-        active: user.id == selected_user_id
-      ) do |item|
-        if user.icon_url.present?
-          item.with_leading_visual_content do
-            img(src: user.icon_url, alt: user.email, class: "user-avatar")
-          end
-        else
-          item.with_leading_visual_icon(icon: :person)
-        end
-        item.with_description { user.email }
-      end
-    end
+  def sorted_users
+    @sorted_users ||= users.sort_by { |u| [u.id == current_user&.id ? 0 : 1, display_name(u).downcase] }
   end
 
   def display_name(user)

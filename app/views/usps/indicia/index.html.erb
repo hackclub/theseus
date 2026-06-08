@@ -6,15 +6,12 @@
       <h1 class="page-title">Indicia</h1>
       <p class="page-subtitle"><%= @usps_indicia.count %> purchased</p>
     </div>
-    <%= render Primer::Beta::Button.new(tag: :a, href: new_usps_indicium_path, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :plus)
-      "New Indicium"
-    end %>
+    <a href="<%= new_usps_indicium_path %>" variant-="green">+ New Indicium</a>
   </div>
 
   <% if @usps_indicia.any? %>
-    <%= render Primer::Beta::BorderBox.new do |box|
-      box.with_header do %>
+    <div box-="round">
+      <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--foreground2);">
         <div class="indicia-row">
           <span class="indicia-col-id col-header">ID</span>
           <code class="indicia-col-sku col-header">SKU</code>
@@ -22,25 +19,22 @@
           <span class="indicia-col-date col-header">Date</span>
           <span class="indicia-col-cat col-header">Category</span>
         </div>
-      <% end
+      </div>
 
-      @usps_indicia.each do |indicium|
-        box.with_row do %>
-          <a href="<%= usps_indicium_path(indicium) %>" class="indicia-row link-reset">
-            <span class="indicia-col-id"><%= render Components::Shared::PublicId.new(value: indicium.public_id) %></span>
-            <code class="indicia-col-sku mono"><%= indicium.usps_sku %></code>
-            <span class="indicia-col-num fw-medium"><%= number_to_currency(indicium.postage) %></span>
-            <span class="indicia-col-date kv-label"><%= indicium.mailing_date %></span>
-            <span class="indicia-col-cat kv-label"><%= indicium.processing_category %></span>
-          </a>
-        <% end
-      end
-    end %>
+      <% @usps_indicia.each do |indicium| %>
+        <a href="<%= usps_indicium_path(indicium) %>" class="indicia-row link-reset" style="display: block; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
+          <span class="indicia-col-id"><%= render Components::Shared::PublicId.new(value: indicium.public_id) %></span>
+          <code class="indicia-col-sku mono"><%= indicium.usps_sku %></code>
+          <span class="indicia-col-num fw-medium"><%= number_to_currency(indicium.postage) %></span>
+          <span class="indicia-col-date kv-label"><%= indicium.mailing_date %></span>
+          <span class="indicia-col-cat kv-label"><%= indicium.processing_category %></span>
+        </a>
+      <% end %>
+    </div>
   <% else %>
-    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :mail)
-      bs.with_heading(tag: :h3) { "No indicia yet" }
-      bs.with_description { "Purchased postage will appear here." }
-    end %>
+    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+      <h3 style="margin: 0;">✉ No indicia yet</h3>
+      <p style="color: var(--foreground2);">Purchased postage will appear here.</p>
+    </div>
   <% end %>
 </div>

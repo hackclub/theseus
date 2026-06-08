@@ -1,9 +1,9 @@
-<% scheme = case order.aasm.current_state
-  when :draft then :secondary
-  when :dispatched then :accent
-  when :mailed then :success
-  when :errored then :danger
-  when :canceled then :attention
-  else :secondary
+<% variant = case order.aasm.current_state
+  when :draft then "background2"
+  when :dispatched then "blue"
+  when :mailed then "green"
+  when :errored then "red"
+  when :canceled then "yellow"
+  else "background2"
   end %>
-<%= render(Primer::Beta::Label.new(scheme: scheme)) { order.humanized_state } %>
+<span is-="badge" variant-="<%= variant %>"><%= order.humanized_state %></span>

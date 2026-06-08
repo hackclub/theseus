@@ -4,19 +4,16 @@
   <h1 class="page-title content-section"><%= @payment_account.organization_name %></h1>
 
   <h2 class="section-heading">Organization Details</h2>
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
-    box.with_row do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
       <div class="kv-row"><span class="kv-label">Organization ID</span><code><%= @payment_account.organization_id %></code></div>
-    <% end
-    box.with_row do %>
+    </div>
+    <div style="padding: 0.5lh 1ch;">
       <div class="kv-row"><span class="kv-label">Added</span><span><%= @payment_account.created_at.strftime("%B %d, %Y") %></span></div>
-    <% end
-  end %>
+    </div>
+  </div>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: hcb_payment_accounts_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to HCB accounts"
-    end %>
+    <a href="<%= hcb_payment_accounts_path %>">← Back to HCB accounts</a>
   </div>
 </div>

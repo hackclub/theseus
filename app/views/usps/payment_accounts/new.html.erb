@@ -4,9 +4,6 @@
   <h1 class="page-title content-section">New USPS Payment Account</h1>
   <%= render "form", usps_payment_account: @usps_payment_account %>
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: usps_payment_accounts_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to payment accounts"
-    end %>
+    <a href="<%= usps_payment_accounts_path %>">← Back to payment accounts</a>
   </div>
 </div>

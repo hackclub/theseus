@@ -9,9 +9,6 @@
   <%= render "form", source_tag: @source_tag %>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: source_tag_path(@source_tag), scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to source tag"
-    end %>
+    <a href="<%= source_tag_path(@source_tag) %>">← Back to source tag</a>
   </div>
 </div>

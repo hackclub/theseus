@@ -6,28 +6,22 @@
       <h1 class="page-title">USPS Payment Accounts</h1>
       <p class="page-subtitle"><%= @usps_payment_accounts.count %> accounts</p>
     </div>
-    <%= render Primer::Beta::Button.new(tag: :a, href: new_usps_payment_account_path, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :plus)
-      "New Account"
-    end %>
+    <a href="<%= new_usps_payment_account_path %>" variant-="green">+ New Account</a>
   </div>
 
   <% if @usps_payment_accounts.any? %>
-    <%= render Primer::Beta::BorderBox.new do |box|
-      @usps_payment_accounts.each do |account|
-        box.with_row do %>
-          <a href="<%= usps_payment_account_path(account) %>" class="resource-card link-reset">
-            <span class="resource-card-title"><%= account.display_name %></span>
-            <%= render(Primer::Beta::Label.new(scheme: :secondary, size: :small)) { account.account_type } %>
-          </a>
-        <% end
-      end
-    end %>
+    <div box-="round">
+      <% @usps_payment_accounts.each do |account| %>
+        <a href="<%= usps_payment_account_path(account) %>" class="resource-card link-reset" style="display: block; padding: 0.5lh 1ch; border-bottom: 1px solid var(--background2);">
+          <span class="resource-card-title"><%= account.display_name %></span>
+          <span is-="badge" variant-="background2"><%= account.account_type %></span>
+        </a>
+      <% end %>
+    </div>
   <% else %>
-    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :credit_card)
-      bs.with_heading(tag: :h3) { "No payment accounts yet" }
-      bs.with_primary_action(href: new_usps_payment_account_path) { "Add one" }
-    end %>
+    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+      <h3 style="margin: 0;">No payment accounts yet</h3>
+      <p style="color: var(--foreground2);"><a href="<%= new_usps_payment_account_path %>">Add one</a></p>
+    </div>
   <% end %>
 </div>

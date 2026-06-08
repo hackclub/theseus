@@ -1,58 +1,43 @@
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
-    <%= render Primer::Beta::Flash.new(scheme: :danger, full: true, mb: 3) do %>
+    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
       <strong><%= pluralize(warehouse_template.errors.count, "error") %> prohibited this template from being saved:</strong>
       <ul class="error-list">
         <% warehouse_template.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
-    <% end %>
+    </div>
   <% end %>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Template Details<% end %>
-    <% end %>
-    <% box.with_body do %>
-      <%= render Primer::Alpha::TextField.new(
-        name: "warehouse_template[name]",
-        label: "Template name",
-        value: warehouse_template.name,
-        full_width: true,
-        required: true,
-        mb: 3
-      ) %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch;">Template Details</h2>
+    <div is-="separator"></div>
+    <div style="padding: 1lh 1ch;">
+      <div style="margin-bottom: 1lh;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Template name <span style="color: var(--red);">*</span></label>
+        <input type="text" name="warehouse_template[name]" value="<%= warehouse_template.name %>" required style="width: 100%;">
+      </div>
 
-      <%= render Primer::Alpha::CheckBox.new(
-        name: "warehouse_template[public]",
-        label: "Share this template with all users",
-        checked: warehouse_template.public
-      ) %>
-    <% end %>
-  <% end %>
+      <label><input type="hidden" name="warehouse_template[public]" value="0"><input type="checkbox" name="warehouse_template[public]" value="1" <%= "checked" if warehouse_template.public %>> Share this template with all users</label>
+    </div>
+  </div>
 
-  <%= render Primer::Beta::BorderBox.new(mb: 4) do |box| %>
-    <% box.with_header do |header| %>
-      <% header.with_title(tag: :h2) do %>Contents<% end %>
-    <% end %>
-    <% box.with_body do %>
+  <div box-="round" style="margin-bottom: 2lh;">
+    <h2 style="margin: 0; padding: 1lh 1ch;">Contents</h2>
+    <div is-="separator"></div>
+    <div style="padding: 1lh 1ch;">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: :in_inventory,
         show_unit_cost: false,
         add_button_text: "Add Item"
       ) %>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 
   <div class="page-actions">
-    <%= render Primer::Beta::Button.new(tag: :a, href: warehouse_templates_path, scheme: :secondary) do
-      "Cancel"
-    end %>
-    <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-      btn.with_leading_visual_icon(icon: :check)
-      warehouse_template.persisted? ? "Update Template" : "Create Template"
-    end %>
+    <a href="<%= warehouse_templates_path %>">Cancel</a>
+    <button type="submit" variant-="green">✓ <%= warehouse_template.persisted? ? "Update Template" : "Create Template" %></button>
   </div>
 <% end %>

@@ -3,23 +3,16 @@
 <div class="page-container--narrow">
   <h1 class="page-title content-section">Generate Customs Receipt</h1>
 
-  <%= render Primer::Beta::BorderBox.new do |box| %>
-    <% box.with_body do %>
+  <div box-="round">
+    <div style="padding: 1lh 1ch;">
       <%= form_with url: generate_customs_receipts_path, method: :get do |f| %>
-        <%= render Primer::Alpha::TextField.new(
-          name: "search",
-          label: "Search",
-          placeholder: "ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)",
-          full_width: true,
-          leading_visual: { icon: :search },
-          mb: 3
-        ) %>
+        <div style="margin-bottom: 1lh;">
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Search</label>
+          <input type="text" name="search" placeholder="ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)" style="width: 100%;">
+        </div>
 
-        <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :file)
-          "Generate"
-        end %>
+        <button type="submit" variant-="green">⎘ Generate</button>
       <% end %>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 </div>

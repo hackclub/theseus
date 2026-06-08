@@ -32,17 +32,14 @@ class Components::StaticPages::Home < Components::Base
       end
 
       div(class: "page-actions") do
-        render Primer::Beta::Button.new(tag: :a, href: new_letter_path, scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :mail)
-          "Send a letter"
+        a(href: new_letter_path) do
+          button("variant-": "green") { "✉ Send a letter" }
         end
-        render Primer::Beta::Button.new(tag: :a, href: new_warehouse_order_path, scheme: :secondary) do |btn|
-          btn.with_leading_visual_icon(icon: :package)
-          "Send a warehouse order"
+        a(href: new_warehouse_order_path) do
+          button { "📦 Send a warehouse order" }
         end
-        render Primer::Beta::Button.new(tag: :a, href: new_letter_batch_path, scheme: :secondary) do |btn|
-          btn.with_leading_visual_icon(icon: :stack)
-          "Create a batch"
+        a(href: new_letter_batch_path) do
+          button { "≡ Create a batch" }
         end
       end
     end
@@ -53,20 +50,20 @@ class Components::StaticPages::Home < Components::Base
       # Action items section
       h2(class: "home-section-heading") { "Needs Attention" }
       div(class: "home-kpi-grid mb-3") do
-        action_card("Orders to dispatch", stats[:orders_to_dispatch], :package, warehouse_orders_path(state: "draft"))
-        action_card("Letters to print", stats[:letters_to_print], :mail, letters_path(status: "pending"))
-        action_card("Ready to mail", stats[:letters_to_mail], :check, letters_path(status: "printed"))
-        action_card("Open batches", stats[:open_letter_batches], :inbox, letter_batches_path)
-        action_card("My queued letters", stats[:my_queued_letters], :inbox, letter_queues_path) if stats[:my_queue_count].to_i > 0
+        action_card("Orders to dispatch", stats[:orders_to_dispatch], "📦", warehouse_orders_path(state: "draft"))
+        action_card("Letters to print", stats[:letters_to_print], "✉", letters_path(status: "pending"))
+        action_card("Ready to mail", stats[:letters_to_mail], "✓", letters_path(status: "printed"))
+        action_card("Open batches", stats[:open_letter_batches], "📥", letter_batches_path)
+        action_card("My queued letters", stats[:my_queued_letters], "📥", letter_queues_path) if stats[:my_queue_count].to_i > 0
       end
 
       # Global stats section
       h2(class: "home-section-heading") { "This Week" }
       div(class: "home-kpi-grid") do
-        stat_card("In transit", stats[:orders_in_transit], :rocket, warehouse_orders_path(state: "dispatched"))
-        stat_card("Orders shipped", stats[:orders_shipped_this_week], :package, warehouse_orders_path(state: "mailed"))
-        stat_card("Letters mailed", stats[:letters_mailed_this_week], :"paper-airplane", letters_path(status: "mailed"))
-        stat_card("Letters (30d)", stats[:total_letters_this_month], :graph, letters_path)
+        stat_card("In transit", stats[:orders_in_transit], "🚀", warehouse_orders_path(state: "dispatched"))
+        stat_card("Orders shipped", stats[:orders_shipped_this_week], "📦", warehouse_orders_path(state: "mailed"))
+        stat_card("Letters mailed", stats[:letters_mailed_this_week], "✈", letters_path(status: "mailed"))
+        stat_card("Letters (30d)", stats[:total_letters_this_month], "📊", letters_path)
       end
     end
   end
@@ -76,19 +73,19 @@ class Components::StaticPages::Home < Components::Base
     div(class: "home-main-grid") do
       if wh
         warehouse_links = [
-          { label: "Orders", href: warehouse_orders_path, icon: :package, check: -> { true } },
-          { label: "Batches", href: warehouse_batches_path, icon: :stack, check: -> { true } },
-          { label: "SKUs", href: warehouse_skus_path, icon: :archive, check: -> { policy(::Warehouse::SKU.new).index? } },
-          { label: "Purchase Orders", href: warehouse_purchase_orders_path, icon: :container, check: -> { policy(::Warehouse::PurchaseOrder.new).index? } }
+          { label: "Orders", href: warehouse_orders_path, icon: "📦", check: -> { true } },
+          { label: "Batches", href: warehouse_batches_path, icon: "≡", check: -> { true } },
+          { label: "SKUs", href: warehouse_skus_path, icon: "📁", check: -> { policy(::Warehouse::SKU.new).index? } },
+          { label: "Purchase Orders", href: warehouse_purchase_orders_path, icon: "📦", check: -> { policy(::Warehouse::PurchaseOrder.new).index? } }
         ]
         link_panel("Warehouse", warehouse_links)
       end
 
       mail_links = [
-        { label: "Letters", href: letters_path, icon: :mail, check: -> { policy(::Letter.new).index? } },
-        { label: "Batches", href: letter_batches_path, icon: :stack, check: -> { policy(::Letter::Batch.new).index? } },
-        { label: "Mail Scanner", href: scanner_letters_path, icon: :zap, check: -> { policy(::Letter.new).index? } },
-        { label: "Return Addresses", href: return_addresses_path, icon: :home, check: -> { policy(ReturnAddress.new).index? } }
+        { label: "Letters", href: letters_path, icon: "✉", check: -> { policy(::Letter.new).index? } },
+        { label: "Batches", href: letter_batches_path, icon: "≡", check: -> { policy(::Letter::Batch.new).index? } },
+        { label: "Mail Scanner", href: scanner_letters_path, icon: "↯", check: -> { policy(::Letter.new).index? } },
+        { label: "Return Addresses", href: return_addresses_path, icon: "🏠", check: -> { policy(ReturnAddress.new).index? } }
       ]
       link_panel("Mail", mail_links)
 
@@ -104,18 +101,14 @@ class Components::StaticPages::Home < Components::Base
             href: customs_receipts_path,
             class: "link-panel-item"
           ) do
-            span(class: "link-panel-icon") do
-              render Primer::Beta::Octicon.new(icon: :"file-badge", size: :small)
-            end
+            span(class: "link-panel-icon") { "⎘" }
             span(class: "link-panel-label") { "Customs Receipts" }
           end if policy(:customs_receipt).index?
           a(
             href: public_root_path,
             class: "link-panel-item"
           ) do
-            span(class: "link-panel-icon") do
-              render Primer::Beta::Octicon.new(icon: :globe, size: :small)
-            end
+            span(class: "link-panel-icon") { "🌐" }
             span(class: "link-panel-label") { "Public Site" }
           end
         end
@@ -135,9 +128,7 @@ class Components::StaticPages::Home < Components::Base
           p(class: "dash-card-label") { title }
           span(class: "dash-card-value") { value.to_s }
         end
-        span(class: has_items ? "text-attention" : "link-panel-icon") do
-          render Primer::Beta::Octicon.new(icon:, size: :small)
-        end
+        span(class: has_items ? "text-attention" : "link-panel-icon") { icon }
       end
     end
   end
@@ -152,9 +143,7 @@ class Components::StaticPages::Home < Components::Base
           p(class: "dash-card-label") { title }
           span(class: "dash-card-value") { value.to_s }
         end
-        span(class: "link-panel-icon") do
-          render Primer::Beta::Octicon.new(icon:, size: :small)
-        end
+        span(class: "link-panel-icon") { icon }
       end
     end
   end
@@ -171,9 +160,7 @@ class Components::StaticPages::Home < Components::Base
             href: link[:href],
             class: "link-panel-item"
           ) do
-            span(class: "link-panel-icon") do
-              render Primer::Beta::Octicon.new(icon: link[:icon], size: :small)
-            end
+            span(class: "link-panel-icon") { link[:icon] }
             span(class: "link-panel-label") { link[:label] }
           end
         end
@@ -182,31 +169,34 @@ class Components::StaticPages::Home < Components::Base
   end
 
   def render_id_lookup_dialog
-    span(class: "link-panel-icon") do
-      render Primer::Beta::Octicon.new(icon: :search, size: :small)
-    end
-    render(Primer::Alpha::Dialog.new(
-      title: "Find object by ID",
-      subtitle: "Enter a Theseus ID or package tracking number...",
-      size: :medium
-    )) do |dialog|
-      dialog.with_show_button(scheme: :invisible, classes: "Link--primary") do
-        plain "ID Lookup"
-      end
-      dialog.with_body do
+    span(class: "link-panel-icon") { "⌕" }
+
+    dialog(id: "id-lookup-dialog", "size-": "medium", "position-": "center", "container-": "fill") do
+      tag("column", "box-": "round", "shear-": "top") do
+        tag("row", "align-": "center between") do
+          span("is-": "badge", "variant-": "background0") { "Find object by ID" }
+          button("size-": "small", "variant-": "foreground0", onclick: "this.closest('dialog').close()") { "×" }
+        end
+        p(style: "color: var(--foreground2); margin: 0 0 1lh;") { "Enter a Theseus ID or package tracking number..." }
+        div("is-": "separator")
+
         form_with url: helpers.lookup_public_ids_path, method: :post do |f|
-          render(Primer::Alpha::TextField.new(
-            name: :id,
-            label: nil,
-            placeholder: "e.g. ltr!abc123, 9400111...",
-            full_width: true,
-            autofocus: true
-          ))
+          div(style: "padding: 1lh 0;") do
+            input(
+              type: "text",
+              name: :id,
+              placeholder: "e.g. ltr!abc123, 9400111...",
+              autofocus: true,
+              style: "width: 100%;"
+            )
+          end
           div(class: "dialog-form-footer") do
-            render(Primer::ButtonComponent.new(type: :submit, scheme: :primary)) { "Go!" }
+            button(type: "submit", "variant-": "green") { "Go!" }
           end
         end
       end
     end
+
+    a(href: "#", onclick: "document.getElementById('id-lookup-dialog').showModal(); return false;", class: "Link--primary") { "ID Lookup" }
   end
 end

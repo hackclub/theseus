@@ -7,11 +7,10 @@
   </div>
 
   <% if @blocking.empty? && @no_po_cost.empty? && @backordered.empty? && @stuck_orders.empty? %>
-    <%= render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :"check-circle")
-      bs.with_heading(tag: :h2) { "No problems!" }
-      bs.with_description { "Go take a nap or something." }
-    end %>
+    <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+      <h2 style="margin: 0;">✓ No problems!</h2>
+      <p style="color: var(--foreground2);">Go take a nap or something.</p>
+    </div>
   <% end %>
 
   <% if @blocking.any? %>
@@ -19,21 +18,22 @@
       <div class="section-header">
         <div class="section-title-group">
           <h2 class="section-heading-lg">Dispatch Blockers</h2>
-          <%= render Primer::Beta::Label.new(scheme: :danger) { "blocking" } %>
+          <span is-="badge" variant-="red">blocking</span>
         </div>
         <p class="section-desc">No cost data at all — orders with these SKUs will refuse to dispatch.</p>
       </div>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        box.with_header do %>
+      <div box-="round">
+        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
           <div class="problems-row">
             <span class="problems-col-sku col-header">SKU</span>
             <span class="problems-col-name col-header">Name</span>
             <span class="problems-col-num col-header">In Stock</span>
             <span class="problems-col-link col-header">Zenventory</span>
           </div>
-        <% end
-        @blocking.each do |sku|
-          box.with_row do %>
+        </div>
+        <% @blocking.each_with_index do |sku, i| %>
+          <% if i > 0 %><div is-="separator"></div><% end %>
+          <div style="padding: 0.5lh 1ch;">
             <div class="problems-row">
               <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
               <span class="problems-col-name"><%= sku.name %></span>
@@ -44,9 +44,9 @@
                 <% end %>
               </span>
             </div>
-          <% end
-        end
-      end %>
+          </div>
+        <% end %>
+      </div>
     </div>
   <% end %>
 
@@ -55,12 +55,12 @@
       <div class="section-header">
         <div class="section-title-group">
           <h2 class="section-heading-lg">Missing PO Cost Data</h2>
-          <%= render Primer::Beta::Label.new(scheme: :attention) { "degraded" } %>
+          <span is-="badge" variant-="yellow">degraded</span>
         </div>
         <p class="section-desc">No <code>average_po_cost</code> from Zenventory — covered by fallback but should be fixed.</p>
       </div>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        box.with_header do %>
+      <div box-="round">
+        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
           <div class="problems-row">
             <span class="problems-col-sku col-header">SKU</span>
             <span class="problems-col-name col-header">Name</span>
@@ -68,9 +68,10 @@
             <span class="problems-col-num col-header">Source</span>
             <span class="problems-col-link col-header">Zenventory</span>
           </div>
-        <% end
-        @no_po_cost.each do |sku|
-          box.with_row do %>
+        </div>
+        <% @no_po_cost.each_with_index do |sku, i| %>
+          <% if i > 0 %><div is-="separator"></div><% end %>
+          <div style="padding: 0.5lh 1ch;">
             <div class="problems-row">
               <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
               <span class="problems-col-name"><%= sku.name %></span>
@@ -84,9 +85,9 @@
                 <% end %>
               </span>
             </div>
-          <% end
-        end
-      end %>
+          </div>
+        <% end %>
+      </div>
     </div>
   <% end %>
 
@@ -95,12 +96,12 @@
       <div class="section-header">
         <div class="section-title-group">
           <h2 class="section-heading-lg">Backordered Without Enough Inbound</h2>
-          <%= render Primer::Beta::Label.new(scheme: :attention) { "warning" } %>
+          <span is-="badge" variant-="yellow">warning</span>
         </div>
         <p class="section-desc">Oversold and not enough inbound stock to cover the deficit.</p>
       </div>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        box.with_header do %>
+      <div box-="round">
+        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
           <div class="problems-row">
             <span class="problems-col-sku col-header">SKU</span>
             <span class="problems-col-name col-header">Name</span>
@@ -108,9 +109,10 @@
             <span class="problems-col-num col-header">Inbound</span>
             <span class="problems-col-num col-header">Shortfall</span>
           </div>
-        <% end
-        @backordered.each do |sku|
-          box.with_row do %>
+        </div>
+        <% @backordered.each_with_index do |sku, i| %>
+          <% if i > 0 %><div is-="separator"></div><% end %>
+          <div style="padding: 0.5lh 1ch;">
             <div class="problems-row">
               <code class="problems-col-sku"><%= link_to sku.sku, warehouse_sku_path(sku) %></code>
               <span class="problems-col-name"><%= sku.name %></span>
@@ -118,9 +120,9 @@
               <span class="problems-col-num"><%= sku.inbound || 0 %></span>
               <span class="problems-col-num text-danger fw-semibold"><%= sku.in_stock.abs - (sku.inbound || 0) %></span>
             </div>
-          <% end
-        end
-      end %>
+          </div>
+        <% end %>
+      </div>
     </div>
   <% end %>
 
@@ -129,12 +131,12 @@
       <div class="section-header">
         <div class="section-title-group">
           <h2 class="section-heading-lg">Stuck Orders</h2>
-          <%= render Primer::Beta::Label.new(scheme: :danger) { "blocking" } %>
+          <span is-="badge" variant-="red">blocking</span>
         </div>
         <p class="section-desc">Dispatched 2+ weeks ago, never marked mailed. Possible Zenventory sync issue.</p>
       </div>
-      <%= render Primer::Beta::BorderBox.new do |box|
-        box.with_header do %>
+      <div box-="round">
+        <div style="padding: 0.5lh 1ch; border-bottom: 1px solid var(--background3);">
           <div class="problems-row">
             <span class="problems-col-sku col-header">Order</span>
             <span class="problems-col-name col-header">Recipient</span>
@@ -142,9 +144,10 @@
             <span class="problems-col-num col-header">Age</span>
             <span class="problems-col-link col-header">Zenventory</span>
           </div>
-        <% end
-        @stuck_orders.each do |order|
-          box.with_row do %>
+        </div>
+        <% @stuck_orders.each_with_index do |order, i| %>
+          <% if i > 0 %><div is-="separator"></div><% end %>
+          <div style="padding: 0.5lh 1ch;">
             <div class="problems-row">
               <code class="problems-col-sku"><%= link_to order.hc_id, warehouse_order_path(order) %></code>
               <span class="problems-col-name"><%= order.recipient_email %></span>
@@ -156,9 +159,9 @@
                 <% end %>
               </span>
             </div>
-          <% end
-        end
-      end %>
+          </div>
+        <% end %>
+      </div>
     </div>
   <% end %>
 </div>
