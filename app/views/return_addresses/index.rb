@@ -14,7 +14,7 @@ class Views::ReturnAddresses::Index < Views::Base
           render Components::Shared::Jumpcode.new(path: return_addresses_path)
         end
         a(href: new_return_address_path) do
-          button("variant-": "green") { "+ New Return Address" }
+          button("size-": "small", "variant-": "green") { "+ New Return Address" }
         end
       end
 
@@ -47,7 +47,7 @@ class Views::ReturnAddresses::Index < Views::Base
         div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
           h2(style: "margin: 0;") { "No return addresses found" }
           p(style: "color: var(--foreground2);") { "Create your first return address to get started." }
-          a(href: new_return_address_path) { button("variant-": "green") { "Create Return Address" } }
+          a(href: new_return_address_path) { button("size-": "small", "variant-": "green") { "Create Return Address" } }
         end
       end
     end

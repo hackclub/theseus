@@ -29,8 +29,12 @@ class Components::Shared::ActionBar < Components::Base
         render_user_context
         render_impersonation_banner if current_user && impersonating?
 
-        # theme toggle slot
-        span(id: "theme-toggle-slot")
+        # theme toggle
+        button(
+          "size-": "small",
+          id: "theme-toggle",
+          onclick: safe("(function(){var d=document.documentElement,t=d.dataset.webtuiTheme;var n=t.includes('dark')?'vitesse-light-soft':'gruvbox-dark-hard';d.dataset.webtuiTheme=n;localStorage.setItem('theme',n);this.textContent=n.includes('dark')?'☀':'☾'})()")
+        ) { "☀" }
 
         # hints button
         button("size-": "small", onclick: safe("window.openHints && window.openHints()")) { "?" }

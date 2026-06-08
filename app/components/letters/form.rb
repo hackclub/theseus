@@ -86,7 +86,7 @@ class Components::Letters::Form < Components::Base
 
       # Actions
       div(class: "page-actions") do
-        a(href: letters_path) { button { "Cancel" } }
+        a(href: letters_path) { button("size-": "small") { "Cancel" } }
         button(type: "submit", "variant-": "green") do
           plain letter.persisted? ? "✓ Update Letter" : "✓ Create Letter"
         end

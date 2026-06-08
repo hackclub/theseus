@@ -171,11 +171,72 @@
     height: 1lh;
   }
 
-  /* ── Colored buttons ── */
+  /* ── Lickable glass buttons — as100 meets Aqua ──
+   * WebTUI default buttons use a stripe gradient (transparent/color/transparent).
+   * We target [size-="small"] buttons which have solid background-color,
+   * then layer a glass gradient on top via background-image.
+   * Regular (non-small) buttons keep the TUI stripe aesthetic.
+   */
+  button[size-="small"], input[type=submit] {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.12) 48%,
+      rgba(0, 0, 0, 0.04) 52%,
+      rgba(0, 0, 0, 0.10) 100%
+    );
+    transition: all 0.12s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-0.5px);
+      background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.18) 48%,
+        rgba(0, 0, 0, 0.02) 52%,
+        rgba(0, 0, 0, 0.08) 100%
+      );
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0.5px);
+      background-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.08) 0%,
+        rgba(0, 0, 0, 0.03) 48%,
+        rgba(255, 255, 255, 0.02) 52%,
+        rgba(255, 255, 255, 0.08) 100%
+      );
+    }
+  }
+
+  /* ── Colored buttons — action = color ── */
   button[variant-="green"], input[type=submit][variant-="green"] { --button-primary: var(--green); --button-secondary: var(--background0); }
   button[variant-="red"], input[type=submit][variant-="red"] { --button-primary: var(--red); --button-secondary: var(--background0); }
   button[variant-="yellow"], input[type=submit][variant-="yellow"] { --button-primary: var(--yellow); --button-secondary: var(--background0); }
   button[variant-="blue"], input[type=submit][variant-="blue"] { --button-primary: var(--blue); --button-secondary: var(--background0); }
+
+  /* ── Dark theme: subtler glass ── */
+  [data-webtui-theme^="gruvbox-dark"] {
+    button[size-="small"], input[type=submit] {
+      background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(255, 255, 255, 0.04) 48%,
+        rgba(0, 0, 0, 0.06) 52%,
+        rgba(0, 0, 0, 0.16) 100%
+      );
+      &:hover:not(:disabled) {
+        background-image: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.24) 0%,
+          rgba(255, 255, 255, 0.08) 48%,
+          rgba(0, 0, 0, 0.04) 52%,
+          rgba(0, 0, 0, 0.12) 100%
+        );
+      }
+    }
+  }
 
   /* ── Environment indicator ── */
   #theseus-env {

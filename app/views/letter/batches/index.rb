@@ -18,7 +18,7 @@ class Views::Letter::Batches::Index < Views::Base
       ) do |header|
         header.with_actions do
           a(href: new_letter_batch_path) do
-            button("variant-": "green") { "+ New Batch" }
+            button("size-": "small", "variant-": "green") { "+ New Batch" }
           end
       end
 
@@ -130,7 +130,7 @@ class Views::Letter::Batches::Index < Views::Base
     div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
       h2(style: "margin: 0;") { "No letter batches yet" }
       p(style: "color: var(--foreground2);") { "Create a batch to send letters to multiple addresses at once." }
-      a(href: new_letter_batch_path) { button("variant-": "green") { "+ New Batch" } }
+      a(href: new_letter_batch_path) { button("size-": "small", "variant-": "green") { "+ New Batch" } }
     end
   end
 end

@@ -100,7 +100,7 @@ class Views::Letter::Batches::Process < Views::Base
 
         # Submit
         div(class: "page-actions") do
-          a(href: letter_batch_path(@batch)) { button { "Cancel" } }
+          a(href: letter_batch_path(@batch)) { button("size-": "small") { "Cancel" } }
           button(type: "submit", "variant-": "green") { "▶ Generate Labels" }
         end
       end

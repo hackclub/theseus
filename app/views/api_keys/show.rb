@@ -98,12 +98,12 @@ class Views::APIKeys::Show < Views::Base
           div("is-": "separator")
           row( "gap-": "1", style: "justify-content: flex-end; padding: 1lh 0;") do
             button(onclick: safe("document.getElementById('revoke-dialog').close()")) { "Cancel" }
-            button("variant-": "red", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
+            button("size-": "small", "variant-": "red", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
           end
         end
       end
     end
 
-    button("variant-": "red", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
+    button("size-": "small", "variant-": "red", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
   end
 end

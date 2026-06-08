@@ -65,7 +65,7 @@ class Views::Letter::Batches::New < Views::Base
 
         # Actions
         div(class: "page-actions") do
-          a(href: letter_batches_path) { button { "Cancel" } }
+          a(href: letter_batches_path) { button("size-": "small") { "Cancel" } }
           button(type: "submit", "variant-": "green") { "✓ Create Batch" }
         end
       end

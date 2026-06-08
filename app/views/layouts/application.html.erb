@@ -13,6 +13,11 @@
         var sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
         var saved = localStorage.getItem('theme') || (sys ? 'gruvbox-dark-hard' : 'vitesse-light-soft');
         document.documentElement.dataset.webtuiTheme = saved;
+        // Set toggle icon after DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+          var btn = document.getElementById('theme-toggle');
+          if (btn) btn.textContent = saved.includes('dark') ? '☀' : '☾';
+        });
       })();
     </script>
 

@@ -123,7 +123,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   def add_item_panel
     details("is-": "popover", "position-": "bottom baseline-left", id: "sku-select-panel") do
       summary(tabindex: "0") do
-        button("variant-": "green", type: "button") { "+ #{@add_button_text}" }
+        button("size-": "small", "variant-": "green", type: "button") { "+ #{@add_button_text}" }
       end
       column( "gap-": "0", style: "max-height: 40lh; overflow-y: auto;") do
         div(style: "padding: 0.5lh 1ch;") do

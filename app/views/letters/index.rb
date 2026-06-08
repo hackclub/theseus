@@ -14,13 +14,11 @@ class Views::Letters::Index < Views::Base
   end
 
   def view_template
-    div(class: "page-container") do
-      header_section
-      stats_section
-      filters_section
-      letters_list
-      pagination_section
-    end
+    header_section
+    stats_section
+    filters_section
+    letters_list
+    pagination_section
   end
 
   private
@@ -28,20 +26,17 @@ class Views::Letters::Index < Views::Base
   attr_reader :letters, :all_letters, :search, :status, :origin, :user_id, :users
 
   def header_section
-    div(class: "page-header") do
-      div do
-        div(class: "page-title-group") do
-          h1(class: "page-title") { "Letters" }
-          render Components::Shared::Jumpcode.new(path: letters_path)
-        end
-        p(class: "page-subtitle mt-1") do
-          plain "#{letters.respond_to?(:total_count) ? letters.total_count : letters.count} letters"
-        end
+    row("align-": "start between", style: "margin-bottom: 1lh;") do
+      row("gap-": "1", "align-": "center") do
+        h1(style: "margin: 0;") { "Letters" }
+        render Components::Shared::Jumpcode.new(path: letters_path)
       end
-
       a(href: new_letter_path) do
-        button("variant-": "green") { "+ Send Letter" }
+        button("size-": "small", "variant-": "green") { "+ Send Letter" }
       end
+    end
+    p(style: "color: var(--foreground2); margin: 0 0 1lh;") do
+      plain "#{letters.respond_to?(:total_count) ? letters.total_count : letters.count} letters"
     end
   end
 
@@ -53,47 +48,32 @@ class Views::Letters::Index < Views::Base
       received: all_letters.where(aasm_state: :received).count
     }
 
-    div(class: "stat-pill-row") do
-      stat_pill("Pending", counts[:pending], :attention, "pending")
-      stat_pill("Printed", counts[:printed], :secondary, "printed")
-      stat_pill("Mailed", counts[:mailed], :accent, "mailed")
-      stat_pill("Received", counts[:received], :success, "received")
+    row("gap-": "1", style: "margin-bottom: 1lh; flex-wrap: wrap;") do
+      stat_pill("Pending", counts[:pending], "yellow", "pending")
+      stat_pill("Printed", counts[:printed], "background2", "printed")
+      stat_pill("Mailed", counts[:mailed], "blue", "mailed")
+      stat_pill("Received", counts[:received], "green", "received")
     end
   end
 
-  def stat_pill(label, count, scheme, filter_status)
+  def stat_pill(label, count, variant, filter_status)
     is_active = status == filter_status
-    href = if is_active
-             letters_path(origin: origin, search: search, user_id: user_id)
-           else
-             letters_path(origin: origin, search: search, user_id: user_id, status: filter_status)
-           end
-
-    a(
-      href: href,
-      class: "stat-pill-link",
-      data: { scheme: scheme, active: is_active ? "true" : nil }
-    ) do
-      span(class: "fw-semibold") { count.to_s }
-      span(class: is_active ? "" : "kv-label") { label }
+    href = is_active ? letters_path(origin: origin, search: search, user_id: user_id) : letters_path(origin: origin, search: search, user_id: user_id, status: filter_status)
+    a(href: href, style: "text-decoration: none;") do
+      span("is-": "badge", "variant-": is_active ? variant : "background2") do
+        strong { count.to_s }
+        plain " #{label}"
+      end
     end
   end
 
   def filters_section
-    div(class: "filter-section") do
-      div(class: "filter-search") do
-        form_tag(letters_path, method: :get) do
-          hidden_field_tag(:status, status) if status.present?
-          hidden_field_tag(:origin, origin) if origin.present?
-          hidden_field_tag(:user_id, user_id) if user_id.present?
-          input(
-            type: "text",
-            name: "search",
-            placeholder: "Search by recipient, title, or email...",
-            value: search,
-            style: "width: 100%;"
-          )
-        end
+    row("gap-": "1", "align-": "center", style: "margin-bottom: 1lh; flex-wrap: wrap;") do
+      form_tag(letters_path, method: :get) do
+        hidden_field_tag(:status, status) if status.present?
+        hidden_field_tag(:origin, origin) if origin.present?
+        hidden_field_tag(:user_id, user_id) if user_id.present?
+        input(type: "text", name: "search", placeholder: "Search...", value: search, style: "width: 28ch;")
       end
 
       admin_tool do
@@ -106,80 +86,64 @@ class Views::Letters::Index < Views::Base
 
       origin_filter_section
 
-      has_filters = search.present? || status.present? || origin.present? || user_id.present?
-      if has_filters
-        a(href: letters_path, style: "color: var(--foreground2);") { "× Clear filters" }
+      if search.present? || status.present? || origin.present? || user_id.present?
+        a(href: letters_path, style: "color: var(--foreground2);") { "× Clear" }
       end
     end
   end
 
   def origin_filter_section
     origins = [
-      { key: nil, label: "All", icon: "≡" },
-      { key: "manual", label: "Manual", icon: "✎" },
-      { key: "bulk_upload", label: "Bulk upload", icon: "↑" },
-      { key: "queue", label: "Queue", icon: "☰" },
-      { key: "api", label: "API", icon: "</>" },
+      { key: nil, label: "All" },
+      { key: "manual", label: "Manual" },
+      { key: "bulk_upload", label: "Bulk" },
+      { key: "queue", label: "Queue" },
+      { key: "api", label: "API" },
     ]
-
-    div(class: "filter-toggle-row") do
-      origins.each do |o|
-        is_active = origin == o[:key]
-        a(
-          href: letters_path(origin: o[:key], search: search, status: status, user_id: user_id),
-          style: is_active ? "font-weight: bold;" : "color: var(--foreground2);"
-        ) do
-          button("size-": "small") { "#{o[:icon]} #{o[:label]}" }
-        end
+    origins.each do |o|
+      is_active = origin == o[:key]
+      a(
+        href: letters_path(origin: o[:key], search: search, status: status, user_id: user_id),
+        style: "text-decoration: none; #{'font-weight: bold; color: var(--foreground0);' if is_active}"
+      ) do
+        span("is-": "badge", "variant-": is_active ? "foreground0" : "background2") { o[:label] }
       end
     end
   end
 
   def letters_list
     if letters.any?
-      div("box-": "round") do
-        div(class: "letter-list-header", style: "padding: 0.5lh 1ch;") do
-          span(class: "fw-semibold") { "Letter" }
-          div(class: "letter-list-header-side") do
-            span(class: "letter-list-col-recipient") { "Recipient" }
-            span(class: "letter-list-col-batch") { "Batch" }
-            span(class: "letter-list-col-status") { "Status" }
+      table do
+        thead do
+          tr do
+            th { "Letter" }
+            th { "Recipient" }
+            th { "Batch" }
+            th { "Status" }
           end
         end
-        letters.each do |letter|
-          div("is-": "separator")
-          render_letter_row(letter)
+        tbody do
+          letters.each { |l| render_letter_row(l) }
         end
       end
     else
       div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
-        h2(style: "margin: 0;") { "No letters found" }
-        if search.present? || status.present?
-          p(style: "color: var(--foreground2);") { "Try adjusting your search or filters." }
-        else
-          p(style: "color: var(--foreground2);") { "Send your first letter to get started." }
-          a(href: new_letter_path) { button("variant-": "green") { "Send Letter" } }
+        p(style: "margin: 0;") { "No letters found." }
+        if !(search.present? || status.present?)
+          a(href: new_letter_path) { button("size-": "small", "variant-": "green") { "Send Letter" } }
         end
       end
     end
   end
 
   def render_letter_row(letter)
-    a(href: letter_path(letter), class: "letter-row") do
-      div(class: "letter-row-main") do
-        div(class: "letter-row-id-line") do
-          span(class: "letter-row-id") do
-            letter.public_id
-          end
-          if letter.user_facing_title.present?
-            span { "·" }
-            span(class: "letter-row-title") do
-              letter.user_facing_title
-            end
-          end
-          render_tags(letter.tags.first(2)) if letter.tags.present?
+    tr do
+      td do
+        a(href: letter_path(letter), style: "text-decoration: none; color: var(--foreground0);") do
+          strong { letter.public_id }
         end
-        div(class: "letter-row-meta") do
+        render_tags(letter.tags.first(2)) if letter.tags.present?
+        div(style: "color: var(--foreground2); font-size: 0.85em;") do
           plain letter.created_at.strftime("%b %d, %Y")
           plain " · #{letter.origin_label}"
           if letter.mailed_at
@@ -187,29 +151,20 @@ class Views::Letters::Index < Views::Base
           end
         end
       end
-
-      div(class: "letter-row-side") do
-        div(class: "letter-row-recipient") do
-          div(class: "letter-row-recipient-name") { letter.address&.name_line || "—" }
-          if letter.recipient_email.present?
-            div(class: "letter-row-recipient-email") do
-              letter.recipient_email
-            end
-          end
-        end
-
-        div(class: "letter-row-batch") do
-          if letter.batch_id.present?
-            span("is-": "badge") { "Batch ##{letter.batch_id}" }
-          else
-            span(class: "text-sm kv-label") { "—" }
-          end
-        end
-
-        div(class: "letter-row-status") do
-          render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter)
+      td do
+        plain letter.address&.name_line || "—"
+        if letter.recipient_email.present?
+          div(style: "color: var(--foreground2); font-size: 0.85em;") { letter.recipient_email }
         end
       end
+      td do
+        if letter.batch_id.present?
+          span("is-": "badge", "variant-": "background2") { "##{letter.batch_id}" }
+        else
+          span(style: "color: var(--foreground2);") { "—" }
+        end
+      end
+      td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
     end
   end
 

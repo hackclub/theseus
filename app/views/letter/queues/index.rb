@@ -44,10 +44,10 @@ class Views::Letter::Queues::Index < Views::Base
         div(class: "dropdown-container", style: "position: relative;") do
           row( "gap-": "1") do
             a(href: new_letter_queue_path) do
-              button { "⊞ Batch queue" }
+              button("size-": "small") { "⊞ Batch queue" }
             end
             a(href: new_letter_instant_queue_path) do
-              button { "↯ Instant queue" }
+              button("size-": "small") { "↯ Instant queue" }
             end
           end
         end
@@ -165,7 +165,7 @@ class Views::Letter::Queues::Index < Views::Base
         p(style: "color: var(--foreground2);") { "Try adjusting your filters." }
       else
         p(style: "color: var(--foreground2);") { "Create a queue to get started." }
-        a(href: new_letter_queue_path) { button("variant-": "green") { "New Queue" } }
+        a(href: new_letter_queue_path) { button("size-": "small", "variant-": "green") { "New Queue" } }
       end
     end
   end
