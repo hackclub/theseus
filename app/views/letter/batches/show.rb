@@ -183,4 +183,5 @@ class Views::Letter::Batches::Show < Views::Base
       end
     end
   end
+  end
 end

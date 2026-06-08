@@ -67,11 +67,11 @@ class Views::Letters::New < Views::Base
       dl(class: "size-dl") do
         dt { "Letter" }
         dd do
-          raw "Up to 11.5 &times; 6.125 in, 3.5 oz"
+          plain "Up to 11.5 × 6.125 in, 3.5 oz"
         end
         dt { "Flat" }
         dd do
-          raw "Up to 15 &times; 12 in, 13 oz"
+          plain "Up to 15 × 12 in, 13 oz"
         end
       end
     end

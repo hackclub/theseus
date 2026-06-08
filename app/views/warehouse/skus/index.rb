@@ -35,13 +35,19 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
       div(class: "page-actions") do
         if include_non_inventory
-          a(href: warehouse_skus_path, "size-": "small") { "Show inventory only" }
+          a(href: warehouse_skus_path) do
+            button("size-": "small") { "⚙ Show inventory only" }
+          end
         else
-          a(href: warehouse_skus_path(include_non_inventory: true), "size-": "small") { "Show all SKUs" }
+          a(href: warehouse_skus_path(include_non_inventory: true)) do
+            button("size-": "small") { "⚙ Show all SKUs" }
+          end
         end
 
         admin_tool(element: "span") do
-          a(href: new_admin_warehouse_sku_path, "variant-": "green") { "+ New SKU" }
+          a(href: new_admin_warehouse_sku_path) do
+            button("variant-": "green") { "+ New SKU" }
+          end
         end
       end
     end
@@ -52,7 +58,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
       input(
         type: "text",
         name: "sku_search",
-        placeholder: "⌕ Search by SKU, name, or description...",
+        placeholder: "Search by SKU, name, or description...",
         style: "width: 100%;"
       )
     end
@@ -101,19 +107,13 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
   def render_grouped_view
     div(class: "view-toolbar") do
-      button(
-        "size-": "small",
-        id: "expand-all-btn"
-      ) { "Expand all" }
-      button(
-        "size-": "small",
-        id: "collapse-all-btn"
-      ) { "Collapse all" }
-      a(
-        href: warehouse_skus_path(include_non_inventory: include_non_inventory, view: 'flat'),
-        "size-": "small"
-      ) { "Flat view" }
+      button(id: "expand-all-btn", "size-": "small") { "⊞ Expand all" }
+      button(id: "collapse-all-btn", "size-": "small") { "⊟ Collapse all" }
+      a(href: warehouse_skus_path(include_non_inventory: include_non_inventory, view: 'flat')) do
+        button("size-": "small") { "☰ Flat view" }
+      end
     end
+
     warehouse_skus.group_by(&:category).each do |category, skus|
       render_category_section(category, skus)
     end
@@ -122,15 +122,14 @@ class Views::Warehouse::SKUs::Index < Views::Base
   def render_flat_view
     div(class: "view-toolbar--spread") do
       div(class: "page-actions") do
-        button("size-": "small", class: "sort-btn", data: { sort: "sku" }) { "Sort: SKU" }
-        button("size-": "small", class: "sort-btn", data: { sort: "name" }) { "Sort: Name" }
-        button("size-": "small", class: "sort-btn", data: { sort: "cost" }) { "Sort: Cost" }
-        button("size-": "small", class: "sort-btn", data: { sort: "stock" }) { "Sort: Stock" }
+        button(class: "sort-btn", "size-": "small", data: { sort: "sku" }) { "Sort: SKU" }
+        button(class: "sort-btn", "size-": "small", data: { sort: "name" }) { "Sort: Name" }
+        button(class: "sort-btn", "size-": "small", data: { sort: "cost" }) { "Sort: Cost" }
+        button(class: "sort-btn", "size-": "small", data: { sort: "stock" }) { "Sort: Stock" }
       end
-      a(
-        href: warehouse_skus_path(include_non_inventory: include_non_inventory),
-        "size-": "small"
-      ) { "📦 Grouped view" }
+      a(href: warehouse_skus_path(include_non_inventory: include_non_inventory)) do
+        button("size-": "small") { "📦 Grouped view" }
+      end
     end
 
     div(class: "flat-table-wrapper") do
@@ -171,7 +170,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
               td(class: "flat-table-td flat-table-td--right-muted") { sku.inbound&.to_s || "—" }
               td(class: "flat-table-td flat-table-td--right") { helpers.number_to_currency(sku.declared_unit_cost) }
               td(class: "flat-table-td") do
-                span("is-": "badge", "variant-": get_badge_variant(sku)) { get_badge_text(sku) }
+                span("is-": "badge", "variant-": scheme_to_variant(get_badge_scheme(sku))) { get_badge_text(sku) }
               end
               td(class: "flat-table-td flat-table-td--center") do
                 render_sku_actions(sku)
@@ -430,9 +429,9 @@ class Views::Warehouse::SKUs::Index < Views::Base
     ) do
       summary(class: "sku-category-summary") do
         div(class: "category-info") do
-          span { category_icon(category) }
+          span(style: "color: var(--foreground2);") { category_icon(category) }
           span(class: "category-name") { category&.humanize || "Uncategorized" }
-          span("is-": "badge", "variant-": "background2") { skus.count.to_s }
+          span("is-": "badge", "variant-": "background2", id: "counter-#{category}") { skus.count.to_s }
         end
         div(class: "page-actions", id: "status-labels-#{category}") do
           if in_stock > 0
@@ -452,9 +451,11 @@ class Views::Warehouse::SKUs::Index < Views::Base
             div(class: "sku-row", data: { search: search_text, status: stock_status }) do
               render_sku_row(sku)
             end
+            div("is-": "separator")
           end
         end
       end
+    end
   end
 
   def render_sku_row(sku)
@@ -503,15 +504,15 @@ class Views::Warehouse::SKUs::Index < Views::Base
     end
   end
 
-  def get_badge_variant(sku)
+  def get_badge_scheme(sku)
     if sku.in_stock.to_i > 10
-      "green"
+      :success
     elsif sku.in_stock.to_i.between?(1, 10)
-      "yellow"
+      :attention
     elsif sku.in_stock.to_i < 0
-      "red"
+      :danger
     else
-      "background2"
+      :secondary
     end
   end
 
@@ -544,9 +545,9 @@ class Views::Warehouse::SKUs::Index < Views::Base
   end
 
   def render_sku_actions(sku)
-    tag(:details, "is-": "popover", "position-": "bottom baseline-right") do
-      tag(:summary, tabindex: "0", "size-": "small") { "⋯" }
-      column( "gap-": "0") do
+    details("is-": "popover", "position-": "bottom baseline-right") do
+      summary(tabindex: "0", "size-": "small") { "⋯" }
+      column("gap-": "0") do
         a(href: warehouse_sku_path(sku)) { "👁 View details" }
         if sku.zenventory_url.present?
           a(href: sku.zenventory_url, target: "_blank") { "↗ Open in Zenventory" }
@@ -563,13 +564,23 @@ class Views::Warehouse::SKUs::Index < Views::Base
       "sticker" => "📝",
       "poster" => "🖼",
       "card" => "💳",
-      "flyer" => "⎘",
-      "other_printed_material" => "⎘",
-      "hardware" => "⚙",
+      "flyer" => "📄",
+      "other_printed_material" => "📄",
+      "hardware" => "🔧",
       "book" => "📖",
       "swag" => "🎁",
       "grant" => "🎓",
       "prize" => "🏆"
     }[category.to_s] || "📦"
+  end
+
+  def scheme_to_variant(scheme)
+    {
+      success: "green",
+      danger: "red",
+      attention: "yellow",
+      accent: "blue",
+      secondary: "background2"
+    }[scheme] || "background2"
   end
 end

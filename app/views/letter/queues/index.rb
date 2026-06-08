@@ -11,52 +11,19 @@ class Views::Letter::Queues::Index < Views::Base
   end
 
   def view_template
-    div(class: "page-container") do
-      header_section
-      filters_section
-      queue_grid_section
-    end
-  end
+    render Components::Shared::PageToolbar.new(
+      title: "Letter Queues",
+      jumpcode_path: letter_queues_path,
+      action_href: new_letter_queue_path,
+      action_label: "+ Batch Queue"
+    ) do
+      render Components::Shared::OriginTabs.new(
+        options: { nil => "All", "batch" => "Batch", "instant" => "Instant" },
+        active: queue_type,
+        base_path: ->(p = {}) { letter_queues_path(**preserved_params.merge(p)) },
+        preserved_params: preserved_params
+      )
 
-  private
-
-  attr_reader :letter_queues, :all_queues, :letter_counts, :user_id, :queue_type, :users
-
-  def header_section
-    div(class: "page-header") do
-      div do
-        div(class: "page-title-group") do
-          h1(class: "page-title") { "Queues" }
-          render Components::Shared::Jumpcode.new(path: letter_queues_path)
-        end
-        p(class: "page-subtitle mt-1") do
-          plain "#{letter_queues.count} #{"queue".pluralize(letter_queues.count)}"
-        end
-      end
-
-      div(class: "page-actions") do
-        admin_tool do
-          button_to mark_printed_instants_mailed_letter_queues_path, method: :post, class: "btn-danger-sm" do
-            "Mark printed instants mailed"
-          end
-        end
-
-        div(class: "dropdown-container", style: "position: relative;") do
-          row( "gap-": "1") do
-            a(href: new_letter_queue_path) do
-              button("size-": "small") { "⊞ Batch queue" }
-            end
-            a(href: new_letter_instant_queue_path) do
-              button("size-": "small") { "↯ Instant queue" }
-            end
-          end
-        end
-      end
-    end
-  end
-
-  def filters_section
-    div(class: "filter-section") do
       admin_tool do
         render Components::Shared::UserPicker.new(
           users: users,
@@ -65,95 +32,100 @@ class Views::Letter::Queues::Index < Views::Base
         )
       end
 
-      type_toggle
+      a(href: new_letter_instant_queue_path) do
+        button("variant-": "blue") { "+ Instant Queue" }
+      end
+
+      admin_tool do
+        button_to mark_printed_instants_mailed_letter_queues_path, method: :post, style: "display: inline;" do
+          button("variant-": "red", "size-": "small") { "Mark printed instants mailed" }
+        end
+      end
 
       if user_id.present? || queue_type.present?
-        a(href: letter_queues_path, style: "color: var(--foreground2);") { "× Clear filters" }
+        a(href: letter_queues_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
       end
     end
-  end
 
-  def type_toggle
-    types = [
-      { key: nil, label: "All", icon: :rows },
-      { key: "batch", label: "Batch", icon: :stack },
-      { key: "instant", label: "Instant", icon: :zap },
-    ]
-
-    div(class: "filter-toggle-row") do
-      types.each do |t|
-        is_active = queue_type == t[:key]
-          if is_active
-            a(href: letter_queues_path(queue_type: t[:key], user_id: user_id)) do
-              button("variant-": "green") { t[:label] }
-            end
-          else
-            a(href: letter_queues_path(queue_type: t[:key], user_id: user_id), style: "color: var(--foreground2);") do
-              plain t[:label]
-            end
-          end
-      end
-    end
-  end
-
-  def queue_grid_section
-    if letter_queues.any?
-      div(class: "queue-card-grid") do
-        sorted_queues.each { |q| queue_card(q) }
-      end
+    if sorted_queues.any?
+      queue_table
     else
       blankslate
     end
   end
 
+  private
+
+  attr_reader :letter_queues, :all_queues, :letter_counts, :user_id, :queue_type, :users
+
+  def preserved_params
+    { user_id: user_id, queue_type: queue_type }.compact
+  end
+
+  def queue_table
+    table do
+      thead do
+        tr do
+          th { "Name" }
+          th { "Type" }
+          th { "Queued" }
+          th { "Printed" }
+          th { "Mailed" }
+          th { "Total" }
+          th { "Status" }
+        end
+      end
+      tbody do
+        sorted_queues.each do |queue|
+          is_instant = queue.is_a?(::Letter::InstantQueue)
+          href = is_instant ? letter_instant_queue_path(queue, status: :printed) : letter_queue_path(queue, status: :queued)
+          queued  = count_for(queue, "queued")
+          printed = count_for(queue, "printed")
+          mailed  = count_for(queue, "mailed")
+          total   = queued + printed + mailed + count_for(queue, "pending") + count_for(queue, "received")
+          action  = is_instant ? printed : queued
+
+          tr do
+            td do
+              a(href: href, style: "text-decoration: none; color: var(--foreground0); font-weight: 500;") { queue.name }
+            end
+            td do
+              if is_instant
+                span("is-": "badge", "variant-": "green") { "Instant" }
+              else
+                span("is-": "badge", "variant-": "blue") { "Batch" }
+              end
+            end
+            td(style: queued > 0 ? "color: var(--color-blue);" : "color: var(--foreground2);") do
+              plain fmt(queued)
+            end
+            td(style: printed > 0 ? "color: var(--color-green);" : "color: var(--foreground2);") do
+              plain fmt(printed)
+            end
+            td(style: "color: var(--foreground2);") { plain fmt(mailed) }
+            td { plain fmt(total) }
+            td do
+              if action > 0
+                label = is_instant ? "#{fmt(action)} awaiting mail" : "#{fmt(action)} queued"
+                span("is-": "badge", "variant-": is_instant ? "green" : "blue") { label }
+              else
+                span(style: "color: var(--foreground2);") { "Idle" }
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
   def sorted_queues
-    letter_queues.sort_by do |q|
+    @sorted_queues ||= letter_queues.sort_by do |q|
       if q.is_a?(::Letter::InstantQueue)
         printed = count_for(q, "printed")
         printed > 0 ? [1, -printed] : [2, q.name.downcase]
       else
         queued = count_for(q, "queued")
         queued > 0 ? [0, -queued] : [2, q.name.downcase]
-      end
-    end
-  end
-
-  def queue_card(queue)
-    is_instant = queue.is_a?(::Letter::InstantQueue)
-    href = is_instant ? letter_instant_queue_path(queue, status: :printed) : letter_queue_path(queue, status: :queued)
-    action = attention_count(queue)
-
-    if action > 0
-      bg = is_instant ? "var(--bgColor-done-muted)" : "var(--bgColor-accent-muted)"
-      border = is_instant ? "var(--borderColor-done-emphasis)" : "var(--borderColor-accent-emphasis)"
-      box_style = "background: #{bg}; border-color: #{border};"
-    else
-      box_style = nil
-    end
-
-    a(href: href, class: "link-reset d-block") do
-      div("box-": "round", style: box_style) do
-        div(class: "queue-card-header", style: "padding: 1lh 1ch;") do
-          span(class: "queue-card-name") do
-            queue.name
-          end
-          if is_instant
-            span("is-": "badge", "variant-": "green") { "Instant" }
-          else
-            span("is-": "badge", "variant-": "blue") { "Batch" }
-          end
-        end
-        div("is-": "separator")
-        div(class: "queue-card-stat", style: "padding: 1lh 1ch;") do
-          if action > 0
-            label = is_instant ? "awaiting mail" : "queued"
-            span(class: "stat-value") { action.to_s }
-            span(class: "page-subtitle") { label }
-          else
-            span(class: "stat-value kv-label") { "—" }
-            span(class: "page-subtitle") { "idle" }
-          end
-        end
       end
     end
   end
@@ -174,22 +146,7 @@ class Views::Letter::Queues::Index < Views::Base
     letter_counts[[queue.id, state]] || 0
   end
 
-  def attention_count(queue)
-    count_for queue, case queue
-                     when ::Letter::InstantQueue
-                       "printed"
-                     else
-                       "queued"
-    end
-  end
-
-  def state_scheme(state)
-    case state
-    when "queued" then :secondary
-    when "pending" then :attention
-    when "printed" then :accent
-    when "mailed", "received" then :success
-    else :secondary
-    end
+  def fmt(n)
+    n.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
   end
 end

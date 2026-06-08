@@ -20,16 +20,13 @@ class Components::StaticPages::Home < Components::Base
   attr_reader :stats
 
   def header_section
-    row("align-": "start between", style: "margin-bottom: 1lh;") do
-      column do
-        h1(style: "margin: 0;") { "Theseus" }
-        p(style: "color: var(--foreground2); margin: 0;") do
-          plain "Welcome back, "
-          strong { current_user&.username || "friend" }
-        end
+    row("align-": "center between") do
+      p(style: "color: var(--foreground2); margin: 0;") do
+        plain "Welcome back, "
+        strong(style: "color: var(--foreground0);") { current_user&.username || "friend" }
       end
       row("gap-": "1", "align-": "center") do
-        a(href: new_letter_path) { button("variant-": "green") { "+ Letter" } }
+        a(href: new_letter_path) { button("variant-": "green", "size-": "small") { "+ Letter" } }
         a(href: new_warehouse_order_path) { button("size-": "small") { "+ Order" } }
         a(href: new_letter_batch_path) { button("size-": "small") { "+ Batch" } }
       end
@@ -37,29 +34,34 @@ class Components::StaticPages::Home < Components::Base
   end
 
   def kpi_section
-    h3(style: "color: var(--foreground2); margin: 0 0 0.5lh;") { "Needs Attention" }
-    row("gap-": "2", style: "margin-bottom: 1lh; flex-wrap: wrap;") do
-      stats[:orders_to_dispatch].to_i > 0 && kpi_item("Orders to dispatch", stats[:orders_to_dispatch], warehouse_orders_path(state: "draft"), "yellow")
-      kpi_item("To print", stats[:letters_to_print], letters_path(status: "pending"), "yellow")
-      kpi_item("To mail", stats[:letters_to_mail], letters_path(status: "printed"))
-      kpi_item("Open batches", stats[:open_letter_batches], letter_batches_path)
-    end
+    column("gap-": "1") do
+      div do
+        h4(style: "color: var(--foreground2); margin: 0 0 0.5lh; text-transform: uppercase; font-size: 0.8em; letter-spacing: 0.1em;") { "Needs Attention" }
+        div(class: "stat-filters") do
+          kpi_chip("Orders to dispatch", stats[:orders_to_dispatch], warehouse_orders_path(state: "draft"), "yellow") if stats[:orders_to_dispatch].to_i > 0
+          kpi_chip("To print", stats[:letters_to_print], letters_path(status: "pending"), "yellow")
+          kpi_chip("To mail", stats[:letters_to_mail], letters_path(status: "printed"), "yellow")
+          kpi_chip("Open batches", stats[:open_letter_batches], letter_batches_path, "yellow")
+        end
+      end
 
-    h3(style: "color: var(--foreground2); margin: 0 0 0.5lh;") { "This Week" }
-    row("gap-": "2", style: "margin-bottom: 1lh; flex-wrap: wrap;") do
-      kpi_item("In transit", stats[:orders_in_transit], warehouse_orders_path(state: "dispatched"))
-      kpi_item("Shipped", stats[:orders_shipped_this_week], warehouse_orders_path(state: "mailed"))
-      kpi_item("Mailed", stats[:letters_mailed_this_week], letters_path(status: "mailed"))
-      kpi_item("Letters (30d)", stats[:total_letters_this_month], letters_path)
+      div do
+        h4(style: "color: var(--foreground2); margin: 0 0 0.5lh; text-transform: uppercase; font-size: 0.8em; letter-spacing: 0.1em;") { "This Week" }
+        div(class: "stat-filters") do
+          kpi_chip("In transit", stats[:orders_in_transit], warehouse_orders_path(state: "dispatched"))
+          kpi_chip("Shipped", stats[:orders_shipped_this_week], warehouse_orders_path(state: "mailed"))
+          kpi_chip("Mailed", stats[:letters_mailed_this_week], letters_path(status: "mailed"))
+          kpi_chip("Letters (30d)", stats[:total_letters_this_month], letters_path)
+        end
+      end
     end
   end
 
-  def kpi_item(label, value, href, variant = nil)
-    a(href: href, style: "text-decoration: none; color: var(--foreground0);") do
-      column do
-        span(style: "font-size: 1.5em; font-weight: bold;#{ variant == "yellow" ? " color: var(--yellow);" : ""}") { value.to_s }
-        span(style: "color: var(--foreground2); font-size: 0.85em;") { label }
-      end
+  def kpi_chip(label, value, href, color = nil)
+    color_var = color ? "var(--#{color})" : "var(--foreground1)"
+    a(href: href, class: "stat-filter") do
+      span(class: "stat-count", style: "color: #{color_var};") { format_number(value) }
+      span(class: "stat-label") { label }
     end
   end
 
@@ -145,5 +147,9 @@ class Components::StaticPages::Home < Components::Base
     end
 
     a(href: "#", onclick: safe("document.getElementById('id-lookup-dialog').showModal(); return false;"), style: "color: var(--foreground1); text-decoration: none;") { "ID Lookup" }
+  end
+
+  def format_number(n)
+    n.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
   end
 end

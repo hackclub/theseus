@@ -385,7 +385,7 @@ class Components::Letters::Form < Components::Base
     address_data = addresses.map { |ra| { id: ra.id, country: ra.country } }
 
     script do
-      raw <<~JS
+      plain(<<~JS.html_safe)
         (function() {
           document.addEventListener('DOMContentLoaded', function() {
             var returnAddressSelect = document.getElementById('letter_return_address_id');

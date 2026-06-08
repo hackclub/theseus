@@ -229,7 +229,7 @@ class Views::Letter::Batches::Process < Views::Base
 
   def cost_update_script
     script do
-      raw <<~JS
+      plain(<<~JS.html_safe)
         (function() {
           var postageInputs = document.querySelectorAll(
             'input[name="batch[us_postage_type]"], input[name="batch[intl_postage_type]"]'

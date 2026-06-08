@@ -7,39 +7,38 @@ class Views::APIKeys::Index < Views::Base
 
   def view_template
     div(class: "page-container") do
-      div(class: "page-header") do
-        div(class: "page-title-group") do
-          h1(class: "page-title") { "API Keys" }
-          render Components::Shared::Jumpcode.new(path: api_keys_path)
-        end
-        a(href: new_api_key_path) do
-          button("variant-": "green") { "🔑 Visit the locksmith!" }
-        end
-      end
+      render Components::Shared::PageToolbar.new(
+        title: "API Keys",
+        jumpcode_path: api_keys_path,
+        action_href: new_api_key_path,
+        action_label: "+ New Key",
+        action_variant: "green"
+      )
 
       if api_keys.any?
-        div("box-": "round") do
-          api_keys.each_with_index do |key, i|
-            div("is-": "separator") if i > 0
-            a(href: api_key_path(key), class: "api-key-row") do
-              div(class: "api-key-row-layout") do
-                div(class: "flex-1") do
-                  div(class: "page-title-group mb-0") do
-                    span(class: "fw-semibold") { key.pretty_name }
-                    span("is-": "badge", "variant-": key.active? ? "green" : "background2") do
-                      key.active? ? "Active" : "Revoked"
-                    end
+        table do
+          thead do
+            tr do
+              th { "Name" }
+              th { "Key" }
+              th { "Created" }
+              th { "Status" }
+            end
+          end
+          tbody do
+            api_keys.each do |key|
+              tr do
+                td do
+                  a(href: api_key_path(key), style: "text-decoration: none; color: var(--foreground0);") do
+                    plain key.pretty_name
                   end
-                  span(class: "text-sm kv-label") { "Acts as: #{key.user.username}" }
                 end
-
-                div(class: "page-actions") do
-                  if key.pii
-                    span("is-": "badge", "variant-": "yellow") { "PII" }
-                  end
-                  if key.may_impersonate?
-                    span("is-": "badge", "variant-": "red") { "Impersonate" }
-                  end
+                td(style: "color: var(--foreground2); font-size: 0.85em;") do
+                  plain (key.abbreviated rescue "••••••••")
+                end
+                td(style: "color: var(--foreground2);") { plain key.created_at.strftime("%b %d, %Y") }
+                td do
+                  status_badges(key)
                 end
               end
             end
@@ -50,10 +49,27 @@ class Views::APIKeys::Index < Views::Base
           h2(style: "margin: 0;") { "🔑" }
           h3(style: "margin: 0;") { "No API keys yet" }
         end
+      end
     end
   end
 
   private
 
   attr_reader :api_keys
+
+  def status_badges(key)
+    if key.active?
+      span("is-": "badge", "variant-": "green") { "Active" }
+    else
+      span("is-": "badge", "variant-": "background2") { "Revoked" }
+    end
+    whitespace
+    if key.pii
+      span("is-": "badge", "variant-": "yellow") { "PII" }
+      whitespace
+    end
+    if key.may_impersonate?
+      span("is-": "badge", "variant-": "red") { "Impersonate" }
+    end
+  end
 end
