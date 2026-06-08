@@ -59,11 +59,18 @@ class Views::Letters::Index < Views::Base
   def stat_pill(label, count, variant, filter_status)
     is_active = status == filter_status
     href = is_active ? letters_path(origin: origin, search: search, user_id: user_id) : letters_path(origin: origin, search: search, user_id: user_id, status: filter_status)
-    a(href: href, style: "text-decoration: none; color: var(--foreground#{is_active ? '0' : '2'});") do
-      strong { count.to_s }
-      plain " #{label}"
-      if is_active
-        plain " ×"
+    color = variant ? "var(--#{variant})" : "var(--foreground1)"
+    a(href: href, style: "text-decoration: none;") do
+      span(
+        style: [
+          "display: inline-flex; align-items: center; gap: 0.5ch;",
+          "padding: 0 1ch; border-radius: 4px; cursor: pointer;",
+          "transition: background 0.1s;",
+          is_active ? "background: var(--background2); color: #{color}; font-weight: bold;" : "color: var(--foreground2);",
+        ].join(" ")
+      ) do
+        span(style: "color: #{color}; font-weight: bold;") { count.to_s }
+        plain label
       end
     end
   end
@@ -115,8 +122,10 @@ class Views::Letters::Index < Views::Base
       table do
         thead do
           tr do
-            th { "Letter" }
+            th { "ID" }
+            th { "Date" }
             th { "Recipient" }
+            th { "Origin" }
             th { "Batch" }
             th { "Status" }
           end
@@ -139,37 +148,22 @@ class Views::Letters::Index < Views::Base
     tr do
       td do
         a(href: letter_path(letter), style: "text-decoration: none; color: var(--foreground0);") do
-          strong { letter.public_id }
-        end
-        render_tags(letter.tags.first(2)) if letter.tags.present?
-        div(style: "color: var(--foreground2); font-size: 0.85em;") do
-          plain letter.created_at.strftime("%b %d, %Y")
-          plain " · #{letter.origin_label}"
-          if letter.mailed_at
-            plain " · Mailed #{time_ago_in_words(letter.mailed_at)} ago"
-          end
+          plain letter.public_id
         end
       end
+      td(style: "color: var(--foreground2);") { plain letter.created_at.strftime("%b %d") }
       td do
         plain letter.address&.name_line || "—"
-        if letter.recipient_email.present?
-          div(style: "color: var(--foreground2); font-size: 0.85em;") { letter.recipient_email }
-        end
       end
+      td(style: "color: var(--foreground2);") { plain letter.origin_label }
       td do
         if letter.batch_id.present?
-          span("is-": "badge", "variant-": "background2") { "##{letter.batch_id}" }
+          a(href: letter_batch_path(letter.batch_id), style: "text-decoration: none; color: var(--foreground2);") { "##{letter.batch_id}" }
         else
-          span(style: "color: var(--foreground2);") { "—" }
+          plain "—"
         end
       end
       td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
-    end
-  end
-
-  def render_tags(tags)
-    tags.compact_blank.each do |tag|
-      span("is-": "badge") { tag }
     end
   end
 

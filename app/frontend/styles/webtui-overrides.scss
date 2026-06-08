@@ -131,36 +131,34 @@
   table {
     width: 100%;
     border-spacing: 0;
+    border-collapse: collapse;
 
-    &::before { display: none; }
+    /* kill WebTUI's pseudo-element borders */
+    &::before, &::after { display: none; }
     tr td::before, tr td::after,
     tr th::before, tr th::after { display: none; }
 
-    position: relative;
-    padding: 1lh 1ch;
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0.5lh 0.5ch;
-      border: 2px solid var(--box-border-color);
-      pointer-events: none;
+    tr th, tr td {
+      padding: 0.25lh 1ch;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    tr th, tr td { padding: 0 1ch; padding-bottom: 0; text-align: left; }
-    :first-child > tr:first-child > td,
-    :first-child > tr:first-child > th { padding-top: 0; }
-    tr th + th, tr td + td { border-left: 1px solid var(--background1); }
+    /* let recipient/name columns wrap */
+    tr td:nth-child(3) { white-space: normal; max-width: 24ch; }
 
     thead tr th {
       color: var(--foreground2);
       font-weight: normal;
       font-style: italic;
-      padding-bottom: 0.25lh;
-      border-bottom: 1px solid var(--background1);
+      border-bottom: 1px solid var(--background2);
     }
 
-    thead + tbody::before { content: ''; display: table-row; height: 0.25lh; }
+    tbody tr { border-bottom: 1px solid var(--background1); }
     tbody tr:hover td { background-color: var(--background1); }
+    tbody tr:last-child { border-bottom: none; }
   }
 
   /* ── Select ── */
