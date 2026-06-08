@@ -1,90 +1,118 @@
-// View-specific layout rules.
-// WebTUI handles colors, typography, spacing, and components.
-// This file is ONLY for structural layout that WebTUI can't express.
-
-// Two-column detail layouts (show pages)
-.two-col-layout {
-  display: flex;
-  gap: 2ch;
-  > :first-child { flex: 1; min-width: 0; }
-  > :last-child { width: 28ch; flex-shrink: 0; }
-}
-
-// Sticky sidebar for show pages (actions panel)
-.sticky-sidebar {
-  position: sticky;
-  top: 3lh;
-}
-
-// Form layout
-.form-inline { display: inline; }
-.form-contents { display: contents; }
-
-// Stat card grid (homepage)
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(18ch, 1fr));
-  gap: 1ch;
-}
-
-.stat-card {
-  padding: 1lh 1ch;
-  border: 1px solid var(--background2);
-}
-
-.stat-value { font-size: 2em; }
-.stat-label { color: var(--foreground2); text-transform: uppercase; font-size: 0.8em; }
-
-// Dashboard link panels (homepage)
-.home-kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(18ch, 1fr));
-  gap: 1ch;
-}
-
-.home-main-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(28ch, 1fr));
-  gap: 2ch;
-}
-
-.link-panel { border: 1px solid var(--background2); }
-.link-panel-header {
-  padding: 0.5lh 1ch;
-  color: var(--foreground1);
-  font-weight: bold;
-  border-bottom: 1px solid var(--background2);
-}
-.link-panel-body { padding: 0; }
-.link-panel-item {
+// ── Page toolbar ── shared across all index pages
+.page-toolbar {
   display: flex;
   align-items: center;
-  gap: 1ch;
-  padding: 0.25lh 1ch;
-  &:hover { background: var(--background1); }
+  gap: 2ch;
+  flex-wrap: wrap;
+  padding: 0.5lh 0;
+  border-bottom: 1px solid var(--background2);
+  margin-bottom: 0.5lh;
 }
 
-// Detail rows (key-value pairs on show pages)
+.toolbar-spacer { flex: 1; }
+
+.toolbar-search {
+  width: 20ch;
+  font-size: 0.9em;
+}
+
+// ── Stat filter chips ── clickable status counts
+.stat-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.25ch;
+  padding: 0.25lh 0;
+  margin-bottom: 0.5lh;
+}
+
+.stat-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5ch;
+  padding: 0.15lh 1ch;
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--foreground2);
+  transition: background 0.1s, color 0.1s;
+
+  &:hover {
+    background: var(--background1);
+    color: var(--foreground1);
+    text-decoration: none;
+  }
+
+  &.active {
+    background: var(--background2);
+    color: var(--foreground0);
+  }
+}
+
+.stat-count {
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.05ch;
+}
+
+.stat-total {
+  color: var(--foreground2);
+  margin-left: 1ch;
+}
+
+// ── Origin/category tabs ── underline-style filter tabs
+.origin-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+
+  a {
+    padding: 0.15lh 1ch;
+    text-decoration: none;
+    color: var(--foreground2);
+    border-bottom: 2px solid transparent;
+    transition: all 0.1s;
+
+    &:hover {
+      color: var(--foreground0);
+      background: var(--background1);
+      text-decoration: none;
+    }
+
+    &.active {
+      color: var(--foreground0);
+      font-weight: bold;
+      border-bottom-color: var(--foreground0);
+    }
+  }
+}
+
+// ── Detail grids (show pages) ──
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16ch, 1fr));
-  gap: 1ch;
+  grid-template-columns: 14ch 1fr;
+  gap: 0.25lh 2ch;
 }
-.detail-label { color: var(--foreground2); font-size: 0.85em; }
 
-// Page actions row
-.page-actions { display: flex; gap: 1ch; align-items: center; }
+.detail-label {
+  color: var(--foreground2);
+}
 
-// Address block
-.address-block { white-space: pre-line; }
+// ── Two-column show layout ──
+.show-layout {
+  display: flex;
+  gap: 2ch;
+}
 
-// Public ID
-.public-id { cursor: pointer; }
+.show-main { flex: 1; min-width: 0; }
+.show-sidebar { width: 28ch; flex-shrink: 0; }
 
-// Error list
-.error-list { margin: 0.5lh 0 0 2ch; padding: 0; }
-
-// Responsive
+// ── Responsive ──
 @media (max-width: 80ch) {
-  .two-col-layout { flex-direction: column; > :last-child { width: 100%; } }
+  .show-layout { flex-direction: column; }
+  .show-sidebar { width: 100%; }
+  .page-toolbar { gap: 1ch; }
 }
