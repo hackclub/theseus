@@ -113,8 +113,8 @@
   padding: 1lh 2ch !important;
   > strong:first-child {
     display: block;
-    font-style: normal;
-    color: var(--foreground0);
+    font-style: normal !important;
+    color: var(--foreground0) !important;
   }
   > [is-="separator"] { margin-bottom: 0.5lh; }
   margin-bottom: 1lh;

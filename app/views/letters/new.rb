@@ -69,26 +69,9 @@ class Views::Letters::New < Views::Base
       strong { "Size Limits" }
       div("is-": "separator")
 
-      table(style: "margin-top: 0.5lh;") do
-        thead do
-          tr do
-            th
-            th { "Max size" }
-            th { "Max wt" }
-          end
-        end
-        tbody do
-          tr do
-            td { "Letter" }
-            td { "11.5 × 6.125″" }
-            td { "3.5 oz" }
-          end
-          tr do
-            td { "Flat" }
-            td { "15 × 12″" }
-            td { "13 oz" }
-          end
-        end
+      div(style: "margin-top: 0.5lh;") do
+        div { "Letter: 11.5×6.1″ 3.5oz" }
+        div { "Flat: 15×12″ 13oz" }
       end
     end
   end
