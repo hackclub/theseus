@@ -37,7 +37,7 @@ class Views::Warehouse::Orders::Index < Views::Base
         end
       end
       a(href: new_warehouse_order_path) do
-        button("size-": "small", "variant-": "green") { "+ New Order" }
+        button("variant-": "green") { "+ New Order" }
       end
     end
   end
@@ -146,7 +146,7 @@ class Views::Warehouse::Orders::Index < Views::Base
         else
           p(style: "color: var(--foreground2);") { "Create your first order to get started." }
           a(href: new_warehouse_order_path) do
-            button("size-": "small", "variant-": "green") { "+ New Order" }
+            button("variant-": "green") { "+ New Order" }
           end
         end
       end

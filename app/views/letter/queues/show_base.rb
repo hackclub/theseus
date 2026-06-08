@@ -127,7 +127,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
           if is_active
             a(href: href) do
-              button("size-": "small", "variant-": "green") { "#{count} #{state}" }
+              button("variant-": "green") { "#{count} #{state}" }
             end
           else
             a(href: href, style: "color: var(--foreground2);") { "#{count} #{state}" }

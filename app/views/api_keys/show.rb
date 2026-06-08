@@ -85,7 +85,7 @@ class Views::APIKeys::Show < Views::Base
       column( "box-": "round", "shear-": "top") do
         row( "align-": "center between") do
           span("is-": "badge", "variant-": "background0") { "Revoking #{api_key.pretty_name}..." }
-          button("size-": "small", "variant-": "foreground0", onclick: safe("this.closest('dialog').close()")) { "×" }
+          button("variant-": "foreground0", onclick: safe("this.closest('dialog').close()")) { "×" }
         end
         p(style: "color: var(--foreground2); margin: 0 0 1lh;") { "That which thou canst not undo." }
         div("is-": "separator")
@@ -98,12 +98,12 @@ class Views::APIKeys::Show < Views::Base
           div("is-": "separator")
           row( "gap-": "1", style: "justify-content: flex-end; padding: 1lh 0;") do
             button(onclick: safe("document.getElementById('revoke-dialog').close()")) { "Cancel" }
-            button("size-": "small", "variant-": "red", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
+            button("variant-": "red", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
           end
         end
       end
     end
 
-    button("size-": "small", "variant-": "red", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
+    button("variant-": "red", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
   end
 end

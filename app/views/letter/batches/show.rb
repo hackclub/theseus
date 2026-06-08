@@ -71,7 +71,7 @@ class Views::Letter::Batches::Show < Views::Base
         div(class: "page-actions") do
           if @batch.pdf_label.attached?
             a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank") do
-              button("size-": "small", "variant-": "green") { "⬇ View Labels PDF" }
+              button("variant-": "green") { "⬇ View Labels PDF" }
             end
           end
 

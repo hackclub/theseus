@@ -29,7 +29,7 @@ class Components::StaticPages::Home < Components::Base
         end
       end
       row("gap-": "1", "align-": "center") do
-        a(href: new_letter_path) { button("size-": "small", "variant-": "green") { "+ Letter" } }
+        a(href: new_letter_path) { button("variant-": "green") { "+ Letter" } }
         a(href: new_warehouse_order_path) { button("size-": "small") { "+ Order" } }
         a(href: new_letter_batch_path) { button("size-": "small") { "+ Batch" } }
       end
@@ -122,7 +122,7 @@ class Components::StaticPages::Home < Components::Base
       column("box-": "round", "shear-": "top") do
         row("align-": "center between") do
           span("is-": "badge", "variant-": "background0") { "Find object by ID" }
-          button("size-": "small", "variant-": "foreground0", onclick: safe("this.closest('dialog').close()")) { "×" }
+          button("variant-": "foreground0", onclick: safe("this.closest('dialog').close()")) { "×" }
         end
         p(style: "color: var(--foreground2); margin: 0 0 1lh;") { "Enter a Theseus ID or package tracking number..." }
         div("is-": "separator")

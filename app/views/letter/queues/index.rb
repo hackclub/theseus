@@ -85,7 +85,7 @@ class Views::Letter::Queues::Index < Views::Base
         is_active = queue_type == t[:key]
           if is_active
             a(href: letter_queues_path(queue_type: t[:key], user_id: user_id)) do
-              button("size-": "small", "variant-": "green") { t[:label] }
+              button("variant-": "green") { t[:label] }
             end
           else
             a(href: letter_queues_path(queue_type: t[:key], user_id: user_id), style: "color: var(--foreground2);") do
@@ -165,7 +165,7 @@ class Views::Letter::Queues::Index < Views::Base
         p(style: "color: var(--foreground2);") { "Try adjusting your filters." }
       else
         p(style: "color: var(--foreground2);") { "Create a queue to get started." }
-        a(href: new_letter_queue_path) { button("size-": "small", "variant-": "green") { "New Queue" } }
+        a(href: new_letter_queue_path) { button("variant-": "green") { "New Queue" } }
       end
     end
   end

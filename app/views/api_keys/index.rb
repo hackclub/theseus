@@ -13,7 +13,7 @@ class Views::APIKeys::Index < Views::Base
           render Components::Shared::Jumpcode.new(path: api_keys_path)
         end
         a(href: new_api_key_path) do
-          button("size-": "small", "variant-": "green") { "🔑 Visit the locksmith!" }
+          button("variant-": "green") { "🔑 Visit the locksmith!" }
         end
       end
 

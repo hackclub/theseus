@@ -27,7 +27,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
     div(class: "content-section") do
       details(id: "make-batch-dialog") do
         summary do
-          button("size-": "small", "variant-": "green") { "⊞ Make Batch" }
+          button("variant-": "green") { "⊞ Make Batch" }
         end
 
         div("box-": "round", style: "margin-top: 1lh; padding: 1lh 2ch;") do

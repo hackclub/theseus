@@ -32,7 +32,7 @@ class Views::Letters::Index < Views::Base
         render Components::Shared::Jumpcode.new(path: letters_path)
       end
       a(href: new_letter_path) do
-        button("size-": "small", "variant-": "green") { "+ Send Letter" }
+        button("variant-": "green") { "+ Send Letter" }
       end
     end
     p(style: "color: var(--foreground2); margin: 0 0 1lh;") do
@@ -130,7 +130,7 @@ class Views::Letters::Index < Views::Base
       div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
         p(style: "margin: 0;") { "No letters found." }
         if !(search.present? || status.present?)
-          a(href: new_letter_path) { button("size-": "small", "variant-": "green") { "Send Letter" } }
+          a(href: new_letter_path) { button("variant-": "green") { "Send Letter" } }
         end
       end
     end

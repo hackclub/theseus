@@ -171,42 +171,65 @@
     height: 1lh;
   }
 
-  /* ── Lickable glass buttons — as100 meets Aqua ──
-   * WebTUI default buttons use a stripe gradient (transparent/color/transparent).
-   * We target [size-="small"] buttons which have solid background-color,
-   * then layer a glass gradient on top via background-image.
-   * Regular (non-small) buttons keep the TUI stripe aesthetic.
+  /* ── Lickable glass buttons — the candy in the terminal ──
+   * These deliberately break the TUI aesthetic. Rounded, chunky,
+   * glossy pills. The one skeuomorphic indulgence.
    */
-  button[size-="small"], input[type=submit] {
+  button, input[type=submit] {
+    border-radius: 8px;
+    height: 2lh;
+    padding: 0 2ch;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    background-color: var(--button-primary);
     background-image: linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.45) 0%,
-      rgba(255, 255, 255, 0.12) 48%,
-      rgba(0, 0, 0, 0.04) 52%,
-      rgba(0, 0, 0, 0.10) 100%
+      rgba(255, 255, 255, 0.50) 0%,
+      rgba(255, 255, 255, 0.18) 45%,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(0, 0, 0, 0.03) 55%,
+      rgba(0, 0, 0, 0.06) 100%
     );
-    transition: all 0.12s ease;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.4),
+      0 1px 3px rgba(0, 0, 0, 0.12);
 
     &:hover:not(:disabled) {
-      transform: translateY(-0.5px);
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.5),
+        0 3px 8px rgba(0, 0, 0, 0.18);
       background-image: linear-gradient(
         to bottom,
-        rgba(255, 255, 255, 0.55) 0%,
-        rgba(255, 255, 255, 0.18) 48%,
-        rgba(0, 0, 0, 0.02) 52%,
-        rgba(0, 0, 0, 0.08) 100%
+        rgba(255, 255, 255, 0.60) 0%,
+        rgba(255, 255, 255, 0.25) 45%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.02) 55%,
+        rgba(0, 0, 0, 0.04) 100%
       );
     }
 
     &:active:not(:disabled) {
       transform: translateY(0.5px);
+      box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.12),
+        0 1px 2px rgba(0, 0, 0, 0.08);
       background-image: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.08) 0%,
-        rgba(0, 0, 0, 0.03) 48%,
-        rgba(255, 255, 255, 0.02) 52%,
+        rgba(0, 0, 0, 0.04) 0%,
+        rgba(0, 0, 0, 0.02) 45%,
+        rgba(0, 0, 0, 0) 50%,
+        rgba(255, 255, 255, 0.04) 55%,
         rgba(255, 255, 255, 0.08) 100%
       );
+    }
+
+    /* small buttons: same glass, just compact */
+    &[size-="small"] {
+      height: 1.25lh;
+      padding: 0 1ch;
+      font-size: 0.85em;
+      border-radius: 6px;
     }
   }
 
@@ -216,23 +239,31 @@
   button[variant-="yellow"], input[type=submit][variant-="yellow"] { --button-primary: var(--yellow); --button-secondary: var(--background0); }
   button[variant-="blue"], input[type=submit][variant-="blue"] { --button-primary: var(--blue); --button-secondary: var(--background0); }
 
-  /* ── Dark theme: subtler glass ── */
+  /* ── Dark theme: subtler glass, deeper shadows ── */
   [data-webtui-theme^="gruvbox-dark"] {
-    button[size-="small"], input[type=submit] {
+    button, input[type=submit] {
+      box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.3);
       background-image: linear-gradient(
         to bottom,
-        rgba(255, 255, 255, 0.16) 0%,
-        rgba(255, 255, 255, 0.04) 48%,
-        rgba(0, 0, 0, 0.06) 52%,
-        rgba(0, 0, 0, 0.16) 100%
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0.06) 45%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.06) 55%,
+        rgba(0, 0, 0, 0.14) 100%
       );
       &:hover:not(:disabled) {
+        box-shadow:
+          inset 0 1px 1px rgba(255, 255, 255, 0.22),
+          0 4px 10px rgba(0, 0, 0, 0.35);
         background-image: linear-gradient(
           to bottom,
-          rgba(255, 255, 255, 0.24) 0%,
-          rgba(255, 255, 255, 0.08) 48%,
-          rgba(0, 0, 0, 0.04) 52%,
-          rgba(0, 0, 0, 0.12) 100%
+          rgba(255, 255, 255, 0.30) 0%,
+          rgba(255, 255, 255, 0.10) 45%,
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.04) 55%,
+          rgba(0, 0, 0, 0.10) 100%
         );
       }
     }
