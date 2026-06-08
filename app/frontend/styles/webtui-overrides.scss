@@ -78,36 +78,20 @@
     color: inherit !important;
   }
 
-  /* Sidebar nav */
-  ul { list-style: none; padding: 0; margin: 0; }
-
-  a[data-navigable-item] {
-    color: var(--foreground2);
-    text-decoration: none;
-    outline: none;
-    display: flex;
-    align-items: center;
-    padding: 0 1ch;
-    &:hover, &:focus, &.selected {
-      background-color: var(--background1);
-      color: var(--foreground0);
+  /* Sidebar nav — tight, no tree markers */
+  .theseus-sidebar {
+    a[data-navigable-item] {
+      display: block;
+      padding: 0 1ch;
+      color: var(--foreground2);
+      text-decoration: none;
+      outline: none;
+      line-height: 1.4;
+      &:hover { background-color: var(--background1); color: var(--foreground0); }
+      &.selected { background-color: var(--background1); color: var(--foreground0); font-weight: bold; }
     }
-  }
 
-  ul > a[data-navigable-item]::before {
-    content: '├ ';
-    white-space: pre;
-    color: var(--foreground2);
-    flex-shrink: 0;
-  }
-  ul > a[data-navigable-item]:last-of-type::before { content: '└ '; }
-
-  details > summary {
-    font-weight: bold;
-    cursor: pointer;
-    color: var(--foreground1);
-    padding: 0 1ch;
-    &:hover, &:focus { background-color: var(--background1); }
+    [is-="separator"] { margin: 0.25lh 0; opacity: 0.3; }
   }
 
   /* ── Flash banners ── */
@@ -174,12 +158,11 @@
     height: 1lh;
   }
 
-  /* ── Lickable glass buttons — the candy in the terminal ──
-   * Completely overrides WebTUI's button stripe pattern.
-   * Rounded, glossy pills with proper glass gradient.
+  /* ── Lickable glass — ONLY on action buttons with variant or submit ──
+   * Form utility buttons (presets, quick picks) stay flat.
+   * Glass is the reward for being an action.
    */
-  button:not([box-]),
-  input[type=submit] {
+  button[variant-], input[type=submit] {
     border-radius: 8px !important;
     height: 2lh;
     padding: 0 2ch;
@@ -199,7 +182,6 @@
       inset 0 1px 1px rgba(255, 255, 255, 0.35),
       0 1px 3px rgba(0, 0, 0, 0.12);
 
-    /* kill WebTUI's focus underline and active color swap */
     &:focus { text-decoration: none !important; font-weight: inherit !important; }
     &:active { color: var(--mapped-secondary, var(--button-secondary, var(--background0))) !important; }
 
@@ -218,10 +200,7 @@
       ) !important;
     }
 
-    /* kill WebTUI's primary/secondary swap on :active — just darken */
     &:active:not(:disabled) {
-      --mapped-primary: var(--button-primary, var(--foreground0));
-      --mapped-secondary: var(--button-secondary, var(--background0));
       transform: none !important;
       box-shadow:
         inset 0 3px 8px rgba(0, 0, 0, 0.35),
@@ -252,7 +231,7 @@
 
   /* ── Dark theme: subtler glass ── */
   [data-webtui-theme^="gruvbox-dark"] {
-    button:not([box-]), input[type=submit] {
+    button[variant-], input[type=submit] {
       box-shadow:
         inset 0 1px 1px rgba(255, 255, 255, 0.12),
         0 2px 4px rgba(0, 0, 0, 0.3);
@@ -278,6 +257,18 @@
         ) !important;
       }
     }
+  }
+
+  /* ── Plain buttons — flat, no glass ── */
+  button:not([variant-]):not([type=submit]):not([box-]) {
+    &:focus { text-decoration: none !important; font-weight: inherit !important; }
+  }
+
+  /* ── Input/form contrast fix for dark themes ── */
+  input, textarea, select {
+    background-color: var(--background1) !important;
+    color: var(--foreground0);
+    border-color: var(--background2) !important;
   }
 
   /* ── Environment indicator ── */
