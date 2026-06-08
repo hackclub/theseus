@@ -36,15 +36,15 @@
 
   .message {
     flex: 1;
-    color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+    color: var(--foreground0);
   }
 
   .switch-btn {
     padding: 0.25rem 0.5rem;
-    border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+    border: 1px solid var(--background2);
     border-radius: 0.375rem;
-    background: var(--bgColor-default, var(--color-canvas-default, #fff));
-    color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
+    background: var(--background1);
+    color: var(--blue);
     font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
@@ -54,6 +54,6 @@
   }
 
   .switch-btn:hover {
-    background: var(--bgColor-accent-muted, var(--color-accent-subtle, #ddf4ff));
+    background: var(--background2);
   }
 </style>

@@ -27,7 +27,7 @@
     gap: 0.5rem;
     cursor: pointer;
     font-size: 0.875rem;
-    color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+    color: var(--foreground0);
   }
 
   .machinable-toggle.disabled {
@@ -37,7 +37,7 @@
 
   input[type='checkbox'] {
     margin-top: 0.125rem;
-    accent-color: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
+    accent-color: var(--blue);
   }
 
   .toggle-label {
@@ -48,6 +48,6 @@
 
   .toggle-label small {
     font-size: 0.75rem;
-    color: var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    color: var(--foreground2);
   }
 </style>

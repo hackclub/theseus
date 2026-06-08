@@ -95,30 +95,30 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    color: var(--foreground2);
   }
 
   .dim-input {
     display: flex;
     align-items: center;
-    border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+    border: 1px solid var(--background2);
     border-radius: 0.375rem;
-    background: var(--bgColor-default, var(--color-canvas-default, #fff));
+    background: var(--background1);
     overflow: hidden;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
 
   .dim-input:focus-within {
-    border-color: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
-    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
   }
 
   .dim-input:has(.invalid) {
-    border-color: var(--borderColor-danger-emphasis, var(--color-danger-emphasis, #cf222e));
+    border-color: var(--red);
   }
 
   .dim-input:has(.invalid):focus-within {
-    box-shadow: 0 0 0 3px rgba(207, 34, 46, 0.15);
+    box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
   }
 
   input {
@@ -127,7 +127,7 @@
     border: none;
     background: transparent;
     font-size: 0.875rem;
-    color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+    color: var(--foreground0);
     outline: none;
     font-variant-numeric: tabular-nums;
   }
@@ -135,20 +135,20 @@
   .unit {
     padding-right: 0.5rem;
     font-size: 0.75rem;
-    color: var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    color: var(--foreground2);
     user-select: none;
     flex-shrink: 0;
   }
 
   .dim-sep {
-    color: var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    color: var(--foreground2);
     font-size: 0.875rem;
     padding-bottom: 0.375rem;
   }
 
   .dim-error {
     font-size: 0.6875rem;
-    color: var(--fgColor-danger, var(--color-danger-fg, #cf222e));
+    color: var(--red);
   }
 
   input[type='number']::-webkit-inner-spin-button,

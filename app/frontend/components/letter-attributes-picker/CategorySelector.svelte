@@ -54,9 +54,9 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+    border: 1px solid var(--background2);
     border-radius: 0.375rem;
-    background: var(--bgColor-default, var(--color-canvas-default, #fff));
+    background: var(--background1);
     cursor: pointer;
     transition: border-color 0.15s, background-color 0.15s;
     text-align: left;
@@ -65,26 +65,26 @@
   }
 
   .category-card:hover {
-    border-color: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
+    border-color: var(--blue);
   }
 
   .category-card.selected {
-    border-color: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
-    background: var(--bgColor-accent-muted, var(--color-accent-subtle, #ddf4ff));
+    border-color: var(--blue);
+    background: var(--background2);
   }
 
   .radio-dot {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 2px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+    border: 2px solid var(--background2);
     flex-shrink: 0;
     position: relative;
     transition: border-color 0.15s;
   }
 
   .radio-dot.checked {
-    border-color: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
+    border-color: var(--blue);
   }
 
   .radio-dot.checked::after {
@@ -95,7 +95,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
+    background: var(--blue);
   }
 
   .category-info {
@@ -108,7 +108,7 @@
   }
 
   .category-info small {
-    color: var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    color: var(--foreground2);
     font-size: 0.75rem;
   }
 </style>

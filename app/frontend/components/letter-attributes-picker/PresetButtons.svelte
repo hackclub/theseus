@@ -31,18 +31,38 @@
   .preset-row {
     display: flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: 0.5ch;
     flex-wrap: wrap;
   }
 
   .preset-label {
-    font-size: 0.8125rem;
-    color: var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    font-size: 0.85em;
+    color: var(--foreground2);
+  }
+
+  .btn {
+    padding: 0 1ch;
+    height: 1.5lh;
+    border: 1px solid var(--background2);
+    border-radius: 4px;
+    background: var(--background1);
+    color: var(--foreground1);
+    font: inherit;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+
+  .btn:hover {
+    background: var(--background2);
+    color: var(--foreground0);
+    border-color: var(--foreground2);
   }
 
   .btn.active {
-    background: var(--bgColor-accent-muted, var(--color-accent-subtle, #ddf4ff));
-    border-color: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
-    color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
+    background: var(--background2);
+    border-color: var(--blue);
+    color: var(--foreground0);
+    font-weight: bold;
   }
 </style>

@@ -38,16 +38,16 @@
     align-items: center;
     justify-content: center;
     gap: 0.375rem;
-    background: var(--bgColor-muted, var(--color-canvas-subtle, #f6f8fa));
-    border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+    background: var(--background1);
+    border: 1px solid var(--background2);
     border-radius: 0.5rem;
     flex-shrink: 0;
   }
 
   .envelope {
-    border: 1.5px solid var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    border: 1.5px solid var(--foreground2);
     border-radius: 2px;
-    background: var(--bgColor-default, var(--color-canvas-default, #fff));
+    background: var(--background1);
     transition: width 0.2s ease, height 0.2s ease;
     position: relative;
   }
@@ -58,17 +58,17 @@
     right: 3px;
     width: 10px;
     height: 13px;
-    border: 1px dashed var(--borderColor-default, var(--color-border-default, #d0d7de));
+    border: 1px dashed var(--background2);
     border-radius: 1px;
   }
 
   .dims {
     font-size: 0.6875rem;
-    color: var(--fgColor-muted, var(--color-fg-muted, #656d76));
+    color: var(--foreground2);
     font-variant-numeric: tabular-nums;
   }
 
   .empty-envelope {
-    color: var(--borderColor-default, var(--color-border-default, #d0d7de));
+    color: var(--background2);
   }
 </style>
