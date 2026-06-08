@@ -25,29 +25,26 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
     queued_count = letter_counts.fetch("queued", 0)
 
     div(class: "content-section") do
-      render Primer::Alpha::Dialog.new(
-        title: "Make Batch",
-        subtitle: "Create a batch from queued letters",
-        size: :medium,
-        id: "make-batch-dialog"
-      ) do |dialog|
-        dialog.with_show_button(scheme: :primary, size: :medium) do |btn|
-          btn.with_leading_visual_icon(icon: :package)
-          "Make Batch"
+      details(id: "make-batch-dialog") do
+        summary do
+          button("variant-": "green") { "⊞ Make Batch" }
         end
 
-        form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
-          render(Primer::Alpha::Dialog::Body.new) do
-            render(Primer::Alpha::TextField.new(
-              name: "limit",
-              label: "How many letters to batch?",
-              caption: "Leave blank to batch all #{queued_count} queued letters"
-            ))
-          end
+        div("box-": "round", style: "margin-top: 1lh; padding: 1lh 2ch;") do
+          h3(style: "margin: 0;") { "Make Batch" }
+          p(style: "color: var(--foreground2);") { "Create a batch from queued letters" }
+          div("is-": "separator")
 
-          render(Primer::Alpha::Dialog::Footer.new(show_divider: true)) do
-            render(Primer::Beta::Button.new(data: { "close-dialog-id": "make-batch-dialog" })) { "Cancel" }
-            render(Primer::Beta::Button.new(scheme: :primary, type: :submit)) { "Make Batch" }
+          form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
+            div(style: "margin-bottom: 1lh;") do
+              label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "How many letters to batch?" }
+              input(type: "text", name: "limit", style: "width: 100%;")
+              small(style: "color: var(--foreground2);") { "Leave blank to batch all #{queued_count} queued letters" }
+            end
+
+            tag("row", "gap-": "1", style: "justify-content: flex-end;") do
+              button(type: "submit", "variant-": "green") { "✓ Make Batch" }
+            end
           end
         end
       end
@@ -60,11 +57,10 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
     return unless batches.any?
 
     collapsible_section("Batches", batches.count) do
-      render Primer::Beta::BorderBox.new do |box|
-        batches.each do |batch|
-          box.with_row do
-            batch_row(batch)
-          end
+      div("box-": "round") do
+        batches.each_with_index do |batch, i|
+          batch_row(batch)
+          div("is-": "separator") unless i == batches.size - 1
         end
       end
     end

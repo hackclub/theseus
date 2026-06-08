@@ -25,57 +25,40 @@ class Components::ReturnAddresses::Form < Components::Base
     form_with model: return_address, local: true do |f|
       div(class: "form-stack") do
         div(class: "form-grid-auto") do
-          render Primer::Alpha::TextField.new(
-            name: "return_address[name]",
-            label: "Name",
-            value: return_address.name,
-            caption: "Organization or personal name",
-            full_width: true,
-            required: true
-          )
+          div(style: "margin-bottom: 1lh;") do
+            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Name *" }
+            input(type: "text", name: "return_address[name]", value: return_address.name, required: true, style: "width: 100%;")
+            small(style: "color: var(--foreground2);") { "Organization or personal name" }
+          end
 
-          render Primer::Alpha::TextField.new(
-            name: "return_address[line_1]",
-            label: "Address Line 1",
-            value: return_address.line_1,
-            caption: "Street address, P.O. box, etc.",
-            full_width: true,
-            required: true
-          )
+          div(style: "margin-bottom: 1lh;") do
+            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Address Line 1 *" }
+            input(type: "text", name: "return_address[line_1]", value: return_address.line_1, required: true, style: "width: 100%;")
+            small(style: "color: var(--foreground2);") { "Street address, P.O. box, etc." }
+          end
         end
 
-        render Primer::Alpha::TextField.new(
-          name: "return_address[line_2]",
-          label: "Address Line 2",
-          value: return_address.line_2,
-          caption: "Apartment, suite, unit, etc. (optional)",
-          full_width: true
-        )
+        div(style: "margin-bottom: 1lh;") do
+          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Address Line 2" }
+          input(type: "text", name: "return_address[line_2]", value: return_address.line_2, style: "width: 100%;")
+          small(style: "color: var(--foreground2);") { "Apartment, suite, unit, etc. (optional)" }
+        end
 
         div(class: "form-grid-auto--sm") do
-          render Primer::Alpha::TextField.new(
-            name: "return_address[city]",
-            label: "City",
-            value: return_address.city,
-            full_width: true,
-            required: true
-          )
+          div(style: "margin-bottom: 1lh;") do
+            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "City *" }
+            input(type: "text", name: "return_address[city]", value: return_address.city, required: true, style: "width: 100%;")
+          end
 
-          render Primer::Alpha::TextField.new(
-            name: "return_address[state]",
-            label: "State",
-            value: return_address.state,
-            full_width: true,
-            required: true
-          )
+          div(style: "margin-bottom: 1lh;") do
+            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "State *" }
+            input(type: "text", name: "return_address[state]", value: return_address.state, required: true, style: "width: 100%;")
+          end
 
-          render Primer::Alpha::TextField.new(
-            name: "return_address[postal_code]",
-            label: "Postal Code",
-            value: return_address.postal_code,
-            full_width: true,
-            required: true
-          )
+          div(style: "margin-bottom: 1lh;") do
+            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Postal Code *" }
+            input(type: "text", name: "return_address[postal_code]", value: return_address.postal_code, required: true, style: "width: 100%;")
+          end
         end
 
         div do
@@ -99,21 +82,19 @@ class Components::ReturnAddresses::Form < Components::Base
         end
 
         div(class: "checkbox-card") do
-          render Primer::Alpha::CheckBox.new(
-            name: "return_address[shared]",
-            label: "Make this address shared",
-            caption: "Allow other users to select this return address for their letters",
-            checked: return_address.shared
-          )
+          label do
+            input(type: "checkbox", name: "return_address[shared]", value: "1", checked: return_address.shared)
+            plain " Make this address shared"
+          end
+          small(style: "color: var(--foreground2); display: block;") { "Allow other users to select this return address for their letters" }
         end
 
         input(type: "hidden", name: "return_address[user_id]", value: current_user&.id)
         input(type: "hidden", name: "from_letter", value: "true") if from_letter
 
         div(class: "pt-2") do
-          render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :check)
-            return_address.persisted? ? "Update Return Address" : "Create Return Address"
+          button(type: "submit", "variant-": "green") do
+            plain(return_address.persisted? ? "✓ Update Return Address" : "✓ Create Return Address")
           end
         end
       end

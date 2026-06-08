@@ -42,20 +42,13 @@ class Views::Letter::Queues::ShowBase < Views::Base
       end
 
       div(class: "page-actions") do
-        render Primer::Beta::Button.new(tag: :a, href: letter_queues_path, scheme: :secondary, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :"arrow-left")
-          "Back to queues"
-        end
-        render Primer::Beta::Button.new(tag: :a, href: edit_queue_path, scheme: :secondary, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :pencil)
-          "Edit"
+        a(href: letter_queues_path, style: "color: var(--foreground2);") { "← Back to queues" }
+        a(href: edit_queue_path) do
+          button("size-": "small") { "✎ Edit" }
         end
         admin_tool do
           form_with(url: queue_show_path, method: :delete, class: "form-inline") do
-            render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :small) do |btn|
-              btn.with_leading_visual_icon(icon: :trash)
-              "Delete"
-            end
+            button(type: "submit", "variant-": "red", "size-": "small") { "✕ Delete" }
           end
         end
       end
@@ -70,7 +63,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
     div(class: "filter-bar content-section") do
       active_states.each do |state|
-        render(Primer::Beta::Label.new(scheme: state_scheme(state), size: :large)) do
+        span("is-": "badge", "variant-": state_badge_variant(state)) do
           "#{letter_counts[state]} #{state}"
         end
       end
@@ -86,19 +79,17 @@ class Views::Letter::Queues::ShowBase < Views::Base
     collapsible_section("Letters", letters.count, open: true) do
       letters_filter_bar
       if letters.any?
-        render Primer::Beta::BorderBox.new do |box|
+        div("box-": "round") do
           letters.each do |letter|
-            box.with_row do
-              letter_row(letter)
-            end
+            letter_row(letter)
+            div("is-": "separator")
           end
         end
       else
-        render Primer::Beta::Blankslate.new do |bs|
-          bs.with_visual_icon(icon: :mail)
-          bs.with_heading(tag: :h3) { "No letters" }
+        div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+          h3(style: "margin: 0;") { "No letters" }
           if search.present? || status.present?
-            bs.with_description { "Try adjusting your search or filters." }
+            p(style: "color: var(--foreground2);") { "Try adjusting your search or filters." }
           end
         end
       end
@@ -111,14 +102,12 @@ class Views::Letter::Queues::ShowBase < Views::Base
       div(class: "flex-1") do
         form(action: queue_show_path, method: "get", class: "form-inline") do
           input(type: "hidden", name: "status", value: status) if status.present?
-          render Primer::Alpha::TextField.new(
+          input(
+            type: "text",
             name: "search",
-            label: "Search letters",
-            visually_hide_label: true,
             placeholder: "Search by name or email...",
             value: search,
-            leading_visual: { icon: :search },
-            full_width: true
+            style: "width: 100%;"
           )
         end
       end
@@ -136,28 +125,19 @@ class Views::Letter::Queues::ShowBase < Views::Base
                    queue_show_path(search: search, status: state)
                  end
 
-          render Primer::Beta::Button.new(
-            tag: :a,
-            href: href,
-            scheme: is_active ? :primary : :invisible,
-            size: :small
-          ) do |btn|
-            "#{count} #{state}"
+          if is_active
+            a(href: href) do
+              button("size-": "small", "variant-": "green") { "#{count} #{state}" }
+            end
+          else
+            a(href: href, style: "color: var(--foreground2);") { "#{count} #{state}" }
           end
         end
       end
 
       # Clear filters
       if search.present? || status.present?
-        render Primer::Beta::Button.new(
-          tag: :a,
-          href: queue_show_path,
-          scheme: :invisible,
-          size: :small
-        ) do |btn|
-          btn.with_leading_visual_icon(icon: :x)
-          "Clear"
-        end
+        a(href: queue_show_path, style: "color: var(--foreground2);") { "× Clear" }
       end
     end
   end
@@ -170,69 +150,63 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   def queue_details_section
     collapsible_section("Queue Details") do
-      render Primer::Beta::BorderBox.new do |box|
+      div("box-": "round") do
         admin_tool do
-          box.with_row do
-            div do
-              strong { "Owner" }
-              div(class: "detail-value") do
-                render_user_mention(queue.user)
-              end
+          div(style: "padding: 1lh 1ch;") do
+            strong { "Owner" }
+            div(class: "detail-value") do
+              render_user_mention(queue.user)
             end
           end
+          div("is-": "separator")
         end
 
         if queue.tags.any?
-          box.with_row do
-            div do
-              strong { "Tags" }
-              div(class: "detail-value tags-inline") do
-                queue.tags.each do |tag|
-                  render(Primer::Beta::Label.new(size: :medium)) { tag }
-                end
+          div(style: "padding: 1lh 1ch;") do
+            strong { "Tags" }
+            div(class: "detail-value tags-inline") do
+              queue.tags.each do |t|
+                span("is-": "badge") { t }
               end
             end
           end
+          div("is-": "separator")
         end
 
-        box.with_row do
-          div do
-            strong { "Return Address" }
-            div(class: "detail-value") do
-              if queue.letter_return_address.present?
-                render_address(queue)
-              else
-                span(class: "kv-label") { "No return address" }
-              end
+        div(style: "padding: 1lh 1ch;") do
+          strong { "Return Address" }
+          div(class: "detail-value") do
+            if queue.letter_return_address.present?
+              render_address(queue)
+            else
+              span(class: "kv-label") { "No return address" }
             end
           end
         end
+        div("is-": "separator")
 
-        box.with_row do
-          div do
-            strong { "Mailer ID" }
-            div(class: "detail-value") do
-              plain(queue.letter_mailer_id&.display_name || "No mailer ID")
-            end
+        div(style: "padding: 1lh 1ch;") do
+          strong { "Mailer ID" }
+          div(class: "detail-value") do
+            plain(queue.letter_mailer_id&.display_name || "No mailer ID")
+          end
+        end
+        div("is-": "separator")
+
+        div(style: "padding: 1lh 1ch;") do
+          strong { "Letter Specs" }
+          div(class: "detail-value") do
+            span { "#{queue.letter_width}\" × #{queue.letter_height}\" · #{queue.letter_weight} oz" }
           end
         end
 
-        box.with_row do
-          div do
-            strong { "Letter Specs" }
-            div(class: "detail-value") do
-              span { "#{queue.letter_width}\" × #{queue.letter_height}\" · #{queue.letter_weight} oz" }
-            end
-          end
-        end
-
-        extra_queue_details(box)
+        extra_queue_details
       end
     end
   end
 
   # Hook for subclasses to add extra detail rows
-  def extra_queue_details(box); end
+  def extra_queue_details; end
 
   # --- Helpers ---
 
@@ -283,6 +257,16 @@ class Views::Letter::Queues::ShowBase < Views::Base
     when "printed" then :accent
     when "mailed", "received" then :success
     else :secondary
+    end
+  end
+
+  def state_badge_variant(state)
+    case state
+    when "queued" then "blue"
+    when "pending" then "yellow"
+    when "printed" then "blue"
+    when "mailed", "received" then "green"
+    else nil
     end
   end
 

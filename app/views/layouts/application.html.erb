@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-webtui-theme="gruvbox-dark-hard">
   <head>
     <title><%= content_for(:title) || "Theseus" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,6 +7,14 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <script>
+      (function() {
+        var sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var saved = localStorage.getItem('theme') || (sys ? 'gruvbox-dark-hard' : 'vitesse-light-soft');
+        document.documentElement.dataset.webtuiTheme = saved;
+      })();
+    </script>
 
     <%= yield :head %>
 
@@ -19,27 +27,34 @@
     <%= vite_stylesheet_tag 'app_style.scss' %>
   </head>
 
-  <body data-color-mode="auto" data-light-theme="light" data-dark-theme="dark"<% if Rails.env.development? %> class="not_prod"<% end %>>
-    <% if Rails.env.development? %>
-      <div class="dev-border-overlay"></div>
-    <% end %>
-    <%= render Components::Shared::AppHeader.new %>
-    <% if flash.any? %>
-      <div class="flash-container" style="padding: 1em 4em">
-        <% flash.each do |type, message| %>
-          <div x-data="{ open: true }" x-show="open" @click="if ($el.querySelector('.js-flash-close')) open = false">
-            <%= render(Primer::Beta::Flash.new(scheme: flash_scheme(type), dismissible: true, icon: flash_icon(type))) { message } %>
-          </div>
+  <body>
+    <%= render Components::Shared::ActionBar.new %>
+    <%= render Components::Shared::Sidebar.new(current_path: request.path) %>
+
+    <div id="theseus-layout">
+      <div id="theseus-content">
+        <% if flash.any? %>
+          <% flash.each do |type, message| %>
+            <div box-="square" class="tui-banner tui-banner-<%= flash_banner_class(type) %>" style="margin-bottom: 1lh;">
+              [<%= flash_banner_icon(type) %>] <%= message %>
+            </div>
+          <% end %>
         <% end %>
+
+        <%= yield %>
       </div>
-    <% end %>
-    <div style="padding: 4em">
-      <%= yield %>
     </div>
-    <%= render Components::Shared::AppFooter.new %>
+
+    <div id="theseus-env"><%= Rails.env %></div>
+
     <% if current_user %>
+      <!-- erblint:disable ScriptType -->
       <script type="application/json" id="kbar-data"><%= raw Shortcodes.kbar_data_for(current_user) %></script>
+      <script type="application/json" id="keyboard-shortcuts-data"><%= raw(keyboard_shortcuts_data.to_json) %></script>
+      <!-- erblint:enable ScriptType -->
       <div data-svelte-component="command-palette"></div>
+      <div data-svelte-component="hints-modal"></div>
+      <div data-svelte-component="keyboard-shortcuts"></div>
     <% end %>
   </body>
 </html>

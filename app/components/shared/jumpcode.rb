@@ -8,67 +8,44 @@ class Components::Shared::Jumpcode < Components::Base
   def view_template
     return unless @code
 
-    span(class: "jumpcode") do
+    tag("row", "gap-": "1", "align-": "center", class: "jumpcode") do
       span(
-        class: "jumpcode-badge",
+        "is-": "badge", "variant-": "background2",
         title: "Press ⌘K and type #{@code}",
         onclick: safe("window.openKbar?.()")
       ) do
-        span(class: "jumpcode-prefix") { "⌘K" }
-        plain @code
+        span(style: "color: var(--foreground2);") { "⌘K" }
+        plain " #{@code}"
       end
 
-      render_help_button
-    end
-  end
-
-  private
-
-  def render_help_button
-    render(Primer::Alpha::Dialog.new(
-      title: "what's a jumpcode?",
-      size: :small
-    )) do |dialog|
-      dialog.with_show_button(
-        scheme: :invisible,
-        size: :small,
-        "aria-label": "What's a jumpcode?"
-      ) do
-        span(class: "jumpcode-help-trigger") { "?" }
-      end
-
-      dialog.with_body do
-        div(class: "jumpcode-dialog-body") do
-          p(class: "jumpcode-dialog-p") do
-            plain "you've probably seen the "
-            code(class: "jumpcode-code") { "⌘K #{@code}" }
-            plain " badges around — those are jumpcodes. hit "
-            code(class: "jumpcode-code") { "⌘K" }
+      details("is-": "popover", "position-": "bottom baseline-right", class: "jumpcode-help") do
+        summary(tabindex: "0", size: "small") { "?" }
+        div(style: "padding: 1lh 1ch; max-width: 48ch;") do
+          p do
+            plain "these are jumpcodes. hit "
+            code { "⌘K" }
             plain ", type the code, go."
           end
-
-          p(class: "jumpcode-dialog-p") do
-            plain "letter pages start with L ("
-            code(class: "jumpcode-code") { "MAIL" }
-            plain ", "
-            code(class: "jumpcode-code") { "SCAN" }
-            plain ", "
-            code(class: "jumpcode-code") { "LBAT" }
-            plain "), warehouse starts with W ("
-            code(class: "jumpcode-code") { "WORD" }
-            plain ", "
-            code(class: "jumpcode-code") { "SKUS" }
-            plain "). you'll pick them up fast."
+          p do
+            plain "letter pages: "
+            span("is-": "badge", "variant-": "background2") { "MAIL" }
+            plain " "
+            span("is-": "badge", "variant-": "background2") { "SCAN" }
+            plain " "
+            span("is-": "badge", "variant-": "background2") { "LBAT" }
           end
-
-          p(class: "jumpcode-dialog-p--last") do
-            plain "the palette also does search — "
-            code(class: "jumpcode-code") { "?l" }
-            plain " for letters, "
-            code(class: "jumpcode-code") { "?w" }
-            plain " for orders — and you can paste IDs like "
-            code(class: "jumpcode-code") { "ltr!abc123" }
-            plain " to jump to them."
+          p do
+            plain "warehouse: "
+            span("is-": "badge", "variant-": "background2") { "WORD" }
+            plain " "
+            span("is-": "badge", "variant-": "background2") { "SKUS" }
+          end
+          p do
+            plain "also try "
+            code { "?l" }
+            plain " (search letters) or "
+            code { "ltr!abc" }
+            plain " (jump to ID)"
           end
         end
       end

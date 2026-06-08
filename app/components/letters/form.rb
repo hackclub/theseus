@@ -17,81 +17,67 @@ class Components::Letters::Form < Components::Base
 
     form_with(model: letter, url: form_url) do |f|
       # Letter Specs
-      render Primer::Beta::BorderBox.new(mb: 4) do |box|
-        box.with_header do |header|
-          header.with_title(tag: :h2) { "Letter Specs" }
-        end
-        box.with_body do
-          div(
-            data_svelte_component: "letter-attributes-picker",
-            data_form_scope: "letter",
-            data_is_batch: "false",
-            data_initial_width: letter.width.to_s,
-            data_initial_height: letter.height.to_s,
-            data_initial_weight: (letter.weight || 1).to_s,
-            data_initial_processing_category: (letter.processing_category || "letter").to_s,
-            data_initial_non_machinable: (letter.non_machinable || false).to_s
-          )
+      div("box-": "round", style: "margin-bottom: 2lh;") do
+        h2(style: "margin: 0;") { "Letter Specs" }
+        div("is-": "separator")
+        div(
+          data_svelte_component: "letter-attributes-picker",
+          data_form_scope: "letter",
+          data_is_batch: "false",
+          data_initial_width: letter.width.to_s,
+          data_initial_height: letter.height.to_s,
+          data_initial_weight: (letter.weight || 1).to_s,
+          data_initial_processing_category: (letter.processing_category || "letter").to_s,
+          data_initial_non_machinable: (letter.non_machinable || false).to_s
+        )
 
-          mailing_date_field(f)
-        end
+        mailing_date_field(f)
       end
 
       # Recipient Address
-      render Primer::Beta::BorderBox.new(mb: 4) do |box|
-        box.with_header do |header|
-          header.with_title(tag: :h2) { "Recipient Address" }
-        end
-        box.with_body do
-          address_fields(f)
-        end
+      div("box-": "round", style: "margin-bottom: 2lh;") do
+        h2(style: "margin: 0;") { "Recipient Address" }
+        div("is-": "separator")
+        address_fields(f)
       end
 
       # Sender & Postage
-      render Primer::Beta::BorderBox.new(mb: 4) do |box|
-        box.with_header do |header|
-          header.with_title(tag: :h2) { "Sender & Postage" }
-        end
-        box.with_body do
-          sender_postage_fields(f)
-        end
+      div("box-": "round", style: "margin-bottom: 2lh;") do
+        h2(style: "margin: 0;") { "Sender & Postage" }
+        div("is-": "separator")
+        sender_postage_fields(f)
       end
 
       postage_script
 
       # Extras
-      render Primer::Beta::BorderBox.new(mb: 4) do |box|
-        box.with_header do |header|
-          header.with_title(tag: :h2) { "Extras" }
-        end
-        box.with_body do
-          render Primer::Alpha::TextField.new(
+      div("box-": "round", style: "margin-bottom: 2lh;") do
+        h2(style: "margin: 0;") { "Extras" }
+        div("is-": "separator")
+        field_group(label: "Title", caption: "Optional — shown on the letter list") do
+          input(
+            type: "text",
             name: "letter[user_facing_title]",
-            label: "Title",
-            caption: "Optional — shown on the letter list",
             value: letter.user_facing_title,
-            full_width: true,
-            mb: 3
+            style: "width: 100%;"
           )
+        end
 
-          render Primer::Alpha::TextField.new(
+        field_group(label: "Recipient email", caption: "Optional email address for the recipient") do
+          input(
+            type: "email",
             name: "letter[recipient_email]",
-            label: "Recipient email",
-            caption: "Optional email address for the recipient",
             value: letter.recipient_email,
-            input_type: :email,
-            full_width: true,
-            mb: 3
+            style: "width: 100%;"
           )
+        end
 
-          render Primer::Alpha::TextArea.new(
+        field_group(label: "Rubber stamps", caption: "Extra text to print on the label") do
+          textarea(
             name: "letter[rubber_stamps]",
-            label: "Rubber stamps",
-            caption: "Extra text to print on the label",
-            value: letter.rubber_stamps,
             rows: 3,
-            full_width: true
-          )
+            style: "width: 100%;"
+          ) { letter.rubber_stamps }
         end
       end
 
@@ -100,12 +86,9 @@ class Components::Letters::Form < Components::Base
 
       # Actions
       div(class: "page-actions") do
-        render Primer::Beta::Button.new(tag: :a, href: letters_path, scheme: :secondary) do
-          "Cancel"
-        end
-        render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :check)
-          letter.persisted? ? "Update Letter" : "Create Letter"
+        a(href: letters_path) { button { "Cancel" } }
+        button(type: "submit", "variant-": "green") do
+          plain letter.persisted? ? "✓ Update Letter" : "✓ Create Letter"
         end
       end
     end
@@ -115,6 +98,16 @@ class Components::Letters::Form < Components::Base
 
   attr_reader :letter
 
+  def field_group(label:, caption: nil, &block)
+    div(style: "margin-bottom: 1lh;") do
+      tag("label", style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { label }
+      yield
+      if caption
+        span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") { caption }
+      end
+    end
+  end
+
   def form_url
     letter.persisted? ? letter_path(letter) : letters_path
   end
@@ -122,8 +115,8 @@ class Components::Letters::Form < Components::Base
   def error_messages
     return unless letter.errors.any?
 
-    render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do
-      strong { "Hey, slight issue:" }
+    div("box-": "square", class: "tui-banner tui-banner-error", style: "margin-bottom: 1lh;") do
+      strong { "[!] Hey, slight issue:" }
       ul(class: "error-list") do
         letter.errors.each do |error|
           li { error.full_message }
@@ -179,83 +172,90 @@ class Components::Letters::Form < Components::Base
       div(id: form_id, class: "address-form") do
         # Name
         div(class: "form-grid") do
-          render Primer::Alpha::TextField.new(
-            name: a.field_name(:first_name), label: "First name",
-            value: a.object&.first_name, required: true, full_width: true
-          )
-          render Primer::Alpha::TextField.new(
-            name: a.field_name(:last_name), label: "Last name",
-            value: a.object&.last_name, full_width: true
-          )
+          field_group(label: "First name") do
+            input(
+              type: "text",
+              name: a.field_name(:first_name),
+              value: a.object&.first_name,
+              required: true,
+              style: "width: 100%;"
+            )
+          end
+          field_group(label: "Last name") do
+            input(
+              type: "text",
+              name: a.field_name(:last_name),
+              value: a.object&.last_name,
+              style: "width: 100%;"
+            )
+          end
         end
 
         # Street
-        render Primer::Alpha::TextField.new(
-          name: a.field_name(:line_1), label: "Street address",
-          value: a.object&.line_1, required: true, full_width: true
-        )
+        field_group(label: "Street address") do
+          input(
+            type: "text",
+            name: a.field_name(:line_1),
+            value: a.object&.line_1,
+            required: true,
+            style: "width: 100%;"
+          )
+        end
 
-        # Apt
-        render Primer::Alpha::TextField.new(
-          name: a.field_name(:line_2), label: "Apt, suite, unit, etc.",
-          caption: "Optional", value: a.object&.line_2, full_width: true
-        )
+        field_group(label: "Apt, suite, unit, etc.", caption: "Optional") do
+          input(
+            type: "text",
+            name: a.field_name(:line_2),
+            value: a.object&.line_2,
+            style: "width: 100%;"
+          )
+        end
 
         # City / State / Postal
         div(class: "address-form-city-row") do
-          render Primer::Alpha::TextField.new(
-            name: a.field_name(:city), label: "City",
-            value: a.object&.city, required: true, full_width: true
-          )
-          render Primer::Alpha::TextField.new(
-            name: a.field_name(:state), label: "State",
-            value: a.object&.state, required: true, full_width: true
-          )
-          render Primer::Alpha::TextField.new(
-            name: a.field_name(:postal_code), label: "Postal code",
-            value: a.object&.postal_code, required: true, full_width: true
-          )
+          field_group(label: "City") do
+            input(
+              type: "text",
+              name: a.field_name(:city),
+              value: a.object&.city,
+              required: true,
+              style: "width: 100%;"
+            )
+          end
+          field_group(label: "State") do
+            input(
+              type: "text",
+              name: a.field_name(:state),
+              value: a.object&.state,
+              required: true,
+              style: "width: 100%;"
+            )
+          end
+          field_group(label: "Postal code") do
+            input(
+              type: "text",
+              name: a.field_name(:postal_code),
+              value: a.object&.postal_code,
+              required: true,
+              style: "width: 100%;"
+            )
+          end
         end
 
         # Country
         div(class: "address-form-country") do
-          label(class: "date-field-label") do
-            plain "Country "
-            span(class: "text-danger") { "*" }
-          end
-          div(class: "mt-1") do
-            render(Primer::Alpha::SelectPanel.new(
-              title: "Select country",
-              size: :medium,
-              fetch_strategy: :local,
-              dynamic_label: true,
-              select_variant: :single,
-              form_arguments: { builder: a, name: :country }
-            )) do |panel|
-              panel.with_show_button(scheme: :secondary) do
-                span(class: "country-btn-content") do
-                  if current_entry
-                    span(class: "country-flag") { current_entry[:flag] }
-                    span { current_entry[:name] }
-                  else
-                    span(class: "kv-label") { "Select" }
-                  end
-                end
-              end
-
+          field_group(label: "Country") do
+            select(
+              name: a.field_name(:country),
+              id: "#{form_id}_country",
+              style: "width: 100%;"
+            ) do
+              option(value: "") { "Select a country..." }
               all_ordered.each do |country|
-                panel.with_item(
-                  label: country[:display],
-                  content_arguments: {
-                    data: {
-                      value: country[:code],
-                      code: country[:code],
-                      name: country[:name]
-                    }
-                  },
-                  data: { filter_string: "#{country[:code]}#{country[:code]}#{country[:code]} #{country[:name]}" },
-                  active: country[:code] == current_country
-                )
+                option(
+                  value: country[:code],
+                  selected: country[:code] == current_country
+                ) { country[:display] }
               end
             end
           end
@@ -272,24 +272,23 @@ class Components::Letters::Form < Components::Base
         (function() {
           var container = document.getElementById('#{form_id}');
           if (!container) return;
-          function setupPanel() {
-            var panel = container.querySelector('select-panel');
-            if (!panel) return;
-            panel.filterFn = function(item, query) {
-              var q = query.toLowerCase().trim();
-              if (!q) return true;
-              var itemContent = item.querySelector('[data-code]');
-              var code = itemContent ? itemContent.dataset.code.toLowerCase() : '';
-              var name = itemContent ? itemContent.dataset.name.toLowerCase() : '';
-              if (code === q) return true;
-              if (name.startsWith(q)) return true;
-              return false;
-            };
-          }
-          setupPanel();
-          if (window.customElements) {
-            window.customElements.whenDefined('select-panel').then(setupPanel);
-          }
+          var select = container.querySelector('select[id$="_country"]');
+          if (!select) return;
+          var filterInput = document.createElement('input');
+          filterInput.type = 'text';
+          filterInput.placeholder = 'Filter countries...';
+          filterInput.style.cssText = 'width: 100%; margin-bottom: 0.5lh;';
+          select.parentNode.insertBefore(filterInput, select);
+          var options = Array.from(select.options);
+          filterInput.addEventListener('input', function() {
+            var q = filterInput.value.toLowerCase().trim();
+            options.forEach(function(opt) {
+              if (!opt.value) return;
+              var text = opt.textContent.toLowerCase();
+              var code = opt.value.toLowerCase();
+              opt.style.display = (!q || code === q || text.indexOf(q) !== -1) ? '' : 'none';
+            });
+          });
         })();
       JS
     end
@@ -321,14 +320,14 @@ class Components::Letters::Form < Components::Base
       end
     end
 
-    render Primer::Alpha::TextField.new(
-      name: "letter[return_address_name]",
-      label: "Custom return name",
-      caption: "Leave blank to use the return address name",
-      value: letter.return_address_name,
-      full_width: true,
-      mb: 3
-    )
+    field_group(label: "Custom return name", caption: "Leave blank to use the return address name") do
+      input(
+        type: "text",
+        name: "letter[return_address_name]",
+        value: letter.return_address_name,
+        style: "width: 100%;"
+      )
+    end
 
     # Postage type (hidden by default, shown by JS for US addresses)
     div(id: "postage-options", class: "form-field-lg", style: "display: none;") do
@@ -376,8 +375,8 @@ class Components::Letters::Form < Components::Base
       end
     end
 
-    render(Primer::Beta::Flash.new(scheme: :warning)) do
-      plain "Please leave the mailer ID at the default if you're mailing from HQ &mdash; otherwise talk to Nora (it has USPS implications)."
+    div("box-": "square", class: "tui-banner tui-banner-warning", style: "margin-top: 1lh;") do
+      plain "[!] Please leave the mailer ID at the default if you're mailing from HQ — otherwise talk to Nora (it has USPS implications)."
     end
   end
 

@@ -9,11 +9,10 @@ class Views::ReturnAddresses::New < Views::Base
     div(class: "page-container--sm") do
       h1(class: "page-title content-section") { "New Return Address" }
 
-      render Primer::Beta::BorderBox.new(mb: 3) do |box|
-        box.with_header { "Address Details" }
-        box.with_body do
-          render Components::ReturnAddresses::Form.new(return_address:)
-        end
+      div("box-": "round", style: "margin-bottom: 3lh;") do
+        h3(style: "margin: 0;") { "Address Details" }
+        div("is-": "separator")
+        render Components::ReturnAddresses::Form.new(return_address:)
       end
 
       render Components::Shared::BackButton.new(href: return_addresses_path)

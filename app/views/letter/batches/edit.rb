@@ -15,10 +15,7 @@ class Views::Letter::Batches::Edit < Views::Base
 
     div(class: "page-container") do
       div(class: "page-header") do
-        render Primer::Beta::Button.new(tag: :a, href: letter_batch_path(@batch), scheme: :invisible, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :"arrow-left")
-          "Back"
-        end
+        a(href: letter_batch_path(@batch), style: "color: var(--foreground2);") { "← Back" }
         h1(class: "page-title") { "Edit Letter Batch ##{@batch.id}" }
       end
 
@@ -26,11 +23,10 @@ class Views::Letter::Batches::Edit < Views::Base
 
       form_with(model: @batch, url: letter_batch_path(@batch), scope: :letter_batch, method: :patch) do |f|
         # Letter Specs
-        render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_header do |header|
-            header.with_title(tag: :h2) { "Letter Specs" }
-          end
-          box.with_body do
+        div("box-": "round", style: "margin-bottom: 2lh;") do
+          h2(style: "margin: 0; padding: 1lh 1ch 0;") { "Letter Specs" }
+          div("is-": "separator")
+          div(style: "padding: 1lh 1ch;") do
             div(
               data_svelte_component: "letter-attributes-picker",
               data_form_scope: "letter_batch",
@@ -44,11 +40,10 @@ class Views::Letter::Batches::Edit < Views::Base
         end
 
         # Sender & Postage
-        render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_header do |header|
-            header.with_title(tag: :h2) { "Sender & Postage" }
-          end
-          box.with_body do
+        div("box-": "round", style: "margin-bottom: 2lh;") do
+          h2(style: "margin: 0; padding: 1lh 1ch 0;") { "Sender & Postage" }
+          div("is-": "separator")
+          div(style: "padding: 1lh 1ch;") do
             sender_fields(f)
           end
         end
@@ -58,13 +53,8 @@ class Views::Letter::Batches::Edit < Views::Base
 
         # Actions
         div(class: "page-actions") do
-          render Primer::Beta::Button.new(tag: :a, href: letter_batch_path(@batch), scheme: :secondary) do
-            "Cancel"
-          end
-          render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :check)
-            "Update Batch"
-          end
+          a(href: letter_batch_path(@batch)) { button { "Cancel" } }
+          button(type: "submit", "variant-": "green") { "✓ Update Batch" }
         end
       end
     end
@@ -75,8 +65,8 @@ class Views::Letter::Batches::Edit < Views::Base
   def error_messages
     return unless @batch.errors.any?
 
-    render Primer::Beta::Flash.new(scheme: :danger, mb: 3) do
-      strong { "Hey, slight issue:" }
+    div("box-": "square", class: "tui-banner tui-banner-error", style: "margin-bottom: 1lh;") do
+      strong { "[!] Hey, slight issue:" }
       ul(class: "error-list") do
         @batch.errors.each do |error|
           li { error.full_message }
@@ -118,14 +108,11 @@ class Views::Letter::Batches::Edit < Views::Base
       end
     end
 
-    render Primer::Alpha::TextField.new(
-      name: "letter_batch[letter_return_address_name]",
-      label: "Custom Return Address Name",
-      caption: "Leave blank to use the return address name",
-      value: @batch.letter_return_address_name,
-      full_width: true,
-      mb: 3
-    )
+    div(style: "margin-bottom: 1lh;") do
+      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Custom Return Address Name" }
+      input(type: "text", name: "letter_batch[letter_return_address_name]", value: @batch.letter_return_address_name, style: "width: 100%;")
+      p(class: "form-hint") { "Leave blank to use the return address name" }
+    end
   end
 
   def tag_picker(f)

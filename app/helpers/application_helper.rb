@@ -116,6 +116,31 @@ module ApplicationHelper
     end
   end
 
+  # WebTUI flash banner helpers
+  def flash_banner_class(type)
+    case type.to_s
+    when "notice", "success" then "success"
+    when "alert", "error" then "error"
+    when "warning" then "warning"
+    else "info"
+    end
+  end
+
+  def flash_banner_icon(type)
+    case type.to_s
+    when "notice", "success" then "+"
+    when "alert", "error" then "!"
+    when "warning" then "!"
+    else "i"
+    end
+  end
+
+  def keyboard_shortcuts_data
+    data = {}
+    data[:back] = request.referer if request.referer.present? && request.referer != request.url
+    data
+  end
+
   private
 
   def recursively_transform_values(obj, &block)

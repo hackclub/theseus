@@ -10,10 +10,10 @@ class Components::Shared::PageHeader < Components::Base
   end
 
   def view_template
-    div(class: "page-header") do
-      div do
-        div(class: "page-title-group") do
-          h1(class: "page-title") { @title }
+    tag("row", "align-": "start between", "gap-": "2", style: "margin-bottom: 2lh;") do
+      tag("column") do
+        tag("row", "gap-": "1", "align-": "center") do
+          h1(style: "margin: 0;") { @title }
           if @jumpcode
             render Components::Shared::Jumpcode.new(code: @jumpcode)
           elsif @jumpcode_path
@@ -21,11 +21,11 @@ class Components::Shared::PageHeader < Components::Base
           end
         end
         if @subtitle
-          p(class: "page-subtitle mt-1") { @subtitle }
+          span(style: "color: var(--foreground2);") { @subtitle }
         end
       end
       if @actions_block
-        div(class: "page-actions") do
+        tag("row", "gap-": "1", "align-": "center") do
           @actions_block.call
         end
       end

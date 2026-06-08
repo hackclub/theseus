@@ -15,18 +15,11 @@ class Views::Letter::Batches::Show < Views::Base
         subtitle: "#{helpers.pluralize(@batch.addresses.count, 'address')} / #{helpers.pluralize(@batch.letters.count, 'letter')}"
       ) do |header|
         header.with_actions do
-          render Primer::Beta::Button.new(tag: :a, href: letter_batches_path, scheme: :secondary, size: :small) do |btn|
-            btn.with_leading_visual_icon(icon: :"arrow-left")
-            "Back"
-          end
-          render Primer::Beta::Button.new(tag: :a, href: edit_letter_batch_path(@batch), scheme: :secondary, size: :small) do |btn|
-            btn.with_leading_visual_icon(icon: :pencil)
-            "Edit"
-          end
+          a(href: letter_batches_path, style: "color: var(--foreground2);") { "← Back" }
+          a(href: edit_letter_batch_path(@batch)) { button("size-": "small") { "✎ Edit" } }
           if @batch.fields_mapped?
-            render Primer::Beta::Button.new(tag: :a, href: process_confirm_letter_batch_path(@batch), scheme: :primary, size: :small) do |btn|
-              btn.with_leading_visual_icon(icon: :play)
-              "Process"
+            a(href: process_confirm_letter_batch_path(@batch)) do
+              button("variant-": "green", "size-": "small") { "▶ Process" }
             end
           end
         end
@@ -43,11 +36,10 @@ class Views::Letter::Batches::Show < Views::Base
   private
 
   def batch_details
-    render Primer::Beta::BorderBox.new(mb: 4) do |box|
-      box.with_header do |header|
-        header.with_title(tag: :h3) { "Details" }
-      end
-      box.with_body do
+    div("box-": "round", style: "margin-bottom: 2lh;") do
+      h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Details" }
+      div("is-": "separator")
+      div(style: "padding: 1lh 1ch;") do
         dl(class: "detail-dl") do
           detail_row("Status") { render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch) }
           detail_row("Origin") { plain @batch.origin }
@@ -72,47 +64,29 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def batch_actions
-    render Primer::Beta::BorderBox.new(mb: 4) do |box|
-      box.with_header do |header|
-        header.with_title(tag: :h3) { "Actions" }
-      end
-      box.with_body do
+    div("box-": "round", style: "margin-bottom: 2lh;") do
+      h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Actions" }
+      div("is-": "separator")
+      div(style: "padding: 1lh 1ch;") do
         div(class: "page-actions") do
           if @batch.pdf_label.attached?
-            render Primer::Beta::Button.new(
-              tag: :a,
-              href: rails_blob_path(@batch.pdf_label, disposition: :inline),
-              scheme: :primary,
-              target: "_blank"
-            ) do |btn|
-              btn.with_leading_visual_icon(icon: :download)
-              "View Labels PDF"
+            a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank") do
+              button("variant-": "green") { "⬇ View Labels PDF" }
             end
           end
 
           form(method: :post, action: mark_printed_letter_batch_path(@batch), class: "form-inline") do
             input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-            render Primer::Beta::Button.new(type: :submit, scheme: :secondary) do |btn|
-              btn.with_leading_visual_icon(icon: :check)
-              "Mark All Printed"
-            end
+            button(type: "submit") { "✓ Mark All Printed" }
           end
 
           form(method: :post, action: mark_mailed_letter_batch_path(@batch), class: "form-inline") do
             input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-            render Primer::Beta::Button.new(type: :submit, scheme: :secondary) do |btn|
-              btn.with_leading_visual_icon(icon: :mail)
-              "Mark All Mailed"
-            end
+            button(type: "submit") { "◇ Mark All Mailed" }
           end
 
-          render Primer::Beta::Button.new(
-            tag: :a,
-            href: regen_letter_batch_path(@batch),
-            scheme: :secondary
-          ) do |btn|
-            btn.with_leading_visual_icon(icon: :sync)
-            "Regenerate Labels"
+          a(href: regen_letter_batch_path(@batch)) do
+            button { "⟳ Regenerate Labels" }
           end
         end
 
@@ -124,7 +98,6 @@ class Views::Letter::Batches::Show < Views::Base
         end
       end
     end
-  end
 
   def letters_section
     details(class: "collapsible-section") do
@@ -206,10 +179,7 @@ class Views::Letter::Batches::Show < Views::Base
       form(method: :post, action: letter_batch_path(@batch)) do
         input(type: :hidden, name: :_method, value: :delete)
         input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-        render Primer::Beta::Button.new(type: :submit, scheme: :danger) do |btn|
-          btn.with_leading_visual_icon(icon: :trash)
-          "Delete this batch"
-        end
+        button(type: "submit", "variant-": "red") { "✕ Delete this batch" }
       end
     end
   end

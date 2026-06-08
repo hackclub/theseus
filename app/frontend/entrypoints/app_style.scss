@@ -1,6 +1,35 @@
-@use "../styles/colors" as *;
-@use "../styles/app" as *;
-@use "../styles/nav.css";
+@layer base, utils, components;
 
-@import "selectize/dist/css/selectize";
-@import "../styles/selectize-primer";
+@import "@webtui/css/base.css";
+@import "@webtui/css/utils/box.css";
+@import "@webtui/css/components/typography.css";
+@import "@webtui/css/components/button.css";
+@import "@webtui/css/components/input.css";
+@import "@webtui/css/components/textarea.css";
+@import "@webtui/css/components/table.css";
+@import "@webtui/css/components/badge.css";
+@import "@webtui/css/components/dialog.css";
+@import "@webtui/css/components/separator.css";
+@import "@webtui/css/components/checkbox.css";
+@import "@webtui/css/components/radio.css";
+@import "@webtui/css/components/switch.css";
+@import "@webtui/css/components/pre.css";
+@import "@webtui/css/components/accordion.css";
+@import "@webtui/css/components/popover.css";
+@import "@webtui/css/components/progress.css";
+@import "@webtui/css/components/spinner.css";
+@import "@webtui/css/components/tooltip.css";
+@import "@webtui/css/components/view.css";
+
+/* Layout primitives */
+@import "../styles/webtui-layout.css";
+
+/* Themes */
+@import "@webtui/theme-gruvbox";
+@import "@webtui/theme-vitesse";
+
+/* Overrides */
+@import "../styles/webtui-overrides";
+
+/* Primer compat — keep loaded during migration */
+@import "../styles/app";

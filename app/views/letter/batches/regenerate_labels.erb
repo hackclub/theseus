@@ -13,13 +13,8 @@
       </label>
     </div>
     <div class="page-actions">
-      <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-        btn.with_leading_visual_icon(icon: :sync)
-        "Regenerate Labels"
-      end %>
-      <%= render Primer::Beta::Button.new(tag: :a, href: letter_batch_path(@batch), scheme: :secondary) do
-        "Cancel"
-      end %>
+      <button type="submit" variant-="green">⟳ Regenerate Labels</button>
+      <a href="<%= letter_batch_path(@batch) %>"><button>Cancel</button></a>
     </div>
   <% end %>
 </div>

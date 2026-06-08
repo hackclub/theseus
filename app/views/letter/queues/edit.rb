@@ -8,10 +8,7 @@ class Views::Letter::Queues::Edit < Views::Base
   def view_template
     div(class: "page-container--narrow") do
       div(class: "page-title-group content-section") do
-        render Primer::Beta::Button.new(tag: :a, href: letter_queue_path(@queue), scheme: :invisible, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :"arrow-left")
-          "Back"
-        end
+        a(href: letter_queue_path(@queue), style: "color: var(--foreground2);") { "← Back" }
         h1(class: "page-title") { "Edit #{@queue.name}" }
       end
 

@@ -9,10 +9,7 @@ class Views::Letters::New < Views::Base
   def view_template
     div(class: "page-container") do
       div(class: "page-title-group content-section") do
-        render Primer::Beta::Button.new(tag: :a, href: letters_path, scheme: :invisible, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :"arrow-left")
-          "Back"
-        end
+        a(href: letters_path, style: "color: var(--foreground2);") { "← Back" }
         h1(class: "page-title") { "New Letter" }
       end
 
@@ -32,55 +29,49 @@ class Views::Letters::New < Views::Base
   private
 
   def postage_rates_card
-    render Primer::Beta::BorderBox.new(mb: 3) do |box|
-      box.with_header do |header|
-        header.with_title(tag: :h3) { "Postage Rates" }
-      end
-      box.with_body do
-        p(class: "rates-heading") { "Letters (stamps)" }
-        table(class: "rates-table") do
-          USPS::PricingEngine::US_STAMP_LETTER_RATES.first(4).each do |oz, price|
-            tr do
-              td { oz == oz.to_i ? "#{oz.to_i} oz" : "#{oz} oz" }
-              td(class: "font-mono") { helpers.number_to_currency(price) }
-            end
+    div("box-": "round", style: "margin-bottom: 2lh;") do
+      h3(style: "margin: 0;") { "Postage Rates" }
+      div("is-": "separator")
+      p(class: "rates-heading") { "Letters (stamps)" }
+      table(class: "rates-table") do
+        USPS::PricingEngine::US_STAMP_LETTER_RATES.first(4).each do |oz, price|
+          tr do
+            td { oz == oz.to_i ? "#{oz.to_i} oz" : "#{oz} oz" }
+            td(class: "font-mono") { helpers.number_to_currency(price) }
           end
         end
+      end
 
-        p(class: "rates-heading") { "Flats (stamps)" }
-        table(class: "rates-table") do
-          USPS::PricingEngine::US_STAMP_FLAT_RATES.first(3).each do |oz, price|
-            tr do
-              td { oz == oz.to_i ? "#{oz.to_i} oz" : "#{oz} oz" }
-              td(class: "font-mono") { helpers.number_to_currency(price) }
-            end
+      p(class: "rates-heading") { "Flats (stamps)" }
+      table(class: "rates-table") do
+        USPS::PricingEngine::US_STAMP_FLAT_RATES.first(3).each do |oz, price|
+          tr do
+            td { oz == oz.to_i ? "#{oz.to_i} oz" : "#{oz} oz" }
+            td(class: "font-mono") { helpers.number_to_currency(price) }
           end
         end
-
-        p(class: "rates-note") do
-          plain "Non-machinable surcharge: +"
-          plain helpers.number_to_currency(USPS::PricingEngine::FCMI_NON_MACHINABLE_SURCHARGE)
-        end
-        p(class: "rates-note") { "Indicia is slightly cheaper for standard letters." }
       end
+
+      p(class: "rates-note") do
+        plain "Non-machinable surcharge: +"
+        plain helpers.number_to_currency(USPS::PricingEngine::FCMI_NON_MACHINABLE_SURCHARGE)
+      end
+      p(class: "rates-note") { "Indicia is slightly cheaper for standard letters." }
     end
   end
 
   def size_limits_card
-    render Primer::Beta::BorderBox.new do |box|
-      box.with_header do |header|
-        header.with_title(tag: :h3) { "Size Limits" }
-      end
-      box.with_body do
-        dl(class: "size-dl") do
-          dt { "Letter" }
-          dd do
-            raw "Up to 11.5 &times; 6.125 in, 3.5 oz"
-          end
-          dt { "Flat" }
-          dd do
-            raw "Up to 15 &times; 12 in, 13 oz"
-          end
+    div("box-": "round") do
+      h3(style: "margin: 0;") { "Size Limits" }
+      div("is-": "separator")
+      dl(class: "size-dl") do
+        dt { "Letter" }
+        dd do
+          raw "Up to 11.5 &times; 6.125 in, 3.5 oz"
+        end
+        dt { "Flat" }
+        dd do
+          raw "Up to 15 &times; 12 in, 13 oz"
         end
       end
     end

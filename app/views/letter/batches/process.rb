@@ -11,31 +11,25 @@ class Views::Letter::Batches::Process < Views::Base
   def view_template
     div(class: "page-container--narrow") do
       div(class: "page-header") do
-        render Primer::Beta::Button.new(tag: :a, href: letter_batch_path(@batch), scheme: :invisible, size: :small) do |btn|
-          btn.with_leading_visual_icon(icon: :"arrow-left")
-          "Back to batch"
-        end
+        a(href: letter_batch_path(@batch), style: "color: var(--foreground2);") { "← Back to batch" }
         h1(class: "page-title") { "Process Letter Batch ##{@batch.id}" }
       end
 
-      render Primer::Alpha::Banner.new(scheme: :default, mb: 4) do
-        "This will generate labels for #{helpers.pluralize(@batch.addresses.count, 'address')}."
+      div("box-": "square", class: "tui-banner", style: "margin-bottom: 2lh;") do
+        plain "This will generate labels for #{helpers.pluralize(@batch.addresses.count, 'address')}."
       end
 
       form_with(model: @batch, url: process_letter_batch_path(@batch), method: :post, scope: :batch) do |f|
         # Title
-        render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_header do |header|
-            header.with_title(tag: :h3) { "Letter Details" }
-          end
-          box.with_body do
-            render Primer::Alpha::TextField.new(
-              name: "batch[user_facing_title]",
-              label: "Letter Title",
-              caption: "Visible to recipients on their letters (e.g. \"Monthly Newsletter\")",
-              full_width: true,
-              mb: 3
-            )
+        div("box-": "round", style: "margin-bottom: 2lh;") do
+          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Letter Details" }
+          div("is-": "separator")
+          div(style: "padding: 1lh 1ch;") do
+            div(style: "margin-bottom: 1lh;") do
+              label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Letter Title" }
+              input(type: "text", name: "batch[user_facing_title]", style: "width: 100%;")
+              p(class: "form-hint") { "Visible to recipients on their letters (e.g. \"Monthly Newsletter\")" }
+            end
 
             # Mailing Date
             div(class: "form-field-lg") do
@@ -55,22 +49,20 @@ class Views::Letter::Batches::Process < Views::Base
         end
 
         # Templates
-        render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_header do |header|
-            header.with_title(tag: :h3) { "Label Templates" }
-          end
-          box.with_body do
+        div("box-": "round", style: "margin-bottom: 2lh;") do
+          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Label Templates" }
+          div("is-": "separator")
+          div(style: "padding: 1lh 1ch;") do
             p(class: "form-hint mb-2") { "Select multiple templates to cycle through them, or just one for all labels." }
             template_select
           end
         end
 
         # QR Code
-        render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_header do |header|
-            header.with_title(tag: :h3) { "Options" }
-          end
-          box.with_body do
+        div("box-": "round", style: "margin-bottom: 2lh;") do
+          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Options" }
+          div("is-": "separator")
+          div(style: "padding: 1lh 1ch;") do
             label(class: "form-check-label form-field") do
               input(type: "checkbox", name: "batch[include_qr_code]", value: "1", checked: true)
               span { "Include QR code on labels" }
@@ -88,35 +80,28 @@ class Views::Letter::Batches::Process < Views::Base
         end
 
         # Postage
-        render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_header do |header|
-            header.with_title(tag: :h3) { "Postage" }
-          end
-          box.with_body do
+        div("box-": "round", style: "margin-bottom: 2lh;") do
+          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Postage" }
+          div("is-": "separator")
+          div(style: "padding: 1lh 1ch;") do
             postage_options
             cost_info
           end
         end
 
         # Payment Account
-        render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_header do |header|
-            header.with_title(tag: :h3) { "Payment" }
-          end
-          box.with_body do
+        div("box-": "round", style: "margin-bottom: 2lh;") do
+          h3(style: "margin: 0; padding: 1lh 1ch 0;") { "Payment" }
+          div("is-": "separator")
+          div(style: "padding: 1lh 1ch;") do
             payment_fields
           end
         end
 
         # Submit
         div(class: "page-actions") do
-          render Primer::Beta::Button.new(tag: :a, href: letter_batch_path(@batch), scheme: :secondary) do
-            "Cancel"
-          end
-          render Primer::Beta::Button.new(type: :submit, scheme: :primary) do |btn|
-            btn.with_leading_visual_icon(icon: :play)
-            "Generate Labels"
-          end
+          a(href: letter_batch_path(@batch)) { button { "Cancel" } }
+          button(type: "submit", "variant-": "green") { "▶ Generate Labels" }
         end
       end
 

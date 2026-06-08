@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class Views::ReturnAddresses::Index < Views::Base
-  def initialize(return_addresses:)
+  def initialize(return_addresses:, search: nil)
     @return_addresses = return_addresses
+    @search = search
   end
 
   def view_template
@@ -12,26 +13,41 @@ class Views::ReturnAddresses::Index < Views::Base
           h1(class: "page-title") { "Return Addresses" }
           render Components::Shared::Jumpcode.new(path: return_addresses_path)
         end
-        render Primer::Beta::Button.new(tag: :a, href: new_return_address_path, scheme: :primary) do |btn|
-          btn.with_leading_visual_icon(icon: :plus)
-          "New Return Address"
+        a(href: new_return_address_path) do
+          button("variant-": "green") { "+ New Return Address" }
+        end
+      end
+
+      div(class: "filter-bar-wrap") do
+        div(class: "filter-search") do
+          form(action: return_addresses_path, method: "get", class: "form-contents") do
+            input(
+              type: "text",
+              name: "search",
+              placeholder: "Search by name, address, city...",
+              value: @search,
+              style: "width: 100%;"
+            )
+          end
+        end
+
+        if @search.present?
+          a(href: return_addresses_path, style: "color: var(--foreground2);") { "× Clear" }
         end
       end
 
       if return_addresses.any?
-        render Primer::Beta::BorderBox.new do |box|
+        div("box-": "round") do
           return_addresses.each do |address|
-            box.with_row do
-              render_address_row(address)
-            end
+            render_address_row(address)
+            div("is-": "separator") unless address == return_addresses.last
           end
         end
       else
-        render Primer::Beta::Blankslate.new(border: true) do |bs|
-          bs.with_visual_icon(icon: :location)
-          bs.with_heading(tag: :h2) { "No return addresses found" }
-          bs.with_description { "Create your first return address to get started." }
-          bs.with_primary_action(href: new_return_address_path) { "Create Return Address" }
+        div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+          h2(style: "margin: 0;") { "No return addresses found" }
+          p(style: "color: var(--foreground2);") { "Create your first return address to get started." }
+          a(href: new_return_address_path) { button("variant-": "green") { "Create Return Address" } }
         end
       end
     end
@@ -64,46 +80,37 @@ class Views::ReturnAddresses::Index < Views::Base
 
   def render_badges(address)
     if address == current_user&.home_return_address
-      render(Primer::Beta::Label.new(scheme: :success)) { plain "Default" }
+      span("is-": "badge", "variant-": "green") { "Default" }
     end
 
     if address.shared
-      render(Primer::Beta::Label.new(scheme: :accent)) { plain "Shared" }
+      span("is-": "badge", "variant-": "blue") { "Shared" }
     end
 
     if address.user == current_user && address != current_user&.home_return_address
-      render(Primer::Beta::Label.new(scheme: :secondary)) { plain "Mine" }
+      span("is-": "badge") { "Mine" }
     end
   end
 
   def render_actions_menu(address)
-    render Primer::Alpha::ActionMenu.new do |menu|
-      menu.with_show_button(icon: :"kebab-horizontal", "aria-label": "Actions", scheme: :invisible)
+    details(style: "position: relative; display: inline-block;") do
+      summary(style: "cursor: pointer; list-style: none; color: var(--foreground2);") { "⋯" }
+      div("box-": "round", style: "position: absolute; right: 0; z-index: 10; min-width: 20ch; padding: 0.5lh 0;") do
+        a(href: edit_return_address_path(address), style: "display: block; padding: 0.25lh 1ch;") { "✎ Edit" }
 
-      menu.with_item(label: "Edit", href: edit_return_address_path(address)) do |item|
-        item.with_leading_visual_icon(icon: :pencil)
-      end
-
-      unless address == current_user&.home_return_address
-        menu.with_item(
-          label: "Set as Default",
-          href: set_as_home_return_address_path(address),
-          content_arguments: { method: :post }
-        ) do |item|
-          item.with_leading_visual_icon(icon: :home)
+        unless address == current_user&.home_return_address
+          a(
+            href: set_as_home_return_address_path(address),
+            data: { turbo_method: :post },
+            style: "display: block; padding: 0.25lh 1ch;"
+          ) { "⌂ Set as Default" }
         end
-      end
 
-      menu.with_item(
-        label: "Delete",
-        scheme: :danger,
-        href: return_address_path(address),
-        content_arguments: {
-          method: :delete,
-          data: { confirm: "Are you sure you want to delete this return address?" }
-        }
-      ) do |item|
-        item.with_leading_visual_icon(icon: :trash)
+        a(
+          href: return_address_path(address),
+          data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this return address?" },
+          style: "display: block; padding: 0.25lh 1ch; color: var(--red);"
+        ) { "✕ Delete" }
       end
     end
   end

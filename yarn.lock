@@ -849,6 +849,21 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.1.5.tgz#74ee3aad995d0a3996a6bb9533d4d280514ede03"
   integrity sha512-oJ4F3TnvpXaQwZJNF3ZK+kLPHKarDmJjJ6jyzVNDKH9md1dptjC7lWR//jrGuLdek/U6iltWxqAnYOu8gCiOvA==
 
+"@webtui/css@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@webtui/css/-/css-0.1.7.tgz#9fe53161f387e3b50e6012dbacec17a2da2910b7"
+  integrity sha512-iPK/gRM0EPBSa1tyJINm2pRPuKoT1GryN0Qljar+gDaKHJPNExKvOmnVKk91JpsTUb8qXZd+ggSJJjns1fXLNg==
+
+"@webtui/theme-gruvbox@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@webtui/theme-gruvbox/-/theme-gruvbox-0.0.2.tgz#a8058e64b66ba579db74498e8e7e07b2d7178d10"
+  integrity sha512-7BZ3+FQEswA8AiZR8WhmFUOGZT+HTL4BR/QgusMa26Cyv6zEz3w+T4aME8RTB7m5lWCUWq88X16XDe4xmoTLng==
+
+"@webtui/theme-vitesse@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@webtui/theme-vitesse/-/theme-vitesse-0.0.2.tgz#6e9ba2d30f532d84339a5f9659822114db96d5f4"
+  integrity sha512-GGz7o6Zi7C5U9iaowzLPxdCDjKmHwqu5KSU/XO9RtrCizFuEq696g6769N5ZHsXQ+lnRyosRnPzxGwGe6X+T4g==
+
 acorn@^7.1.1:
   version "7.4.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.4.1.tgz#feaed255973d2e77555b83dbc08851a6c63520fa"

@@ -11,8 +11,7 @@
             Letter to <%= @letter.address.name_line %>
           <% end %>
         </h1>
-        <% status_scheme = { pending: :secondary, printed: :accent, mailed: :success, received: :done, canceled: :attention, errored: :danger }[@letter.aasm_state.to_sym] || :secondary %>
-        <%= render(Primer::Beta::Label.new(scheme: status_scheme, size: :large)) { @letter.aasm_state.humanize } %>
+        <%= render Components::Shared::StatusBadge.new(status: @letter.aasm_state, type: :letter) %>
       </div>
       <p class="page-subtitle">
         <%= render Components::Shared::PublicId.new(value: @letter.public_id) %>
@@ -20,19 +19,10 @@
     </div>
 
     <div class="page-actions">
-      <%= render Primer::Beta::Button.new(tag: :a, href: edit_letter_path(@letter), scheme: :secondary, size: :medium) do |btn|
-        btn.with_leading_visual_icon(icon: :pencil)
-        "Edit"
-      end %>
-      <%= render Primer::Beta::Button.new(tag: :a, href: public_letter_path(@letter), scheme: :secondary, size: :medium, target: "_blank") do |btn|
-        btn.with_leading_visual_icon(icon: :"link-external")
-        "Public Page"
-      end %>
+      <a href="<%= edit_letter_path(@letter) %>"><button>✎ Edit</button></a>
+      <a href="<%= public_letter_path(@letter) %>" target="_blank"><button>↗ Public Page</button></a>
       <%= form_with url: letter_path(@letter), method: :delete, data: { turbo_confirm: "Delete this letter?" }, class: "form-inline" do %>
-        <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :medium) do |btn|
-          btn.with_leading_visual_icon(icon: :trash)
-          "Delete"
-        end %>
+        <button type="submit" variant-="red">✕ Delete</button>
       <% end %>
     </div>
   </div>
@@ -40,7 +30,7 @@
   <% if @letter.tags.present? %>
     <div class="tags-row">
       <% @letter.tags.compact_blank.each do |tag| %>
-        <%= render(Primer::Beta::Label.new(tag: :a, href: tag_stats_path(tag), scheme: :secondary)) { tag } %>
+        <a href="<%= tag_stats_path(tag) %>"><span is-="badge"><%= tag %></span></a>
       <% end %>
     </div>
   <% end %>
@@ -50,9 +40,10 @@
       <div class="content-section">
         <h2 class="section-heading">Addresses</h2>
         <div class="two-col-equal">
-          <%= render Primer::Beta::BorderBox.new do |box|
-            box.with_header { "From" }
-            box.with_row do %>
+          <div box-="round">
+            <h3 style="margin: 0;">From</h3>
+            <div is-="separator"></div>
+            <div style="padding: 1lh 1ch;">
               <% if @letter.return_address.present? %>
                 <div class="address-block">
                   <div class="fw-semibold"><%= @letter.return_address_name_line %></div>
@@ -66,12 +57,13 @@
               <% else %>
                 <span class="kv-label">No return address</span>
               <% end %>
-            <% end
-          end %>
+            </div>
+          </div>
 
-          <%= render Primer::Beta::BorderBox.new do |box|
-            box.with_header { "To" }
-            box.with_row do %>
+          <div box-="round">
+            <h3 style="margin: 0;">To</h3>
+            <div is-="separator"></div>
+            <div style="padding: 1lh 1ch;">
               <div class="address-block">
                 <div class="fw-semibold"><%= @letter.address.name_line %></div>
                 <div class="kv-label">
@@ -81,8 +73,8 @@
                   <%= @letter.address.country %>
                 </div>
               </div>
-            <% end
-          end %>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -93,16 +85,17 @@
 
       <div class="content-section">
         <h2 class="section-heading">Postage</h2>
-        <%= render Primer::Beta::BorderBox.new do |box|
-          if @letter.postage_type == "indicia"
-            if @letter.usps_indicium.present?
-              box.with_row do %>
+        <div box-="round">
+          <% if @letter.postage_type == "indicia" %>
+            <% if @letter.usps_indicium.present? %>
+              <div style="padding: 1lh 1ch;">
                 <div class="page-title-group">
-                  <%= render Primer::Beta::Octicon.new(icon: :"check-circle", color: :success) %>
+                  <span style="color: var(--green);">✓</span>
                   <span class="fw-semibold text-success">Indicia Purchased</span>
                 </div>
-              <% end
-              box.with_row do %>
+              </div>
+              <div is-="separator"></div>
+              <div style="padding: 1lh 1ch;">
                 <div class="detail-grid">
                   <div>
                     <div class="detail-label">Cost</div>
@@ -123,56 +116,52 @@
                     <%= render Components::Shared::PublicId.new(value: @letter.usps_indicium.public_id) %>
                   </div>
                 </div>
-              <% end
-              admin_tool do %>
+              </div>
+              <% admin_tool do %>
                 <% if @letter.usps_indicium.raw_json_response.nil? %>
-                  <div class="py-2">
+                  <div style="padding: 1lh 1ch;">
                     <%= form_with url: clear_indicium_letter_path(@letter), method: :post, data: { turbo_confirm: "This will destroy the orphaned indicium. Are you sure?" }, class: "form-inline" do %>
-                      <%= render Primer::Beta::Button.new(type: :submit, scheme: :danger, size: :small) do |btn|
-                        btn.with_leading_visual_icon(icon: :trash)
-                        "Clear Orphaned Indicium"
-                      end %>
+                      <button type="submit" variant-="red" size-="small">✕ Clear Orphaned Indicium</button>
                     <% end %>
                   </div>
                 <% end %>
               <% end %>
               <%= render 'admin_inspector', record: @letter.usps_indicium %>
-            <% else
-              box.with_row do %>
+            <% else %>
+              <div style="padding: 1lh 1ch;">
                 <div class="page-title-group">
-                  <%= render Primer::Beta::Octicon.new(icon: :alert, color: :attention) %>
+                  <span style="color: var(--yellow);">⚠</span>
                   <span class="fw-medium text-attention">Indicia Not Purchased</span>
                 </div>
-              <% end
-              box.with_row do %>
+              </div>
+              <div is-="separator"></div>
+              <div style="padding: 1lh 1ch;">
                 <% if @letter.batch_id.nil? %>
                   <%= render 'buy_indicia_form', letter: @letter %>
                 <% else %>
                   <span class="kv-label">Postage will be purchased when processing the batch.</span>
                 <% end %>
-              <% end
-            end
-          elsif @letter.postage_type == "international_origin"
-            box.with_row do %>
-              <div>
-                <%= render(Primer::Beta::Label.new(scheme: :accent)) { "International Origin" } %>
-                <span class="kv-label">Postage paid at origin (<%= @letter.return_address&.country %>)</span>
               </div>
-            <% end
-          else
-            box.with_row do %>
+            <% end %>
+          <% elsif @letter.postage_type == "international_origin" %>
+            <div style="padding: 1lh 1ch;">
+              <span is-="badge" variant-="blue">International Origin</span>
+              <span class="kv-label">Postage paid at origin (<%= @letter.return_address&.country %>)</span>
+            </div>
+          <% else %>
+            <div style="padding: 1lh 1ch;">
               <div class="kv-row">
                 <span class="kv-label">Using physical stamps</span>
                 <% if @letter.batch_id.nil? %>
                   <%= form_with url: letter_path(@letter), method: :patch, class: "form-inline" do |f| %>
                     <%= f.hidden_field :postage_type, value: "indicia", name: "letter[postage_type]" %>
-                    <%= render Primer::Beta::Button.new(type: :submit, scheme: :secondary, size: :small) { "Switch to Indicia" } %>
+                    <button type="submit" size-="small">Switch to Indicia</button>
                   <% end %>
                 <% end %>
               </div>
-            <% end
-          end
-        end %>
+            </div>
+          <% end %>
+        </div>
       </div>
 
       <% if @letter.batch.present? %>
@@ -182,8 +171,8 @@
       <% if @letter.imb_serial_number.present? && @letter.address.country&.upcase == 'US' %>
         <div class="content-section">
           <h2 class="section-heading">IMb Tracking</h2>
-          <%= render Primer::Beta::BorderBox.new do |box|
-            box.with_row do %>
+          <div box-="round">
+            <div style="padding: 1lh 1ch;">
               <div class="detail-grid">
                 <div>
                   <div class="detail-label">Serial</div>
@@ -194,19 +183,19 @@
                   <span><%= @letter.imb_rollover_count %></span>
                 </div>
               </div>
-            <% end
-          end %>
+            </div>
+          </div>
         </div>
       <% end %>
 
       <% if @letter.rubber_stamps.present? %>
         <div class="content-section">
           <h2 class="section-heading">Rubber Stamps</h2>
-          <%= render Primer::Beta::BorderBox.new do |box|
-            box.with_row do %>
+          <div box-="round">
+            <div style="padding: 1lh 1ch;">
               <pre class="pre-wrap"><%= @letter.rubber_stamps %></pre>
-            <% end
-          end %>
+            </div>
+          </div>
         </div>
       <% end %>
 
@@ -214,113 +203,82 @@
     </div>
 
     <div>
-      <div class="sticky-sidebar">
-        <h2 class="section-heading">Actions</h2>
-        <%= render Primer::Beta::BorderBox.new(mb: 4) do |box|
-          box.with_body do %>
-            <% case @letter.aasm_state %>
-            <% when 'pending' %>
-              <% if @letter.label.attached? %>
-                <div class="form-field">
-                  <div class="detail-label">Label Ready</div>
-                  <div class="page-actions">
-                    <%= render Primer::Beta::Button.new(tag: :a, href: rails_blob_path(@letter.label, disposition: 'inline'), scheme: :secondary, size: :small, target: "_blank") do |btn|
-                      btn.with_leading_visual_icon(icon: :eye)
-                      "View Label"
-                    end %>
-                    <%= form_with url: clear_label_letter_path(@letter), method: :post, data: { turbo_confirm: "Clear this label?" }, class: "form-inline" do %>
-                      <%= render Primer::Beta::Button.new(type: :submit, scheme: :secondary, size: :small) do |btn|
-                        btn.with_leading_visual_icon(icon: :x)
-                        "Clear"
-                      end %>
-                    <% end %>
-                  </div>
+      <div class="sticky-sidebar inspector-panel">
+        <div class="inspector-group">
+          <h3 class="inspector-group-label">Actions</h3>
+          <% case @letter.aasm_state %>
+          <% when 'pending' %>
+            <% if @letter.label.attached? %>
+              <div class="form-field">
+                <div class="detail-label">Label Ready</div>
+                <div class="page-actions">
+                  <a href="<%= rails_blob_path(@letter.label, disposition: 'inline') %>" target="_blank"><button size-="small">👁 View Label</button></a>
+                  <%= form_with url: clear_label_letter_path(@letter), method: :post, data: { turbo_confirm: "Clear this label?" }, class: "form-inline" do %>
+                    <button type="submit" size-="small">× Clear</button>
+                  <% end %>
                 </div>
-                <hr class="divider">
-                <%= form_with url: mark_printed_letter_path(@letter), method: :post do %>
-                  <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary, block: true) do |btn|
-                    btn.with_leading_visual_icon(icon: :check)
-                    "Mark as Printed"
-                  end %>
-                <% end %>
-              <% elsif @letter.batch.present? %>
-                <%= form_with url: mark_printed_letter_path(@letter), method: :post do %>
-                  <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary, block: true) do |btn|
-                    btn.with_leading_visual_icon(icon: :check)
-                    "Mark as Printed"
-                  end %>
-                <% end %>
-              <% else %>
-                <div class="detail-label">Generate Label</div>
-                <%= form_tag(generate_label_letter_path(@letter), method: :post) do %>
-                  <div class="form-field">
-                    <%= render 'shared/template_picker', multiple: false %>
-                    <input type="hidden" name="template" id="selected_template">
-                  </div>
-                  <div class="form-field">
-                    <%= render Primer::Alpha::CheckBox.new(
-                      name: "qr",
-                      label: "Include QR Code",
-                      value: "1",
-                      checked: true
-                    ) %>
-                  </div>
-                  <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary, block: true) do |btn|
-                    btn.with_leading_visual_icon(icon: :file)
-                    "Generate Label"
-                  end %>
-                <% end %>
-                <% dev_tool do %>
-                  <div class="mt-2">
-                    <%= link_to "preview label?", preview_template_letter_path(@letter), class: "resource-card-meta" %>
-                  </div>
-                <% end %>
-              <% end %>
-            <% when 'printed' %>
-              <%= form_with url: mark_mailed_letter_path(@letter), method: :post do %>
-                <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary, block: true) do |btn|
-                  btn.with_leading_visual_icon(icon: :check)
-                  "Mark as Mailed"
-                end %>
-              <% end %>
-            <% when 'mailed' %>
-              <%= form_with url: mark_received_letter_path(@letter), method: :post do %>
-                <%= render Primer::Beta::Button.new(type: :submit, scheme: :primary, block: true) do |btn|
-                  btn.with_leading_visual_icon(icon: :check)
-                  "Mark as Received"
-                end %>
-              <% end %>
-            <% when 'received' %>
-              <div class="letter-received-card">
-                <%= render Primer::Beta::Octicon.new(icon: :"check-circle", size: :medium) %>
-                <div class="fw-semibold mt-1">Letter received</div>
               </div>
+              <hr class="divider">
+              <%= form_with url: mark_printed_letter_path(@letter), method: :post do %>
+                <button type="submit" variant-="green" style="width: 100%;">✓ Mark as Printed</button>
+              <% end %>
+            <% elsif @letter.batch.present? %>
+              <%= form_with url: mark_printed_letter_path(@letter), method: :post do %>
+                <button type="submit" variant-="green" style="width: 100%;">✓ Mark as Printed</button>
+              <% end %>
+            <% else %>
+              <div class="detail-label">Generate Label</div>
+              <%= form_with(url: generate_label_letter_path(@letter), method: :post) do |f| %>
+                <div class="form-field">
+                  <%= render Components::Shared::TemplatePicker.new(form: f, name: :template) %>
+                </div>
+                <div class="form-field">
+                  <label>
+                    <input type="checkbox" name="qr" value="1" checked>
+                    Include QR Code
+                  </label>
+                </div>
+                <button type="submit" variant-="green" style="width: 100%;">⎘ Generate Label</button>
+              <% end %>
+              <% dev_tool do %>
+                <div class="mt-2">
+                  <%= link_to "preview label?", preview_template_letter_path(@letter), class: "resource-card-meta" %>
+                </div>
+              <% end %>
             <% end %>
-          <% end
-        end %>
+          <% when 'printed' %>
+            <%= form_with url: mark_mailed_letter_path(@letter), method: :post do %>
+              <button type="submit" variant-="green" style="width: 100%;">✓ Mark as Mailed</button>
+            <% end %>
+          <% when 'mailed' %>
+            <%= form_with url: mark_received_letter_path(@letter), method: :post do %>
+              <button type="submit" variant-="green" style="width: 100%;">✓ Mark as Received</button>
+            <% end %>
+          <% when 'received' %>
+            <div class="letter-received-card">
+              <span style="font-size: 2em;">✓</span>
+              <div class="fw-semibold mt-1">Letter received</div>
+            </div>
+          <% end %>
+        </div>
 
         <% if @letter.label.attached? %>
           <%= render 'shared/instant_print_window', url: rails_blob_path(@letter.label, disposition: 'inline') %>
-          <h2 class="section-heading">Label Preview</h2>
-          <%= render Primer::Beta::BorderBox.new do |box|
-            box.with_body do %>
-              <div class="label-preview">
-                <iframe src="<%= rails_blob_path(@letter.label, disposition: 'inline') %>"></iframe>
-              </div>
-              <div class="mt-3">
-                <%= link_to "Download Label", rails_blob_path(@letter.label, disposition: "attachment"), class: "resource-card-meta" %>
-              </div>
-            <% end
-          end %>
+          <div class="inspector-group">
+            <h3 class="inspector-group-label">Label Preview</h3>
+            <div class="label-preview">
+              <iframe src="<%= rails_blob_path(@letter.label, disposition: 'inline') %>"></iframe>
+            </div>
+            <div class="mt-2">
+              <%= link_to "Download Label", rails_blob_path(@letter.label, disposition: "attachment"), class: "resource-card-meta" %>
+            </div>
+          </div>
         <% end %>
       </div>
     </div>
   </div>
 
   <div class="back-link">
-    <%= render Primer::Beta::Button.new(tag: :a, href: letters_path, scheme: :invisible, size: :small) do |btn|
-      btn.with_leading_visual_icon(icon: :"arrow-left")
-      "Back to letters"
-    end %>
+    <a href="<%= letters_path %>" style="color: var(--foreground2);">← Back to letters</a>
   </div>
 </div>

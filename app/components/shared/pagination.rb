@@ -13,25 +13,25 @@ class Components::Shared::Pagination < Components::Base
     current = collection.current_page
     total = collection.total_pages
 
-    nav(class: "pagination") do
+    tag("row", "gap-": "1", "align-": "center center", class: "pagination") do
       if current > 1
-        a(href: page_path(1), class: "pagination-link") { "« First" }
-        a(href: page_path(current - 1), class: "pagination-link") { "‹ Prev" }
+        a(href: page_path(1)) { "« First" }
+        a(href: page_path(current - 1), rel: "prev") { "‹ Prev" }
       end
 
       window(current, total).each do |page_num|
         if page_num == :gap
-          span(class: "pagination-gap") { "…" }
+          span(style: "color: var(--foreground2);") { "…" }
         elsif page_num == current
-          span(class: "pagination-current") { page_num.to_s }
+          span("is-": "badge", "variant-": "foreground0") { page_num.to_s }
         else
-          a(href: page_path(page_num), class: "pagination-link") { page_num.to_s }
+          a(href: page_path(page_num)) { page_num.to_s }
         end
       end
 
       if current < total
-        a(href: page_path(current + 1), class: "pagination-link") { "Next ›" }
-        a(href: page_path(total), class: "pagination-link") { "Last »" }
+        a(href: page_path(current + 1), rel: "next") { "Next ›" }
+        a(href: page_path(total)) { "Last »" }
       end
     end
   end

@@ -41,16 +41,14 @@ class Views::Letter::Queues::Index < Views::Base
           end
         end
 
-        render Primer::Alpha::ActionMenu.new do |menu|
-          menu.with_show_button(scheme: :primary, size: :medium) do |btn|
-            btn.with_leading_visual_icon(icon: :plus)
-            "New Queue"
-          end
-          menu.with_item(label: "Batch queue", href: new_letter_queue_path) do |item|
-            item.with_leading_visual_icon(icon: :stack)
-          end
-          menu.with_item(label: "Instant queue", href: new_letter_instant_queue_path) do |item|
-            item.with_leading_visual_icon(icon: :zap)
+        div(class: "dropdown-container", style: "position: relative;") do
+          tag("row", "gap-": "1") do
+            a(href: new_letter_queue_path) do
+              button { "⊞ Batch queue" }
+            end
+            a(href: new_letter_instant_queue_path) do
+              button { "↯ Instant queue" }
+            end
           end
         end
       end
@@ -70,15 +68,7 @@ class Views::Letter::Queues::Index < Views::Base
       type_toggle
 
       if user_id.present? || queue_type.present?
-        render Primer::Beta::Button.new(
-          tag: :a,
-          href: letter_queues_path,
-          scheme: :invisible,
-          size: :small
-        ) do |btn|
-          btn.with_leading_visual_icon(icon: :x)
-          "Clear filters"
-        end
+        a(href: letter_queues_path, style: "color: var(--foreground2);") { "× Clear filters" }
       end
     end
   end
@@ -93,15 +83,15 @@ class Views::Letter::Queues::Index < Views::Base
     div(class: "filter-toggle-row") do
       types.each do |t|
         is_active = queue_type == t[:key]
-        render Primer::Beta::Button.new(
-          tag: :a,
-          href: letter_queues_path(queue_type: t[:key], user_id: user_id),
-          scheme: is_active ? :secondary : :invisible,
-          size: :medium
-        ) do |btn|
-          btn.with_leading_visual_icon(icon: t[:icon])
-          t[:label]
-        end
+          if is_active
+            a(href: letter_queues_path(queue_type: t[:key], user_id: user_id)) do
+              button("size-": "small", "variant-": "green") { t[:label] }
+            end
+          else
+            a(href: letter_queues_path(queue_type: t[:key], user_id: user_id), style: "color: var(--foreground2);") do
+              plain t[:label]
+            end
+          end
       end
     end
   end
@@ -142,48 +132,40 @@ class Views::Letter::Queues::Index < Views::Base
     end
 
     a(href: href, class: "link-reset d-block") do
-      render Primer::Beta::BorderBox.new(style: box_style) do |box|
-        box.with_row do
-          div(class: "queue-card-header") do
-            span(class: "queue-card-name") do
-              queue.name
-            end
-            if is_instant
-              render(Primer::Beta::Label.new(scheme: :done, size: :medium)) { "Instant" }
-            else
-              render(Primer::Beta::Label.new(scheme: :accent, size: :medium)) { "Batch" }
-            end
+      div("box-": "round", style: box_style) do
+        div(class: "queue-card-header", style: "padding: 1lh 1ch;") do
+          span(class: "queue-card-name") do
+            queue.name
+          end
+          if is_instant
+            span("is-": "badge", "variant-": "green") { "Instant" }
+          else
+            span("is-": "badge", "variant-": "blue") { "Batch" }
           end
         end
-
-        box.with_row do
+        div("is-": "separator")
+        div(class: "queue-card-stat", style: "padding: 1lh 1ch;") do
           if action > 0
             label = is_instant ? "awaiting mail" : "queued"
-            div(class: "queue-card-stat") do
-              span(class: "stat-value") { action.to_s }
-              span(class: "page-subtitle") { label }
-            end
+            span(class: "stat-value") { action.to_s }
+            span(class: "page-subtitle") { label }
           else
-            div(class: "queue-card-stat") do
-              span(class: "stat-value kv-label") { "—" }
-              span(class: "page-subtitle") { "idle" }
-            end
+            span(class: "stat-value kv-label") { "—" }
+            span(class: "page-subtitle") { "idle" }
           end
         end
-
       end
     end
   end
 
   def blankslate
-    render Primer::Beta::Blankslate.new(border: true) do |bs|
-      bs.with_visual_icon(icon: :stack)
-      bs.with_heading(tag: :h2) { "No queues found" }
+    div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+      h2(style: "margin: 0;") { "No queues found" }
       if queue_type.present? || user_id.present?
-        bs.with_description { "Try adjusting your filters." }
+        p(style: "color: var(--foreground2);") { "Try adjusting your filters." }
       else
-        bs.with_description { "Create a queue to get started." }
-        bs.with_primary_action(href: new_letter_queue_path) { "New Queue" }
+        p(style: "color: var(--foreground2);") { "Create a queue to get started." }
+        a(href: new_letter_queue_path) { button("variant-": "green") { "New Queue" } }
       end
     end
   end

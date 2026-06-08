@@ -39,9 +39,8 @@ class Views::Letters::Index < Views::Base
         end
       end
 
-      render Primer::Beta::Button.new(tag: :a, href: new_letter_path, scheme: :primary) do |btn|
-        btn.with_leading_visual_icon(icon: :plus)
-        "Send Letter"
+      a(href: new_letter_path) do
+        button("variant-": "green") { "+ Send Letter" }
       end
     end
   end
@@ -70,20 +69,10 @@ class Views::Letters::Index < Views::Base
              letters_path(origin: origin, search: search, user_id: user_id, status: filter_status)
            end
 
-    schemes = {
-      secondary: { bg: "var(--bgColor-muted)", border: "var(--borderColor-default)", active_bg: "var(--bgColor-neutral-emphasis)" },
-      accent: { bg: "var(--bgColor-accent-muted)", border: "var(--borderColor-accent-muted)", active_bg: "var(--bgColor-accent-emphasis)" },
-      success: { bg: "var(--bgColor-success-muted)", border: "var(--borderColor-success-muted)", active_bg: "var(--bgColor-success-emphasis)" },
-      attention: { bg: "var(--bgColor-attention-muted)", border: "var(--borderColor-attention-muted)", active_bg: "var(--bgColor-attention-emphasis)" }
-    }
-    s = schemes[scheme]
-
     a(
       href: href,
       class: "stat-pill-link",
-      style: "background: #{is_active ? s[:active_bg] : s[:bg]}; " \
-             "border-color: #{is_active ? s[:active_bg] : s[:border]}; " \
-             "color: #{is_active ? 'var(--fgColor-onEmphasis)' : 'inherit'};"
+      data: { scheme: scheme, active: is_active ? "true" : nil }
     ) do
       span(class: "fw-semibold") { count.to_s }
       span(class: is_active ? "" : "kv-label") { label }
@@ -97,14 +86,12 @@ class Views::Letters::Index < Views::Base
           hidden_field_tag(:status, status) if status.present?
           hidden_field_tag(:origin, origin) if origin.present?
           hidden_field_tag(:user_id, user_id) if user_id.present?
-          render Primer::Alpha::TextField.new(
+          input(
+            type: "text",
             name: "search",
-            label: "Search",
-            visually_hide_label: true,
             placeholder: "Search by recipient, title, or email...",
             value: search,
-            leading_visual: { icon: :search },
-            full_width: true
+            style: "width: 100%;"
           )
         end
       end
@@ -121,39 +108,28 @@ class Views::Letters::Index < Views::Base
 
       has_filters = search.present? || status.present? || origin.present? || user_id.present?
       if has_filters
-        render Primer::Beta::Button.new(
-          tag: :a,
-          href: letters_path,
-          scheme: :invisible,
-          size: :small
-        ) do |btn|
-          btn.with_leading_visual_icon(icon: :x)
-          "Clear filters"
-        end
+        a(href: letters_path, style: "color: var(--foreground2);") { "× Clear filters" }
       end
     end
   end
 
   def origin_filter_section
     origins = [
-      { key: nil, label: "All", icon: :rows },
-      { key: "manual", label: "Manual", icon: :pencil },
-      { key: "bulk_upload", label: "Bulk upload", icon: :upload },
-      { key: "queue", label: "Queue", icon: :stack },
-      { key: "api", label: "API", icon: :code },
+      { key: nil, label: "All", icon: "≡" },
+      { key: "manual", label: "Manual", icon: "✎" },
+      { key: "bulk_upload", label: "Bulk upload", icon: "↑" },
+      { key: "queue", label: "Queue", icon: "☰" },
+      { key: "api", label: "API", icon: "</>" },
     ]
 
     div(class: "filter-toggle-row") do
       origins.each do |o|
         is_active = origin == o[:key]
-        render Primer::Beta::Button.new(
-          tag: :a,
+        a(
           href: letters_path(origin: o[:key], search: search, status: status, user_id: user_id),
-          scheme: is_active ? :secondary : :invisible,
-          size: :medium
-        ) do |btn|
-          btn.with_leading_visual_icon(icon: o[:icon])
-          o[:label]
+          style: is_active ? "font-weight: bold;" : "color: var(--foreground2);"
+        ) do
+          button("size-": "small") { "#{o[:icon]} #{o[:label]}" }
         end
       end
     end
@@ -161,33 +137,28 @@ class Views::Letters::Index < Views::Base
 
   def letters_list
     if letters.any?
-      render Primer::Beta::BorderBox.new do |box|
-        box.with_header do
-          div(class: "letter-list-header") do
-            span(class: "fw-semibold") { "Letter" }
-            div(class: "letter-list-header-side") do
-              span(class: "letter-list-col-recipient") { "Recipient" }
-              span(class: "letter-list-col-batch") { "Batch" }
-              span(class: "letter-list-col-status") { "Status" }
-            end
+      div("box-": "round") do
+        div(class: "letter-list-header", style: "padding: 0.5lh 1ch;") do
+          span(class: "fw-semibold") { "Letter" }
+          div(class: "letter-list-header-side") do
+            span(class: "letter-list-col-recipient") { "Recipient" }
+            span(class: "letter-list-col-batch") { "Batch" }
+            span(class: "letter-list-col-status") { "Status" }
           end
         end
-
         letters.each do |letter|
-          box.with_row do
-            render_letter_row(letter)
-          end
+          div("is-": "separator")
+          render_letter_row(letter)
         end
       end
     else
-      render Primer::Beta::Blankslate.new(border: true) do |bs|
-        bs.with_visual_icon(icon: :mail)
-        bs.with_heading(tag: :h2) { "No letters found" }
+      div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+        h2(style: "margin: 0;") { "No letters found" }
         if search.present? || status.present?
-          bs.with_description { "Try adjusting your search or filters." }
+          p(style: "color: var(--foreground2);") { "Try adjusting your search or filters." }
         else
-          bs.with_description { "Send your first letter to get started." }
-          bs.with_primary_action(href: new_letter_path) { "Send Letter" }
+          p(style: "color: var(--foreground2);") { "Send your first letter to get started." }
+          a(href: new_letter_path) { button("variant-": "green") { "Send Letter" } }
         end
       end
     end
@@ -229,9 +200,7 @@ class Views::Letters::Index < Views::Base
 
         div(class: "letter-row-batch") do
           if letter.batch_id.present?
-            render Primer::Beta::Label.new(scheme: :secondary, size: :medium) do
-              "Batch ##{letter.batch_id}"
-            end
+            span("is-": "badge") { "Batch ##{letter.batch_id}" }
           else
             span(class: "text-sm kv-label") { "—" }
           end
@@ -246,7 +215,7 @@ class Views::Letters::Index < Views::Base
 
   def render_tags(tags)
     tags.compact_blank.each do |tag|
-      render(Primer::Beta::Label.new(scheme: :secondary, size: :medium)) { tag }
+      span("is-": "badge") { tag }
     end
   end
 
