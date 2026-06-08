@@ -259,9 +259,33 @@
     }
   }
 
-  /* ── Plain buttons — flat, no glass ── */
+  /* ── Plain buttons — real software, not terminal ──
+   * Subtle rounding, clean border, proper form-control feel.
+   * Kills WebTUI's stripe gradient on all non-action buttons.
+   */
   button:not([variant-]):not([type=submit]):not([box-]) {
+    border-radius: 4px !important;
+    background-color: var(--background1) !important;
+    background-image: none !important;
+    color: var(--foreground1);
+    border: 1px solid var(--background2) !important;
+    height: 1.5lh;
+    padding: 0 1.5ch;
+    transition: all 0.1s ease;
+    &:hover:not(:disabled) {
+      background-color: var(--background2) !important;
+      color: var(--foreground0);
+      border-color: var(--foreground2) !important;
+    }
+    &:active:not(:disabled) {
+      background-color: var(--background0) !important;
+    }
     &:focus { text-decoration: none !important; font-weight: inherit !important; }
+    &[size-="small"] {
+      height: 1.25lh;
+      padding: 0 1ch;
+      font-size: 0.85em;
+    }
   }
 
   /* ── Input/form contrast fix for dark themes ── */
