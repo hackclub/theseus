@@ -6,12 +6,12 @@
     {
       value: 'letter',
       label: 'Letter',
-      desc: `up to ${LETTER_LIMITS.maxWidth}\u00D7${LETTER_LIMITS.maxHeight}\u201D, ${LETTER_LIMITS.maxWeight}oz`,
+      desc: `up to ${LETTER_LIMITS.maxWidth}×${LETTER_LIMITS.maxHeight}″, ${LETTER_LIMITS.maxWeight}oz`,
     },
     {
       value: 'flat',
       label: 'Flat',
-      desc: `up to ${FLAT_LIMITS.maxWidth}\u00D7${FLAT_LIMITS.maxHeight}\u201D, ${FLAT_LIMITS.maxWeight}oz`,
+      desc: `up to ${FLAT_LIMITS.maxWidth}×${FLAT_LIMITS.maxHeight}″, ${FLAT_LIMITS.maxWeight}oz`,
     },
   ];
 
@@ -25,90 +25,73 @@
 
 <div class="form-group">
   <label class="form-label">Processing Category</label>
-  <div class="category-selector">
+  <div class="segmented">
     {#each categories as cat}
       <button
         type="button"
-        class="category-card"
+        class="segment"
         class:selected={$processingCategory === cat.value}
         on:click={() => select(cat.value)}
       >
-        <span class="radio-dot" class:checked={$processingCategory === cat.value}></span>
-        <span class="category-info">
-          <strong>{cat.label}</strong>
-          <small>{cat.desc}</small>
-        </span>
+        <strong>{cat.label}</strong>
+        <small>{cat.desc}</small>
       </button>
     {/each}
   </div>
 </div>
 
 <style>
-  .category-selector {
+  .form-group { margin-bottom: 1lh; }
+  .form-label {
+    display: block;
+    color: var(--foreground2);
+    margin-bottom: 0.25lh;
+  }
+
+  .segmented {
     display: flex;
-    gap: 0.5rem;
+    gap: 0;
   }
 
-  .category-card {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--background2);
-    border-radius: 0.375rem;
-    background: var(--background1);
-    cursor: pointer;
-    transition: border-color 0.15s, background-color 0.15s;
-    text-align: left;
-    font: inherit;
-    color: inherit;
-  }
-
-  .category-card:hover {
-    border-color: var(--blue);
-  }
-
-  .category-card.selected {
-    border-color: var(--blue);
-    background: var(--background2);
-  }
-
-  .radio-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid var(--background2);
-    flex-shrink: 0;
-    position: relative;
-    transition: border-color 0.15s;
-  }
-
-  .radio-dot.checked {
-    border-color: var(--blue);
-  }
-
-  .radio-dot.checked::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--blue);
-  }
-
-  .category-info {
+  .segment {
+    flex: 1;
     display: flex;
     flex-direction: column;
-  }
-
-  .category-info strong {
-    font-size: 0.875rem;
-  }
-
-  .category-info small {
+    gap: 0;
+    padding: 0.25lh 1ch;
+    border: 1px solid var(--background2);
+    background: var(--background0);
     color: var(--foreground2);
-    font-size: 0.75rem;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    transition: all 0.1s;
+  }
+
+  .segment:first-child { border-radius: 4px 0 0 4px; }
+  .segment:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+
+  .segment:hover:not(.selected) {
+    background: var(--background1);
+    color: var(--foreground1);
+  }
+
+  .segment.selected {
+    background: var(--background2);
+    border-color: var(--foreground2);
+    color: var(--foreground0);
+  }
+
+  .segment strong {
+    font-size: 0.9em;
+  }
+
+  .segment small {
+    font-size: 0.75em;
+    color: var(--foreground2);
+  }
+
+  .segment.selected small {
+    color: var(--foreground1);
   }
 </style>

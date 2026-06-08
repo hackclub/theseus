@@ -7,6 +7,8 @@
 @layer base {
   :root {
     --box-border-color: var(--background2);
+    --box-padding-x: 2ch;
+    --box-padding-y: 1lh;
   }
 
   body, html {

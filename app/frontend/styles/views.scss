@@ -110,6 +110,7 @@
 // Consistent spacing inside box-="round" sections.
 // Title → separator → 0.5lh → content → 0 bottom (box padding handles it)
 [box-] {
+  padding: 1lh 2ch !important;
   > strong:first-child { display: block; }
   > [is-="separator"] { margin-bottom: 0.5lh; }
   margin-bottom: 1lh;
