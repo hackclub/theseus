@@ -225,7 +225,7 @@ class Letter::BatchesController < BaseBatchesController
   end
 
   def import_with_skip
-    authorize @batch, policy_class: Letter::BatchPolicy
+    authorize @batch, :update?, policy_class: Letter::BatchPolicy
     count = LetterBatchImporter.new(@batch).call(skip_invalid: true)
     redirect_to process_confirm_letter_batch_path(@batch), notice: "Imported #{count} letters (skipped invalid rows)."
   end
