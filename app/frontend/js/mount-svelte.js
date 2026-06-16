@@ -14,7 +14,7 @@ const components = {
 };
 
 export function mountSvelteComponents() {
-  document.querySelectorAll('[data-svelte-component]').forEach((target) => {
+  document.querySelectorAll('[data-svelte-component]:not([data-svelte-mounted])').forEach((target) => {
     const componentName = target.dataset.svelteComponent;
     const Component = components[componentName];
 
@@ -23,9 +23,11 @@ export function mountSvelteComponents() {
       return;
     }
 
+    target.dataset.svelteMounted = 'true';
+
     const props = {};
     Object.keys(target.dataset).forEach((key) => {
-      if (key === 'svelteComponent') return;
+      if (key === 'svelteComponent' || key === 'svelteMounted') return;
 
       let value = target.dataset[key];
       try {

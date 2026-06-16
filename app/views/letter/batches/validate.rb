@@ -35,7 +35,7 @@ class Views::Letter::Batches::Validate < Views::Base
       }
     end
 
-    render partial: "letter/batches/grid", locals: { cells: cells }
+    raw helpers.render(partial: "letter/batches/grid", locals: { cells: cells })
 
     if error_count > 0
       h3 { "Invalid rows" }

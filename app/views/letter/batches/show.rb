@@ -41,16 +41,16 @@ class Views::Letter::Batches::Show < Views::Base
       hr
       div(style: "margin-top: 0.5rem;") do
         if @batch.purchasing? || @batch.generating_labels?
-          unsafe_raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
-          unsafe_raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
+          raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
+          raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
         elsif @batch.processed?
           failed_letters = @batch.letters.where(indicia_state: "failed")
           if failed_letters.any?
             div(style: "margin-bottom: 0.5rem;") do
               span(class: "text-danger") { "#{failed_letters.count} letter(s) failed indicia purchase" }
             end
-            unsafe_raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
-            unsafe_raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
+            raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
+            raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
             div(style: "margin-top: 0.75rem; display: flex; gap: 0.5rem;") do
               form_with(url: "#", method: :post) do
                 button(type: "submit", class: "btn-warning btn-sm") { "⟳ Retry Failed" }
