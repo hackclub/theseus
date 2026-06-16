@@ -164,7 +164,8 @@ class Letter::BatchesController < BaseBatchesController
         usps_payment_account_id: letter_batch_params[:usps_payment_account_id],
         hcb_payment_account_id: letter_batch_params[:hcb_payment_account_id],
         non_machinable: letter_batch_params[:non_machinable],
-        template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank,
+        template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank.presence ||
+          [SnailMail::PhlexService.templates_for_size(:standard).first].compact,
         user_facing_title: letter_batch_params[:user_facing_title],
         include_qr_code: letter_batch_params[:include_qr_code],
       }
