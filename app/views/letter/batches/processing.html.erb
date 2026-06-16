@@ -1,0 +1,105 @@
+<%= turbo_stream_from @batch, :progress %>
+
+<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:1rem;">
+  <a href="<%= letter_batch_path(@batch) %>" style="text-decoration:none;color:GrayText;font-size:0.85em;">← <%= @batch.user_facing_title || "Batch ##{@batch.id}" %></a>
+  <h2 style="margin:0;">Processing</h2>
+  <%= render Components::Shared::StatusBadge.new(status: @batch.aasm_state, type: :batch) %>
+</div>
+
+<%# ── Summary counters ── %>
+<% total = @batch.letters.count %>
+<% purchased = @batch.letters.where(indicia_state: "purchased").count %>
+<% failed = @batch.letters.where(indicia_state: "failed").count %>
+<% pending = total - purchased - failed %>
+<% us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
+<% intl_count = total - us_count %>
+
+<div id="batch-summary" style="display:flex;gap:1.5rem;align-items:center;margin-bottom:1rem;">
+  <div>
+    <strong style="font-size:1.5em;font-variant-numeric:tabular-nums;"><%= purchased %></strong>
+    <span class="text-muted"> / <%= total %> purchased</span>
+  </div>
+  <% if failed > 0 %>
+    <div style="color:var(--red);">
+      <strong style="font-size:1.5em;"><%= failed %></strong> failed
+    </div>
+  <% end %>
+  <% if pending > 0 && @batch.purchasing? %>
+    <div class="text-muted"><%= pending %> remaining</div>
+  <% end %>
+</div>
+
+<%# ── Progress bar ── %>
+<% pct = total > 0 ? ((purchased + failed) * 100.0 / total).round(1) : 0 %>
+<div class="batch-progress-bar" style="margin-bottom:0.75rem;">
+  <div class="batch-progress-fill" style="width:<%= pct %>%;"></div>
+</div>
+
+<%# ── Breakdown ── %>
+<div style="display:flex;gap:2rem;margin-bottom:1rem;font-size:0.9em;" class="text-muted">
+  <span>US: <%= us_count %></span>
+  <span>International: <%= intl_count %></span>
+  <% if @batch.letters.where(postage_type: "stamps").any? %>
+    <span>Stamps: <%= @batch.letters.where(postage_type: "stamps").count %></span>
+  <% end %>
+  <% if @batch.letters.where(postage_type: "indicia").any? %>
+    <span>Indicia: <%= @batch.letters.where(postage_type: "indicia").count %></span>
+  <% end %>
+</div>
+
+<%# ── The grid ── %>
+<div id="batch-grid-container">
+  <%= render partial: "letter/batches/grid", locals: { cells: @cells } %>
+</div>
+
+<%# ── Errors ── %>
+<% failed_letters = @batch.letters.where(indicia_state: "failed") %>
+<% if failed_letters.any? %>
+  <div id="batch-errors" style="margin-top:1.25rem;">
+    <strong style="font-size:0.85em;color:GrayText;text-transform:uppercase;letter-spacing:0.04em;">
+      <%= failed_letters.count %> failed
+    </strong>
+    <table style="margin-top:0.25rem;">
+      <thead>
+        <tr>
+          <th>Letter</th>
+          <th>Recipient</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% failed_letters.includes(:address).each do |letter| %>
+          <tr>
+            <td><a href="<%= letter_path(letter) %>"><%= letter.public_id %></a></td>
+            <td><%= letter.address&.first_name %> <%= letter.address&.last_name %></td>
+            <td style="color:var(--red);"><%= letter.indicia_error %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<%# ── Actions ── %>
+<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--background2);display:flex;gap:0.75rem;align-items:center;">
+  <% if @batch.processed? %>
+    <% if @batch.pdf_label.attached? %>
+      <a href="<%= rails_blob_path(@batch.pdf_label, disposition: :inline) %>" target="_blank" class="btn-success" style="text-decoration:none;">⬇ Download Labels</a>
+    <% end %>
+    <a href="<%= letter_batch_path(@batch) %>">← Back to batch</a>
+  <% elsif failed_letters.any? && !@batch.purchasing? %>
+    <%= form_with url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
+      <button type="submit" class="btn-warning">⟳ Retry <%= failed_letters.count %> failed</button>
+    <% end %>
+    <a href="<%= letter_batch_path(@batch) %>" class="text-muted">Skip & continue</a>
+  <% elsif @batch.purchasing? || @batch.generating_labels? %>
+    <span class="text-muted">Working…</span>
+  <% else %>
+    <a href="<%= letter_batch_path(@batch) %>">← Back to batch</a>
+  <% end %>
+</div>
+
+<%# ── Auto-refresh fallback (turbo streams are primary) ── %>
+<% if @batch.purchasing? || @batch.generating_labels? %>
+  <script>setTimeout(function(){ window.location.reload(); }, 3000);</script>
+<% end %>

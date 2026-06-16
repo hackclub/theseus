@@ -16,6 +16,10 @@ class Letter::BatchesController < BaseBatchesController
   # GET /letter/batches/:id
   def show
     authorize @batch, policy_class: Letter::BatchPolicy
+    if @batch.purchasing? || @batch.generating_labels?
+      redirect_to processing_letter_batch_path(@batch)
+      return
+    end
     render Views::Letter::Batches::Show.new(batch: @batch)
   end
 
@@ -31,6 +35,25 @@ class Letter::BatchesController < BaseBatchesController
     @csv_headers = @batch.csv_headers
     @sample_row = @batch.csv_sample_row
     render Views::Letter::Batches::Map.new(batch: @batch, csv_headers: @csv_headers, sample_row: @sample_row)
+  end
+
+  # GET /letter/batches/:id/processing
+  def processing
+    authorize @batch, policy_class: Letter::BatchPolicy
+    @cells = @batch.letters.select(:id, :public_id, :indicia_state, :postage_type).order(:id).map do |letter|
+      state = case letter.indicia_state
+              when "purchased" then "purchased"
+              when "failed" then "failed"
+              else "pending"
+              end
+      icon = case state
+             when "purchased" then "✓"
+             when "failed" then "x"
+             else " "
+             end
+      { id: letter.id, state: state, title: letter.public_id, icon: icon }
+    end
+    # renders processing.html.erb
   end
 
   # POST /letter/batches/:id/set_mapping
@@ -148,7 +171,7 @@ class Letter::BatchesController < BaseBatchesController
     )
 
     BatchProcessJob.perform_later(@batch.id)
-    redirect_to letter_batch_path(@batch), notice: "Processing started — watch the grid!"
+    redirect_to processing_letter_batch_path(@batch)
   end
 
   def mark_printed
@@ -182,7 +205,7 @@ class Letter::BatchesController < BaseBatchesController
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
     @batch.letters.where(indicia_state: "failed").update_all(indicia_state: nil, indicia_error: nil)
     BatchProcessJob.perform_later(@batch.id)
-    redirect_to letter_batch_path(@batch), notice: "Retrying failed letters..."
+    redirect_to processing_letter_batch_path(@batch)
   end
 
   def update_costs

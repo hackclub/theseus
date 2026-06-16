@@ -8,7 +8,7 @@ class BatchProcessJob < ApplicationJob
     key: -> { "batch_process_#{arguments.first}" }
   )
 
-  WORKERS = 5
+  WORKERS = Rails.env.production? ? 5 : 1
 
   def perform(batch_id)
     batch = Letter::Batch.find(batch_id)

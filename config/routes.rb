@@ -479,6 +479,7 @@ Rails.application.routes.draw do
           get "/map", to: "batches#map_fields", as: :map_fields
           post "/set_mapping", to: "batches#set_mapping", as: :set_mapping
           post :import_with_skip
+          get :processing
           post :mark_printed
           post :mark_mailed
           post :update_costs

@@ -1,7 +1,7 @@
 Rails.application.configure do
   config.good_job.preserve_job_records = true
   config.good_job.enable_cron = Rails.env.production?
-  config.good_job.execution_mode = :external
+  config.good_job.execution_mode = Rails.env.production? ? :external : :async
 
   config.good_job.cron = {
     update_mailing_info: {
