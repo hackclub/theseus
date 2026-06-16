@@ -67,40 +67,41 @@ class BatchProcessJob < ApplicationJob
     ).call
     raise "HCB transfer failed" unless transfer
 
-    # Concurrent purchasing
     actual_cents = Concurrent::AtomicFixnum.new(0)
     purchased_count = Concurrent::AtomicFixnum.new(0)
     failed_count = Concurrent::AtomicFixnum.new(0)
     token_lock = Mutex.new
     payment_token = usps_account.create_payment_token
-    token_uses = Concurrent::AtomicFixnum.new(0)
 
     pool = Concurrent::FixedThreadPool.new(WORKERS)
 
     letters_to_buy.find_each do |letter|
       pool.post do
         ActiveRecord::Base.connection_pool.with_connection do
-          tok = token_lock.synchronize do
-            if token_uses.value >= 100
-              payment_token = usps_account.create_payment_token
-              token_uses.value = 0
-            end
-            token_uses.increment
-            payment_token
-          end
-
           begin
-            indicium = USPS::Indicium.create!(
-              letter: letter,
-              payment_account: usps_account,
-              hcb_payment_account: hcb_account,
-              mailing_date: batch.letter_mailing_date,
-            )
-            indicium.buy!(tok)
+            tok = token_lock.synchronize { payment_token }
+            buy_indicium(letter, usps_account, hcb_account, batch, tok)
             letter.update_columns(indicia_state: "purchased")
-            actual_cents.increment((indicium.cost * 100).ceil)
+            actual_cents.increment((letter.usps_indicium.cost * 100).ceil)
             purchased_count.increment
             broadcast_cell(batch, letter, "purchased")
+          rescue Faraday::UnauthorizedError, USPS::USPSError => e
+            # Token expired — refresh and retry once
+            new_tok = token_lock.synchronize do
+              payment_token = usps_account.create_payment_token
+            end
+            begin
+              buy_indicium(letter, usps_account, hcb_account, batch, new_tok)
+              letter.update_columns(indicia_state: "purchased")
+              actual_cents.increment((letter.usps_indicium.cost * 100).ceil)
+              purchased_count.increment
+              broadcast_cell(batch, letter, "purchased")
+            rescue => retry_err
+              letter.update_columns(indicia_state: "failed", indicia_error: retry_err.message[0..500])
+              failed_count.increment
+              broadcast_cell(batch, letter, "failed")
+              Sentry.capture_exception(retry_err, tags: { money: true }, extra: { letter_id: letter.id, batch_id: batch.id })
+            end
           rescue => e
             letter.update_columns(indicia_state: "failed", indicia_error: e.message[0..500])
             failed_count.increment
@@ -128,6 +129,16 @@ class BatchProcessJob < ApplicationJob
     end
 
     batch.update!(hcb_payment_account: hcb_account, hcb_transfer_id: transfer.id)
+  end
+
+  def buy_indicium(letter, usps_account, hcb_account, batch, token)
+    indicium = letter.usps_indicium || USPS::Indicium.create!(
+      letter: letter,
+      payment_account: usps_account,
+      hcb_payment_account: hcb_account,
+      mailing_date: batch.letter_mailing_date,
+    )
+    indicium.buy!(token) unless indicium.postage.present?
   end
 
   def broadcast_cell(batch, letter, state)
