@@ -49,7 +49,6 @@ class BatchProcessJob < ApplicationJob
 
     batch.update!(process_error: nil)
     batch.mark_processed! if batch.may_mark_processed?
-    reconcile_hcb(batch, options)
     broadcast_done(batch)
 
   end
@@ -167,34 +166,6 @@ class BatchProcessJob < ApplicationJob
     # NOTE: reconciliation happens in perform after mark_processed,
     # NOT here. refunding inside purchase_indicia caused a money bug:
     # failed batch → full refund → retry skips charge → free postage.
-  end
-  def reconcile_hcb(batch, options)
-    return unless batch.hcb_transfer_id.present?
-    return if batch.hcb_transfer_id.start_with?("mock")
-
-    charged_cents = batch.hcb_transfer_amount_cents.to_i
-    return if charged_cents == 0
-
-    hcb_account = HCB::PaymentAccount.find_by(id: options[:hcb_payment_account_id])
-    return unless hcb_account
-
-    actual_cents = (batch.letters.where(indicia_state: "purchased")
-                        .joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil
-
-    overpaid = charged_cents - actual_cents
-    if overpaid > 100 # only refund if > $1
-      HCB::PaymentAccount.refund_to_organization!(
-        organization_id: hcb_account.organization_id,
-        amount_cents: overpaid,
-        name: "Adjustment for #{batch.public_id}",
-        memo: "[theseus] overpayment refund",
-      )
-      batch.update_columns(hcb_refund_cents: overpaid)
-      Rails.logger.info "[BatchProcessJob] Refunded #{overpaid} cents to #{hcb_account.organization_name}"
-    end
-  rescue => e
-    Rails.logger.error "[BatchProcessJob] HCB reconciliation failed: #{e.message}"
-    Sentry.capture_exception(e, extra: { batch_id: batch.id })
   end
 
 
