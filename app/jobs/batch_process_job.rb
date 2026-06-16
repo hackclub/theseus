@@ -88,14 +88,14 @@ class BatchProcessJob < ApplicationJob
 
     pool = Concurrent::FixedThreadPool.new(WORKERS)
 
-    letters_to_buy.find_each do |letter|
+    letters_to_buy.in_batches.each_record do |letter|
       pool.post do
         ActiveRecord::Base.connection_pool.with_connection do
           begin
             tok = token_lock.synchronize { payment_token }
-            buy_indicium(letter, usps_account, hcb_account, batch, tok)
+            indicium = buy_indicium(letter, usps_account, hcb_account, batch, tok)
             letter.update_columns(indicia_state: "purchased")
-            actual_cents.increment((letter.usps_indicium.cost * 100).ceil)
+            actual_cents.increment((indicium.cost * 100).ceil)
             purchased_count.increment
             broadcast_cell(batch, letter, "purchased")
           rescue Faraday::UnauthorizedError, USPS::USPSError => e
@@ -104,9 +104,9 @@ class BatchProcessJob < ApplicationJob
               payment_token = usps_account.create_payment_token
             end
             begin
-              buy_indicium(letter, usps_account, hcb_account, batch, new_tok)
+              indicium = buy_indicium(letter, usps_account, hcb_account, batch, new_tok)
               letter.update_columns(indicia_state: "purchased")
-              actual_cents.increment((letter.usps_indicium.cost * 100).ceil)
+              actual_cents.increment((indicium.cost * 100).ceil)
               purchased_count.increment
               broadcast_cell(batch, letter, "purchased")
             rescue => retry_err
@@ -152,6 +152,7 @@ class BatchProcessJob < ApplicationJob
       mailing_date: batch.letter_mailing_date,
     )
     indicium.buy!(token) unless indicium.postage.present?
+    indicium.reload
   end
 
   def broadcast_cell(batch, letter, state)
