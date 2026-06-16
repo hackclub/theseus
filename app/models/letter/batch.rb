@@ -231,6 +231,32 @@ class Letter::Batch < Batch
     end
   end
 
+  def generate_labels(options = {})
+    return unless letters.any?
+
+    preloaded_letters = letters.order(:id).includes(:address, :usps_mailer_id, :usps_indicium, :return_address)
+
+    label_options = {}
+    if template_cycle.present?
+      label_options[:template_cycle] = template_cycle
+    elsif template.present?
+      label_options[:template] = template
+    end
+
+    pdf = SnailMail::PhlexService.generate_batch_labels(
+      preloaded_letters,
+      label_options.merge(options)
+    )
+
+    attach_pdf(pdf.render)
+    pdf
+  end
+
+  def regenerate_labels!(options = {})
+    labels_pdf.purge
+    generate_labels(options)
+  end
+
   private
 
   def update_letter_tags
@@ -240,34 +266,5 @@ class Letter::Batch < Batch
   def address_fields
     # Only include address fields and rubber_stamps for letter mapping
     ["rubber_stamps"]
-  end
-
-  def generate_labels(options = {})
-    return unless letters.any?
-
-    # Preload associations to avoid N+1 queries
-    preloaded_letters = letters.order(:id).includes(:address, :usps_mailer_id, :usps_indicium, :return_address)
-
-    # Build options for label generation
-    label_options = {}
-
-    # Add template information
-    if template_cycle.present?
-      label_options[:template_cycle] = template_cycle
-    elsif template.present?
-      label_options[:template] = template
-    end
-
-    # Use the SnailMail service to generate labels
-    pdf = SnailMail::PhlexService.generate_batch_labels(
-      preloaded_letters,
-      label_options.merge(options)
-    )
-
-    # Directly attach the PDF to this batch
-    attach_pdf(pdf.render)
-
-    # Return the PDF
-    pdf
   end
 end
