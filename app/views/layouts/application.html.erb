@@ -21,7 +21,7 @@
     <%= vite_stylesheet_tag 'app_style.scss' %>
   </head>
 
-  <body>
+  <body data-turbo="false">
     <%= render Components::Shared::ActionBar.new %>
     <%= render Components::Shared::Sidebar.new(current_path: request.path) %>
 
