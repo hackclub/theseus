@@ -205,6 +205,15 @@ class Letter::BatchesController < BaseBatchesController
   def retry_failed
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
     @batch.letters.where(indicia_state: "failed").update_all(indicia_state: nil, indicia_error: nil)
+    @batch.update!(process_error: nil)
+
+    # Fix empty template_cycle if that's what caused the failure
+    opts = @batch.process_options || {}
+    if opts["template_cycle"].blank?
+      opts["template_cycle"] = [SnailMail::PhlexService.templates_for_size(:standard).first].compact
+      @batch.update!(process_options: opts)
+    end
+
     BatchProcessJob.perform_later(@batch.id)
     redirect_to processing_letter_batch_path(@batch)
   end

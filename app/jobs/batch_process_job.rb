@@ -237,23 +237,11 @@ class BatchProcessJob < ApplicationJob
       html: "<div id=\"batch-error-banner\" class=\"banner banner-error\"><strong>Error:</strong> #{ERB::Util.html_escape(message)}</div>"
     )
   end
-
   def broadcast_done(batch)
-    actions = "<div id=\"batch-actions\" style=\"display:flex;gap:0.75rem;align-items:center;margin-top:1rem;\">"
-    if batch.pdf_label.attached?
-      actions += "<a href=\"/back_office/letter/batches/#{batch.public_id}/regen\" class=\"btn-success\" style=\"text-decoration:none;\">⬇ Download Labels</a>"
-    end
-    failed_count = batch.letters.where(indicia_state: "failed").count
-    if failed_count > 0
-      actions += "<form method=\"post\" action=\"/back_office/letter/batches/#{batch.public_id}/retry_failed\" style=\"display:inline\">"
-      actions += "<input type=\"hidden\" name=\"authenticity_token\" value=\"\">"
-      actions += "<button class=\"btn-warning\">⟳ Retry #{failed_count} failed</button></form>"
-    end
-    actions += "<a href=\"/back_office/letter/batches/#{batch.public_id}\" style=\"color:GrayText\">← Back to batch</a></div>"
     Turbo::StreamsChannel.broadcast_replace_to(
       [batch, :progress],
       target: "batch-actions",
-      html: actions
+      html: '<div id="batch-actions"><script>window.location.reload()</script></div>'
     )
   end
 end
