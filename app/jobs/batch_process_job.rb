@@ -30,6 +30,7 @@ class BatchProcessJob < ApplicationJob
         batch.update!(process_error: e.message)
         batch.mark_failed! if batch.may_mark_failed?
         broadcast_error_banner(batch, e.message)
+        auto_refund_if_nothing_spent(batch, options)
         Sentry.capture_exception(e, tags: { money: true }, extra: { batch_id: batch.id })
         return
       end
@@ -166,6 +167,30 @@ class BatchProcessJob < ApplicationJob
     # NOTE: reconciliation happens in perform after mark_processed,
     # NOT here. refunding inside purchase_indicia caused a money bug:
     # failed batch → full refund → retry skips charge → free postage.
+  end
+
+  def auto_refund_if_nothing_spent(batch, options)
+    return unless batch.hcb_transfer_id.present?
+    return if batch.hcb_transfer_id.start_with?("mock")
+    return if batch.letters.where(indicia_state: "purchased").exists?
+
+    amount = batch.hcb_transfer_amount_cents.to_i
+    return if amount <= 0
+
+    hcb_account = HCB::PaymentAccount.find_by(id: options[:hcb_payment_account_id])
+    return unless hcb_account
+
+    HCB::PaymentAccount.refund_to_organization!(
+      organization_id: hcb_account.organization_id,
+      amount_cents: amount,
+      name: "Auto-refund for #{batch.public_id} (failed before purchasing)",
+      memo: "[theseus] auto-refund, zero postage purchased",
+    )
+    batch.update_columns(hcb_transfer_id: nil, hcb_transfer_amount_cents: nil)
+    batch.audit!(:hcb_auto_refunded, amount_cents: amount, reason: "failed before any postage purchased")
+  rescue => e
+    batch.audit!(:hcb_auto_refund_failed, error: e.message)
+    Sentry.capture_exception(e, extra: { batch_id: batch.id })
   end
 
 
