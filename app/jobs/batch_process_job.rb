@@ -22,26 +22,36 @@ class BatchProcessJob < ApplicationJob
     if options[:us_postage_type] == "indicia" || options[:intl_postage_type] == "indicia"
       batch.mark_purchasing! if batch.may_mark_purchasing?
       total = batch.letters.where(postage_type: "indicia").count
-      broadcast_summary(batch, phase: :purchasing, purchased: 0, total: total, failed: 0)
+      broadcast_summary(batch, purchased: 0, total: total, failed: 0)
 
       begin
         purchase_indicia(batch, options)
       rescue => e
         batch.update!(process_error: e.message)
+        batch.mark_failed! if batch.may_mark_failed?
+        broadcast_error_banner(batch, e.message)
         Sentry.capture_exception(e, tags: { money: true }, extra: { batch_id: batch.id })
-        return # stop — don't generate labels if payment failed
+        return
       end
     end
 
     # Phase 3: generate labels
     batch.mark_generating_labels! if batch.may_mark_generating_labels?
-    broadcast_summary(batch, phase: :generating_labels)
-    batch.generate_labels(options)
+    begin
+      batch.generate_labels(options)
+    rescue => e
+      batch.update!(process_error: "Label generation failed: #{e.message}")
+      batch.mark_failed! if batch.may_mark_failed?
+      broadcast_error_banner(batch, "Label generation failed: #{e.message}")
+      Sentry.capture_exception(e, extra: { batch_id: batch.id })
+      return
+    end
 
+    batch.update!(process_error: nil) # clear any previous error
     batch.mark_processed! if batch.may_mark_processed?
-    broadcast_summary(batch, phase: :done)
-  end
+    broadcast_done(batch)
 
+  end
   private
 
   def configure_letters(batch, options)
@@ -136,15 +146,17 @@ class BatchProcessJob < ApplicationJob
               letter.update_columns(indicia_state: "failed", indicia_error: retry_err.message[0..500])
               failed_count.increment
               broadcast_cell(batch, letter, "failed")
+              broadcast_letter_error(batch, letter, retry_err.message[0..200])
               Sentry.capture_exception(retry_err, tags: { money: true }, extra: { letter_id: letter.id, batch_id: batch.id })
             end
           rescue => e
             letter.update_columns(indicia_state: "failed", indicia_error: e.message[0..500])
             failed_count.increment
             broadcast_cell(batch, letter, "failed")
+            broadcast_letter_error(batch, letter, e.message[0..200])
             Sentry.capture_exception(e, tags: { money: true }, extra: { letter_id: letter.id, batch_id: batch.id })
           ensure
-            broadcast_summary(batch, phase: :purchasing, purchased: purchased_count.value, total: total, failed: failed_count.value)
+            broadcast_summary(batch, purchased: purchased_count.value, total: total, failed: failed_count.value)
           end
         end
       end
@@ -179,20 +191,69 @@ class BatchProcessJob < ApplicationJob
   end
 
   def broadcast_cell(batch, letter, state)
-    icon = state == "purchased" ? "✓" : "✗"
+    icon = state == "purchased" ? "✓" : "x"
     Turbo::StreamsChannel.broadcast_replace_to(
-      batch, :progress,
+      [batch, :progress],
       target: "cell-#{letter.id}",
-      html: "<div id='cell-#{letter.id}' class='batch-cell batch-cell-#{state}' title='#{letter.public_id}: #{state}'>#{icon}</div>".html_safe
+      html: "<span id=\"cell-#{letter.id}\" class=\"batch-cell batch-cell-#{state}\" title=\"#{letter.public_id}\">[#{icon}]</span>"
     )
   end
 
-  def broadcast_summary(batch, **data)
+  def broadcast_letter_error(batch, letter, error)
+    Turbo::StreamsChannel.broadcast_append_to(
+      [batch, :progress],
+      target: "batch-error-tbody",
+      html: "<tr id=\"error-#{letter.id}\"><td><a href=\"/back_office/letters/#{letter.public_id}\">#{letter.public_id}</a></td>" \
+            "<td>#{ERB::Util.html_escape(letter.address&.first_name)} #{ERB::Util.html_escape(letter.address&.last_name)}</td>" \
+            "<td style=\"color:var(--red)\">#{ERB::Util.html_escape(error)}</td></tr>"
+    )
+  end
+
+  def broadcast_summary(batch, purchased:, total:, failed:)
+    pct = total > 0 ? ((purchased + failed) * 100.0 / total).round(1) : 0
+    remaining = total - purchased - failed
+    html = <<~HTML
+      <div id="batch-summary" style="display:flex;gap:1.5rem;align-items:center;margin-bottom:0.5rem;">
+        <div><strong style="font-size:1.5em;font-variant-numeric:tabular-nums;">#{purchased}</strong>
+        <span style="color:GrayText"> / #{total} purchased</span></div>
+        #{failed > 0 ? "<div style=\"color:var(--red)\"><strong style=\"font-size:1.5em\">#{failed}</strong> failed</div>" : ""}
+        #{remaining > 0 ? "<div style=\"color:GrayText\">#{remaining} remaining</div>" : ""}
+      </div>
+      <div class="batch-progress-bar" style="margin-bottom:0.75rem;">
+        <div class="batch-progress-fill" style="width:#{pct}%"></div>
+      </div>
+    HTML
     Turbo::StreamsChannel.broadcast_replace_to(
-      batch, :progress,
+      [batch, :progress],
       target: "batch-summary",
-      partial: "letter/batches/grid_summary",
-      locals: data.merge(batch: batch)
+      html: html
+    )
+  end
+
+  def broadcast_error_banner(batch, message)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      [batch, :progress],
+      target: "batch-error-banner",
+      html: "<div id=\"batch-error-banner\" class=\"banner banner-error\"><strong>Error:</strong> #{ERB::Util.html_escape(message)}</div>"
+    )
+  end
+
+  def broadcast_done(batch)
+    actions = "<div id=\"batch-actions\" style=\"display:flex;gap:0.75rem;align-items:center;margin-top:1rem;\">"
+    if batch.pdf_label.attached?
+      actions += "<a href=\"/back_office/letter/batches/#{batch.public_id}/regen\" class=\"btn-success\" style=\"text-decoration:none;\">⬇ Download Labels</a>"
+    end
+    failed_count = batch.letters.where(indicia_state: "failed").count
+    if failed_count > 0
+      actions += "<form method=\"post\" action=\"/back_office/letter/batches/#{batch.public_id}/retry_failed\" style=\"display:inline\">"
+      actions += "<input type=\"hidden\" name=\"authenticity_token\" value=\"\">"
+      actions += "<button class=\"btn-warning\">⟳ Retry #{failed_count} failed</button></form>"
+    end
+    actions += "<a href=\"/back_office/letter/batches/#{batch.public_id}\" style=\"color:GrayText\">← Back to batch</a></div>"
+    Turbo::StreamsChannel.broadcast_replace_to(
+      [batch, :progress],
+      target: "batch-actions",
+      html: actions
     )
   end
 end

@@ -62,13 +62,14 @@ class Batch < ApplicationRecord
     state :purchasing
     state :generating_labels
     state :processed
+    state :failed
 
     event :mark_fields_mapped do
       transitions from: :awaiting_field_mapping, to: :fields_mapped
     end
 
     event :mark_purchasing do
-      transitions from: :fields_mapped, to: :purchasing
+      transitions from: [:fields_mapped, :failed], to: :purchasing
     end
 
     event :mark_generating_labels do
@@ -80,6 +81,10 @@ class Batch < ApplicationRecord
       after do
         User::UpdateTasksJob.perform_later(user)
       end
+    end
+
+    event :mark_failed do
+      transitions from: [:purchasing, :generating_labels], to: :failed
     end
   end
 

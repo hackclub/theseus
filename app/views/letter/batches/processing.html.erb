@@ -6,106 +6,108 @@
   <%= render Components::Shared::StatusBadge.new(status: @batch.aasm_state, type: :batch) %>
 </div>
 
-<% if @batch.process_error.present? %>
-  <div class="banner banner-error" style="margin-bottom:1rem;">
-    <strong>Error:</strong> <%= @batch.process_error %>
-  </div>
-<% end %>
+<%# ── Error banner (turbo target) ── %>
+<div id="batch-error-banner">
+  <% if @batch.process_error.present? %>
+    <div class="banner banner-error"><strong>Error:</strong> <%= @batch.process_error %></div>
+  <% end %>
+</div>
 
-<%# ── Summary counters ── %>
+<%# ── Summary counters (turbo target) ── %>
 <% total = @batch.letters.count %>
 <% purchased = @batch.letters.where(indicia_state: "purchased").count %>
 <% failed = @batch.letters.where(indicia_state: "failed").count %>
 <% pending = total - purchased - failed %>
-<% us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
-<% intl_count = total - us_count %>
+<% pct = total > 0 ? ((purchased + failed) * 100.0 / total).round(1) : 0 %>
 
-<div id="batch-summary" style="display:flex;gap:1.5rem;align-items:center;margin-bottom:1rem;">
+<div id="batch-summary" style="display:flex;gap:1.5rem;align-items:center;margin-bottom:0.5rem;">
   <div>
     <strong style="font-size:1.5em;font-variant-numeric:tabular-nums;"><%= purchased %></strong>
-    <span class="text-muted"> / <%= total %> purchased</span>
+    <span style="color:GrayText"> / <%= total %> purchased</span>
   </div>
   <% if failed > 0 %>
-    <div style="color:var(--red);">
-      <strong style="font-size:1.5em;"><%= failed %></strong> failed
-    </div>
+    <div style="color:var(--red);"><strong style="font-size:1.5em;"><%= failed %></strong> failed</div>
   <% end %>
-  <% if pending > 0 && @batch.purchasing? %>
-    <div class="text-muted"><%= pending %> remaining</div>
+  <% if pending > 0 %>
+    <div style="color:GrayText;"><%= pending %> remaining</div>
   <% end %>
 </div>
-
-<%# ── Progress bar ── %>
-<% pct = total > 0 ? ((purchased + failed) * 100.0 / total).round(1) : 0 %>
 <div class="batch-progress-bar" style="margin-bottom:0.75rem;">
   <div class="batch-progress-fill" style="width:<%= pct %>%;"></div>
 </div>
 
 <%# ── Breakdown ── %>
-<div style="display:flex;gap:2rem;margin-bottom:1rem;font-size:0.9em;" class="text-muted">
+<% us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
+<% intl_count = total - us_count %>
+<div style="display:flex;gap:2rem;margin-bottom:0.75rem;font-size:0.85em;color:GrayText;">
   <span>US: <%= us_count %></span>
-  <span>International: <%= intl_count %></span>
-  <% if @batch.letters.where(postage_type: "stamps").any? %>
-    <span>Stamps: <%= @batch.letters.where(postage_type: "stamps").count %></span>
-  <% end %>
-  <% if @batch.letters.where(postage_type: "indicia").any? %>
-    <span>Indicia: <%= @batch.letters.where(postage_type: "indicia").count %></span>
-  <% end %>
+  <% if intl_count > 0 %><span>Intl: <%= intl_count %></span><% end %>
+  <% stamps = @batch.letters.where(postage_type: "stamps").count %>
+  <% indicia = @batch.letters.where(postage_type: "indicia").count %>
+  <% if stamps > 0 %><span>Stamps: <%= stamps %></span><% end %>
+  <% if indicia > 0 %><span>Indicia: <%= indicia %></span><% end %>
 </div>
 
-<%# ── The grid ── %>
+<%# ── The grid (turbo targets per cell) ── %>
 <div id="batch-grid-container">
   <%= render partial: "letter/batches/grid", locals: { cells: @cells } %>
 </div>
 
-<%# ── Errors ── %>
-<% failed_letters = @batch.letters.where(indicia_state: "failed") %>
-<% if failed_letters.any? %>
-  <div id="batch-errors" style="margin-top:1.25rem;">
+<%# ── Error table (turbo appends here) ── %>
+<% failed_letters = @batch.letters.where(indicia_state: "failed").includes(:address) %>
+<div style="margin-top:1.25rem;">
+  <% if failed_letters.any? %>
     <strong style="font-size:0.85em;color:GrayText;text-transform:uppercase;letter-spacing:0.04em;">
       <%= failed_letters.count %> failed
     </strong>
-    <table style="margin-top:0.25rem;">
-      <thead>
-        <tr>
-          <th>Letter</th>
-          <th>Recipient</th>
-          <th>Error</th>
+  <% end %>
+  <table style="margin-top:0.25rem;<%= 'display:none;' unless failed_letters.any? %>" id="batch-error-table">
+    <thead>
+      <tr><th>Letter</th><th>Recipient</th><th>Error</th></tr>
+    </thead>
+    <tbody id="batch-error-tbody">
+      <% failed_letters.each do |letter| %>
+        <tr id="error-<%= letter.id %>">
+          <td><a href="<%= letter_path(letter) %>"><%= letter.public_id %></a></td>
+          <td><%= letter.address&.first_name %> <%= letter.address&.last_name %></td>
+          <td style="color:var(--red);"><%= letter.indicia_error %></td>
         </tr>
-      </thead>
-      <tbody>
-        <% failed_letters.includes(:address).each do |letter| %>
-          <tr>
-            <td><a href="<%= letter_path(letter) %>"><%= letter.public_id %></a></td>
-            <td><%= letter.address&.first_name %> <%= letter.address&.last_name %></td>
-            <td style="color:var(--red);"><%= letter.indicia_error %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
-<%# ── Actions ── %>
-<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--background2);display:flex;gap:0.75rem;align-items:center;">
+<%# ── Actions (turbo target) ── %>
+<div id="batch-actions" style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--background2);display:flex;gap:0.75rem;align-items:center;">
   <% if @batch.processed? %>
     <% if @batch.pdf_label.attached? %>
       <a href="<%= rails_blob_path(@batch.pdf_label, disposition: :inline) %>" target="_blank" class="btn-success" style="text-decoration:none;">⬇ Download Labels</a>
     <% end %>
-    <a href="<%= letter_batch_path(@batch) %>">← Back to batch</a>
-  <% elsif failed_letters.any? && !@batch.purchasing? %>
-    <%= form_with url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
-      <button type="submit" class="btn-warning">⟳ Retry <%= failed_letters.count %> failed</button>
+    <% if failed_letters.any? %>
+      <%= form_with url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
+        <button type="submit" class="btn-warning">⟳ Retry <%= failed_letters.count %> failed</button>
+      <% end %>
     <% end %>
-    <a href="<%= letter_batch_path(@batch) %>" class="text-muted">Skip & continue</a>
-  <% elsif @batch.purchasing? || @batch.generating_labels? %>
-    <span class="text-muted">Working…</span>
+    <a href="<%= letter_batch_path(@batch) %>" style="color:GrayText;">← Back to batch</a>
+  <% elsif @batch.failed? %>
+    <%= form_with url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
+      <button type="submit" class="btn-warning">⟳ Retry</button>
+    <% end %>
+    <a href="<%= letter_batch_path(@batch) %>" style="color:GrayText;">← Back to batch</a>
   <% else %>
-    <a href="<%= letter_batch_path(@batch) %>">← Back to batch</a>
+    <span class="text-muted">Working…</span>
   <% end %>
 </div>
 
-<%# ── Auto-refresh fallback (turbo streams are primary) ── %>
-<% if @batch.purchasing? || @batch.generating_labels? %>
+<%# ── Auto-refresh (fallback for when turbo streams aren't connected) ── %>
+<% unless @batch.processed? || @batch.failed? %>
   <script>setTimeout(function(){ window.location.reload(); }, 3000);</script>
 <% end %>
+
+<script>
+  // Show error table when a turbo stream appends a row
+  document.addEventListener('turbo:before-stream-render', function() {
+    var table = document.getElementById('batch-error-table');
+    if (table) table.style.display = '';
+  });
+</script>
