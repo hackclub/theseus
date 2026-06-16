@@ -143,11 +143,11 @@ class Views::Letter::Batches::Process < Views::Base
           span(class: "text-muted", style: "margin-left:0.5rem;") { "(#{us_count} letters)" }
           div(style: "margin-top:0.25rem;display:flex;gap:1rem;") do
             label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
-              input(type: "radio", name: "batch[us_postage_type]", value: "stamps", checked: true)
+              input(type: "radio", name: "batch[us_postage_type]", value: "stamps", class: "postage-radio")
               plain " Stamps"
             end
             label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
-              input(type: "radio", name: "batch[us_postage_type]", value: "indicia")
+              input(type: "radio", name: "batch[us_postage_type]", value: "indicia", checked: true, class: "postage-radio")
               plain " Indicia"
             end
           end
@@ -159,11 +159,11 @@ class Views::Letter::Batches::Process < Views::Base
             span(class: "text-muted", style: "margin-left:0.5rem;") { "(#{intl_count} letters)" }
             div(style: "margin-top:0.25rem;display:flex;gap:1rem;") do
               label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
-                input(type: "radio", name: "batch[intl_postage_type]", value: "stamps", checked: true)
+                input(type: "radio", name: "batch[intl_postage_type]", value: "stamps", class: "postage-radio")
                 plain " Stamps"
               end
               label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
-                input(type: "radio", name: "batch[intl_postage_type]", value: "indicia")
+                input(type: "radio", name: "batch[intl_postage_type]", value: "indicia", checked: true, class: "postage-radio")
                 plain " Indicia"
               end
             end
@@ -181,7 +181,7 @@ class Views::Letter::Batches::Process < Views::Base
   def payment_box
     default_usps_id = ENV["DEFAULT_USPS_PACC_ID"] || USPS::PaymentAccount.first&.id
 
-    section(style: "margin-bottom: 1rem;") do
+    section(id: "payment-section", style: "margin-bottom: 1rem;") do
       strong { "Payment" }
       hr
 
@@ -242,41 +242,23 @@ class Views::Letter::Batches::Process < Views::Base
     script do
       plain(<<~JS.html_safe)
         (function() {
-          var postageInputs = document.querySelectorAll(
-            'input[name="batch[us_postage_type]"], input[name="batch[intl_postage_type]"]'
-          );
-          var paymentSelect = document.getElementById('batch_usps_payment_account_id');
-          var nonMachinableCheckbox = document.getElementById('batch_non_machinable');
+          var radios = document.querySelectorAll('.postage-radio');
+          var paymentSection = document.getElementById('payment-section');
 
-          function updateCosts() {
-            var usType = document.querySelector('input[name="batch[us_postage_type]"]:checked').value;
-            var intlType = document.querySelector('input[name="batch[intl_postage_type]"]:checked').value;
-            var nonMachinable = nonMachinableCheckbox ? nonMachinableCheckbox.checked : false;
-
-            if (paymentSelect) {
-              paymentSelect.required = (usType === 'indicia' || intlType === 'indicia');
-            }
-
-            fetch('#{update_costs_letter_batch_path(@batch)}', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-              },
-              body: JSON.stringify({ us_postage_type: usType, intl_postage_type: intlType, non_machinable: nonMachinable })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              document.getElementById('total_postage_cost').textContent = '$' + data.total_cost.toFixed(2);
-              document.getElementById('us_cost_difference').textContent = '$' + data.cost_difference.us.toFixed(2);
-              document.getElementById('intl_cost_difference').textContent = '$' + data.cost_difference.intl.toFixed(2);
-            });
+          function needsIndicia() {
+            var us = document.querySelector('input[name="batch[us_postage_type]"]:checked');
+            var intl = document.querySelector('input[name="batch[intl_postage_type]"]:checked');
+            return (us && us.value === 'indicia') || (intl && intl.value === 'indicia');
           }
 
-          postageInputs.forEach(function(input) {
-            input.addEventListener('change', updateCosts);
-          });
-          if (nonMachinableCheckbox) nonMachinableCheckbox.addEventListener('change', updateCosts);
+          function toggle() {
+            if (paymentSection) {
+              paymentSection.style.display = needsIndicia() ? '' : 'none';
+            }
+          }
+
+          radios.forEach(function(r) { r.addEventListener('change', toggle); });
+          toggle();
         })();
       JS
     end
