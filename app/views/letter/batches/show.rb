@@ -176,8 +176,6 @@ class Views::Letter::Batches::Show < Views::Base
         span(class: "detail-label") { "Letters" }
         span { helpers.number_with_delimiter(@batch.letters.count) }
 
-        span(class: "detail-label") { "Addresses" }
-        span { helpers.number_with_delimiter(@batch.addresses.count) }
 
         if @batch.processed?
           span(class: "detail-label") { "Total Postage" }
