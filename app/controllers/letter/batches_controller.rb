@@ -236,6 +236,7 @@ class Letter::BatchesController < BaseBatchesController
       name: "Refund for #{@batch.public_id}",
       memo: "[theseus] overpayment refund",
     )
+    @batch.audit!(:hcb_refunded, amount_cents: overpaid, admin: current_user.email)
 
     redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % (overpaid / 100.0)}"
   rescue => e

@@ -5,6 +5,7 @@
 #  id                          :bigint           not null, primary key
 #  aasm_state                  :string
 #  address_count               :integer
+#  audit_log                   :jsonb
 #  field_mapping               :jsonb
 #  hcb_transfer_amount_cents   :integer
 #  letter_height               :decimal(, )

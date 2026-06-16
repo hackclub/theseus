@@ -101,6 +101,27 @@
   <% end %>
 </div>
 
+<%# ── Audit trail ── %>
+<% if @batch.audit_log.present? && current_user&.admin? %>
+  <details style="margin-top:1rem;">
+    <summary style="color:GrayText;font-size:0.85em;cursor:pointer;">Audit trail (<%= @batch.audit_log.size %> events)</summary>
+    <table style="margin-top:0.25rem;font-size:0.85em;">
+      <thead>
+        <tr><th style="width:10rem;">Time</th><th style="width:12rem;">Event</th><th>Details</th></tr>
+      </thead>
+      <tbody>
+        <% @batch.audit_log.reverse.each do |entry| %>
+          <tr>
+            <td class="text-muted" style="font-variant-numeric:tabular-nums;"><%= Time.parse(entry["at"]).strftime("%H:%M:%S") %></td>
+            <td><code><%= entry["event"] %></code></td>
+            <td class="text-muted"><%= entry.except("at", "event").map { |k, v| "#{k}: #{v}" }.join(", ") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </details>
+<% end %>
+
 <script>
   // Show error table when turbo stream appends a row
   document.addEventListener('turbo:before-stream-render', function() {

@@ -5,6 +5,7 @@
 #  id                          :bigint           not null, primary key
 #  aasm_state                  :string
 #  address_count               :integer
+#  audit_log                   :jsonb
 #  field_mapping               :jsonb
 #  hcb_transfer_amount_cents   :integer
 #  letter_height               :decimal(, )
@@ -114,6 +115,12 @@ class Batch < ApplicationRecord
     csv.open do |file|
       File.read(file, encoding: "bom|utf-8")
     end
+  end
+
+  def audit!(event, **data)
+    log = (audit_log || [])
+    log << { at: Time.current.iso8601, event: event }.merge(data)
+    update_columns(audit_log: log)
   end
 
   def attach_pdf(pdf_data) = PdfAttachmentUtil.attach_pdf(pdf_data, self, :pdf_document)

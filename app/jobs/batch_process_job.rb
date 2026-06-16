@@ -80,23 +80,22 @@ class BatchProcessJob < ApplicationJob
 
     estimated_cents = (letters_to_buy.sum(:postage) * 100).ceil
     transfer = if batch.hcb_transfer_id.present?
-      nil # already charged on a previous run
+      batch.audit!(:hcb_charge_skipped, reason: "already charged", transfer_id: batch.hcb_transfer_id)
+      nil
     elsif ENV["MOCK_HCB"].present?
-      Rails.logger.info "[BatchProcessJob] MOCK_HCB: skipping HCB charge of #{estimated_cents} cents"
       batch.update_columns(hcb_transfer_id: "mock_#{SecureRandom.hex(4)}", hcb_transfer_amount_cents: estimated_cents)
+      batch.audit!(:hcb_charge_mocked, amount_cents: estimated_cents)
       nil
     else
-      # Check balance before charging
       begin
         org = hcb_account.organization
         if org.balance_cents < estimated_cents
           raise "Insufficient HCB balance: #{org.name} has $#{'%.2f' % (org.balance_cents / 100.0)} " \
                 "but postage costs $#{'%.2f' % (estimated_cents / 100.0)}"
         end
+        batch.audit!(:hcb_balance_checked, balance_cents: org.balance_cents, estimated_cents: estimated_cents)
       rescue => e
         raise if e.message.include?("Insufficient HCB balance")
-        Rails.logger.warn "[BatchProcessJob] Could not check HCB balance: #{e.message}"
-        # proceed anyway — the transfer itself will fail if insufficient funds
       end
 
       xfer = HCB::TransferService.new(
@@ -105,9 +104,10 @@ class BatchProcessJob < ApplicationJob
         name: "Postage for #{batch.public_id}",
         memo: "[theseus] batch postage",
       ).call
-      raise "HCB transfer failed: #{xfer.errors.join(', ') if xfer.respond_to?(:errors)}" unless xfer
+      raise "HCB transfer failed" unless xfer
 
       batch.update_columns(hcb_payment_account_id: hcb_account.id, hcb_transfer_id: xfer.id, hcb_transfer_amount_cents: estimated_cents)
+      batch.audit!(:hcb_charged, amount_cents: estimated_cents, transfer_id: xfer.id)
       xfer
     end
 
