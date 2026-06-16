@@ -23,6 +23,7 @@ module Theseus
     # Initialize configuration defaults for originally generated Rails version.
     config.assets.enabled = false
     config.load_defaults 8.0
+    config.action_view.form_with_generates_remote_forms = false
     config.active_job.queue_adapter = :good_job
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
