@@ -13,36 +13,39 @@ class LetterBatchImporter
 
     count = 0
 
-    CSV.parse(@batch.csv_data, headers: true).each do |row|
-      if skip_invalid
-        next if validate_row(row).any?
+    ActiveRecord::Base.transaction do
+      CSV.parse(@batch.csv_data, headers: true).each do |row|
+        if skip_invalid
+          next if validate_row(row).any?
+        end
+
+        first_name = get(row, "first_name")
+        next if first_name.blank?
+
+        address = @batch.addresses.create!(build_address(row))
+
+        @batch.letters.create!(
+          address: address,
+          height: @batch.letter_height,
+          width: @batch.letter_width,
+          weight: @batch.letter_weight,
+          processing_category: @batch.letter_processing_category,
+          usps_mailer_id: @batch.mailer_id,
+          return_address: @batch.letter_return_address,
+          return_address_name: @batch.letter_return_address_name,
+          recipient_email: get(row, "email"),
+          rubber_stamps: get(row, "rubber_stamps"),
+          tags: @batch.tags,
+          user: @batch.user,
+        )
+
+        count += 1
       end
 
-      first_name = get(row, "first_name")
-      next if first_name.blank?
-
-      address = @batch.addresses.create!(build_address(row))
-
-      @batch.letters.create!(
-        address: address,
-        height: @batch.letter_height,
-        width: @batch.letter_width,
-        weight: @batch.letter_weight,
-        processing_category: @batch.letter_processing_category,
-        usps_mailer_id: @batch.mailer_id,
-        return_address: @batch.letter_return_address,
-        return_address_name: @batch.letter_return_address_name,
-        recipient_email: get(row, "email"),
-        rubber_stamps: get(row, "rubber_stamps"),
-        tags: @batch.tags,
-        user: @batch.user,
-      )
-
-      count += 1
+      @batch.mark_fields_mapped unless @batch.fields_mapped? || @batch.processed?
+      @batch.save!
     end
 
-    @batch.mark_fields_mapped unless @batch.fields_mapped? || @batch.processed?
-    @batch.save!
     count
   end
 
