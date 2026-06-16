@@ -1,23 +1,11 @@
 module LettersHelper
-  # Deprecated: Use Components::Shared::StatusBadge instead
-  def letter_status_badge(status, addtl_class='nil')
-
-    clazz, text = case status.to_s
-                  when 'queued'
-                    ['bg-muted', 'queued']
-                  when 'pending'
-                    ['pending', 'ready to print']
-                  when "printed"
-                    ["info", "printed"]
-                  when "mailed"
-                    ["success", "mailed"]
-                  when "received"
-                    ["success", "received"]
-                  when "canceled", "failed"
-                    "bg-error-bg text-error-fg border border-error-border"
-                  else
-                    "bg-smoke text-slate border border-muted"
-                  end
-    content_tag('span', text, :class => "badge #{clazz} #{addtl_class}".strip)
+  def status_color(state)
+    case state.to_s
+    when "mailed", "received" then "var(--green)"
+    when "printed", "processed" then "color-mix(in srgb, var(--green) 60%, GrayText)"
+    when "queued" then "var(--yellow)"
+    when "failed" then "var(--red)"
+    else "GrayText"
+    end
   end
 end
