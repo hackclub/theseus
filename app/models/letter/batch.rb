@@ -369,23 +369,6 @@ class Letter::Batch < Batch
     ["rubber_stamps"]
   end
 
-  def build_mapping(row, address)
-    letters.build(
-      height: letter_height,
-      width: letter_width,
-      weight: letter_weight,
-      processing_category: letter_processing_category,
-      recipient_email: row["email"],
-      address: address,
-      usps_mailer_id: mailer_id,
-      return_address: letter_return_address,
-      return_address_name: letter_return_address_name,
-      rubber_stamps: row["rubber_stamps"],
-      tags: tags,
-      user: user,
-    )
-  end
-
   def generate_labels(options = {})
     return unless letters.any?
 

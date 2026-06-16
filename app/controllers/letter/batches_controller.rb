@@ -25,20 +25,31 @@ class Letter::BatchesController < BaseBatchesController
     render Views::Letter::Batches::Edit.new(batch: @batch)
   end
 
+  # GET /letter/batches/:id/map
+  def map_fields
+    authorize @batch, policy_class: Letter::BatchPolicy
+    @csv_headers = @batch.csv_headers
+    @sample_row = @batch.csv_sample_row
+    render Views::Letter::Batches::Map.new(batch: @batch, csv_headers: @csv_headers, sample_row: @sample_row)
+  end
+
+  # POST /letter/batches/:id/set_mapping
+  def set_mapping
+    authorize @batch, policy_class: Letter::BatchPolicy
+    @batch.update!(field_mapping: params[:field_mapping].to_unsafe_h)
+    count = Letter::BatchImporter.new(@batch).call
+    redirect_to process_confirm_letter_batch_path(@batch), notice: "Mapped #{count} letters."
+  rescue => e
+    redirect_to map_fields_letter_batch_path(@batch), alert: "Mapping failed: #{e.message}"
+  end
+
   # POST /letter/batches
   def create
     authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batch = Letter::Batch.new(batch_params.merge(user: current_user))
 
     if @batch.save
-      begin
-        addresses_data = JSON.parse(params[:letter_batch][:addresses_data])
-        @batch.import_addresses!(addresses_data)
-        redirect_to process_confirm_letter_batch_path(@batch), notice: "Batch created with #{@batch.addresses.count} addresses. Review and process."
-      rescue StandardError => e
-        event_id = Sentry.capture_exception(e)&.event_id
-        redirect_to letter_batch_path(@batch), flash: { alert: "Batch created but address import failed: #{e.message} (error: #{event_id})" }
-      end
+      redirect_to map_fields_letter_batch_path(@batch)
     else
       render Views::Letter::Batches::New.new(batch: @batch), status: :unprocessable_entity
     end

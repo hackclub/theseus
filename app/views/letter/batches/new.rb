@@ -20,57 +20,45 @@ class Views::Letter::Batches::New < Views::Base
       end
     end
 
-    div(class: "show-layout") do
-      div(class: "show-main") do
-        error_messages
+    error_messages
 
-        form_with(model: @batch, url: letter_batches_path, scope: :letter_batch) do |f|
-          section(style: "margin-bottom: 1rem;") do
-            strong { "Letter Specs" }
-            hr
-            div(style: "margin-top: 0.5rem;") do
-              div(
-                data_svelte_component: "letter-attributes-picker",
-                data_form_scope: "letter_batch",
-                data_is_batch: "true",
-                data_initial_weight: "1",
-                data_initial_processing_category: "letter"
-              )
-            end
-          end
+    form_with(model: @batch, url: letter_batches_path, scope: :letter_batch, multipart: true) do |f|
+      section(style: "margin-bottom: 1rem;") do
+        strong { "Letter Specs" }
+        hr
+        div(style: "margin-top: 0.5rem;") do
+          div(
+            data_svelte_component: "letter-attributes-picker",
+            data_form_scope: "letter_batch",
+            data_is_batch: "true",
+            data_initial_weight: "1",
+            data_initial_processing_category: "letter"
+          )
+        end
+      end
 
-          section(style: "margin-bottom: 1rem;") do
-            strong { "Sender & Postage" }
-            hr
-            div(style: "margin-top: 0.5rem;") do
-              sender_fields(f)
-            end
-          end
+      section(style: "margin-bottom: 1rem;") do
+        strong { "Sender & Postage" }
+        hr
+        div(style: "margin-top: 0.5rem;") { sender_fields(f) }
+      end
 
-          section(style: "margin-bottom: 1rem;") do
-            strong { "Addresses" }
-            hr
-            div(style: "margin-top: 0.5rem;") do
-              address_fields = (Address.column_names - %w[id created_at updated_at batch_id]) + %w[rubber_stamps]
-              div(
-                data_svelte_component: "batch-csv-mapper",
-                data_address_fields: address_fields.to_json,
-                data_form_field_name: "letter_batch[addresses_data]"
-              )
-            end
-          end
-
-          tag_picker(f)
-
-          div(style: "display:flex;gap:0.5rem;margin-top:1rem;") do
-            button(type: "submit", class: "btn-success") { "✓ Create Batch" }
-            a(href: letter_batches_path) { button { "Cancel" } }
+      section(style: "margin-bottom: 1rem;") do
+        strong { "CSV File" }
+        hr
+        div(style: "margin-top: 0.5rem;") do
+          input(type: "file", name: "letter_batch[csv]", accept: ".csv", required: true)
+          p(class: "text-muted", style: "margin:0.5rem 0 0;font-size:0.85em;") do
+            plain "Upload a CSV with address columns. You'll map them on the next page."
           end
         end
       end
 
-      div(class: "show-sidebar") do
-        about_card
+      tag_picker(f)
+
+      div(style: "display:flex;gap:0.5rem;margin-top:1rem;") do
+        button(type: "submit", class: "btn-success") { "Upload & Map →" }
+        a(href: letter_batches_path) { "Cancel" }
       end
     end
   end
@@ -145,16 +133,6 @@ class Views::Letter::Batches::New < Views::Base
         end
       end
       p(class: "form-hint") { "Select from common tags or create your own" }
-    end
-  end
-
-  def about_card
-    section do
-      strong { "About Batches" }
-      hr
-      div(style: "margin-top: 0.5rem;", class: "text-muted") do
-        p(style: "margin: 0;") { "Upload a CSV of addresses and configure letter specs. After creating, you'll map CSV columns to address fields, then process to generate labels." }
-      end
     end
   end
 end
