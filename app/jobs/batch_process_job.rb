@@ -203,30 +203,17 @@ class BatchProcessJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_append_to(
       [batch, :progress],
       target: "batch-error-tbody",
-      html: "<tr id=\"error-#{letter.id}\"><td><a href=\"/back_office/letters/#{letter.public_id}\">#{letter.public_id}</a></td>" \
-            "<td>#{ERB::Util.html_escape(letter.address&.first_name)} #{ERB::Util.html_escape(letter.address&.last_name)}</td>" \
-            "<td style=\"color:var(--red)\">#{ERB::Util.html_escape(error)}</td></tr>"
+      partial: "letter/batches/error_row",
+      locals: { letter: letter, error_message: error }
     )
   end
 
   def broadcast_summary(batch, purchased:, total:, failed:)
-    pct = total > 0 ? ((purchased + failed) * 100.0 / total).round(1) : 0
-    remaining = total - purchased - failed
-    html = <<~HTML
-      <div id="batch-summary" style="display:flex;gap:1.5rem;align-items:center;margin-bottom:0.5rem;">
-        <div><strong style="font-size:1.5em;font-variant-numeric:tabular-nums;">#{purchased}</strong>
-        <span style="color:GrayText"> / #{total} purchased</span></div>
-        #{failed > 0 ? "<div style=\"color:var(--red)\"><strong style=\"font-size:1.5em\">#{failed}</strong> failed</div>" : ""}
-        #{remaining > 0 ? "<div style=\"color:GrayText\">#{remaining} remaining</div>" : ""}
-      </div>
-      <div class="batch-progress-bar" style="margin-bottom:0.75rem;">
-        <div class="batch-progress-fill" style="width:#{pct}%"></div>
-      </div>
-    HTML
     Turbo::StreamsChannel.broadcast_replace_to(
       [batch, :progress],
       target: "batch-summary",
-      html: html
+      partial: "letter/batches/progress_summary",
+      locals: { purchased: purchased, total: total, failed: failed }
     )
   end
 
@@ -237,6 +224,7 @@ class BatchProcessJob < ApplicationJob
       html: "<div id=\"batch-error-banner\" class=\"banner banner-error\"><strong>Error:</strong> #{ERB::Util.html_escape(message)}</div>"
     )
   end
+
   def broadcast_done(batch)
     Turbo::StreamsChannel.broadcast_replace_to(
       [batch, :progress],

@@ -13,30 +13,10 @@
   <% end %>
 </div>
 
-<%# ── Summary counters (turbo target) ── %>
 <% total = @batch.letters.count %>
 <% purchased = @batch.letters.where(indicia_state: "purchased").count %>
 <% failed = @batch.letters.where(indicia_state: "failed").count %>
-<% pending = total - purchased - failed %>
-<% pct = total > 0 ? ((purchased + failed) * 100.0 / total).round(1) : 0 %>
-
-<div id="batch-summary">
-  <div style="display:flex;gap:1.5rem;align-items:center;margin-bottom:0.5rem;">
-    <div>
-      <strong style="font-size:1.5em;font-variant-numeric:tabular-nums;"><%= purchased %></strong>
-      <span style="color:GrayText"> / <%= total %> purchased</span>
-    </div>
-    <% if failed > 0 %>
-      <div style="color:var(--red);"><strong style="font-size:1.5em;"><%= failed %></strong> failed</div>
-    <% end %>
-    <% if pending > 0 %>
-      <div style="color:GrayText;"><%= pending %> remaining</div>
-    <% end %>
-  </div>
-  <div class="batch-progress-bar" style="margin-bottom:0.75rem;">
-    <div class="batch-progress-fill" style="width:<%= pct %>%;"></div>
-  </div>
-</div>
+<%= render partial: "letter/batches/progress_summary", locals: { purchased: purchased, total: total, failed: failed } %>
 
 <%# ── Breakdown ── %>
 <% us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
@@ -69,11 +49,7 @@
     </thead>
     <tbody id="batch-error-tbody">
       <% failed_letters.each do |letter| %>
-        <tr id="error-<%= letter.id %>">
-          <td><a href="<%= letter_path(letter) %>"><%= letter.public_id %></a></td>
-          <td><%= letter.address&.first_name %> <%= letter.address&.last_name %></td>
-          <td style="color:var(--red);"><%= letter.indicia_error %></td>
-        </tr>
+        <%= render partial: "letter/batches/error_row", locals: { letter: letter, error_message: letter.indicia_error } %>
       <% end %>
     </tbody>
   </table>

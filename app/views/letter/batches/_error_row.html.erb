@@ -1,0 +1,5 @@
+<tr id="error-<%= letter.id %>">
+  <td><a href="<%= letter_path(letter) %>"><%= letter.public_id %></a></td>
+  <td><%= letter.address&.first_name %> <%= letter.address&.last_name %></td>
+  <td style="color:var(--red);"><%= error_message %></td>
+</tr>

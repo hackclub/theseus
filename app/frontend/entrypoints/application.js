@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs'
-import * as Turbo from '@hotwired/turbo-rails'
-Turbo.session.drive = false // only use Turbo Streams, not Drive
+import '@hotwired/turbo-rails'
 import '~/js/click-to-copy.js'
 import '~/js/mount-svelte.js'
 window.Alpine = Alpine
