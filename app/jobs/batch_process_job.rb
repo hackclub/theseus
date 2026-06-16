@@ -3,6 +3,11 @@
 class BatchProcessJob < ApplicationJob
   queue_as :default
 
+  good_job_control_concurrency_with(
+    perform_limit: 1,
+    key: -> { "batch_process_#{arguments.first}" }
+  )
+
   WORKERS = 5
 
   def perform(batch_id)
@@ -57,15 +62,23 @@ class BatchProcessJob < ApplicationJob
     total = letters_to_buy.count
     return if total == 0
 
-    # Estimate cost and charge HCB
-    estimated_cents = (letters_to_buy.sum(&:postage) * 100).ceil
-    transfer = HCB::TransferService.new(
-      hcb_payment_account: hcb_account,
-      amount_cents: estimated_cents,
-      name: "Postage for #{batch.public_id}",
-      memo: "[theseus] batch postage",
-    ).call
-    raise "HCB transfer failed" unless transfer
+    # Charge HCB (idempotent — skip if already charged)
+    transfer = if batch.hcb_transfer_id.present?
+      nil # already charged on a previous run
+    else
+      estimated_cents = (letters_to_buy.sum(&:postage) * 100).ceil
+      xfer = HCB::TransferService.new(
+        hcb_payment_account: hcb_account,
+        amount_cents: estimated_cents,
+        name: "Postage for #{batch.public_id}",
+        memo: "[theseus] batch postage",
+      ).call
+      raise "HCB transfer failed" unless xfer
+
+      # Atomic: record the transfer ID immediately so a crash won't double-charge
+      batch.update!(hcb_payment_account: hcb_account, hcb_transfer_id: xfer.id)
+      xfer
+    end
 
     actual_cents = Concurrent::AtomicFixnum.new(0)
     purchased_count = Concurrent::AtomicFixnum.new(0)
@@ -117,18 +130,18 @@ class BatchProcessJob < ApplicationJob
     pool.shutdown
     pool.wait_for_termination
 
-    # Reconcile HCB — only refund if > $1
-    overpaid = estimated_cents - actual_cents.value
-    if overpaid > 100
-      HCB::PaymentAccount.refund_to_organization!(
-        organization_id: hcb_account.organization_id,
-        amount_cents: overpaid,
-        name: "Adjustment for #{batch.public_id}",
-        memo: "[theseus] overpayment refund",
-      )
+    # Reconcile HCB — refund overpayment if > $1
+    if transfer
+      overpaid = (transfer.respond_to?(:amount_cents) ? transfer.amount_cents : estimated_cents) - actual_cents.value
+      if overpaid > 100
+        HCB::PaymentAccount.refund_to_organization!(
+          organization_id: hcb_account.organization_id,
+          amount_cents: overpaid,
+          name: "Adjustment for #{batch.public_id}",
+          memo: "[theseus] overpayment refund",
+        )
+      end
     end
-
-    batch.update!(hcb_payment_account: hcb_account, hcb_transfer_id: transfer.id)
   end
 
   def buy_indicium(letter, usps_account, hcb_account, batch, token)
