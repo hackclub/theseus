@@ -20,14 +20,14 @@ class Views::Letter::Batches::Process < Views::Base
       div(class: "show-main") do
         form_with(model: @batch, url: process_letter_batch_path(@batch), method: :post, scope: :batch) do |f|
           letter_details_box(f)
-          templates_box
-          options_box
           postage_box
           payment_box
+          templates_box
+          options_box
 
-          div(style: "display:flex;gap:0.5rem;margin-top:1rem;") do
-            button(type: "submit", class: "btn-success") { "▶ Generate Labels" }
-            a(href: letter_batch_path(@batch)) { button { "Cancel" } }
+          div(style: "display:flex;gap:0.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--background2);") do
+            button(type: "submit", class: "btn-success", data: { disable_with: "Processing…" }) { "▶ Start Processing" }
+            a(href: letter_batch_path(@batch), style: "color:GrayText;align-self:center;") { "Cancel" }
           end
         end
 
@@ -44,28 +44,30 @@ class Views::Letter::Batches::Process < Views::Base
 
   def letter_details_box(f)
     section(style: "margin-bottom: 1rem;") do
-      strong { "Letter Details" }
+      strong { "Details" }
       hr
-      div(style: "margin-top: 0.5rem;") do
-        div(style: "margin-bottom: 1rem;") do
-          label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Letter Title" }
-          input(type: "text", name: "batch[user_facing_title]", style: "width: 100%;")
-          p(class: "form-hint") { "Visible to recipients on their letters (e.g. \"Monthly Newsletter\")" }
-        end
 
-        div(class: "form-field-lg") do
-          label(class: "date-field-label", for: "batch_letter_mailing_date") { "Mailing Date" }
-          p(class: "form-hint mb-2") { "Select the date you plan to mail these letters." }
-          input(
-            type: "date",
-            name: "batch[letter_mailing_date]",
-            id: "batch_letter_mailing_date",
-            value: (@batch.letter_mailing_date || @batch.default_mailing_date).iso8601,
-            min: Date.current.iso8601,
-            required: true,
-            class: "date-field w-full"
-          )
-        end
+      div(style: "margin-top:0.75rem;") do
+        label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Batch Title" }
+        input(
+          type: "text",
+          name: "batch[user_facing_title]",
+          placeholder: "e.g. Monthly Newsletter, YSWS Stickers Round 3",
+          style: "width:100%;",
+          autofocus: true
+        )
+        p(class: "text-muted", style: "margin:0.25rem 0 0;font-size:0.85em;") { "Visible to recipients. Shows in the batch list." }
+      end
+
+      div(style: "margin-top:0.75rem;") do
+        label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Mailing Date" }
+        input(
+          type: "date",
+          name: "batch[letter_mailing_date]",
+          value: (@batch.letter_mailing_date || @batch.default_mailing_date).iso8601,
+          min: Date.current.iso8601,
+          required: true
+        )
       end
     end
   end
@@ -128,96 +130,84 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def postage_box
+    us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count
+    intl_count = @batch.letters.count - us_count
+
     section(style: "margin-bottom: 1rem;") do
       strong { "Postage" }
       hr
-      div(style: "margin-top: 0.5rem;") do
-        div(class: "postage-grid") do
-          div do
-            strong { "US Mail" }
-            div(class: "radio-group") do
-              label(class: "form-check-label") do
-                input(type: "radio", name: "batch[us_postage_type]", value: "stamps", checked: true)
-                span { "Stamps" }
-              end
-              label(class: "form-check-label") do
-                input(type: "radio", name: "batch[us_postage_type]", value: "indicia")
-                span { "Indicia (Metered)" }
-              end
+
+      div(style: "display:flex;gap:2rem;margin-top:0.75rem;") do
+        div do
+          strong { "US Mail" }
+          span(class: "text-muted", style: "margin-left:0.5rem;") { "(#{us_count} letters)" }
+          div(style: "margin-top:0.25rem;display:flex;gap:1rem;") do
+            label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
+              input(type: "radio", name: "batch[us_postage_type]", value: "stamps", checked: true)
+              plain " Stamps"
+            end
+            label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
+              input(type: "radio", name: "batch[us_postage_type]", value: "indicia")
+              plain " Indicia"
             end
           end
+        end
+
+        if intl_count > 0
           div do
-            strong { "International Mail" }
-            div(class: "radio-group") do
-              label(class: "form-check-label") do
+            strong { "International" }
+            span(class: "text-muted", style: "margin-left:0.5rem;") { "(#{intl_count} letters)" }
+            div(style: "margin-top:0.25rem;display:flex;gap:1rem;") do
+              label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
                 input(type: "radio", name: "batch[intl_postage_type]", value: "stamps", checked: true)
-                span { "Stamps" }
+                plain " Stamps"
               end
-              label(class: "form-check-label") do
+              label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
                 input(type: "radio", name: "batch[intl_postage_type]", value: "indicia")
-                span { "Indicia (Metered)" }
+                plain " Indicia"
               end
             end
           end
         end
+      end
 
-        div(id: "cost-info", class: "cost-info") do
-          div(class: "cost-grid") do
-            span(class: "detail-label") { "Total postage cost:" }
-            span(id: "total_postage_cost") { number_to_currency(@batch.postage_cost) }
-
-            span(class: "detail-label") { "US cost difference:" }
-            span(id: "us_cost_difference") { number_to_currency(@batch.postage_cost_difference[:us]) }
-
-            span(class: "detail-label") { "International cost difference:" }
-            span(id: "intl_cost_difference") { number_to_currency(@batch.postage_cost_difference[:intl]) }
-          end
-          div(id: "cost_explanation", style: "color: GrayText; margin-top: 0.5rem;") do
-            us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count
-            intl_count = @batch.letters.joins(:address).where.not(addresses: { country: "US" }).count
-            total_stamps = us_count + intl_count
-            if total_stamps > 0
-              plain "You'll have to put stamps on #{total_stamps} envelope#{"s" unless total_stamps == 1}"
-            end
-          end
-        end
+      div(class: "detail-grid", style: "margin-top:0.75rem;") do
+        span(class: "detail-label") { "Estimated cost" }
+        strong(id: "total_postage_cost") { number_to_currency(@batch.postage_cost) }
       end
     end
   end
 
   def payment_box
+    default_usps_id = ENV["DEFAULT_USPS_PACC_ID"] || USPS::PaymentAccount.first&.id
+
     section(style: "margin-bottom: 1rem;") do
       strong { "Payment" }
       hr
-      div(style: "margin-top: 0.5rem;") do
-        div(class: "form-field-lg") do
-          label(class: "date-field-label", for: "batch_usps_payment_account_id") { "USPS Payment Account" }
-          p(class: "form-hint mb-2") { "Required only when using indicia." }
-          select(
-            name: "batch[usps_payment_account_id]",
-            id: "batch_usps_payment_account_id",
-            class: "select-field"
-          ) do
-            option(value: "") { "Select a payment account..." }
-            USPS::PaymentAccount.all.each do |pa|
-              option(value: pa.id) { pa.display_name }
+
+      # USPS account — admin only, others get the default
+      if current_user&.admin?
+        admin_tool(element: "div") do
+          div(style: "margin-top:0.75rem;") do
+            label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "USPS Payment Account" }
+            select(name: "batch[usps_payment_account_id]", style: "width:100%;") do
+              USPS::PaymentAccount.all.each do |pa|
+                option(value: pa.id, selected: pa.id == default_usps_id.to_i) { pa.display_name }
+              end
             end
           end
         end
+      else
+        input(type: "hidden", name: "batch[usps_payment_account_id]", value: default_usps_id)
+      end
 
-        if current_user.hcb_payment_accounts.any?
-          div do
-            label(class: "date-field-label", for: "batch_hcb_payment_account_id") { "HCB Payment Account" }
-            p(class: "form-hint mb-2") { "Required for indicia purchases." }
-            select(
-              name: "batch[hcb_payment_account_id]",
-              id: "batch_hcb_payment_account_id",
-              class: "select-field"
-            ) do
-              option(value: "") { "Select an HCB account..." }
-              current_user.hcb_payment_accounts.each do |hcb|
-                option(value: hcb.id) { hcb.display_name }
-              end
+      # HCB account
+      if current_user.hcb_payment_accounts.any?
+        div(style: "margin-top:0.75rem;") do
+          label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "HCB Payment Account" }
+          select(name: "batch[hcb_payment_account_id]", style: "width:100%;") do
+            current_user.hcb_payment_accounts.each do |hcb|
+              option(value: hcb.id) { hcb.display_name }
             end
           end
         end

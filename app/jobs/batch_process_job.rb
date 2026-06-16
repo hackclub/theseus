@@ -63,10 +63,14 @@ class BatchProcessJob < ApplicationJob
     return if total == 0
 
     # Charge HCB (idempotent — skip if already charged)
+    estimated_cents = (letters_to_buy.sum(&:postage) * 100).ceil
     transfer = if batch.hcb_transfer_id.present?
       nil # already charged on a previous run
+    elsif ENV["MOCK_HCB"].present?
+      Rails.logger.info "[BatchProcessJob] MOCK_HCB: skipping HCB charge of #{estimated_cents} cents"
+      batch.update!(hcb_transfer_id: "mock_#{SecureRandom.hex(4)}")
+      nil
     else
-      estimated_cents = (letters_to_buy.sum(&:postage) * 100).ceil
       xfer = HCB::TransferService.new(
         hcb_payment_account: hcb_account,
         amount_cents: estimated_cents,
@@ -75,7 +79,6 @@ class BatchProcessJob < ApplicationJob
       ).call
       raise "HCB transfer failed" unless xfer
 
-      # Atomic: record the transfer ID immediately so a crash won't double-charge
       batch.update!(hcb_payment_account: hcb_account, hcb_transfer_id: xfer.id)
       xfer
     end
