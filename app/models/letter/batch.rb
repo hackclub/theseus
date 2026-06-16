@@ -6,6 +6,7 @@
 #  aasm_state                  :string
 #  address_count               :integer
 #  field_mapping               :jsonb
+#  hcb_transfer_amount_cents   :integer
 #  letter_height               :decimal(, )
 #  letter_mailing_date         :date
 #  letter_processing_category  :integer

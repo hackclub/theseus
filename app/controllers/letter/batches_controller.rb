@@ -218,6 +218,30 @@ class Letter::BatchesController < BaseBatchesController
     redirect_to processing_letter_batch_path(@batch)
   end
 
+  def refund_overpayment
+    authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    charged = @batch.hcb_transfer_amount_cents.to_i
+    spent = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil
+    overpaid = charged - spent
+
+    if overpaid <= 0
+      redirect_to processing_letter_batch_path(@batch), alert: "Nothing to refund."
+      return
+    end
+
+    hcb_account = @batch.hcb_payment_account
+    HCB::PaymentAccount.refund_to_organization!(
+      organization_id: hcb_account.organization_id,
+      amount_cents: overpaid,
+      name: "Refund for #{@batch.public_id}",
+      memo: "[theseus] overpayment refund",
+    )
+
+    redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % (overpaid / 100.0)}"
+  rescue => e
+    redirect_to processing_letter_batch_path(@batch), alert: "Refund failed: #{e.message}"
+  end
+
   def update_costs
     authorize @batch, :update_costs?, policy_class: Letter::BatchPolicy
     # Calculate counts without saving

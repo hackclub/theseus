@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_16_205314) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_233253) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -102,6 +102,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_205314) do
     t.string "hcb_transfer_id"
     t.jsonb "process_options"
     t.string "process_error"
+    t.integer "hcb_transfer_amount_cents"
     t.index ["hcb_payment_account_id"], name: "index_batches_on_hcb_payment_account_id"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
     t.index ["letter_queue_id"], name: "index_batches_on_letter_queue_id"

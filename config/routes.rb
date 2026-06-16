@@ -484,6 +484,7 @@ Rails.application.routes.draw do
           post :mark_mailed
           post :update_costs
           post :retry_failed
+          post :refund_overpayment
           get :regen, to: "batches#regenerate_form", as: :regenerate_form
           post :regen, to: "batches#regenerate_labels", as: :regenerate_labels
         end

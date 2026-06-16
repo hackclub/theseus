@@ -55,6 +55,30 @@
   </table>
 </div>
 
+<%# ── Money summary ── %>
+<% if @batch.hcb_transfer_id.present? && !@batch.hcb_transfer_id.start_with?("mock") %>
+  <% charged = @batch.hcb_transfer_amount_cents.to_i %>
+  <% spent_cents = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil %>
+  <% overpaid = charged - spent_cents %>
+  <div class="detail-grid" style="margin-top:1rem;font-size:0.9em;">
+    <span class="detail-label">Charged HCB</span>
+    <span>$<%= '%.2f' % (charged / 100.0) %></span>
+    <span class="detail-label">USPS spent</span>
+    <span>$<%= '%.2f' % (spent_cents / 100.0) %></span>
+    <% if overpaid > 0 %>
+      <span class="detail-label">Overpaid</span>
+      <span style="color:var(--yellow);">
+        $<%= '%.2f' % (overpaid / 100.0) %>
+        <% if current_user&.admin? && @batch.processed? %>
+          <%= form_with url: refund_overpayment_letter_batch_path(@batch), method: :post, class: "form-inline", style: "display:inline;margin-left:0.5rem;" do %>
+            <button type="submit" class="btn-sm btn-warning">Refund</button>
+          <% end %>
+        <% end %>
+      </span>
+    <% end %>
+  </div>
+<% end %>
+
 <%# ── Actions (turbo target) ── %>
 <div id="batch-actions" style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--background2);display:flex;gap:0.75rem;align-items:center;">
   <% if @batch.processed? %>
