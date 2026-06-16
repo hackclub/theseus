@@ -47,15 +47,16 @@ class BatchProcessJob < ApplicationJob
       return
     end
 
-    batch.update!(process_error: nil) # clear any previous error
+    batch.update!(process_error: nil)
     batch.mark_processed! if batch.may_mark_processed?
+    reconcile_hcb(batch, options)
     broadcast_done(batch)
 
   end
   private
 
   def configure_letters(batch, options)
-    batch.letters.find_each do |letter|
+    batch.letters.includes(:address).find_each do |letter|
       letter.mailing_date = batch.letter_mailing_date
       if letter.address&.us?
         letter.postage_type = options[:us_postage_type]
@@ -75,17 +76,15 @@ class BatchProcessJob < ApplicationJob
     letters_to_buy = batch.letters.includes(:address, :usps_indicium)
                           .where(postage_type: "indicia")
                           .where(indicia_state: [nil, "failed"])
-                          .where.missing(:usps_indicium)
     total = letters_to_buy.count
     return if total == 0
 
-    # Charge HCB (idempotent — skip if already charged)
-    estimated_cents = (letters_to_buy.sum(&:postage) * 100).ceil
+    estimated_cents = (letters_to_buy.sum(:postage) * 100).ceil
     transfer = if batch.hcb_transfer_id.present?
       nil # already charged on a previous run
     elsif ENV["MOCK_HCB"].present?
       Rails.logger.info "[BatchProcessJob] MOCK_HCB: skipping HCB charge of #{estimated_cents} cents"
-      batch.update!(hcb_transfer_id: "mock_#{SecureRandom.hex(4)}")
+      batch.update_columns(hcb_transfer_id: "mock_#{SecureRandom.hex(4)}", hcb_transfer_amount_cents: estimated_cents)
       nil
     else
       # Check balance before charging
@@ -109,7 +108,7 @@ class BatchProcessJob < ApplicationJob
       ).call
       raise "HCB transfer failed: #{xfer.errors.join(', ') if xfer.respond_to?(:errors)}" unless xfer
 
-      batch.update!(hcb_payment_account: hcb_account, hcb_transfer_id: xfer.id)
+      batch.update_columns(hcb_payment_account_id: hcb_account.id, hcb_transfer_id: xfer.id, hcb_transfer_amount_cents: estimated_cents)
       xfer
     end
 
@@ -165,19 +164,39 @@ class BatchProcessJob < ApplicationJob
     pool.shutdown
     pool.wait_for_termination
 
-    # Reconcile HCB — refund overpayment if > $1
-    if transfer
-      overpaid = (transfer.respond_to?(:amount_cents) ? transfer.amount_cents : estimated_cents) - actual_cents.value
-      if overpaid > 100
-        HCB::PaymentAccount.refund_to_organization!(
-          organization_id: hcb_account.organization_id,
-          amount_cents: overpaid,
-          name: "Adjustment for #{batch.public_id}",
-          memo: "[theseus] overpayment refund",
-        )
-      end
-    end
+    # NOTE: reconciliation happens in perform after mark_processed,
+    # NOT here. refunding inside purchase_indicia caused a money bug:
+    # failed batch → full refund → retry skips charge → free postage.
   end
+  def reconcile_hcb(batch, options)
+    return unless batch.hcb_transfer_id.present?
+    return if batch.hcb_transfer_id.start_with?("mock")
+
+    charged_cents = batch.hcb_transfer_amount_cents.to_i
+    return if charged_cents == 0
+
+    hcb_account = HCB::PaymentAccount.find_by(id: options[:hcb_payment_account_id])
+    return unless hcb_account
+
+    actual_cents = (batch.letters.where(indicia_state: "purchased")
+                        .joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil
+
+    overpaid = charged_cents - actual_cents
+    if overpaid > 100 # only refund if > $1
+      HCB::PaymentAccount.refund_to_organization!(
+        organization_id: hcb_account.organization_id,
+        amount_cents: overpaid,
+        name: "Adjustment for #{batch.public_id}",
+        memo: "[theseus] overpayment refund",
+      )
+      batch.update_columns(hcb_refund_cents: overpaid)
+      Rails.logger.info "[BatchProcessJob] Refunded #{overpaid} cents to #{hcb_account.organization_name}"
+    end
+  rescue => e
+    Rails.logger.error "[BatchProcessJob] HCB reconciliation failed: #{e.message}"
+    Sentry.capture_exception(e, extra: { batch_id: batch.id })
+  end
+
 
   def buy_indicium(letter, usps_account, hcb_account, batch, token)
     indicium = letter.usps_indicium || USPS::Indicium.create!(
@@ -229,7 +248,7 @@ class BatchProcessJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_replace_to(
       [batch, :progress],
       target: "batch-actions",
-      html: '<div id="batch-actions"><script>window.location.reload()</script></div>'
+      html: '<div id="batch-actions"><meta http-equiv="refresh" content="0"></div>'
     )
   end
 end
