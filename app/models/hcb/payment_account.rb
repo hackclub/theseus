@@ -32,6 +32,8 @@ class HCB::PaymentAccount < ApplicationRecord
   validates :organization_name, presence: true
   validate :organization_not_blocked
 
+  def display_name = organization_name
+
   private
 
   def organization_not_blocked
