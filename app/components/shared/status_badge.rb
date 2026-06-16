@@ -7,10 +7,20 @@ class Components::Shared::StatusBadge < Components::Base
   end
 
   def view_template
-    span("is-": "badge", "variant-": variant_for_status) { text_for_status }
+    span(class: "badge #{css_class_for_status}".strip) { text_for_status }
   end
 
   private
+
+  def css_class_for_status
+    case variant_for_status
+    when "green" then "badge-success"
+    when "red" then "badge-danger"
+    when "yellow" then "badge-warning"
+    when "blue" then "badge-info"
+    else ""
+    end
+  end
 
   def variant_for_status
     case [@type, @status.to_s]

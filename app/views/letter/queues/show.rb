@@ -6,7 +6,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
   def type_label = "Batch"
 
   def type_badge
-    span("is-": "badge", "variant-": "blue") { "Batch" }
+    span(class: "badge badge-info") { "Batch" }
   end
 
   def edit_queue_path
@@ -25,17 +25,17 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
 
     details(id: "make-batch-dialog") do
       summary(style: "list-style: none;") do
-        button("variant-": "green", style: "width: 100%;") { "⊞ Make Batch" }
+        button(class: "btn-success", style: "width: 100%;") { "⊞ Make Batch" }
       end
 
-      div(style: "margin-top: 0.5lh;") do
+      div(style: "margin-top: 0.5rem;") do
         form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
-          div(style: "margin-bottom: 0.5lh;") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "How many letters?" }
+          div(style: "margin-bottom: 0.5rem;") do
+            label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "How many letters?" }
             input(type: "text", name: "limit", style: "width: 100%;")
-            small(style: "color: var(--foreground2);") { "Blank = all #{queued_count}" }
+            small(class: "text-muted") { "Blank = all #{queued_count}" }
           end
-          button(type: "submit", "variant-": "green", style: "width: 100%;") { "✓ Create Batch" }
+          button(type: "submit", class: "btn-success", style: "width: 100%;") { "✓ Create Batch" }
         end
       end
     end
@@ -46,10 +46,10 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
   def batches_section
     return unless batches.any?
 
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Batches" }
-      span(style: "color: var(--foreground2); margin-left: 1ch;") { "(#{batches.count})" }
-      div("is-": "separator")
+      span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{batches.count})" }
+      hr
 
       table do
         thead do
@@ -64,10 +64,10 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
           batches.each do |batch|
             tr do
               td do
-                a(href: letter_batch_path(batch), style: "text-decoration: none; color: var(--foreground0);") { "Batch ##{batch.id}" }
+                a(href: letter_batch_path(batch), style: "text-decoration: none;") { "Batch ##{batch.id}" }
               end
               td { plain "#{batch.letters.size}" }
-              td(style: "color: var(--foreground2);") { batch.created_at.strftime("%b %-d, %Y") }
+              td(class: "text-muted") { batch.created_at.strftime("%b %-d, %Y") }
               td { render Components::Shared::StatusBadge.new(status: batch.aasm_state, type: :batch) }
             end
           end

@@ -26,60 +26,51 @@ class Views::Letter::Batches::Index < Views::Base
       action_href: new_letter_batch_path,
       action_label: "+ New Batch"
     ) do
-      if @search.present? || @state.present?
-        a(href: letter_batches_path, class: "stat-filter") { "× Clear" }
+      if @state.present? || @search.present?
+        a(href: letter_batches_path, style: "color: GrayText; white-space: nowrap;") { "× Clear" }
       end
     end
   end
 
   def stat_filters
-    counts = {
-      awaiting_field_mapping: @batches.select { |b| b.aasm_state == "awaiting_field_mapping" }.size,
-      fields_mapped: @batches.select { |b| b.aasm_state == "fields_mapped" }.size,
-      processed: @batches.select { |b| b.aasm_state == "processed" }.size
-    }
+    stats = [
+      { param: nil, count: @batches.count, label: "All" },
+      { param: "awaiting_field_mapping", count: @batches.where(aasm_state: "awaiting_field_mapping").count, label: "Awaiting", color: "yellow" },
+      { param: "fields_mapped", count: @batches.where(aasm_state: "fields_mapped").count, label: "Mapped", color: "blue" },
+      { param: "processed", count: @batches.where(aasm_state: "processed").count, label: "Processed", color: "green" },
+      { param: "printed", count: @batches.where(aasm_state: "printed").count, label: "Printed" },
+      { param: "mailed", count: @batches.where(aasm_state: "mailed").count, label: "Mailed" }
+    ]
 
     render Components::Shared::StatFilters.new(
-      stats: [
-        { label: "Open", count: counts[:awaiting_field_mapping], color: "yellow", param: "awaiting_field_mapping" },
-        { label: "Mapped", count: counts[:fields_mapped], color: "blue", param: "fields_mapped" },
-        { label: "Processed", count: counts[:processed], color: "green", param: "processed" }
-      ],
+      stats: stats,
       active: @state,
-      filter_key: :state,
-      base_path: ->(params = {}) { letter_batches_path(search: @search, **params) },
-      preserved_params: { search: @search },
-      total: @batches.size
+      base_path: ->(status: nil, **) { letter_batches_path(state: status, search: @search) },
+      filter_key: :status
     )
   end
 
   def batches_table
     filtered = if @state.present?
-                 @batches.select { |b| b.aasm_state == @state }
+                 @batches.where(aasm_state: @state)
                else
                  @batches
                end
 
-    if filtered.any?
-      table do
-        thead do
-          tr do
-            th { "Batch" }
-            th { "Date" }
-            th { "Letters" }
-            th { "Addresses" }
-            th { "Status" }
-          end
-        end
-        tbody do
-          filtered.each { |batch| render_batch_row(batch) }
+    table do
+      thead do
+        tr do
+          th { "ID" }
+          th { "Origin" }
+          th { "Letters" }
+          th { "Created" }
+          th { "Status" }
         end
       end
-    else
-      div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
-        h2(style: "margin: 0;") { "No letter batches yet" }
-        p(style: "color: var(--foreground2);") { "Create a batch to send letters to multiple addresses at once." }
-        a(href: new_letter_batch_path) { button("variant-": "green") { "+ New Batch" } }
+      tbody do
+        filtered.order(created_at: :desc).limit(100).each do |batch|
+          render_batch_row(batch)
+        end
       end
     end
   end
@@ -87,21 +78,12 @@ class Views::Letter::Batches::Index < Views::Base
   def render_batch_row(batch)
     tr do
       td do
-        a(href: letter_batch_path(batch), style: "text-decoration: none; color: var(--foreground0);") do
-          plain batch.public_id
-        end
-        if batch.tags.any?
-          plain " "
-          batch.tags.first(2).compact_blank.each do |t|
-            span(style: "color: var(--foreground2); font-size: 0.8em;") { t }
-            plain " "
-          end
-        end
+        a(href: letter_batch_path(batch), style: "text-decoration: none; font-weight: 500;") { "Batch ##{batch.id}" }
       end
-      td(style: "color: var(--foreground2);") { plain batch.created_at.strftime("%b %d") }
-      td { plain format_number(batch.letters.size) }
-      td { plain format_number(batch.addresses.size) }
-      td { render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch) }
+      td(class: "text-muted") { batch.origin || "—" }
+      td { format_number(batch.letters.size) }
+      td(class: "text-muted") { batch.created_at.strftime("%b %-d, %Y") }
+      td { render Components::Shared::StatusBadge.new(status: batch.aasm_state, type: :batch) }
     end
   end
 

@@ -1,8 +1,8 @@
 <%= form_with(model: usps_payment_account) do |form| %>
   <% if usps_payment_account.errors.any? %>
-    <div box-="square" style="margin-bottom: 1lh; color: var(--red);">
+    <div style="margin-bottom: 1rem; color: var(--red);">
       [!] <strong><%= pluralize(usps_payment_account.errors.count, "error") %>:</strong>
-      <ul style="margin: 0; padding-left: 2ch;">
+      <ul style="margin: 0; padding-left: 1rem;">
         <% usps_payment_account.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,17 +10,17 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Account Details</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Display name</label>
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Display name</label>
         <input type="text" name="usps_payment_account[name]" value="<%= usps_payment_account.name %>" style="width: 100%;">
       </div>
 
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">CRID/MID</label>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">CRID/MID</label>
         <select name="usps_payment_account[usps_mailer_id_id]" required style="width: 100%;">
           <option value="">Select one...</option>
           <% USPS::MailerId.all.each do |mid| %>
@@ -29,8 +29,8 @@
         </select>
       </div>
 
-      <div x-data="{account_type: '<%= usps_payment_account.account_type %>'}" style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Account type</label>
+      <div x-data="{account_type: '<%= usps_payment_account.account_type %>'}" style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Account type</label>
         <select name="usps_payment_account[account_type]" x-model="account_type" style="width: 100%;">
           <% USPS::PaymentAccount.account_types.keys.each do |type| %>
             <option value="<%= type %>" <%= "selected" if type == usps_payment_account.account_type %>><%= type %></option>
@@ -38,34 +38,34 @@
         </select>
 
         <template x-if="account_type=='EPS'">
-          <div style="margin-top: 1lh;">
-            <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">EPS account number</label>
+          <div style="margin-top: 1rem;">
+            <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">EPS account number</label>
             <input type="text" name="usps_payment_account[account_number]" value="<%= usps_payment_account.account_number %>" style="width: 100%;">
           </div>
         </template>
         <template x-if="account_type=='PERMIT'">
-          <row gap-="2" style="margin-top: 1lh;">
+          <div style="display:flex;gap:1rem;margin-top: 1rem;">
             <div style="flex: 1;">
-              <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Permit number</label>
+              <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Permit number</label>
               <input type="text" name="usps_payment_account[permit_number]" value="<%= usps_payment_account.permit_number %>" style="width: 100%;">
             </div>
             <div style="flex: 1;">
-              <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Permit ZIP</label>
+              <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Permit ZIP</label>
               <input type="text" name="usps_payment_account[permit_zip]" value="<%= usps_payment_account.permit_zip %>" style="width: 100%;">
             </div>
-          </row>
+          </div>
         </template>
       </div>
 
       <div>
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Manifest MID</label>
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Manifest MID</label>
         <input type="text" name="usps_payment_account[manifest_mid]" value="<%= usps_payment_account.manifest_mid %>" style="width: 100%;">
       </div>
     </div>
-  </div>
+  </section>
 
-  <row gap-="1" align-="center" style="justify-content: flex-end;">
-    <a href="<%= usps_payment_accounts_path %>" style="color: var(--foreground2); text-decoration: none;">Cancel</a>
-    <button type="submit" variant-="green"><%= usps_payment_account.persisted? ? "Update Account" : "Create Account" %></button>
-  </row>
+  <div style="display:flex;align-items:center;gap:0.5rem;justify-content: flex-end;">
+    <a href="<%= usps_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">Cancel</a>
+    <button type="submit" class="btn-success"><%= usps_payment_account.persisted? ? "Update Account" : "Create Account" %></button>
+  </div>
 <% end %>

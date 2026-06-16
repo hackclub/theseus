@@ -1,7 +1,7 @@
 <%= form_with(url: buy_indicia_letter_path(letter), method: :post) do |form| %>
   <% if current_user.hcb_payment_accounts.any? %>
-    <div style="margin-bottom: 0.5lh;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">HCB Organization</label>
+    <div style="margin-bottom: 0.5rem;">
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">HCB Organization</label>
       <select name="hcb_payment_account_id" required style="width: 100%;">
         <option value="">Select organization…</option>
         <% current_user.hcb_payment_accounts.each do |account| %>
@@ -10,8 +10,8 @@
       </select>
     </div>
 
-    <div style="margin-bottom: 0.5lh;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">USPS Account</label>
+    <div style="margin-bottom: 0.5rem;">
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">USPS Account</label>
       <select name="usps_payment_account_id" required style="width: 100%;">
         <% USPS::PaymentAccount.all.each do |account| %>
           <option value="<%= account.id %>" <%= "selected" if account.id == USPS::PaymentAccount.first&.id %>><%= account.name %></option>
@@ -19,8 +19,8 @@
       </select>
     </div>
 
-    <button type="submit" variant-="green" style="width: 100%;">✓ Buy Indicia</button>
+    <button type="submit" class="btn-success" style="width: 100%;">✓ Buy Indicia</button>
   <% else %>
-    <span style="color: var(--foreground2);"><%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to purchase postage.</span>
+    <span style="color: GrayText;"><%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to purchase postage.</span>
   <% end %>
 <% end %>

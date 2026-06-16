@@ -93,9 +93,9 @@ class Views::Warehouse::Orders::Index < Views::Base
           warehouse_orders.each do |order|
             tr do
               td do
-                a(href: warehouse_order_path(order), style: "text-decoration: none; color: var(--foreground0);") { order.hc_id }
+                a(href: warehouse_order_path(order), style: "text-decoration: none;") { order.hc_id }
               end
-              td(style: "color: var(--foreground2);") { plain order.created_at.strftime("%b %d") }
+              td(style: "color: GrayText;") { plain order.created_at.strftime("%b %d") }
               td { plain order.address&.name_line || "—" }
               td(style: "text-align: right;") { plain order.line_items.sum(&:quantity).to_s }
               td { status_badge(order) }
@@ -104,14 +104,14 @@ class Views::Warehouse::Orders::Index < Views::Base
         end
       end
     else
-      div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+      section(style: "text-align: center; padding: 2rem;") do
         h2(style: "margin: 0;") { "No orders found" }
         if search.present? || state.present?
-          p(style: "color: var(--foreground2);") { "Try adjusting your search or filters." }
+          p(style: "color: GrayText;") { "Try adjusting your search or filters." }
         else
-          p(style: "color: var(--foreground2);") { "Create your first order to get started." }
+          p(style: "color: GrayText;") { "Create your first order to get started." }
           a(href: new_warehouse_order_path) do
-            button("variant-": "green") { "+ New Order" }
+            button(class: "btn-success") { "+ New Order" }
           end
         end
       end
@@ -119,23 +119,23 @@ class Views::Warehouse::Orders::Index < Views::Base
   end
 
   def status_badge(order)
-    variant = case order.aasm_state.to_sym
-              when :draft then "background2"
-              when :dispatched then "blue"
-              when :mailed then "green"
-              when :errored then "red"
-              when :canceled then "yellow"
-              else "background2"
-              end
+    badge_class = case order.aasm_state.to_sym
+                  when :draft then "badge"
+                  when :dispatched then "badge badge-info"
+                  when :mailed then "badge badge-success"
+                  when :errored then "badge badge-danger"
+                  when :canceled then "badge badge-warning"
+                  else "badge"
+                  end
 
-    span("is-": "badge", "variant-": variant) { order.humanized_state }
+    span(class: badge_class) { order.humanized_state }
   end
 
   def pagination_section
     render Components::Shared::Pagination.new(
       collection: warehouse_orders,
-      base_path: method(:warehouse_orders_path),
-      filter_params: { origin: origin, search: search, state: state, user_id: user_id }
+      base_path: ->(page:, **) { warehouse_orders_path(page: page, state: state, origin: origin, search: search, user_id: user_id) },
+      filter_params: { state: state, origin: origin, search: search, user_id: user_id }
     )
   end
 end

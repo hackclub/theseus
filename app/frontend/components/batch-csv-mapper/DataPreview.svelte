@@ -68,16 +68,16 @@
 
   .stats {
     font-size: 13px;
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
   }
 
   .skipped {
-    color: var(--fgColor-attention, #9a6700);
+    color: var(--warning-fg);
   }
 
   .table-wrap {
     overflow-x: auto;
-    border: 1px solid var(--borderColor-default, #d1d5db);
+    border: 1px solid var(--background2);
     border-radius: 6px;
   }
 
@@ -90,17 +90,17 @@
   th {
     text-align: left;
     padding: 6px 10px;
-    background: var(--bgColor-muted, #f6f8fa);
+    background: var(--background1);
     font-weight: 600;
     font-size: 12px;
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
     white-space: nowrap;
-    border-bottom: 1px solid var(--borderColor-default, #d1d5db);
+    border-bottom: 1px solid var(--background2);
   }
 
   td {
     padding: 6px 10px;
-    border-bottom: 1px solid var(--borderColor-muted, #d8dee4);
+    border-bottom: 1px solid var(--background2);
     white-space: nowrap;
     max-width: 200px;
     overflow: hidden;
@@ -108,12 +108,12 @@
   }
 
   td.empty {
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
   }
 
   td.missing {
-    background: var(--bgColor-danger-muted, #ffebe9);
-    color: var(--fgColor-danger, #d1242f);
+    background: var(--error-bg);
+    color: var(--error-fg);
     font-weight: 500;
   }
 
@@ -125,6 +125,6 @@
     padding: 8px;
     text-align: center;
     font-size: 12px;
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
   }
 </style>

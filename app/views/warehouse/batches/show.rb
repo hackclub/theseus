@@ -8,30 +8,30 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def view_template
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: warehouse_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
+    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: warehouse_batches_path, style: "text-decoration: none; color: GrayText;") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "Warehouse Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
-      row("gap-": "1", "align-": "center") do
-        span(style: "color: var(--foreground2);") { "#{helpers.pluralize(@batch.addresses.count, 'address')}" }
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        span(style: "color: GrayText;") { "#{helpers.pluralize(@batch.addresses.count, 'address')}" }
         if @batch.tags.any?
           render Components::Shared::Tags.new(tags: @batch.tags)
         end
       end
-      span(class: "toolbar-spacer")
-      row("gap-": "1", "align-": "center") do
+      span(class: "spacer")
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
         a(href: edit_warehouse_batch_path(@batch)) { "✎ Edit" }
         if @batch.fields_mapped?
           a(href: process_confirm_warehouse_batch_path(@batch)) do
-            button("variant-": "green", "size-": "small") { "▶ Process" }
+            button(class: "btn-success btn-sm") { "▶ Process" }
           end
         end
         form(method: :post, action: warehouse_batch_path(@batch)) do
           input(type: :hidden, name: :_method, value: :delete)
           input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-          button(type: "submit", "variant-": "red", "size-": "small", data: { turbo_confirm: "Delete this batch?" }) { "✕" }
+          button(type: "submit", class: "btn-danger btn-sm", data: { turbo_confirm: "Delete this batch?" }) { "✕" }
         end
       end
     end
@@ -53,10 +53,10 @@ class Views::Warehouse::Batches::Show < Views::Base
   private
 
   def batch_details
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Details" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Template" }
         span { @batch.warehouse_template&.name || "—" }
         span(class: "detail-label") { "Title" }
@@ -72,10 +72,10 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def orders_section
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Orders (#{@batch.orders.count})" }
-      div("is-": "separator")
-      table(style: "margin-top: 0.5lh; width: 100%;") do
+      hr
+      table(style: "margin-top: 0.5rem; width: 100%;") do
         thead do
           tr do
             th(style: "text-align: left;") { "ID" }
@@ -97,10 +97,10 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def addresses_section
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Addresses (#{@batch.addresses.count})" }
-      div("is-": "separator")
-      table(style: "margin-top: 0.5lh; width: 100%;") do
+      hr
+      table(style: "margin-top: 0.5rem; width: 100%;") do
         thead do
           tr do
             th(style: "text-align: left;") { "Name" }
@@ -124,31 +124,31 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def actions_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Actions" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
+      hr
+      div(style: "margin-top: 0.5rem;") do
         if @batch.fields_mapped?
           a(href: process_confirm_warehouse_batch_path(@batch)) do
-            button("variant-": "green", style: "width: 100%;") { "▶ Process Batch" }
+            button(class: "btn-success", style: "width: 100%;") { "▶ Process Batch" }
           end
         elsif @batch.processed?
-          div(style: "text-align: center; padding: 1lh 0; color: var(--green);") do
+          div(style: "text-align: center; padding: 1rem 0; color: var(--green);") do
             span(style: "font-size: 2em;") { "✓" }
-            div(style: "margin-top: 0.5lh;") { strong { "Processed" } }
+            div(style: "margin-top: 0.5rem;") { strong { "Processed" } }
           end
         else
-          span(style: "color: var(--foreground2);") { "Map fields before processing" }
+          span(style: "color: GrayText;") { "Map fields before processing" }
         end
       end
     end
   end
 
   def cost_summary_box
-    div("box-": "round") do
+    section do
       strong { "Cost Summary" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Contents" }
         span { number_to_currency(@batch.contents_cost) }
         span(class: "detail-label") { "Labor" }

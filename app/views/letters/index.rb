@@ -96,10 +96,10 @@ class Views::Letters::Index < Views::Base
         end
       end
     else
-      div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
-        p(style: "margin: 0;") { "No letters found." }
+      section(style: "text-align:center;padding:2rem") do
+        p(style: "margin:0;") { "No letters found." }
         if !(search.present? || status.present?)
-          a(href: new_letter_path) { button("variant-": "green") { "Send Letter" } }
+          a(href: new_letter_path) { button(class: "btn-success") { "Send Letter" } }
         end
       end
     end
@@ -108,7 +108,7 @@ class Views::Letters::Index < Views::Base
   def render_letter_row(letter)
     tr do
       td do
-        a(href: letter_path(letter), style: "text-decoration: none; color: var(--foreground0);") do
+        a(href: letter_path(letter), style: "text-decoration:none;") do
           plain letter.public_id
         end
         if letter.tags.present?
@@ -117,14 +117,14 @@ class Views::Letters::Index < Views::Base
           end
         end
       end
-      td(style: "color: var(--foreground2);") { plain letter.created_at.strftime("%b %d") }
+      td(class: "text-muted") { plain letter.created_at.strftime("%b %d") }
       td do
         plain letter.address&.name_line || "—"
       end
-      td(style: "color: var(--foreground2);") { plain letter.origin_label }
+      td(class: "text-muted") { plain letter.origin_label }
       td do
         if letter.batch_id.present?
-          a(href: letter_batch_path(letter.batch_id), style: "text-decoration: none; color: var(--foreground2);") { "##{letter.batch_id}" }
+          a(href: letter_batch_path(letter.batch_id), style: "text-decoration:none;", class: "text-muted") { "##{letter.batch_id}" }
         else
           plain "—"
         end

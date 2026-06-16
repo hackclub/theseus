@@ -1,10 +1,10 @@
 <% content_for :title, "New Order" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_orders_path %>" style="text-decoration: none; color: var(--foreground2);">← Orders</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_orders_path %>" style="text-decoration: none; color: GrayText;">← Orders</a>
     <strong style="font-size: 1.15em;">New Order</strong>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -13,13 +13,13 @@
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Info</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh; color: var(--foreground2);">
-        <p style="margin: 0 0 0.5lh;">Orders are sent to the warehouse for fulfillment. The recipient receives a shipping notification when it ships.</p>
+      <hr>
+      <div style="margin-top: 0.5rem; color: GrayText;">
+        <p style="margin: 0 0 0.5rem;">Orders are sent to the warehouse for fulfillment. The recipient receives a shipping notification when it ships.</p>
         <p style="margin: 0;">Items must be in inventory to be included.</p>
       </div>
-    </div>
+    </section>
   </div>
 </div>

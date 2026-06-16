@@ -1,6 +1,6 @@
-<div box-="round" style="margin-bottom: 1lh;">
+<section style="margin-bottom: 1rem;">
   <strong>Orders</strong>
-  <div is-="separator"></div>
+  <hr>
   <table style="width: 100%;">
     <thead>
       <tr>
@@ -12,23 +12,23 @@
     <tbody>
       <% orders.each do |order| %>
         <tr>
-          <td style="padding: 0.25lh 1ch;">
+          <td style="padding: 0.25rem 0.5rem;">
             <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
             <% if order.user_facing_title.present? %>
               <span class="row-tag"><%= order.user_facing_title %></span>
             <% end %>
           </td>
-          <td style="padding: 0.25lh 1ch;">
+          <td style="padding: 0.25rem 0.5rem;">
             <%= order.address&.name_line || "—" %>
             <% if order.recipient_email.present? %>
-              <span style="color: var(--foreground2);"> (<%= order.recipient_email %>)</span>
+              <span style="color: GrayText;"> (<%= order.recipient_email %>)</span>
             <% end %>
           </td>
-          <td style="padding: 0.25lh 1ch;">
+          <td style="padding: 0.25rem 0.5rem;">
             <%= render 'warehouse/orders/status_badge', order: order %>
           </td>
         </tr>
       <% end %>
     </tbody>
   </table>
-</div>
+</section>

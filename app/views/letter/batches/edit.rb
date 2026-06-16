@@ -13,9 +13,9 @@ class Views::Letter::Batches::Edit < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
+    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: GrayText;") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Edit Batch" }
       end
     end
@@ -25,10 +25,10 @@ class Views::Letter::Batches::Edit < Views::Base
         error_messages
 
         form_with(model: @batch, url: letter_batch_path(@batch), scope: :letter_batch, method: :patch) do |f|
-          div("box-": "round", style: "margin-bottom: 1lh;") do
+          section(style: "margin-bottom: 1rem;") do
             strong { "Letter Specs" }
-            div("is-": "separator")
-            div(style: "margin-top: 0.5lh;") do
+            hr
+            div(style: "margin-top: 0.5rem;") do
               div(
                 data_svelte_component: "letter-attributes-picker",
                 data_form_scope: "letter_batch",
@@ -41,18 +41,18 @@ class Views::Letter::Batches::Edit < Views::Base
             end
           end
 
-          div("box-": "round", style: "margin-bottom: 1lh;") do
+          section(style: "margin-bottom: 1rem;") do
             strong { "Sender & Postage" }
-            div("is-": "separator")
-            div(style: "margin-top: 0.5lh;") do
+            hr
+            div(style: "margin-top: 0.5rem;") do
               sender_fields(f)
             end
           end
 
           tag_picker(f)
 
-          row("gap-": "1", style: "margin-top: 1lh;") do
-            button(type: "submit", "variant-": "green") { "✓ Update Batch" }
+          div(style: "display:flex;gap:0.5rem;margin-top:1rem;") do
+            button(type: "submit", class: "btn-success") { "✓ Update Batch" }
             a(href: letter_batch_path(@batch)) { button { "Cancel" } }
           end
         end
@@ -69,10 +69,10 @@ class Views::Letter::Batches::Edit < Views::Base
   def error_messages
     return unless @batch.errors.any?
 
-    div("box-": "round", style: "margin-bottom: 1lh; border-color: var(--red);") do
+    section(style: "margin-bottom: 1rem; border-color: var(--red);") do
       strong(style: "color: var(--red);") { "#{@batch.errors.count} #{"error".pluralize(@batch.errors.count)} prevented saving" }
-      div("is-": "separator")
-      ul(style: "margin: 0.5lh 0 0; padding-left: 2ch;") do
+      hr
+      ul(style: "margin: 0.5rem 0 0; padding-left: 1rem;") do
         @batch.errors.full_messages.each { |msg| li { msg } }
       end
     end
@@ -111,8 +111,8 @@ class Views::Letter::Batches::Edit < Views::Base
       end
     end
 
-    div(style: "margin-bottom: 1lh;") do
-      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Custom Return Address Name" }
+    div(style: "margin-bottom: 1rem;") do
+      label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Custom Return Address Name" }
       input(type: "text", name: "letter_batch[letter_return_address_name]", value: @batch.letter_return_address_name, style: "width: 100%;")
       p(class: "form-hint") { "Leave blank to use the return address name" }
     end
@@ -135,10 +135,10 @@ class Views::Letter::Batches::Edit < Views::Base
   end
 
   def batch_info_card
-    div("box-": "round") do
+    section do
       strong { "Batch Info" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Status" }
         span { render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch) }
 

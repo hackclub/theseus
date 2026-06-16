@@ -1,13 +1,13 @@
 <tr id="<%= dom_id order %>">
-  <td style="padding: 0.25lh 1ch;">
+  <td style="padding: 0.25rem 0.5rem;">
     <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
     <% if order.user_facing_title.present? %>
       <span class="row-tag"><%= order.user_facing_title %></span>
     <% end %>
   </td>
-  <td style="padding: 0.25lh 1ch;"><%= order.address&.name_line || "—" %></td>
-  <td style="padding: 0.25lh 1ch; color: var(--foreground2);"><%= order.recipient_email %></td>
-  <td style="padding: 0.25lh 1ch;">
+  <td style="padding: 0.25rem 0.5rem;"><%= order.address&.name_line || "—" %></td>
+  <td style="padding: 0.25rem 0.5rem; color: GrayText;"><%= order.recipient_email %></td>
+  <td style="padding: 0.25rem 0.5rem;">
     <%= render 'warehouse/orders/status_badge', order: order %>
   </td>
 </tr>

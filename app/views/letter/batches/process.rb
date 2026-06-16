@@ -9,9 +9,9 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def view_template
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
+    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: GrayText;") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Process Batch" }
       end
     end
@@ -25,8 +25,8 @@ class Views::Letter::Batches::Process < Views::Base
           postage_box
           payment_box
 
-          row("gap-": "1", style: "margin-top: 1lh;") do
-            button(type: "submit", "variant-": "green") { "▶ Generate Labels" }
+          div(style: "display:flex;gap:0.5rem;margin-top:1rem;") do
+            button(type: "submit", class: "btn-success") { "▶ Generate Labels" }
             a(href: letter_batch_path(@batch)) { button { "Cancel" } }
           end
         end
@@ -43,12 +43,12 @@ class Views::Letter::Batches::Process < Views::Base
   private
 
   def letter_details_box(f)
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Letter Details" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
-        div(style: "margin-bottom: 1lh;") do
-          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Letter Title" }
+      hr
+      div(style: "margin-top: 0.5rem;") do
+        div(style: "margin-bottom: 1rem;") do
+          label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Letter Title" }
           input(type: "text", name: "batch[user_facing_title]", style: "width: 100%;")
           p(class: "form-hint") { "Visible to recipients on their letters (e.g. \"Monthly Newsletter\")" }
         end
@@ -74,10 +74,10 @@ class Views::Letter::Batches::Process < Views::Base
     standard_templates = SnailMail::PhlexService.templates_for_size(:standard)
     envelope_templates = SnailMail::PhlexService.templates_for_size(:envelope)
 
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Label Templates" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
+      hr
+      div(style: "margin-top: 0.5rem;") do
         p(class: "form-hint mb-2") { "Select multiple templates to cycle through them, or just one for all labels." }
         select(
           name: "batch[template_cycle]",
@@ -106,10 +106,10 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def options_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Options" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
+      hr
+      div(style: "margin-top: 0.5rem;") do
         label(class: "form-check-label form-field") do
           input(type: "checkbox", name: "batch[include_qr_code]", value: "1", checked: true)
           span { "Include QR code on labels" }
@@ -128,10 +128,10 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def postage_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Postage" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
+      hr
+      div(style: "margin-top: 0.5rem;") do
         div(class: "postage-grid") do
           div do
             strong { "US Mail" }
@@ -172,7 +172,7 @@ class Views::Letter::Batches::Process < Views::Base
             span(class: "detail-label") { "International cost difference:" }
             span(id: "intl_cost_difference") { number_to_currency(@batch.postage_cost_difference[:intl]) }
           end
-          div(id: "cost_explanation", style: "color: var(--foreground2); margin-top: 0.5lh;") do
+          div(id: "cost_explanation", style: "color: GrayText; margin-top: 0.5rem;") do
             us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count
             intl_count = @batch.letters.joins(:address).where.not(addresses: { country: "US" }).count
             total_stamps = us_count + intl_count
@@ -186,10 +186,10 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def payment_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Payment" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
+      hr
+      div(style: "margin-top: 0.5rem;") do
         div(class: "form-field-lg") do
           label(class: "date-field-label", for: "batch_usps_payment_account_id") { "USPS Payment Account" }
           p(class: "form-hint mb-2") { "Required only when using indicia." }
@@ -226,10 +226,10 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def summary_card
-    div("box-": "round") do
+    section do
       strong { "Batch Summary" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Addresses" }
         span { @batch.addresses.count.to_s }
 

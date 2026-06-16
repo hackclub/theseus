@@ -1,36 +1,31 @@
 .banner {
-    border: 1px solid;
-    border-radius: 8px;
-    padding: var(--space-3) var(--space-4);
-    margin-bottom: var(--space-4);
-    font-weight: var(--font-weight-medium);
-}
-
-.banner > svg {
-    height: 1.25rem;
-    width: 1.25rem;
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 .banner-warning {
-    background: var(--warning-bg);
-    border-color: var(--warning-border);
-    color: var(--warning-fg-strong);
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+  color: var(--warning-fg, var(--warning-fg-strong));
 }
 
 .banner-danger {
-    background: var(--error-bg);
-    border-color: var(--error-border);
-    color: var(--error-fg-strong);
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error-fg, var(--error-fg-strong));
 }
 
 .banner-info {
-    background: var(--info-bg);
-    border-color: var(--info-border);
-    color: var(--info-fg-strong);
+  background: var(--info-bg);
+  border-color: var(--info-border);
+  color: var(--info-fg, var(--info-fg-strong));
 }
 
 .banner-success {
-    background: var(--success-bg);
-    border-color: var(--success-border);
-    color: var(--success-fg-strong);
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-fg, var(--success-fg-strong));
 }

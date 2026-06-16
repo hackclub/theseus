@@ -16,7 +16,7 @@ class Components::Shared::PageToolbar < Components::Base
   end
 
   def view_template(&block)
-    div(class: "page-toolbar") do
+    div(class: "toolbar") do
       strong(style: "font-size: 1.15em; flex-shrink: 0;") { @title }
 
       if @jumpcode_path
@@ -34,13 +34,24 @@ class Components::Shared::PageToolbar < Components::Base
 
       yield if block_given?
 
-      span(class: "toolbar-spacer")
+      span(class: "spacer")
 
       if @action_href && @action_label
         a(href: @action_href) do
-          button("variant-": @action_variant) { @action_label }
+          button(class: variant_class(@action_variant)) { @action_label }
         end
       end
+    end
+  end
+
+  private
+
+  def variant_class(variant)
+    case variant
+    when "green" then "btn-success"
+    when "red" then "btn-danger"
+    when "yellow" then "btn-warning"
+    when "blue" then "btn-info"
     end
   end
 end

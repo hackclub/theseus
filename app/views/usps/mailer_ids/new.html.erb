@@ -1,10 +1,10 @@
 <% content_for :title, "New Mailer ID" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= usps_mailer_ids_path %>" style="text-decoration: none; color: var(--foreground2);">← Mailer IDs</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= usps_mailer_ids_path %>" class="text-muted" style="text-decoration: none;">← Mailer IDs</a>
     <strong style="font-size: 1.15em;">New Mailer ID</strong>
-  </row>
+  </div>
 </div>
 
 <%= render "form", usps_mailer_id: @usps_mailer_id %>

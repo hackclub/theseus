@@ -32,21 +32,21 @@ class Views::ReturnAddresses::Index < Views::Base
           return_addresses.each do |address|
             tr do
               td do
-                a(href: edit_return_address_path(address), style: "text-decoration: none; color: var(--foreground0); font-weight: 600;") do
+                a(href: edit_return_address_path(address), style: "text-decoration: none; font-weight: 600;") do
                   plain address.name
                 end
                 whitespace
                 render_badges(address)
               end
-              td(style: "color: var(--foreground2);") do
+              td(class: "text-muted") do
                 parts = [address.line_1]
                 parts << address.line_2 if address.line_2.present?
                 plain parts.join(", ")
               end
-              td(style: "color: var(--foreground2);") { plain "#{address.city}, #{address.state} #{address.postal_code}" }
+              td(class: "text-muted") { plain "#{address.city}, #{address.state} #{address.postal_code}" }
               td do
                 if address == current_user&.home_return_address
-                  span("is-": "badge", "variant-": "green") { "Default" }
+                  span(class: "badge badge-success") { "Default" }
                 else
                   plain "—"
                 end
@@ -59,10 +59,10 @@ class Views::ReturnAddresses::Index < Views::Base
         end
       end
     else
-      div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+      div(style: "text-align: center; padding: 2rem;") do
         h2(style: "margin: 0;") { "No return addresses found" }
-        p(style: "color: var(--foreground2);") { "Create your first return address to get started." }
-        a(href: new_return_address_path) { button("variant-": "green") { "Create Return Address" } }
+        p(class: "text-muted") { "Create your first return address to get started." }
+        a(href: new_return_address_path) { button(class: "btn-success") { "Create Return Address" } }
       end
     end
   end
@@ -73,24 +73,24 @@ class Views::ReturnAddresses::Index < Views::Base
 
   def render_badges(address)
     if address.shared
-      span("is-": "badge", "variant-": "blue") { "Shared" }
+      span(class: "badge badge-info") { "Shared" }
     end
 
     if address.user == current_user && address != current_user&.home_return_address
-      span("is-": "badge") { "Mine" }
+      span(class: "badge") { "Mine" }
     end
   end
 
   def render_actions(address)
     return unless address.user == current_user || current_user&.admin?
 
-    a(href: edit_return_address_path(address), style: "color: var(--foreground2); margin-right: 1ch;") { "✎" }
+    a(href: edit_return_address_path(address), style: "color: GrayText; margin-right: 0.5rem;") { "✎" }
 
     unless address == current_user&.home_return_address
       a(
         href: set_as_home_return_address_path(address),
         data: { turbo_method: :post },
-        style: "color: var(--foreground2); margin-right: 1ch;"
+        style: "color: GrayText; margin-right: 0.5rem;"
       ) { "⌂" }
     end
 

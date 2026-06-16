@@ -1,50 +1,50 @@
 <% content_for :title, "Order Templates" %>
 
-<div class="page-toolbar">
-  <row gap-="1" align-="center">
+<div class="toolbar">
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <strong style="font-size: 1.15em;">Order Templates</strong>
     <%= render Components::Shared::Jumpcode.new(path: warehouse_templates_path) %>
-  </row>
-  <row gap-="1" align-="center">
-    <span style="color: var(--foreground2);">Reusable order configurations</span>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <a href="<%= new_warehouse_template_path %>" variant-="green" size-="small">+ New Template</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <span style="color: GrayText;">Reusable order configurations</span>
+  </div>
+  <span class="spacer"></span>
+  <a href="<%= new_warehouse_template_path %>" class="btn-success btn-sm">+ New Template</a>
 </div>
 
 <% if current_user&.warehouse_templates&.any? %>
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Your Templates</strong>
-    <div is-="separator"></div>
+    <hr>
     <% current_user.warehouse_templates.each_with_index do |template, i| %>
-      <% if i > 0 %><div is-="separator"></div><% end %>
-      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5lh 0; display: flex; align-items: center; gap: 1ch;">
+      <% if i > 0 %><hr><% end %>
+      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
         <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
-        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
+        <span style="color: GrayText;"><%= template.line_items.count %> items</span>
         <% if template.public %>
-          <span is-="badge" variant-="blue">Shared</span>
+          <span class="badge badge-info">Shared</span>
         <% end %>
         <%= render Components::Shared::PublicId.new(value: template.public_id) %>
       </a>
     <% end %>
-  </div>
+  </section>
 <% end %>
 
-<div box-="round">
+<section>
   <strong>Public Templates</strong>
-  <div is-="separator"></div>
+  <hr>
   <% if Warehouse::Template.shared.any? %>
     <% Warehouse::Template.shared.each_with_index do |template, i| %>
-      <% if i > 0 %><div is-="separator"></div><% end %>
-      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5lh 0; display: flex; align-items: center; gap: 1ch;">
+      <% if i > 0 %><hr><% end %>
+      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
         <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
-        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
-        <span style="color: var(--foreground2);">by <%= template.user&.username || "unknown" %></span>
+        <span style="color: GrayText;"><%= template.line_items.count %> items</span>
+        <span style="color: GrayText;">by <%= template.user&.username || "unknown" %></span>
       </a>
     <% end %>
   <% else %>
-    <div style="text-align: center; padding: 2lh 2ch; color: var(--foreground2);">
+    <div style="text-align: center; padding: 2rem; color: GrayText;">
       No public templates yet. Shared templates from other users will appear here.
     </div>
   <% end %>
-</div>
+</section>

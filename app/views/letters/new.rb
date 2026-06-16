@@ -1,78 +1,16 @@
 # frozen_string_literal: true
 
 class Views::Letters::New < Views::Base
-  include Phlex::Rails::Helpers::NumberToCurrency
-
   def initialize(letter:)
     @letter = letter
   end
 
   def view_template
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: letters_path, style: "text-decoration: none; color: var(--foreground2);") { "← Letters" }
-        strong(style: "font-size: 1.15em;") { "New Letter" }
-      end
+    div(style: "display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;") do
+      a(href: letters_path, style: "text-decoration:none;color:GrayText;") { "← Letters" }
+      strong(style: "font-size:1.15em;") { "New Letter" }
     end
 
-    div(class: "show-layout") do
-      div(class: "show-main") do
-        render Components::Letters::Form.new(letter: @letter)
-      end
-
-      div(class: "show-sidebar") do
-        postage_rates_card
-        size_limits_card
-      end
-    end
-  end
-
-  private
-
-  def postage_rates_card
-    div("box-": "round", style: "margin-bottom: 1lh;") do
-      strong { "Postage Rates" }
-      div("is-": "separator")
-
-      span(style: "color: var(--foreground2); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05ch;") { "Letters (stamps)" }
-      table(style: "margin-bottom: 0.5lh;") do
-        USPS::PricingEngine::US_STAMP_LETTER_RATES.first(4).each do |oz, price|
-          tr do
-            td(style: "color: var(--foreground2);") { oz == oz.to_i ? "#{oz.to_i} oz" : "#{oz} oz" }
-            td { helpers.number_to_currency(price) }
-          end
-        end
-      end
-
-      span(style: "color: var(--foreground2); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05ch;") { "Flats (stamps)" }
-      table(style: "margin-bottom: 0.5lh;") do
-        USPS::PricingEngine::US_STAMP_FLAT_RATES.first(3).each do |oz, price|
-          tr do
-            td(style: "color: var(--foreground2);") { oz == oz.to_i ? "#{oz.to_i} oz" : "#{oz} oz" }
-            td { helpers.number_to_currency(price) }
-          end
-        end
-      end
-
-      p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0;") do
-        plain "Non-machinable: +"
-        plain helpers.number_to_currency(USPS::PricingEngine::FCMI_NON_MACHINABLE_SURCHARGE)
-      end
-      p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0;") do
-        plain "Indicia is slightly cheaper for standard letters."
-      end
-    end
-  end
-
-  def size_limits_card
-    div("box-": "round") do
-      strong { "Size Limits" }
-      div("is-": "separator")
-
-      div(style: "margin-top: 0.5lh;") do
-        div { "Letter: 11.5×6.1″ 3.5oz" }
-        div { "Flat: 15×12″ 13oz" }
-      end
-    end
+    render Components::Letters::Form.new(letter: @letter)
   end
 end

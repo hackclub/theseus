@@ -1,17 +1,11 @@
 <% flash.each do |type, message| %>
   <% next if message.blank? %>
   <% banner_class = case type.to_sym
-     when :success then "tui-banner-success"
-     when :notice, :info then "tui-banner-info"
-     when :warning then "tui-banner-warning"
-     when :alert, :error, :danger then "tui-banner-error"
-     else "tui-banner-info"
+     when :success then "banner-success"
+     when :notice, :info then "banner-info"
+     when :warning then "banner-warning"
+     when :alert, :error, :danger then "banner-error"
+     else "banner-info"
      end %>
-  <% prefix = case type.to_sym
-     when :success then "✓"
-     when :warning then "⚠"
-     when :alert, :error, :danger then "!"
-     else "ℹ"
-     end %>
-  <div box-="square" class="tui-banner <%= banner_class %>" style="margin-bottom: 1lh;">[<%= prefix %>] <%= message %></div>
+  <div class="banner <%= banner_class %>" style="margin-bottom: 1rem;"><%= message %></div>
 <% end %>

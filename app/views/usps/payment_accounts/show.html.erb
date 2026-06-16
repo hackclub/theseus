@@ -1,26 +1,26 @@
 <% content_for :title, @usps_payment_account.display_name %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= usps_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← Payment Accounts</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= usps_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">← Payment Accounts</a>
     <strong style="font-size: 1.15em;"><%= @usps_payment_account.display_name %></strong>
-    <span is-="badge" variant-="background2"><%= @usps_payment_account.account_type %></span>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <row gap-="1" align-="center">
+    <span class="badge"><%= @usps_payment_account.account_type %></span>
+  </div>
+  <span class="spacer"></span>
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <a href="<%= edit_usps_payment_account_path(@usps_payment_account) %>">✎ Edit</a>
     <%= form_with url: usps_payment_account_path(@usps_payment_account), method: :delete, data: { turbo_confirm: "Delete this payment account?" }, class: "form-inline" do %>
-      <button type="submit" variant-="red" size-="small">✕</button>
+      <button type="submit" class="btn-danger btn-sm">✕</button>
     <% end %>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Account Details</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Name</span>
         <span><%= @usps_payment_account.name %></span>
         <span class="detail-label">Account Type</span>
@@ -42,21 +42,21 @@
         <span class="detail-label">Mailer ID</span>
         <span><%= @usps_payment_account.usps_mailer_id&.name || "—" %></span>
       </div>
-    </div>
+    </section>
 
     <%= render partial: "admin_inspector", locals: { record: @usps_payment_account } %>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Actions</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh;">
-        <a href="<%= edit_usps_payment_account_path(@usps_payment_account) %>"><button style="width: 100%; margin-bottom: 0.5lh;">✎ Edit Account</button></a>
+      <hr>
+      <div style="margin-top: 0.5rem;">
+        <a href="<%= edit_usps_payment_account_path(@usps_payment_account) %>"><button style="width: 100%; margin-bottom: 0.5rem;">✎ Edit Account</button></a>
         <%= form_with url: usps_payment_account_path(@usps_payment_account), method: :delete, data: { turbo_confirm: "Delete this payment account?" } do %>
-          <button type="submit" variant-="red" size-="small" style="width: 100%;">✕ Delete</button>
+          <button type="submit" class="btn-danger btn-sm" style="width: 100%;">✕ Delete</button>
         <% end %>
       </div>
-    </div>
+    </section>
   </div>
 </div>

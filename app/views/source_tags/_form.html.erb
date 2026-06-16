@@ -1,6 +1,6 @@
 <%= form_with(model: source_tag) do |form| %>
   <% if source_tag.errors.any? %>
-    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+    <div class="banner banner-error" style="margin-bottom: 1rem;">
       <strong>[!] <%= pluralize(source_tag.errors.count, "error") %>:</strong>
       <ul class="error-list">
         <% source_tag.errors.each do |error| %>
@@ -10,34 +10,34 @@
     </div>
   <% end %>
 
-  <div box-="round">
+  <section>
     <strong>Details</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Slug</label>
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Slug</label>
         <input type="text" name="source_tag[slug]" value="<%= source_tag.slug %>" autofocus style="width: 100%;">
-        <p style="color: var(--foreground2); font-size: 0.85em; margin: 0.25lh 0 0;">Short identifier for programmatic use</p>
+        <p style="color: GrayText; font-size: 0.85em; margin: 0.25rem 0 0;">Short identifier for programmatic use</p>
       </div>
 
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Name</label>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Name</label>
         <input type="text" name="source_tag[name]" value="<%= source_tag.name %>" style="width: 100%;">
       </div>
 
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Owner</label>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Owner</label>
         <input type="text" name="source_tag[owner]" value="<%= source_tag.owner %>" style="width: 100%;">
       </div>
 
-      <row gap-="1" align-="center">
-        <button type="submit" variant-="green"><%= source_tag.persisted? ? "✓ Update" : "✓ Create" %></button>
+      <div style="display:flex;align-items:center;gap:0.5rem">
+        <button type="submit" class="btn-success"><%= source_tag.persisted? ? "✓ Update" : "✓ Create" %></button>
         <% if source_tag.persisted? %>
           <a href="<%= source_tag_path(source_tag) %>"><button type="button">Cancel</button></a>
         <% else %>
           <a href="<%= source_tags_path %>"><button type="button">Cancel</button></a>
         <% end %>
-      </row>
+      </div>
     </div>
-  </div>
+  </section>
 <% end %>

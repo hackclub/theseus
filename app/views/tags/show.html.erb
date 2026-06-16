@@ -1,13 +1,13 @@
 <% content_for :title, "Tag: #{@tag}" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= tags_path %>" style="text-decoration: none; color: var(--foreground2);">← Tags</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= tags_path %>" class="text-muted" style="text-decoration: none;">← Tags</a>
     <strong style="font-size: 1.15em;"><%= @tag %></strong>
-    <span is-="badge" variant-="blue">Tag</span>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <row gap-="1" align-="center">
+    <span class="badge badge-info">Tag</span>
+  </div>
+  <span class="spacer"></span>
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <select name="time_period" id="time_period" style="margin: 0;">
       <option value="all_time" <%= "selected" if @time_period == "all_time" %>>All-time</option>
       <option value="ytd" <%= "selected" if @time_period == "ytd" %>>Year-to-date</option>
@@ -30,37 +30,37 @@
         <% end %>
       </select>
     </span>
-    <button size-="small" onclick="updateTimePeriod()">Go</button>
-  </row>
+    <button class="btn-sm" onclick="updateTimePeriod()">Go</button>
+  </div>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <row gap-="2" style="margin-bottom: 1lh;">
-      <div box-="round" style="flex: 1; text-align: center; padding: 1lh 1ch;">
+    <div style="display:flex;gap:1rem;margin-bottom: 1rem;">
+      <section style="flex: 1; text-align: center; padding: 1rem 0.5rem;">
         <div style="font-size: 1.5em; font-weight: bold;"><%= number_with_delimiter(@warehouse_order_count) %></div>
-        <div style="color: var(--foreground2);">Warehouse Orders</div>
-      </div>
-      <div box-="round" style="flex: 1; text-align: center; padding: 1lh 1ch;">
+        <div class="text-muted">Warehouse Orders</div>
+      </section>
+      <section style="flex: 1; text-align: center; padding: 1rem 0.5rem;">
         <div style="font-size: 1.5em; font-weight: bold;"><%= number_with_delimiter(@letter_count) %></div>
-        <div style="color: var(--foreground2);">Letters</div>
-      </div>
-    </row>
+        <div class="text-muted">Letters</div>
+      </section>
+    </div>
 
-    <row gap-="2" style="margin-bottom: 1lh;">
-      <div box-="round" style="flex: 1;">
+    <div style="display:flex;gap:1rem;margin-bottom: 1rem;">
+      <section style="flex: 1;">
         <strong>Letter Costs</strong>
-        <div is-="separator"></div>
-        <div class="detail-grid" style="margin-top: 0.5lh;">
+        <hr>
+        <div class="detail-grid" style="margin-top: 0.5rem;">
           <span class="detail-label">Postage</span>
           <span style="font-weight: 600;"><%= number_to_currency(@letter_postage_cost) %></span>
         </div>
-      </div>
+      </section>
 
-      <div box-="round" style="flex: 1;">
+      <section style="flex: 1;">
         <strong>Warehouse Costs</strong>
-        <div is-="separator"></div>
-        <div class="detail-grid" style="margin-top: 0.5lh;">
+        <hr>
+        <div class="detail-grid" style="margin-top: 0.5rem;">
           <span class="detail-label">Postage</span>
           <span><%= number_to_currency(@warehouse_order_postage_cost) %></span>
           <span class="detail-label">Labor</span>
@@ -70,19 +70,19 @@
           <span class="detail-label" style="font-weight: 600;">Total</span>
           <span style="font-weight: 600;"><%= number_to_currency(@warehouse_order_total_cost) %></span>
         </div>
-      </div>
-    </row>
+      </section>
+    </div>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Tag Info</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Tag</span>
-        <span is-="badge" variant-="blue"><%= @tag %></span>
+        <span class="badge badge-info"><%= @tag %></span>
       </div>
-    </div>
+    </section>
   </div>
 </div>
 

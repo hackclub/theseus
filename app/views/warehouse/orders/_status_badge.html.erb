@@ -1,9 +1,9 @@
-<% variant = case order.aasm.current_state
-  when :draft then "background2"
-  when :dispatched then "blue"
-  when :mailed then "green"
-  when :errored then "red"
-  when :canceled then "yellow"
-  else "background2"
+<% badge_class = case order.aasm.current_state
+  when :draft then "badge"
+  when :dispatched then "badge badge-info"
+  when :mailed then "badge badge-success"
+  when :errored then "badge badge-danger"
+  when :canceled then "badge badge-warning"
+  else "badge"
   end %>
-<span is-="badge" variant-="<%= variant %>"><%= order.humanized_state %></span>
+<span class="<%= badge_class %>"><%= order.humanized_state %></span>

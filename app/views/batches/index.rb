@@ -15,9 +15,9 @@ class Views::Batches::Index < Views::Base
     if @batches.any?
       batches_table
     else
-      div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+      section(style: "text-align: center; padding: 2rem;") do
         strong { "No batches yet" }
-        div(style: "margin-top: 0.5lh; color: var(--foreground2);") { "Upload a CSV to create your first batch." }
+        div(style: "margin-top: 0.5rem; color: GrayText;") { "Upload a CSV to create your first batch." }
       end
     end
   end
@@ -43,7 +43,7 @@ class Views::Batches::Index < Views::Base
 
   def batch_row(batch)
     tr do
-      td(style: "padding: 0.25lh 1ch;") do
+      td(style: "padding: 0.25rem 0.5rem;") do
         a(href: batch_path(batch), style: "font-weight: bold; text-decoration: none;") { "##{batch.id}" }
         if batch.tags.any?
           batch.tags.each do |tag|
@@ -51,12 +51,12 @@ class Views::Batches::Index < Views::Base
           end
         end
       end
-      td(style: "padding: 0.25lh 1ch;") { batch.type.split("::").first.titleize }
-      td(style: "padding: 0.25lh 1ch;") do
+      td(style: "padding: 0.25rem 0.5rem;") { batch.type.split("::").first.titleize }
+      td(style: "padding: 0.25rem 0.5rem;") do
         plain batch.created_at.strftime(batch.created_at.year == Date.current.year ? "%b %d" : "%b %d, %Y")
       end
-      td(style: "padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;") { batch.addresses.count.to_s }
-      td(style: "padding: 0.25lh 1ch;") do
+      td(style: "padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;") { batch.addresses.count.to_s }
+      td(style: "padding: 0.25rem 0.5rem;") do
         render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch)
       end
     end

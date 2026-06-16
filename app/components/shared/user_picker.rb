@@ -13,11 +13,11 @@ class Components::Shared::UserPicker < Components::Base
     return unless current_user&.is_admin?
 
     div(id: "user-picker-container") do
-      details("is-": "popover", "position-": "bottom baseline-left") do
-        summary(tabindex: "0", "size-": "small") do
+      details(class: "popover", style: "position:relative") do
+        summary(tabindex: "0", class: "btn-sm") do
           if selected_user
             if selected_user.icon_url.present?
-              img(src: selected_user.icon_url, alt: selected_user.email, style: "width: 2ch; height: 1lh; vertical-align: middle; margin-right: 0.5ch;")
+              img(src: selected_user.icon_url, alt: selected_user.email, style: "width:1rem;height:1rem;vertical-align:middle;margin-right:0.25rem")
             else
               plain "👤 "
             end
@@ -27,14 +27,14 @@ class Components::Shared::UserPicker < Components::Base
           end
           plain " ▾"
         end
-        column( "gap-": "0") do
-          a(href: path_builder.call(nil), style: selected_user_id.blank? ? "font-weight: bold;" : nil) do
+        div(style: "position:absolute;left:0;top:100%;background:Canvas;border:1px solid var(--background2);padding:0.5rem;display:flex;flex-direction:column") do
+          a(href: path_builder.call(nil), style: selected_user_id.blank? ? "font-weight:bold" : nil) do
             plain "👤 All users"
           end
           sorted_users.each do |user|
-            a(href: path_builder.call(user.id), style: user.id == selected_user_id ? "font-weight: bold;" : nil) do
+            a(href: path_builder.call(user.id), style: user.id == selected_user_id ? "font-weight:bold" : nil) do
               if user.icon_url.present?
-                img(src: user.icon_url, alt: user.email, style: "width: 2ch; height: 1lh; vertical-align: middle; margin-right: 0.5ch;")
+                img(src: user.icon_url, alt: user.email, style: "width:1rem;height:1rem;vertical-align:middle;margin-right:0.25rem")
               else
                 plain "👤 "
               end

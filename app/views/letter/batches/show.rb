@@ -26,39 +26,39 @@ class Views::Letter::Batches::Show < Views::Base
   private
 
   def header_toolbar
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
+    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: letter_batches_path, style: "text-decoration: none; color: GrayText;") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
       if @batch.tags.any?
-        row("gap-": "1", "align-": "center") do
+        div(style: "display:flex;align-items:center;gap:0.5rem") do
           @batch.tags.compact_blank.each do |tag|
-            span("is-": "badge", "variant-": "background2") { tag }
+            span(class: "badge") { tag }
           end
         end
       end
-      span(class: "toolbar-spacer")
-      row("gap-": "1", "align-": "center") do
+      span(class: "spacer")
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
         a(href: edit_letter_batch_path(@batch)) { "✎ Edit" }
         if @batch.fields_mapped?
           a(href: process_confirm_letter_batch_path(@batch)) do
-            button("variant-": "green", "size-": "small") { "▶ Process" }
+            button(class: "btn-success btn-sm") { "▶ Process" }
           end
         end
         form_with(url: letter_batch_path(@batch), method: :delete, data: { turbo_confirm: "Delete this batch?" }, class: "form-inline") do
-          button(type: "submit", "variant-": "red", "size-": "small") { "✕" }
+          button(type: "submit", class: "btn-danger btn-sm") { "✕" }
         end
       end
     end
   end
 
   def details_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Details" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Origin" }
         span { @batch.origin || "—" }
 
@@ -81,35 +81,35 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def actions_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Actions" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
+      hr
+      div(style: "margin-top: 0.5rem;") do
         if @batch.processed?
           if @batch.pdf_label.attached?
-            a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", style: "display: block; margin-bottom: 0.5lh;") do
-              button("variant-": "green", style: "width: 100%;") { "⬇ View Labels PDF" }
+            a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", style: "display: block; margin-bottom: 0.5rem;") do
+              button(class: "btn-success", style: "width: 100%;") { "⬇ View Labels PDF" }
             end
           end
 
           form_with(url: mark_printed_letter_batch_path(@batch), method: :post) do
-            button(type: "submit", style: "width: 100%; margin-bottom: 0.5lh;") { "✓ Mark All Printed" }
+            button(type: "submit", style: "width: 100%; margin-bottom: 0.5rem;") { "✓ Mark All Printed" }
           end
 
           form_with(url: mark_mailed_letter_batch_path(@batch), method: :post) do
-            button(type: "submit", style: "width: 100%; margin-bottom: 0.5lh;") { "✉ Mark All Mailed" }
+            button(type: "submit", style: "width: 100%; margin-bottom: 0.5rem;") { "✉ Mark All Mailed" }
           end
 
           a(href: regenerate_form_letter_batch_path(@batch), style: "display: block;") do
-            button("size-": "small", style: "width: 100%;") { "⟳ Regenerate Labels" }
+            button(class: "btn-sm", style: "width: 100%;") { "⟳ Regenerate Labels" }
           end
         elsif @batch.fields_mapped?
           a(href: process_confirm_letter_batch_path(@batch), style: "display: block;") do
-            button("variant-": "green", style: "width: 100%;") { "▶ Process Batch" }
+            button(class: "btn-success", style: "width: 100%;") { "▶ Process Batch" }
           end
         elsif @batch.awaiting_field_mapping?
           a(href: map_fields_letter_batch_path(@batch), style: "display: block;") do
-            button("variant-": "green", style: "width: 100%;") { "⇉ Map Fields" }
+            button(class: "btn-success", style: "width: 100%;") { "⇉ Map Fields" }
           end
         end
       end
@@ -117,10 +117,10 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def stats_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Stats" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Letters" }
         span { helpers.number_with_delimiter(@batch.letters.count) }
 
@@ -136,10 +136,10 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def letters_table
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Letters" }
-      span(style: "color: var(--foreground2); margin-left: 1ch;") { "(#{@batch.letters.count})" }
-      div("is-": "separator")
+      span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{@batch.letters.count})" }
+      hr
       table do
         thead do
           tr do
@@ -153,17 +153,17 @@ class Views::Letter::Batches::Show < Views::Base
           @batch.letters.includes(:address).limit(100).each do |letter|
             tr do
               td do
-                a(href: letter_path(letter), style: "text-decoration: none; color: var(--foreground0);") { letter.public_id }
+                a(href: letter_path(letter), style: "text-decoration: none;") { letter.public_id }
               end
               td { plain [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ").presence || "—" }
-              td(style: "color: var(--foreground2);") { plain letter.postage_type&.humanize || "—" }
+              td(class: "text-muted") { plain letter.postage_type&.humanize || "—" }
               td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
             end
           end
         end
       end
       if @batch.letters.count > 100
-        div(style: "padding: 0.5lh 0; color: var(--foreground2);") do
+        div(style: "padding: 0.5rem 0;", class: "text-muted") do
           plain "Showing first 100 of #{helpers.number_with_delimiter(@batch.letters.count)} letters"
         end
       end
@@ -171,10 +171,10 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def addresses_table
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Addresses" }
-      span(style: "color: var(--foreground2); margin-left: 1ch;") { "(#{@batch.addresses.count})" }
-      div("is-": "separator")
+      span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{@batch.addresses.count})" }
+      hr
       table do
         thead do
           tr do

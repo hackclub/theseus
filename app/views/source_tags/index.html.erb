@@ -1,10 +1,10 @@
 <% content_for :title, "Source Tags" %>
 
-<div class="page-toolbar">
+<div class="toolbar">
   <strong style="font-size: 1.15em;">Source Tags</strong>
-  <span style="color: var(--foreground2);"><%= @source_tags.count %> tags</span>
-  <span class="toolbar-spacer"></span>
-  <a href="<%= new_source_tag_path %>"><button variant-="green" size-="small">+ New</button></a>
+  <span class="text-muted"><%= @source_tags.count %> tags</span>
+  <span class="spacer"></span>
+  <a href="<%= new_source_tag_path %>"><button class="btn-success btn-sm">+ New</button></a>
 </div>
 
 <% if @source_tags.any? %>
@@ -19,16 +19,16 @@
     <tbody>
       <% @source_tags.each do |source_tag| %>
         <tr>
-          <td><a href="<%= source_tag_path(source_tag) %>" style="text-decoration: none; color: var(--foreground0); font-weight: bold;"><code><%= source_tag.slug %></code></a></td>
+          <td><a href="<%= source_tag_path(source_tag) %>" style="text-decoration: none; font-weight: bold;"><code><%= source_tag.slug %></code></a></td>
           <td><%= source_tag.name %></td>
-          <td style="color: var(--foreground2);"><%= source_tag.owner.presence || "—" %></td>
+          <td class="text-muted"><%= source_tag.owner.presence || "—" %></td>
         </tr>
       <% end %>
     </tbody>
   </table>
 <% else %>
-  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
-    <p style="margin: 0 0 0.5lh;">No source tags yet.</p>
-    <a href="<%= new_source_tag_path %>"><button variant-="green">+ Create Source Tag</button></a>
-  </div>
+  <section style="text-align: center; padding: 2rem;">
+    <p style="margin: 0 0 0.5rem;">No source tags yet.</p>
+    <a href="<%= new_source_tag_path %>"><button class="btn-success">+ Create Source Tag</button></a>
+  </section>
 <% end %>

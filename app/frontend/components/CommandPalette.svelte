@@ -286,28 +286,28 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<dialog bind:this={dialogEl} id="command-palette" size-="small" position-="center" container-="fill" onclick={(e) => { if (e.target === dialogEl) close(); }} onkeydown={() => {}}>
-  <column box-="round" shear-="top" id="palette-content">
-    <row align-="center between">
-      <span is-="badge" variant-="background0">⌘K Go anywhere</span>
+<dialog bind:this={dialogEl} id="command-palette" onclick={(e) => { if (e.target === dialogEl) close(); }} onkeydown={() => {}}>
+  <div class="kbar-box" id="palette-content">
+    <div class="kbar-row kbar-row-between">
+      <kbd>⌘K Go anywhere</kbd>
       {#if activeScope}
-        <row gap-="1" align-="center">
-          <span is-="badge" variant-="blue">{activeScope.label}</span>
-          <button size-="small" variant-="foreground0" onclick={() => { activeScope = null; query = ''; scopedResults = []; }}>×</button>
-        </row>
+        <div class="kbar-row">
+          <span class="kbar-badge kbar-badge-blue">{activeScope.label}</span>
+          <button class="kbar-btn" onclick={() => { activeScope = null; query = ''; scopedResults = []; }}>×</button>
+        </div>
       {:else}
-        <button size-="small" variant-="foreground0" onclick={close}>×</button>
+        <button class="kbar-btn" onclick={close}>×</button>
       {/if}
-    </row>
+    </div>
 
-    <row align-="center" gap-="1" id="palette-search-row">
+    <div class="kbar-row" id="palette-search-row">
       <span style="color: var(--foreground2);">⌕</span>
       <input bind:this={inputEl} id="palette-input" placeholder={activeScope ? `Search ${activeScope.label}...` : 'Search or type a shortcode...'} autocomplete="off" bind:value={query} oninput={handleInput} onkeydown={handleKeyDown} />
-    </row>
-    <div is-="separator"></div>
+    </div>
+    <hr>
 
     <div id="palette-results">
-      <column id="palette-results-container" bind:this={resultsContainerEl}>
+      <div id="palette-results-container" bind:this={resultsContainerEl}>
         {#each visibleItems as item, i}
           <a class="palette-result" class:active={i === activeIndex} class:disabled={item.disabled} href={item.path || '#'} tabindex="0" onclick={(e) => { e.preventDefault(); selectItem(item); }} onmouseenter={() => { activeIndex = i; }}>
             <span class="palette-result-icon">{item.icon || '·'}</span>
@@ -318,52 +318,114 @@
               {/if}
             </span>
             {#if item.code}
-              <span is-="badge" variant-="background2">{item.code}</span>
+              <kbd>{item.code}</kbd>
             {/if}
             {#if item.hint}
               <span style="color: var(--foreground2);">{item.hint}</span>
             {/if}
           </a>
         {/each}
-      </column>
+      </div>
     </div>
 
-    <row gap-="2" align-="center center" pad-="1 0" style="color: var(--foreground2);">
-      <row gap-="1" align-="center">
-        <span is-="badge" variant-="background2">↑</span>
-        <span is-="badge" variant-="background2">↓</span>
+    <div class="kbar-row kbar-footer" style="color: var(--foreground2);">
+      <div class="kbar-row">
+        <kbd>↑</kbd>
+        <kbd>↓</kbd>
         <span>navigate</span>
-      </row>
-      <row gap-="1" align-="center">
-        <span is-="badge" variant-="background2">↵</span>
+      </div>
+      <div class="kbar-row">
+        <kbd>↵</kbd>
         <span>select</span>
-      </row>
-      <row gap-="1" align-="center">
-        <span is-="badge" variant-="background2">esc</span>
+      </div>
+      <div class="kbar-row">
+        <kbd>esc</kbd>
         <span>close</span>
-      </row>
-    </row>
-  </column>
+      </div>
+    </div>
+  </div>
 </dialog>
 
 <style>
   #command-palette {
     position: fixed;
     z-index: 1000;
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: 40rem;
+    width: 100%;
+    max-height: 70vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     &::backdrop {
       backdrop-filter: grayscale(100%);
       background: rgba(0, 0, 0, 0.3);
     }
   }
-  #palette-content {
-    position: absolute;
-    inset: 0;
+  .kbar-box {
     display: flex;
     flex-direction: column;
-    --box-border-color: var(--foreground2);
+    border: 1px solid var(--foreground2);
+    border-radius: 4px;
+    background: var(--background0);
+    overflow: hidden;
+  }
+  .kbar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .kbar-row-between {
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
+  .kbar-footer {
+    gap: 1rem;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+  kbd {
+    font-family: monospace;
+    font-size: 0.85em;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    background: var(--background2);
+    white-space: nowrap;
+  }
+  .kbar-badge {
+    font-family: monospace;
+    font-size: 0.85em;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    background: var(--background2);
+  }
+  .kbar-badge-blue {
+    background: var(--blue, #2563eb);
+    color: white;
+  }
+  .kbar-btn {
+    background: none;
+    border: 1px solid var(--foreground2);
+    border-radius: 3px;
+    color: var(--foreground0);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85em;
+    padding: 0.1em 0.4em;
+    line-height: 1;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--background2);
+    margin: 0;
+  }
+  #palette-content {
+    max-height: 70vh;
   }
   #palette-search-row {
-    padding: 0 1ch;
+    padding: 0 0.5rem;
   }
   #palette-input {
     background-color: var(--background0);
@@ -380,18 +442,17 @@
     position: relative;
   }
   #palette-results-container {
-    position: absolute;
-    inset: 0;
     overflow-y: auto;
-    padding: 0 1ch;
+    max-height: 50vh;
+    padding: 0 0.5rem;
   }
   .palette-result {
     text-decoration: none;
     color: var(--foreground1);
     display: flex;
     align-items: center;
-    padding: 0 1ch;
-    gap: 1ch;
+    padding: 0 0.5rem;
+    gap: 0.5rem;
     &.active {
       background-color: var(--background1);
       color: var(--foreground0);
@@ -403,7 +464,7 @@
   }
   .palette-result-icon {
     flex-shrink: 0;
-    width: 2ch;
+    width: 1rem;
     text-align: center;
     color: var(--foreground2);
   }
@@ -415,6 +476,6 @@
   }
   .palette-result-sub {
     color: var(--foreground2);
-    margin-left: 1ch;
+    margin-left: 0.5rem;
   }
 </style>

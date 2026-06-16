@@ -42,7 +42,7 @@ class Components::Batches::Form < Components::Base
         end
 
         div(class: "pt-2") do
-          button(type: :submit, "variant-": "green") { "↑ Upload CSV" }
+          button(type: :submit, class: "btn-success") { "↑ Upload CSV" }
         end
       end
     end

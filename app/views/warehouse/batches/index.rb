@@ -66,30 +66,30 @@ class Views::Warehouse::Batches::Index < Views::Base
   def render_batch_row(batch)
     tr do
       td do
-        a(href: warehouse_batch_path(batch), style: "text-decoration: none; color: var(--foreground0);") do
+        a(href: warehouse_batch_path(batch), style: "text-decoration: none;") do
           plain "##{batch.id}"
         end
         if batch.tags.any?
           plain " "
           batch.tags.first(2).compact_blank.each do |t|
-            span(style: "color: var(--foreground2); font-size: 0.8em;") { t }
+            span(style: "color: GrayText; font-size: 0.8em;") { t }
             plain " "
           end
         end
       end
-      td(style: "color: var(--foreground2);") { plain batch.created_at.strftime("%b %d") }
+      td(style: "color: GrayText;") { plain batch.created_at.strftime("%b %d") }
       td { plain batch.warehouse_template&.name || "—" }
-      td(style: "color: var(--foreground2);") { plain batch.address_count&.to_s || "0" }
-      td(style: "color: var(--foreground2);") { plain batch.orders.size.to_s }
+      td(style: "color: GrayText;") { plain batch.address_count&.to_s || "0" }
+      td(style: "color: GrayText;") { plain batch.orders.size.to_s }
       td { render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch) }
     end
   end
 
   def blankslate
-    div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+    section(style: "text-align: center; padding: 2rem;") do
       h2(style: "margin: 0;") { "📦 No warehouse batches yet" }
-      p(style: "color: var(--foreground2);") { "Create a batch to ship items to multiple addresses at once." }
-      a(href: new_warehouse_batch_path, "variant-": "green") { "+ New Batch" }
+      p(style: "color: GrayText;") { "Create a batch to ship items to multiple addresses at once." }
+      a(href: new_warehouse_batch_path, class: "btn-success") { "+ New Batch" }
     end
   end
 end

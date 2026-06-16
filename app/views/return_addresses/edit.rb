@@ -6,27 +6,27 @@ class Views::ReturnAddresses::Edit < Views::Base
   end
 
   def view_template
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: return_addresses_path, style: "text-decoration: none; color: var(--foreground2);") { "← Return Addresses" }
+    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: return_addresses_path, style: "text-decoration: none; color: GrayText;") { "← Return Addresses" }
         strong(style: "font-size: 1.15em;") { "Edit Return Address" }
       end
     end
 
     div(class: "show-layout") do
       div(class: "show-main") do
-        div("box-": "round") do
+        section do
           strong { "Address Details" }
-          div("is-": "separator")
+          hr
           render Components::ReturnAddresses::Form.new(return_address:)
         end
       end
 
       div(class: "show-sidebar") do
-        div("box-": "round") do
+        section do
           strong { "Current Address" }
-          div("is-": "separator")
-          div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+          hr
+          div(class: "detail-grid", style: "margin-top: 0.5rem;") do
             span(class: "detail-label") { "Name" }
             span { return_address.name.presence || "—" }
             span(class: "detail-label") { "Line 1" }

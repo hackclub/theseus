@@ -1,6 +1,6 @@
-<div box-="round" style="margin-bottom: 1lh;">
+<section style="margin-bottom: 1rem;">
   <strong>Addresses</strong>
-  <div is-="separator"></div>
+  <hr>
   <table style="width: 100%;">
     <thead>
       <tr>
@@ -15,17 +15,17 @@
     <tbody>
       <% addresses.each do |address| %>
         <tr>
-          <td style="padding: 0.25lh 1ch;"><%= "#{address.first_name} #{address.last_name}" %></td>
-          <td style="padding: 0.25lh 1ch;">
+          <td style="padding: 0.25rem 0.5rem;"><%= "#{address.first_name} #{address.last_name}" %></td>
+          <td style="padding: 0.25rem 0.5rem;">
             <%= address.line_1 %>
             <% if address.line_2.present? %><br><%= address.line_2 %><% end %>
           </td>
-          <td style="padding: 0.25lh 1ch;"><%= address.city %></td>
-          <td style="padding: 0.25lh 1ch;"><%= address.state %></td>
-          <td style="padding: 0.25lh 1ch;"><code><%= address.postal_code %></code></td>
-          <td style="padding: 0.25lh 1ch;"><%= address.country %></td>
+          <td style="padding: 0.25rem 0.5rem;"><%= address.city %></td>
+          <td style="padding: 0.25rem 0.5rem;"><%= address.state %></td>
+          <td style="padding: 0.25rem 0.5rem;"><code><%= address.postal_code %></code></td>
+          <td style="padding: 0.25rem 0.5rem;"><%= address.country %></td>
         </tr>
       <% end %>
     </tbody>
   </table>
-</div>
+</section>

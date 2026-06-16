@@ -6,10 +6,10 @@ class Views::Letters::Edit < Views::Base
   end
 
   def view_template
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: letter_path(@letter), style: "text-decoration: none; color: var(--foreground2);") { "← #{@letter.public_id}" }
-        strong(style: "font-size: 1.15em;") { "Edit Letter" }
+    div(class: "toolbar", style: "border-bottom:none;margin-bottom:0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: letter_path(@letter), style: "text-decoration:none;color:GrayText;") { "← #{@letter.public_id}" }
+        strong(style: "font-size:1.15em;") { "Edit Letter" }
       end
     end
 
@@ -27,9 +27,9 @@ class Views::Letters::Edit < Views::Base
   private
 
   def letter_info_card
-    div("box-": "round") do
+    section do
       strong { "Letter Info" }
-      div("is-": "separator")
+      hr
 
       div(class: "detail-grid") do
         span(class: "detail-label") { "ID" }

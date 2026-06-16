@@ -7,40 +7,32 @@ class Components::Shared::ActionBar < Components::Base
   register_value_helper :impersonating?
 
   def view_template
-    row( id: "theseus-actionbar", "align-": "center between") do
-      row( "gap-": "1", "align-": "center") do
+    div(id: "theseus-actionbar", style: "display:flex;align-items:center;justify-content:space-between") do
+      div(style: "display:flex;gap:0.5rem;align-items:center") do
         # mobile sidebar toggle
         button(
-          class: "sidebar-toggle",
-          "size-": "small",
+          class: "sidebar-toggle btn-sm",
           onclick: safe("toggleSidebar()")
         ) { "☰" }
 
         # brand
-        a(href: root_path, style: "text-decoration: none; color: var(--foreground0);") do
+        a(href: root_path, style: "text-decoration:none;color:inherit") do
           b { "Theseus" }
           if Rails.env.development?
-            sup(style: "color: var(--foreground2); font-size: 0.7em; margin-left: 0.3ch;") { "dev" }
+            sup(style: "color:GrayText;font-size:0.7em;margin-left:0.15rem") { "dev" }
           end
         end
       end
 
-      row( "gap-": "2", "align-": "center") do
+      div(style: "display:flex;gap:1rem;align-items:center") do
         render_user_context
         render_impersonation_banner if current_user && impersonating?
 
-        # theme toggle
-        button(
-          "size-": "small",
-          id: "theme-toggle",
-          onclick: safe("(function(){var d=document.documentElement,t=d.dataset.webtuiTheme;var n=t.includes('dark')?'vitesse-light-soft':'gruvbox-dark-hard';d.dataset.webtuiTheme=n;localStorage.setItem('theme',n);this.textContent=n.includes('dark')?'☀':'☾'})()")
-        ) { "☀" }
-
         # hints button
-        button("size-": "small", onclick: safe("window.openHints && window.openHints()")) { "?" }
+        button(class: "btn-sm", onclick: safe("window.openHints && window.openHints()")) { "?" }
 
         # kbar button
-        button("size-": "small", id: "kbar-trigger", onclick: safe("window.openKbar && window.openKbar()")) { "⌘K" }
+        button(class: "btn-sm", id: "kbar-trigger", onclick: safe("window.openKbar && window.openKbar()")) { "⌘K" }
 
         # user popover menu
         render_user_menu if current_user
@@ -52,8 +44,7 @@ class Components::Shared::ActionBar < Components::Base
 
   def render_user_context
     return unless current_user
-
-    span(style: "color: var(--foreground2);") do
+    span(style: "color:GrayText") do
       plain current_user.username
     end
   end
@@ -70,20 +61,20 @@ class Components::Shared::ActionBar < Components::Base
   end
 
   def render_user_menu
-    details(**{"is-" => "popover", "position-" => "bottom baseline-right"}) do
-      summary(tabindex: "0", **{"size-" => "small"}) do
+    details(class: "popover", style: "position:relative") do
+      summary(tabindex: "0", class: "btn-sm") do
         plain impersonating? ? "👁" : "👤"
       end
 
-      column( **{"gap-" => "0"}, style: "min-width: 16ch;") do
-        span(style: "color: var(--foreground2); padding-bottom: 0.5lh;") do
+      div(style: "position:absolute;right:0;top:100%;min-width:8rem;background:Canvas;border:1px solid var(--background2);padding:0.5rem;display:flex;flex-direction:column") do
+        span(style: "color:GrayText;padding-bottom:0.5rem") do
           plain current_user.username
         end
-        div(**{"is-" => "separator"})
+        hr
         a(
           href: signout_path,
           data: { method: :delete },
-          style: "color: var(--foreground0); text-decoration: none; padding-top: 0.5lh;"
+          style: "text-decoration:none;padding-top:0.5rem"
         ) { "Log out" }
       end
     end

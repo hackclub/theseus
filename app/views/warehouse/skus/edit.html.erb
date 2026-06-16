@@ -1,10 +1,10 @@
 <% content_for :title, "Edit SKU #{@warehouse_sku.sku}" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @warehouse_sku.sku %></a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" style="text-decoration: none; color: GrayText;">← <%= @warehouse_sku.sku %></a>
     <strong style="font-size: 1.15em;">Edit SKU</strong>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -12,10 +12,10 @@
     <%= render "form", warehouse_sku: @warehouse_sku %>
   </div>
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>SKU Info</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">SKU</span>
         <span><code><%= @warehouse_sku.sku %></code></span>
         <span class="detail-label">In Stock</span>
@@ -23,6 +23,6 @@
         <span class="detail-label">Status</span>
         <span><%= @warehouse_sku.enabled ? "Enabled" : "Disabled" %></span>
       </div>
-    </div>
+    </section>
   </div>
 </div>

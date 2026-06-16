@@ -102,25 +102,25 @@
 
 <style>
   .dropzone {
-    border: 2px dashed var(--borderColor-default, #d1d5db);
+    border: 2px dashed var(--background2);
     border-radius: 6px;
     padding: 24px;
     text-align: center;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
-    background: var(--bgColor-default, #fff);
+    background: Canvas;
   }
 
   .dropzone:hover,
   .dropzone.dragging {
-    border-color: var(--borderColor-accent-emphasis, #0969da);
-    background: var(--bgColor-accent-muted, #ddf4ff);
+    border-color: var(--blue);
+    background: var(--info-bg);
   }
 
   .dropzone.has-file {
     border-style: solid;
-    border-color: var(--borderColor-success-emphasis, #1a7f37);
-    background: var(--bgColor-success-muted, #dafbe1);
+    border-color: var(--green);
+    background: var(--success-bg);
   }
 
   .placeholder {
@@ -128,7 +128,7 @@
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
     font-size: 14px;
   }
 
@@ -137,7 +137,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    color: var(--fgColor-success, #1a7f37);
+    color: var(--success-fg);
     font-size: 14px;
   }
 
@@ -146,17 +146,17 @@
   }
 
   .change-hint {
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
     font-size: 12px;
   }
 
   .error {
     margin-top: 8px;
     padding: 8px 12px;
-    background: var(--bgColor-danger-muted, #ffebe9);
-    border: 1px solid var(--borderColor-danger-muted, #ff8182);
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
     border-radius: 6px;
-    color: var(--fgColor-danger, #d1242f);
+    color: var(--error-fg);
     font-size: 13px;
   }
 </style>

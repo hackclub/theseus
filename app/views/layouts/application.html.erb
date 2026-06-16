@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-webtui-theme="gruvbox-dark-hard">
+<html lang="en">
   <head>
     <title><%= content_for(:title) || "Theseus" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,18 +8,6 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <script>
-      (function() {
-        var sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var saved = localStorage.getItem('theme') || (sys ? 'gruvbox-dark-hard' : 'vitesse-light-soft');
-        document.documentElement.dataset.webtuiTheme = saved;
-        // Set toggle icon after DOM ready
-        document.addEventListener('DOMContentLoaded', function() {
-          var btn = document.getElementById('theme-toggle');
-          if (btn) btn.textContent = saved.includes('dark') ? '☀' : '☾';
-        });
-      })();
-    </script>
 
     <%= yield :head %>
 
@@ -40,9 +28,7 @@
       <div id="theseus-content">
         <% if flash.any? %>
           <% flash.each do |type, message| %>
-            <div box-="square" class="tui-banner tui-banner-<%= flash_banner_class(type) %>" style="margin-bottom: 1lh;">
-              [<%= flash_banner_icon(type) %>] <%= message %>
-            </div>
+            <div class="banner banner-<%= flash_banner_class(type) %>"><%= message %></div>
           <% end %>
         <% end %>
 

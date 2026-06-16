@@ -8,6 +8,7 @@
   import SmartSuggestion from './letter-attributes-picker/SmartSuggestion.svelte';
   import MachinableToggle from './letter-attributes-picker/MachinableToggle.svelte';
   import HiddenFormFields from './letter-attributes-picker/HiddenFormFields.svelte';
+  import PricePreview from './letter-attributes-picker/PricePreview.svelte';
 
   export let formScope = 'letter';
   export let isBatch = false;
@@ -34,6 +35,7 @@
       <PresetButtons />
       <DimensionInputs />
       <MachinableToggle />
+      <PricePreview />
     </div>
     <div class="lap-preview">
       <span class="preview-label">Preview</span>

@@ -6,7 +6,7 @@ class Views::Letter::InstantQueues::Show < Views::Letter::Queues::ShowBase
   def type_label = "Instant"
 
   def type_badge
-    span("is-": "badge", "variant-": "green") { "Instant" }
+    span(class: "badge badge-success") { "Instant" }
   end
 
   def edit_queue_path

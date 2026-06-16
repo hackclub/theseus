@@ -1,42 +1,42 @@
 <% content_for :title, "Cancel Order #{@warehouse_order.hc_id}" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: var(--foreground2);">← Order <%= @warehouse_order.hc_id %></a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: GrayText;">← Order <%= @warehouse_order.hc_id %></a>
     <strong style="font-size: 1.15em;">Cancel Order</strong>
-    <span is-="badge" variant-="red">Destructive</span>
-  </row>
+    <span class="badge badge-danger">Destructive</span>
+  </div>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="square" class="tui-banner tui-banner-warning" style="margin-bottom: 1lh;">
+    <div class="banner banner-warning" style="margin-bottom: 1rem;">
       [!] Please try to avoid needing to do this. If fulfillment is already underway at the warehouse, this will error out and you'll need to contact them directly.
     </div>
 
     <%= form_with url: cancel_warehouse_order_path(@warehouse_order), method: :post do |form| %>
-      <div box-="round" style="margin-bottom: 1lh;">
+      <section style="margin-bottom: 1rem;">
         <strong>Cancellation Details</strong>
-        <div is-="separator"></div>
-        <div style="margin-top: 0.5lh;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Reason for cancellation</label>
+        <hr>
+        <div style="margin-top: 0.5rem;">
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Reason for cancellation</label>
           <textarea name="cancellation_reason" rows="3" required style="width: 100%;"></textarea>
-          <span style="color: var(--foreground2); font-size: 0.85em;">Visible to AGH crew</span>
+          <span style="color: GrayText; font-size: 0.85em;">Visible to AGH crew</span>
         </div>
-      </div>
+      </section>
 
-      <row gap-="1" align-="center">
+      <div style="display:flex;align-items:center;gap:0.5rem">
         <a href="<%= warehouse_order_path(@warehouse_order) %>">Never mind</a>
-        <button type="submit" variant-="red">× Cancel this order</button>
-      </row>
+        <button type="submit" class="btn-danger">× Cancel this order</button>
+      </div>
     <% end %>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Order Info</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">ID</span>
         <span><%= @warehouse_order.hc_id %></span>
         <span class="detail-label">Status</span>
@@ -46,6 +46,6 @@
         <span class="detail-label">Items</span>
         <span><%= @warehouse_order.line_items.sum(&:quantity) %> units</span>
       </div>
-    </div>
+    </section>
   </div>
 </div>

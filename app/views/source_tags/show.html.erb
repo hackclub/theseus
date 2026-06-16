@@ -1,21 +1,21 @@
 <% content_for :title, @source_tag.name %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= source_tags_path %>" style="text-decoration: none; color: var(--foreground2);">← Source Tags</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= source_tags_path %>" class="text-muted" style="text-decoration: none;">← Source Tags</a>
     <strong style="font-size: 1.15em;"><%= @source_tag.name %></strong>
-    <code style="color: var(--foreground2);"><%= @source_tag.slug %></code>
-  </row>
-  <span class="toolbar-spacer"></span>
+    <code class="text-muted"><%= @source_tag.slug %></code>
+  </div>
+  <span class="spacer"></span>
   <a href="<%= edit_source_tag_path(@source_tag) %>">✎ Edit</a>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round">
+    <section>
       <strong>Details</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Slug</span>
         <code><%= @source_tag.slug %></code>
         <span class="detail-label">Name</span>
@@ -25,19 +25,19 @@
         <span class="detail-label">Created</span>
         <span><%= @source_tag.created_at.strftime("%b %d, %Y %H:%M") %></span>
       </div>
-    </div>
+    </section>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Actions</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh;">
-        <a href="<%= edit_source_tag_path(@source_tag) %>" style="text-decoration: none;"><button style="width: 100%; margin-bottom: 0.5lh;">✎ Edit</button></a>
+      <hr>
+      <div style="margin-top: 0.5rem;">
+        <a href="<%= edit_source_tag_path(@source_tag) %>" style="text-decoration: none;"><button style="width: 100%; margin-bottom: 0.5rem;">✎ Edit</button></a>
         <%= form_with url: source_tag_path(@source_tag), method: :delete, data: { turbo_confirm: "Delete this source tag?" }, class: "form-inline" do %>
-          <button type="submit" variant-="red" size-="small" style="width: 100%;">✕ Delete</button>
+          <button type="submit" class="btn-danger btn-sm" style="width: 100%;">✕ Delete</button>
         <% end %>
       </div>
-    </div>
+    </section>
   </div>
 </div>

@@ -1,29 +1,29 @@
 <tr id="<%= dom_id sku %>">
-  <td style="padding: 0.25lh 1ch;">
+  <td style="padding: 0.25rem 0.5rem;">
     <a href="<%= warehouse_sku_path(sku) %>" style="font-weight: bold; text-decoration: none;"><code><%= sku.sku %></code></a>
     <span class="row-tag"><%= sku.name %></span>
   </td>
-  <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= sku.in_stock || "—" %></td>
-  <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;">
+  <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= sku.in_stock || "—" %></td>
+  <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;">
     <% if sku.declared_unit_cost.zero? %>
       <span style="color: var(--red);" title="No cost data">⚠ $0.00</span>
     <% else %>
       <%= number_to_currency(sku.declared_unit_cost) %>
     <% end %>
   </td>
-  <td style="padding: 0.25lh 1ch;">
+  <td style="padding: 0.25rem 0.5rem;">
     <% if sku.in_stock.to_i > 0 %>
-      <span is-="badge" variant-="green">In stock</span>
+      <span class="badge badge-success">In stock</span>
     <% elsif sku.in_stock.to_i < 0 %>
       <% if sku.inbound.to_i >= sku.in_stock.abs %>
-        <span is-="badge" variant-="yellow">Backordered</span>
+        <span class="badge badge-warning">Backordered</span>
       <% else %>
-        <span is-="badge" variant-="red">Backordered (!)</span>
+        <span class="badge badge-danger">Backordered (!)</span>
       <% end %>
     <% else %>
-      <span is-="badge" variant-="background2">No inventory</span>
+      <span class="badge">No inventory</span>
     <% end %>
-    <% if sku.ai_enabled %><span is-="badge" variant-="blue">AI</span><% end %>
-    <% unless sku.enabled %><span is-="badge" variant-="background2">Disabled</span><% end %>
+    <% if sku.ai_enabled %><span class="badge badge-info">AI</span><% end %>
+    <% unless sku.enabled %><span class="badge">Disabled</span><% end %>
   </td>
 </tr>

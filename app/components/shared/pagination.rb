@@ -13,7 +13,7 @@ class Components::Shared::Pagination < Components::Base
     current = collection.current_page
     total = collection.total_pages
 
-    row( "gap-": "1", "align-": "center center", class: "pagination") do
+    nav(class: "pagination") do
       if current > 1
         a(href: page_path(1)) { "« First" }
         a(href: page_path(current - 1), rel: "prev") { "‹ Prev" }
@@ -21,9 +21,9 @@ class Components::Shared::Pagination < Components::Base
 
       window(current, total).each do |page_num|
         if page_num == :gap
-          span(style: "color: var(--foreground2);") { "…" }
+          span(style: "color:GrayText") { "…" }
         elsif page_num == current
-          span("is-": "badge", "variant-": "foreground0") { page_num.to_s }
+          strong { page_num.to_s }
         else
           a(href: page_path(page_num)) { page_num.to_s }
         end

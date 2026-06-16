@@ -13,44 +13,44 @@
 <%= form.fields_for :address do |a| %>
   <% current_country = a.object&.country %>
 
-  <row gap-="2" style="margin-bottom: 0.5lh;">
+  <div style="display:flex;gap:1rem;margin-bottom: 0.5rem;">
     <div style="flex: 1;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">First name <span style="color: var(--red);">*</span></label>
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">First name <span style="color: var(--red);">*</span></label>
       <input type="text" name="<%= a.field_name(:first_name) %>" value="<%= a.object&.first_name %>" required style="width: 100%;">
     </div>
     <div style="flex: 1;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Last name</label>
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Last name</label>
       <input type="text" name="<%= a.field_name(:last_name) %>" value="<%= a.object&.last_name %>" style="width: 100%;">
     </div>
-  </row>
+  </div>
 
-  <div style="margin-bottom: 0.5lh;">
-    <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Street address <span style="color: var(--red);">*</span></label>
+  <div style="margin-bottom: 0.5rem;">
+    <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Street address <span style="color: var(--red);">*</span></label>
     <input type="text" name="<%= a.field_name(:line_1) %>" value="<%= a.object&.line_1 %>" required style="width: 100%;">
   </div>
 
-  <div style="margin-bottom: 0.5lh;">
-    <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Apt, suite, unit</label>
+  <div style="margin-bottom: 0.5rem;">
+    <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Apt, suite, unit</label>
     <input type="text" name="<%= a.field_name(:line_2) %>" value="<%= a.object&.line_2 %>" style="width: 100%;">
   </div>
 
-  <row gap-="2" style="margin-bottom: 0.5lh;">
+  <div style="display:flex;gap:1rem;margin-bottom: 0.5rem;">
     <div style="flex: 2;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">City <span style="color: var(--red);">*</span></label>
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">City <span style="color: var(--red);">*</span></label>
       <input type="text" name="<%= a.field_name(:city) %>" value="<%= a.object&.city %>" required style="width: 100%;">
     </div>
     <div style="flex: 1;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">State <span style="color: var(--red);">*</span></label>
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">State <span style="color: var(--red);">*</span></label>
       <input type="text" name="<%= a.field_name(:state) %>" value="<%= a.object&.state %>" required style="width: 100%;">
     </div>
     <div style="flex: 1;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Postal code <span style="color: var(--red);">*</span></label>
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Postal code <span style="color: var(--red);">*</span></label>
       <input type="text" name="<%= a.field_name(:postal_code) %>" value="<%= a.object&.postal_code %>" required style="width: 100%;">
     </div>
-  </row>
+  </div>
 
-  <div style="margin-bottom: 0.5lh;">
-    <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Country <span style="color: var(--red);">*</span></label>
+  <div style="margin-bottom: 0.5rem;">
+    <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Country <span style="color: var(--red);">*</span></label>
     <select name="<%= a.field_name(:country) %>" required style="width: 100%;">
       <option value="">Select country…</option>
       <% all_ordered.each do |code, display| %>

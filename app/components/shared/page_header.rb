@@ -10,9 +10,9 @@ class Components::Shared::PageHeader < Components::Base
   end
 
   def view_template
-    row( "align-": "start between", "gap-": "2", style: "margin-bottom: 2lh;") do
-      column do
-        row( "gap-": "1", "align-": "center") do
+    div(style: "display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:2rem") do
+      div(style: "display:flex;flex-direction:column") do
+        div(style: "display:flex;gap:0.5rem;align-items:center") do
           h1(style: "margin: 0;") { @title }
           if @jumpcode
             render Components::Shared::Jumpcode.new(code: @jumpcode)
@@ -21,11 +21,11 @@ class Components::Shared::PageHeader < Components::Base
           end
         end
         if @subtitle
-          span(style: "color: var(--foreground2);") { @subtitle }
+          span(style: "color:GrayText") { @subtitle }
         end
       end
       if @actions_block
-        row( "gap-": "1", "align-": "center") do
+        div(style: "display:flex;gap:0.5rem;align-items:center") do
           @actions_block.call
         end
       end

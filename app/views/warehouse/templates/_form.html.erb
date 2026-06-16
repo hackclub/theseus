@@ -1,8 +1,8 @@
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
-    <div box-="square" style="margin-bottom: 1lh; color: var(--red);">
+    <div style="margin-bottom: 1rem; color: var(--red);">
       <strong>[!] <%= pluralize(warehouse_template.errors.count, "error") %>:</strong>
-      <ul style="margin: 0.25lh 0 0; padding-left: 2ch;">
+      <ul style="margin: 0.25rem 0 0; padding-left: 1rem;">
         <% warehouse_template.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,12 +10,12 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Template Details</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 0.5lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Template name <span style="color: var(--red);">*</span></label>
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <div style="margin-bottom: 0.5rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Template name <span style="color: var(--red);">*</span></label>
         <input type="text" name="warehouse_template[name]" value="<%= warehouse_template.name %>" required style="width: 100%;">
       </div>
       <label>
@@ -24,12 +24,12 @@
         Share with all users
       </label>
     </div>
-  </div>
+  </section>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Contents</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
+    <hr>
+    <div style="margin-top: 0.5rem;">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: :in_inventory,
@@ -37,11 +37,11 @@
         add_button_text: "Add Item"
       ) %>
     </div>
-  </div>
+  </section>
 
-  <row gap-="1" align-="center">
-    <span class="toolbar-spacer"></span>
-    <a href="<%= warehouse_templates_path %>" style="color: var(--foreground2);">Cancel</a>
-    <button type="submit" variant-="green">✓ <%= warehouse_template.persisted? ? "Update Template" : "Create Template" %></button>
-  </row>
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <span class="spacer"></span>
+    <a href="<%= warehouse_templates_path %>" style="color: GrayText;">Cancel</a>
+    <button type="submit" class="btn-success">✓ <%= warehouse_template.persisted? ? "Update Template" : "Create Template" %></button>
+  </div>
 <% end %>

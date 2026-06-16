@@ -1,12 +1,12 @@
 <% content_for :title, "Mailer IDs" %>
 
-<div class="page-toolbar">
-  <row gap-="1" align-="center">
+<div class="toolbar">
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <strong style="font-size: 1.15em;">CRID / Mailer ID Pairs</strong>
-    <span style="color: var(--foreground2);"><%= number_with_delimiter(@usps_mailer_ids.count) %> registered</span>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <a href="<%= new_usps_mailer_id_path %>"><button variant-="green">+ New Mailer ID</button></a>
+    <span class="text-muted"><%= number_with_delimiter(@usps_mailer_ids.count) %> registered</span>
+  </div>
+  <span class="spacer"></span>
+  <a href="<%= new_usps_mailer_id_path %>"><button class="btn-success">+ New Mailer ID</button></a>
 </div>
 
 <% if @usps_mailer_ids.any? %>
@@ -29,8 +29,8 @@
     </tbody>
   </table>
 <% else %>
-  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+  <section style="text-align: center; padding: 2rem;">
     <strong>No mailer IDs yet</strong>
-    <div style="color: var(--foreground2); margin-top: 0.25lh;"><a href="<%= new_usps_mailer_id_path %>">Add one</a></div>
-  </div>
+    <div class="text-muted" style="margin-top: 0.25rem;"><a href="<%= new_usps_mailer_id_path %>">Add one</a></div>
+  </section>
 <% end %>

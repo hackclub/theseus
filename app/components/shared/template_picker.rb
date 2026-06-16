@@ -11,7 +11,7 @@ class Components::Shared::TemplatePicker < Components::Base
   end
 
   def view_template
-    div(style: "margin-bottom: 1lh;") do
+    div(style: "margin-bottom:1rem") do
       select(
         name: "#{form.object_name}[#{name}]",
         id: "template-picker-select",

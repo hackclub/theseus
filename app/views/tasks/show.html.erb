@@ -1,39 +1,39 @@
 <% content_for :title, "Tasks" %>
 
-<div class="page-toolbar">
+<div class="toolbar">
   <strong style="font-size: 1.15em;">Your Tasks</strong>
   <%= render Components::Shared::Jumpcode.new(path: tasks_path) %>
-  <span class="toolbar-spacer"></span>
+  <span class="spacer"></span>
   <%= form_with url: refresh_tasks_path, method: :post, class: "form-inline" do %>
-    <button type="submit" size-="small">⟳ Refresh</button>
+    <button type="submit" class="btn-sm">⟳ Refresh</button>
   <% end %>
 </div>
 
 <% if @tasks.empty? %>
-  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+  <section style="text-align: center; padding: 2rem;">
     <div style="font-size: 2em; color: var(--green);">✓</div>
     <strong>All clear!</strong>
-    <p style="color: var(--foreground2); margin: 0.25lh 0 0;">No tasks right now.</p>
-  </div>
+    <p class="text-muted" style="margin: 0.25rem 0 0;">No tasks right now.</p>
+  </section>
 <% else %>
   <% @tasks.group_by { |task| task[:type] }.each do |type, tasks| %>
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong><%= type %></strong>
-      <div is-="separator"></div>
+      <hr>
       <% tasks.each_with_index do |task, i| %>
-        <% if i > 0 %><div is-="separator"></div><% end %>
-        <div style="padding: 0.5lh 0;">
-          <row gap-="1" align-="center">
+        <% if i > 0 %><hr><% end %>
+        <div style="padding: 0.5rem 0;">
+          <div style="display:flex;align-items:center;gap:0.5rem">
             <div style="flex: 1;">
               <span style="font-weight: 500;"><%= task[:name] %></span>
               <% if task[:subtitle] %>
-                <span style="color: var(--foreground2);">(<%= task[:subtitle] %>)</span>
+                <span class="text-muted">(<%= task[:subtitle] %>)</span>
               <% end %>
             </div>
-            <a href="<%= task[:link] %>"><button size-="small">Go →</button></a>
-          </row>
+            <a href="<%= task[:link] %>"><button class="btn-sm">Go →</button></a>
+          </div>
         </div>
       <% end %>
-    </div>
+    </section>
   <% end %>
 <% end %>

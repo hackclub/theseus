@@ -1,12 +1,12 @@
 <% content_for :title, "Indicia" %>
 
-<div class="page-toolbar">
-  <row gap-="1" align-="center">
+<div class="toolbar">
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <strong style="font-size: 1.15em;">Indicia</strong>
-    <span style="color: var(--foreground2);"><%= number_with_delimiter(@usps_indicia.count) %> purchased</span>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <a href="<%= new_usps_indicium_path %>"><button variant-="green">+ New Indicium</button></a>
+    <span class="text-muted"><%= number_with_delimiter(@usps_indicia.count) %> purchased</span>
+  </div>
+  <span class="spacer"></span>
+  <a href="<%= new_usps_indicium_path %>"><button class="btn-success">+ New Indicium</button></a>
 </div>
 
 <% if @usps_indicia.any? %>
@@ -26,15 +26,15 @@
           <td><a href="<%= usps_indicium_path(indicium) %>" style="text-decoration: none;"><strong><%= indicium.public_id %></strong></a></td>
           <td><code><%= indicium.usps_sku %></code></td>
           <td style="text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(indicium.postage) %></td>
-          <td style="color: var(--foreground2);"><%= indicium.mailing_date&.strftime("%b %d") || "—" %></td>
-          <td style="color: var(--foreground2);"><%= indicium.processing_category || "—" %></td>
+          <td class="text-muted"><%= indicium.mailing_date&.strftime("%b %d") || "—" %></td>
+          <td class="text-muted"><%= indicium.processing_category || "—" %></td>
         </tr>
       <% end %>
     </tbody>
   </table>
 <% else %>
-  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+  <section style="text-align: center; padding: 2rem;">
     <strong>No indicia yet</strong>
-    <div style="color: var(--foreground2); margin-top: 0.25lh;">Purchased postage will appear here.</div>
-  </div>
+    <div class="text-muted" style="margin-top: 0.25rem;">Purchased postage will appear here.</div>
+  </section>
 <% end %>

@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class Components::Base < Phlex::HTML
-  # WebTUI custom layout elements
-  register_element :row
-  register_element :column
 
   include Components
   register_value_helper :current_user

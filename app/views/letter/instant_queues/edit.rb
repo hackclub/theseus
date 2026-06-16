@@ -6,24 +6,24 @@ class Views::Letter::InstantQueues::Edit < Views::Base
   end
 
   def view_template
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: letter_instant_queue_path(@queue), style: "text-decoration: none; color: var(--foreground2);") { "← #{@queue.name}" }
+    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: letter_instant_queue_path(@queue), style: "text-decoration: none; color: GrayText;") { "← #{@queue.name}" }
         strong(style: "font-size: 1.15em;") { "Edit Queue" }
       end
     end
 
     div(class: "show-layout") do
       div(class: "show-main") do
-        div("box-": "round") do
+        section do
           render Components::Letter::InstantQueues::Form.new(queue: @queue)
         end
       end
       div(class: "show-sidebar") do
-        div("box-": "round") do
+        section do
           strong { "Queue Info" }
-          div("is-": "separator")
-          div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+          hr
+          div(class: "detail-grid", style: "margin-top: 0.5rem;") do
             span(class: "detail-label") { "Slug" }
             span { @queue.slug }
             span(class: "detail-label") { "Type" }

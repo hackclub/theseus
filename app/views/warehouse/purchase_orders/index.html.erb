@@ -1,21 +1,21 @@
 <% content_for :title, "Purchase Orders" %>
 
-<div class="page-toolbar">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
+<div class="toolbar">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: GrayText;">← SKUs</a>
     <strong style="font-size: 1.15em;">Purchase Orders</strong>
     <%= render Components::Shared::Jumpcode.new(path: warehouse_purchase_orders_path) %>
-  </row>
-  <row gap-="1" align-="center">
-    <span style="color: var(--foreground2);"><%= @purchase_orders.count %> orders</span>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <a href="<%= new_warehouse_purchase_order_path %>" variant-="green" size-="small">+ New Purchase Order</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <span style="color: GrayText;"><%= @purchase_orders.count %> orders</span>
+  </div>
+  <span class="spacer"></span>
+  <a href="<%= new_warehouse_purchase_order_path %>" class="btn-success btn-sm">+ New Purchase Order</a>
 </div>
 
 <% if @purchase_orders.any? %>
   <% grouped = @purchase_orders.group_by(&:status) %>
-  <div class="stat-filters" id="stats-container" style="margin-bottom: 1lh;">
+  <div class="stat-filters" id="stats-container" style="margin-bottom: 1rem;">
     <% if grouped["draft"]&.any? %>
       <button class="stat-filter" data-filter="draft">
         <span class="stat-count"><%= grouped["draft"]&.count || 0 %></span>
@@ -36,26 +36,26 @@
     <% end %>
   </div>
 
-  <div box-="round">
+  <section>
     <% @purchase_orders.each_with_index do |po, i|
-      status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[po.status] || "background2" %>
-      <% if i > 0 %><div is-="separator"></div><% end %>
-      <div class="po-row" data-status="<%= po.status %>" style="padding: 0.5lh 0;">
-        <row gap-="1" align-="center">
+      badge_class = { "draft" => "badge", "open" => "badge badge-info", "completed" => "badge badge-success", "deleted" => "badge badge-danger" }[po.status] || "badge" %>
+      <% if i > 0 %><hr><% end %>
+      <div class="po-row" data-status="<%= po.status %>" style="padding: 0.5rem 0;">
+        <div style="display:flex;align-items:center;gap:0.5rem">
           <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
-          <span is-="badge" variant-="<%= status_variant %>"><%= po.humanized_state %></span>
-          <span style="color: var(--foreground2);"><%= po.supplier_name %></span>
+          <span class="<%= badge_class %>"><%= po.humanized_state %></span>
+          <span style="color: GrayText;"><%= po.supplier_name %></span>
           <span style="flex: 1;"></span>
           <span class="fw-medium"><%= po.line_items.sum(&:quantity) %> units</span>
-          <span style="color: var(--foreground2);"><%= number_to_currency(po.total_cost) %></span>
+          <span style="color: GrayText;"><%= number_to_currency(po.total_cost) %></span>
           <% if po.required_by_date.present? %>
-            <span style="color: var(--foreground2);">due <%= po.required_by_date.strftime("%b %d") %></span>
+            <span style="color: GrayText;">due <%= po.required_by_date.strftime("%b %d") %></span>
           <% end %>
-          <span style="color: var(--foreground2);"><%= time_ago_in_words(po.created_at) %> ago</span>
+          <span style="color: GrayText;"><%= time_ago_in_words(po.created_at) %> ago</span>
           <% admin_tool do %>
-            <details is-="popover" position-="bottom baseline-right">
-              <summary tabindex="0" size-="small">⋯</summary>
-              <column gap-="0">
+            <details class="popover">
+              <summary tabindex="0" class="btn-sm">⋯</summary>
+              <div style="display:flex;flex-direction:column">
                 <a href="<%= warehouse_purchase_order_path(po) %>">👁 View</a>
                 <% if po.draft? %>
                   <a href="<%= edit_warehouse_purchase_order_path(po) %>">✎ Edit</a>
@@ -64,19 +64,19 @@
                   <a href="<%= po.zenventory_url %>" target="_blank">↗ Zenventory</a>
                   <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= po.zenventory_id %>" target="_blank">⎘ Zenv PDF</a>
                 <% end %>
-              </column>
+              </div>
             </details>
           <% end %>
-        </row>
+        </div>
       </div>
     <% end %>
-  </div>
+  </section>
 <% else %>
-  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+  <section style="text-align: center; padding: 2rem;">
     <strong>No purchase orders yet</strong>
-    <div style="color: var(--foreground2); margin-top: 0.5lh;">Create your first purchase order to get started.</div>
-    <div style="margin-top: 1lh;"><a href="<%= new_warehouse_purchase_order_path %>">Create Purchase Order</a></div>
-  </div>
+    <div style="color: GrayText; margin-top: 0.5rem;">Create your first purchase order to get started.</div>
+    <div style="margin-top: 1rem;"><a href="<%= new_warehouse_purchase_order_path %>">Create Purchase Order</a></div>
+  </section>
 <% end %>
 
 <script>
@@ -91,7 +91,7 @@
       row.style.display = (!selectedStatus || row.dataset.status === selectedStatus) ? '' : 'none';
     });
     getFilters().forEach(f => {
-      f.style.outline = (f.dataset.filter === selectedStatus) ? '1px solid var(--foreground0)' : 'none';
+      f.style.outline = (f.dataset.filter === selectedStatus) ? '1px solid currentColor' : 'none';
     });
   }
 

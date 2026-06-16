@@ -1,12 +1,12 @@
 <% content_for :title, "Edit Purchase Order #{@purchase_order.order_number.presence || "##{@purchase_order.id}"}" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_purchase_order_path(@purchase_order) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_purchase_order_path(@purchase_order) %>" style="text-decoration: none; color: GrayText;">← <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></a>
     <strong style="font-size: 1.15em;">Edit Purchase Order</strong>
-    <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[@purchase_order.status] || "background2" %>
-    <span is-="badge" variant-="<%= status_variant %>"><%= @purchase_order.humanized_state %></span>
-  </row>
+    <% badge_class = { "draft" => "badge", "open" => "badge badge-info", "completed" => "badge badge-success", "deleted" => "badge badge-danger" }[@purchase_order.status] || "badge" %>
+    <span class="<%= badge_class %>"><%= @purchase_order.humanized_state %></span>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -14,10 +14,10 @@
     <%= render "form", purchase_order: @purchase_order %>
   </div>
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Order Info</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Supplier</span>
         <span><%= @purchase_order.supplier_name %></span>
         <span class="detail-label">Created</span>
@@ -25,6 +25,6 @@
         <span class="detail-label">Items</span>
         <span><%= @purchase_order.line_items.count %></span>
       </div>
-    </div>
+    </section>
   </div>
 </div>

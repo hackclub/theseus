@@ -25,38 +25,38 @@ class Components::ReturnAddresses::Form < Components::Base
     form_with model: return_address, local: true do |f|
       div(class: "form-stack") do
         div(class: "form-grid-auto") do
-          div(style: "margin-bottom: 1lh;") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Name *" }
+          div(style: "margin-bottom: 1rem;") do
+            label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Name *" }
             input(type: "text", name: "return_address[name]", value: return_address.name, required: true, style: "width: 100%;")
-            small(style: "color: var(--foreground2);") { "Organization or personal name" }
+            small(class: "text-muted") { "Organization or personal name" }
           end
 
-          div(style: "margin-bottom: 1lh;") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Address Line 1 *" }
+          div(style: "margin-bottom: 1rem;") do
+            label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Address Line 1 *" }
             input(type: "text", name: "return_address[line_1]", value: return_address.line_1, required: true, style: "width: 100%;")
-            small(style: "color: var(--foreground2);") { "Street address, P.O. box, etc." }
+            small(class: "text-muted") { "Street address, P.O. box, etc." }
           end
         end
 
-        div(style: "margin-bottom: 1lh;") do
-          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Address Line 2" }
+        div(style: "margin-bottom: 1rem;") do
+          label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Address Line 2" }
           input(type: "text", name: "return_address[line_2]", value: return_address.line_2, style: "width: 100%;")
-          small(style: "color: var(--foreground2);") { "Apartment, suite, unit, etc. (optional)" }
+          small(class: "text-muted") { "Apartment, suite, unit, etc. (optional)" }
         end
 
         div(class: "form-grid-auto--sm") do
-          div(style: "margin-bottom: 1lh;") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "City *" }
+          div(style: "margin-bottom: 1rem;") do
+            label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "City *" }
             input(type: "text", name: "return_address[city]", value: return_address.city, required: true, style: "width: 100%;")
           end
 
-          div(style: "margin-bottom: 1lh;") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "State *" }
+          div(style: "margin-bottom: 1rem;") do
+            label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "State *" }
             input(type: "text", name: "return_address[state]", value: return_address.state, required: true, style: "width: 100%;")
           end
 
-          div(style: "margin-bottom: 1lh;") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Postal Code *" }
+          div(style: "margin-bottom: 1rem;") do
+            label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Postal Code *" }
             input(type: "text", name: "return_address[postal_code]", value: return_address.postal_code, required: true, style: "width: 100%;")
           end
         end
@@ -86,14 +86,14 @@ class Components::ReturnAddresses::Form < Components::Base
             input(type: "checkbox", name: "return_address[shared]", value: "1", checked: return_address.shared)
             plain " Make this address shared"
           end
-          small(style: "color: var(--foreground2); display: block;") { "Allow other users to select this return address for their letters" }
+          small(class: "text-muted", style: "display: block;") { "Allow other users to select this return address for their letters" }
         end
 
         input(type: "hidden", name: "return_address[user_id]", value: current_user&.id)
         input(type: "hidden", name: "from_letter", value: "true") if from_letter
 
         div(class: "pt-2") do
-          button(type: "submit", "variant-": "green") do
+          button(type: "submit", class: "btn-success") do
             plain(return_address.persisted? ? "✓ Update Return Address" : "✓ Create Return Address")
           end
         end

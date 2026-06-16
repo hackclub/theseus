@@ -1,6 +1,6 @@
 <%= form_with(model: warehouse_order) do |form| %>
   <% if warehouse_order.errors.any? %>
-    <div box-="square" class="tui-banner tui-banner-error" style="margin-bottom: 1lh;">
+    <div class="banner banner-error" style="margin-bottom: 1rem;">
       [!] <strong>Hey, slight issue:</strong>
       <ul class="error-list">
         <% warehouse_order.errors.each do |error| %>
@@ -10,34 +10,34 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Order Details</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Short title (shown to recipient)</label>
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Short title (shown to recipient)</label>
         <input type="text" name="warehouse_order[user_facing_title]" value="<%= warehouse_order.user_facing_title %>" style="width: 100%;" autofocus>
       </div>
 
       <div>
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Recipient email</label>
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Recipient email</label>
         <input type="email" name="warehouse_order[recipient_email]" value="<%= warehouse_order.recipient_email %>" style="width: 100%;">
       </div>
     </div>
-  </div>
+  </section>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Shipping Address</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
+    <hr>
+    <div style="margin-top: 0.5rem;">
       <%= render 'addresses/primer_nested_form', form: form %>
     </div>
-  </div>
+  </section>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Contents</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
+    <hr>
+    <div style="margin-top: 0.5rem;">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: current_user&.is_admin? ? :all : :in_inventory,
@@ -45,29 +45,29 @@
         add_button_text: "Add Item"
       ) %>
     </div>
-  </div>
+  </section>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Options</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Internal notes</label>
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Internal notes</label>
         <textarea name="warehouse_order[internal_notes]" rows="3" style="width: 100%;"><%= warehouse_order.internal_notes %></textarea>
       </div>
 
       <label>
         <input type="checkbox" name="warehouse_order[notify_on_dispatch]" value="1" <%= "checked" if warehouse_order.notify_on_dispatch %>>
         Send the recipient a "sent to warehouse" email
-        <span style="display: block; color: var(--foreground2); font-size: 0.85em;">They'll get an email when it ships regardless</span>
+        <span style="display: block; color: GrayText; font-size: 0.85em;">They'll get an email when it ships regardless</span>
       </label>
     </div>
-  </div>
+  </section>
 
   <%= render 'shared/primer_tag_picker', form: form, taggable: warehouse_order %>
 
-  <row gap-="1" align-="center">
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <a href="<%= warehouse_order.persisted? ? warehouse_order_path(warehouse_order) : warehouse_orders_path %>">Cancel</a>
-    <button type="submit" variant-="green">✓ <%= warehouse_order.persisted? ? "Update Order" : "Create Order" %></button>
-  </row>
+    <button type="submit" class="btn-success">✓ <%= warehouse_order.persisted? ? "Update Order" : "Create Order" %></button>
+  </div>
 <% end %>

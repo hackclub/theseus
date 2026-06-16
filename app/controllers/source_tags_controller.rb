@@ -1,4 +1,5 @@
 class SourceTagsController < ApplicationController
+  skip_after_action :verify_authorized
   before_action :set_source_tag, only: %i[ show edit update destroy ]
 
   # GET /source_tags or /source_tags.json

@@ -1,34 +1,34 @@
 <% content_for :title, "Tags" %>
 
-<div class="page-toolbar">
+<div class="toolbar">
   <strong style="font-size: 1.15em;">Tags</strong>
   <%= render Components::Shared::Jumpcode.new(path: tags_path) %>
-  <span class="toolbar-spacer"></span>
+  <span class="spacer"></span>
   <%= form_with url: refresh_tags_path, method: :post, class: "form-inline" do %>
-    <button type="submit" size-="small">↻ Refresh</button>
+    <button type="submit" class="btn-sm">↻ Refresh</button>
   <% end %>
 </div>
 
-<div box-="square" class="tui-banner" style="margin-bottom: 1lh;">
+<div class="banner" style="margin-bottom: 1rem;">
   This page is cached for performance. Hit refresh if you need fresh data.
 </div>
 
-<div box-="round" style="margin-bottom: 1lh;">
+<section style="margin-bottom: 1rem;">
   <strong>Common Tags</strong>
-  <div is-="separator"></div>
-  <div style="margin-top: 0.5lh; display: flex; flex-wrap: wrap; gap: 0.5lh 1ch;">
+  <hr>
+  <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem;">
     <% @common_tags.each do |tag| %>
-      <a href="<%= tag_stats_path(tag.tag) %>" style="text-decoration: none;"><span is-="badge" variant-="blue"><%= tag.tag %></span></a>
+      <a href="<%= tag_stats_path(tag.tag) %>" style="text-decoration: none;"><span class="badge badge-info"><%= tag.tag %></span></a>
     <% end %>
   </div>
-</div>
+</section>
 
-<div box-="round">
+<section>
   <strong>All Tags</strong>
-  <div is-="separator"></div>
-  <div style="margin-top: 0.5lh; display: flex; flex-wrap: wrap; gap: 0.5lh 1ch;">
+  <hr>
+  <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem;">
     <% @tags.each do |tag| %>
-      <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span is-="badge" variant-="background2"><%= tag %></span></a>
+      <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span class="badge"><%= tag %></span></a>
     <% end %>
   </div>
-</div>
+</section>

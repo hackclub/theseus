@@ -1,8 +1,8 @@
 <%= form_with(model: usps_indicium) do |form| %>
   <% if usps_indicium.errors.any? %>
-    <div box-="square" style="margin-bottom: 1lh; color: var(--red);">
+    <div style="margin-bottom: 1rem; color: var(--red);">
       [!] <strong><%= pluralize(usps_indicium.errors.count, "error") %>:</strong>
-      <ul style="margin: 0; padding-left: 2ch;">
+      <ul style="margin: 0; padding-left: 1rem;">
         <% usps_indicium.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,74 +10,74 @@
     </div>
   <% end %>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Postage</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <row gap-="2">
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <div style="display:flex;gap:1rem">
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Postage</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Postage</label>
           <input type="text" name="usps_indicium[postage]" value="<%= usps_indicium.postage %>" style="width: 100%;">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Mailing Date</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Mailing Date</label>
           <%= form.date_field :mailing_date, style: "width: 100%;" %>
         </div>
-      </row>
-      <row gap-="2" style="margin-top: 1lh;">
+      </div>
+      <div style="display:flex;gap:1rem;margin-top: 1rem;">
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">USPS SKU</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">USPS SKU</label>
           <input type="text" name="usps_indicium[usps_sku]" value="<%= usps_indicium.usps_sku %>" style="width: 100%;">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Processing Category</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Processing Category</label>
           <input type="text" name="usps_indicium[processing_category]" value="<%= usps_indicium.processing_category %>" style="width: 100%;">
         </div>
-      </row>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Dimensions</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <row gap-="2">
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <div style="display:flex;gap:1rem">
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Weight (oz)</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Weight (oz)</label>
           <input type="text" name="usps_indicium[postage_weight]" value="<%= usps_indicium.postage_weight %>" style="width: 100%;">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Length (in)</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Length (in)</label>
           <input type="text" name="usps_indicium[postage_length]" value="<%= usps_indicium.postage_length %>" style="width: 100%;">
         </div>
-      </row>
-      <row gap-="2" style="margin-top: 1lh;">
+      </div>
+      <div style="display:flex;gap:1rem;margin-top: 1rem;">
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Height (in)</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Height (in)</label>
           <input type="text" name="usps_indicium[postage_height]" value="<%= usps_indicium.postage_height %>" style="width: 100%;">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Thickness (in)</label>
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Thickness (in)</label>
           <input type="text" name="usps_indicium[postage_thickness]" value="<%= usps_indicium.postage_thickness %>" style="width: 100%;">
         </div>
-      </row>
-      <div style="margin-top: 1lh;">
+      </div>
+      <div style="margin-top: 1rem;">
         <label><input type="checkbox" name="usps_indicium[nonmachinable]" value="1" <%= "checked" if usps_indicium.nonmachinable %>> Non-machinable</label>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div box-="round" style="margin-bottom: 1lh;">
+  <section style="margin-bottom: 1rem;">
     <strong>Raw Response</strong>
-    <div is-="separator"></div>
-    <div style="margin-top: 0.5lh;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">Raw USPS response</label>
+    <hr>
+    <div style="margin-top: 0.5rem;">
+      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Raw USPS response</label>
       <textarea name="usps_indicium[raw_usps_response]" rows="4" style="width: 100%;"><%= usps_indicium.raw_usps_response %></textarea>
     </div>
-  </div>
+  </section>
 
-  <row gap-="1" align-="center" style="justify-content: flex-end;">
-    <a href="<%= usps_indicia_path %>" style="color: var(--foreground2); text-decoration: none;">Cancel</a>
-    <button type="submit" variant-="green"><%= usps_indicium.persisted? ? "Update Indicium" : "Create Indicium" %></button>
-  </row>
+  <div style="display:flex;align-items:center;gap:0.5rem;justify-content: flex-end;">
+    <a href="<%= usps_indicia_path %>" class="text-muted" style="text-decoration: none;">Cancel</a>
+    <button type="submit" class="btn-success"><%= usps_indicium.persisted? ? "Update Indicium" : "Create Indicium" %></button>
+  </div>
 <% end %>

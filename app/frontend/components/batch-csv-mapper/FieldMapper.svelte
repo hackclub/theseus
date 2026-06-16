@@ -85,10 +85,10 @@
 
   .missing-banner {
     padding: 8px 12px;
-    background: var(--bgColor-attention-muted, #fff8c5);
-    border: 1px solid var(--borderColor-attention-muted, #d4a72c);
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
     border-radius: 6px;
-    color: var(--fgColor-attention, #9a6700);
+    color: var(--warning-fg);
     font-size: 13px;
     margin-bottom: 12px;
   }
@@ -100,7 +100,7 @@
     padding: 8px 12px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -110,12 +110,12 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     padding: 8px 12px;
-    border-top: 1px solid var(--borderColor-muted, #d8dee4);
+    border-top: 1px solid var(--background2);
     align-items: center;
   }
 
   .mapper-row:last-child {
-    border-bottom: 1px solid var(--borderColor-muted, #d8dee4);
+    border-bottom: 1px solid var(--background2);
   }
 
   .csv-col {
@@ -135,7 +135,7 @@
 
   .preview {
     font-size: 12px;
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -144,23 +144,23 @@
   select {
     width: 100%;
     padding: 6px 8px;
-    border: 2px solid var(--borderColor-default, #d1d5db);
+    border: 2px solid var(--background2);
     border-radius: 6px;
     font-size: 14px;
-    background: var(--bgColor-default, #fff);
-    color: var(--fgColor-default, #1f2328);
+    background: Canvas;
+    color: inherit;
     transition: border-color 0.15s;
     cursor: pointer;
   }
 
   select:focus {
     outline: none;
-    border-color: var(--borderColor-accent-emphasis, #0969da);
-    box-shadow: 0 0 0 3px var(--borderColor-accent-muted, rgba(9, 105, 218, 0.3));
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 30%, transparent);
   }
 
   select option:disabled {
-    color: var(--fgColor-muted, #656d76);
+    color: GrayText;
   }
 
   @media (max-width: 540px) {

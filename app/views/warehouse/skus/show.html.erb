@@ -1,30 +1,30 @@
 <% content_for :title, @warehouse_sku.sku %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: GrayText;">← SKUs</a>
     <strong style="font-size: 1.15em;"><%= @warehouse_sku.sku %></strong>
     <% if @warehouse_sku.in_stock.to_i > 10 %>
-      <span is-="badge" variant-="green">In stock</span>
+      <span class="badge badge-success">In stock</span>
     <% elsif @warehouse_sku.in_stock.to_i.between?(1, 10) %>
-      <span is-="badge" variant-="yellow">Low stock</span>
+      <span class="badge badge-warning">Low stock</span>
     <% elsif @warehouse_sku.in_stock.to_i < 0 %>
       <% if @warehouse_sku.inbound.to_i >= @warehouse_sku.in_stock.abs %>
-        <span is-="badge" variant-="yellow">Backordered</span>
+        <span class="badge badge-warning">Backordered</span>
       <% else %>
-        <span is-="badge" variant-="red">Backordered (!)</span>
+        <span class="badge badge-danger">Backordered (!)</span>
       <% end %>
     <% else %>
-      <span is-="badge" variant-="background2">No inventory</span>
+      <span class="badge">No inventory</span>
     <% end %>
-    <% if @warehouse_sku.ai_enabled %><span is-="badge" variant-="blue">AI</span><% end %>
-    <% unless @warehouse_sku.enabled %><span is-="badge" variant-="background2">Disabled</span><% end %>
-  </row>
-  <row gap-="1" align-="center">
-    <span style="color: var(--foreground2);"><%= @warehouse_sku.name %></span>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <row gap-="1" align-="center">
+    <% if @warehouse_sku.ai_enabled %><span class="badge badge-info">AI</span><% end %>
+    <% unless @warehouse_sku.enabled %><span class="badge">Disabled</span><% end %>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <span style="color: GrayText;"><%= @warehouse_sku.name %></span>
+  </div>
+  <span class="spacer"></span>
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <% admin_tool do %>
       <a href="<%= edit_admin_warehouse_sku_path(@warehouse_sku) %>">✎ Edit</a>
     <% end %>
@@ -33,15 +33,15 @@
         <a href="<%= @warehouse_sku.zenventory_url %>" target="_blank">↗ Zenventory</a>
       <% end %>
     <% end %>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Details</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">In Stock</span>
         <span><%= @warehouse_sku.in_stock || "—" %></span>
         <span class="detail-label">Inbound</span>
@@ -77,13 +77,13 @@
         <span class="detail-label">Zenventory ID</span>
         <span><code><%= @warehouse_sku.zenventory_id || "—" %></code></span>
       </div>
-    </div>
+    </section>
 
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Recent Orders</strong>
-      <div is-="separator"></div>
+      <hr>
       <% if @recent_orders.any? %>
-        <table style="width: 100%; margin-top: 0.5lh;">
+        <table style="width: 100%; margin-top: 0.5rem;">
           <thead>
             <tr>
               <th style="text-align: left;">Order</th>
@@ -97,36 +97,36 @@
             <% @recent_orders.each do |order| %>
               <% line_item = order.line_items.find_by(sku_id: @warehouse_sku.id) %>
               <tr>
-                <td style="padding: 0.25lh 1ch;">
+                <td style="padding: 0.25rem 0.5rem;">
                   <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
                 </td>
-                <td style="padding: 0.25lh 1ch;"><%= order.address&.name_line || "—" %></td>
-                <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
-                <td style="padding: 0.25lh 1ch;">
+                <td style="padding: 0.25rem 0.5rem;"><%= order.address&.name_line || "—" %></td>
+                <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
+                <td style="padding: 0.25rem 0.5rem;">
                   <% if order.tracking_number.present? %>
-                    <a href="<%= order.tracking_url %>" target="_blank" style="color: var(--foreground2);"><%= order.pretty_via %> ↗</a>
+                    <a href="<%= order.tracking_url %>" target="_blank" style="color: GrayText;"><%= order.pretty_via %> ↗</a>
                   <% else %>
-                    <span style="color: var(--foreground2);">—</span>
+                    <span style="color: GrayText;">—</span>
                   <% end %>
                 </td>
-                <td style="padding: 0.25lh 1ch;">
-                  <% status_variant = { "draft" => "background2", "dispatched" => "blue", "mailed" => "green", "canceled" => "red", "errored" => "red" }[order.aasm_state] || "background2" %>
-                  <span is-="badge" variant-="<%= status_variant %>"><%= order.humanized_state %></span>
+                <td style="padding: 0.25rem 0.5rem;">
+                  <% badge_class = { "draft" => "badge", "dispatched" => "badge badge-info", "mailed" => "badge badge-success", "canceled" => "badge badge-danger", "errored" => "badge badge-danger" }[order.aasm_state] || "badge" %>
+                  <span class="<%= badge_class %>"><%= order.humanized_state %></span>
                 </td>
               </tr>
             <% end %>
           </tbody>
         </table>
       <% else %>
-        <div style="text-align: center; padding: 1lh 0; color: var(--foreground2);">No orders yet.</div>
+        <div style="text-align: center; padding: 1rem 0; color: GrayText;">No orders yet.</div>
       <% end %>
-    </div>
+    </section>
 
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Purchase Orders</strong>
-      <div is-="separator"></div>
+      <hr>
       <% if @recent_purchase_orders.any? %>
-        <table style="width: 100%; margin-top: 0.5lh;">
+        <table style="width: 100%; margin-top: 0.5rem;">
           <thead>
             <tr>
               <th style="text-align: left;">PO</th>
@@ -140,33 +140,33 @@
             <% @recent_purchase_orders.each do |po| %>
               <% line_item = po.line_items.find_by(sku_id: @warehouse_sku.id) %>
               <tr>
-                <td style="padding: 0.25lh 1ch;">
+                <td style="padding: 0.25rem 0.5rem;">
                   <a href="<%= warehouse_purchase_order_path(po) %>" style="font-weight: bold; text-decoration: none;"><%= po.order_number.presence || "##{po.id}" %></a>
                 </td>
-                <td style="padding: 0.25lh 1ch; color: var(--foreground2);"><%= po.supplier_name %></td>
-                <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
-                <td style="padding: 0.25lh 1ch; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(line_item&.unit_cost) %></td>
-                <td style="padding: 0.25lh 1ch;">
-                  <% status_variant = { "draft" => "background2", "open" => "blue", "completed" => "green", "deleted" => "red" }[po.status] || "background2" %>
-                  <span is-="badge" variant-="<%= status_variant %>"><%= po.humanized_state %></span>
+                <td style="padding: 0.25rem 0.5rem; color: GrayText;"><%= po.supplier_name %></td>
+                <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
+                <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(line_item&.unit_cost) %></td>
+                <td style="padding: 0.25rem 0.5rem;">
+                  <% badge_class = { "draft" => "badge", "open" => "badge badge-info", "completed" => "badge badge-success", "deleted" => "badge badge-danger" }[po.status] || "badge" %>
+                  <span class="<%= badge_class %>"><%= po.humanized_state %></span>
                 </td>
               </tr>
             <% end %>
           </tbody>
         </table>
       <% else %>
-        <div style="text-align: center; padding: 1lh 0; color: var(--foreground2);">No purchase orders yet.</div>
+        <div style="text-align: center; padding: 1rem 0; color: GrayText;">No purchase orders yet.</div>
       <% end %>
-    </div>
+    </section>
 
     <%= render partial: "admin_inspector", locals: { record: @warehouse_sku } %>
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Inventory</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">In Stock</span>
         <span style="font-weight: bold;"><%= @warehouse_sku.in_stock || "—" %></span>
         <span class="detail-label">Inbound</span>
@@ -174,6 +174,6 @@
         <span class="detail-label">Unit Cost</span>
         <span style="font-weight: bold;"><%= number_to_currency(@warehouse_sku.declared_unit_cost) %></span>
       </div>
-    </div>
+    </section>
   </div>
 </div>

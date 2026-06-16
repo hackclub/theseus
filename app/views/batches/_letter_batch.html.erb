@@ -1,30 +1,30 @@
-<div box-="round" style="margin-bottom: 1lh;">
+<section style="margin-bottom: 1rem;">
   <strong>Letter Batch</strong>
-  <div is-="separator"></div>
+  <hr>
 
-  <row gap-="2" style="margin-top: 0.5lh; margin-bottom: 1lh;">
-    <div box-="round" style="flex: 1;">
+  <div style="display:flex;gap:1rem;margin-top:0.5rem;margin-bottom:1rem">
+    <section style="flex: 1;">
       <strong>From</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh;">
+      <hr>
+      <div style="margin-top: 0.5rem;">
         <% if batch.letter_return_address.present? %>
           <strong><%= batch.letter_return_address.name %></strong><br>
-          <span style="color: var(--foreground2);">
+          <span style="color: GrayText;">
             <%= batch.letter_return_address.line_1 %><br>
             <% if batch.letter_return_address.line_2.present? %><%= batch.letter_return_address.line_2 %><br><% end %>
             <%= batch.letter_return_address.city %>, <%= batch.letter_return_address.state %> <%= batch.letter_return_address.postal_code %><br>
             <%= batch.letter_return_address.country %>
           </span>
         <% else %>
-          <span style="color: var(--foreground2);">No return address</span>
+          <span style="color: GrayText;">No return address</span>
         <% end %>
       </div>
-    </div>
+    </section>
 
-    <div box-="round" style="flex: 1;">
+    <section style="flex: 1;">
       <strong>Info</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Dimensions</span>
         <span><%= batch.letter_width %> × <%= batch.letter_height %> in</span>
         <span class="detail-label">Weight</span>
@@ -34,32 +34,32 @@
         <span class="detail-label">Addresses</span>
         <span><%= batch.addresses.count %></span>
       </div>
-    </div>
-  </row>
+    </section>
+  </div>
 
   <% if batch.pdf_label.attached? %>
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Generated Labels</strong>
-      <div is-="separator"></div>
-      <row gap-="1" align-="center" style="margin-top: 0.5lh;">
-        <span style="color: var(--foreground2);">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
-        <span class="toolbar-spacer"></span>
-        <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>"><button size-="small" variant-="green">↓ Download PDF</button></a>
+      <hr>
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem">
+        <span style="color: GrayText;">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
+        <span class="spacer"></span>
+        <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>"><button class="btn-success btn-sm">↓ Download PDF</button></a>
         <% if batch.letters.any? && batch.letters.all?(&:pending?) %>
           <%= form_with url: mark_printed_letter_batch_path(batch), method: :post, data: { turbo_confirm: "Mark all letters as printed?" }, class: "form-inline" do %>
-            <button type="submit" size-="small">✓ Mark All Printed</button>
+            <button type="submit" class="btn-sm">✓ Mark All Printed</button>
           <% end %>
         <% end %>
         <% if batch.letters.any? && batch.letters.any?(&:printed?) %>
           <%= form_with url: mark_mailed_letter_batch_path(batch), method: :post, data: { turbo_confirm: "Mark all letters as mailed?" }, class: "form-inline" do %>
-            <button type="submit" size-="small">✉ Mark All Mailed</button>
+            <button type="submit" class="btn-sm">✉ Mark All Mailed</button>
           <% end %>
         <% end %>
-      </row>
-    </div>
+      </div>
+    </section>
   <% else %>
-    <div style="text-align: center; padding: 1lh 0; color: var(--foreground2);">
+    <div style="text-align: center; padding: 1rem 0; color: GrayText;">
       No labels generated yet.
     </div>
   <% end %>
-</div>
+</section>

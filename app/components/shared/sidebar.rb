@@ -15,51 +15,60 @@ class Components::Shared::Sidebar < Components::Base
     render_overlay
 
     nav(class: "theseus-sidebar", id: "sidebar") do
-      nav_link("Home", root_path, exact: true)
-      div("is-": "separator")
+      div(class: "sidebar-section") do
+        nav_link("Home", root_path, exact: true)
+      end
 
-      section_label("Warehouse")
-      nav_link("Orders", warehouse_orders_path)
-      nav_link("Batches", warehouse_batches_path)
-      nav_link("SKUs", warehouse_skus_path)
-      nav_link("Purchase Orders", warehouse_purchase_orders_path)
-      nav_link("Templates", warehouse_templates_path)
-      div("is-": "separator")
+      div(class: "sidebar-section") do
+        span(class: "sidebar-label") { "Warehouse" }
+        nav_link("Orders", warehouse_orders_path)
+        nav_link("Batches", warehouse_batches_path)
+        nav_link("SKUs", warehouse_skus_path)
+        nav_link("Purchase Orders", warehouse_purchase_orders_path)
+        nav_link("Templates", warehouse_templates_path)
+      end
 
-      section_label("Mail")
-      nav_link("Letters", letters_path)
-      nav_link("Batches", letter_batches_path)
-      nav_link("Scanner", scanner_letters_path)
-      nav_link("Return Addresses", return_addresses_path)
-      nav_link("Queues", letter_queues_path)
-      div("is-": "separator")
+      div(class: "sidebar-section") do
+        span(class: "sidebar-label") { "Mail" }
+        nav_link("Letters", letters_path)
+        nav_link("Batches", letter_batches_path)
+        nav_link("Scanner", scanner_letters_path)
+        nav_link("Return Addresses", return_addresses_path)
+        nav_link("Queues", letter_queues_path)
+      end
 
-      section_label("Accounting")
-      nav_link("Tags", tags_path)
-      div("is-": "separator")
+      div(class: "sidebar-section") do
+        span(class: "sidebar-label") { "Accounting" }
+        nav_link("Tags", tags_path)
+      end
 
-      section_label("API")
-      nav_link("API Keys", api_keys_path)
-      nav_link("Queues", letter_queues_path)
-      nav_link("Docs", api_docs_path)
-      div("is-": "separator")
+      div(class: "sidebar-section") do
+        span(class: "sidebar-label") { "API" }
+        nav_link("API Keys", api_keys_path)
+        nav_link("Queues", letter_queues_path)
+        nav_link("Docs", api_docs_path)
+      end
 
-      section_label("Settings")
-      nav_link("Print", settings_qz_tray_path)
-      nav_link("HCB Payment", hcb_payment_accounts_path)
+      div(class: "sidebar-section") do
+        span(class: "sidebar-label") { "Settings" }
+        nav_link("Print", settings_qz_tray_path)
+        nav_link("HCB Payment", hcb_payment_accounts_path)
+      end
 
       if current_user&.admin?
-        div("is-": "separator")
-        section_label("Admin")
-        nav_link("Good Job", good_job_path)
-        nav_link("Admin Panel", admin_root_path)
-        nav_link("Blazer", blazer_path)
+        div(class: "sidebar-section") do
+          span(class: "sidebar-label") { "Admin" }
+          nav_link("Good Job", good_job_path)
+          nav_link("Admin Panel", admin_root_path)
+          nav_link("Blazer", blazer_path)
+        end
       end
 
       if Rails.env.development?
-        div("is-": "separator")
-        section_label("Dev")
-        nav_link("Letter Opener", letter_opener_web_path)
+        div(class: "sidebar-section") do
+          span(class: "sidebar-label") { "Dev" }
+          nav_link("Letter Opener", letter_opener_web_path)
+        end
       end
     end
 
@@ -68,20 +77,9 @@ class Components::Shared::Sidebar < Components::Base
 
   private
 
-  def section_label(text)
-    span(
-      style: "display: block; padding: 0.25lh 1ch 0; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.1ch; color: var(--foreground2);"
-    ) { text }
-  end
-
   def nav_link(label, path, exact: false)
     selected = active?(path, exact: exact)
-    a(
-      href: path,
-      data_navigable_item: true,
-      class: ("selected" if selected),
-      style: "display: block; padding: 0 1ch; color: var(--foreground#{selected ? '0' : '2'}); text-decoration: none; #{'font-weight: bold; background: var(--background1);' if selected}"
-    ) { label }
+    a(href: path, class: ("selected" if selected)) { label }
   end
 
   def active?(path, exact: false)
@@ -94,8 +92,7 @@ class Components::Shared::Sidebar < Components::Base
 
   def render_mobile_toggle
     button(
-      class: "sidebar-toggle",
-      "size-": "small",
+      class: "sidebar-toggle btn-sm",
       onclick: safe("toggleSidebar()")
     ) { "☰" }
   end
@@ -106,16 +103,16 @@ class Components::Shared::Sidebar < Components::Base
 
   def render_toggle_script
     script do
-      plain(<<~JS.html_safe)
+      raw safe(<<~JS)
         function toggleSidebar() {
           var sb = document.getElementById('sidebar');
           var ov = document.querySelector('.sidebar-overlay');
           if (sb.classList.contains('open')) {
             sb.classList.remove('open');
-            ov.style.display = 'none';
+            ov.classList.remove('open');
           } else {
             sb.classList.add('open');
-            ov.style.display = 'block';
+            ov.classList.add('open');
           }
         }
       JS

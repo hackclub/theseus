@@ -1,10 +1,10 @@
 <% content_for :title, "Edit Indicium" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= usps_indicium_path(@usps_indicium) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @usps_indicium.public_id %></a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= usps_indicium_path(@usps_indicium) %>" class="text-muted" style="text-decoration: none;">← <%= @usps_indicium.public_id %></a>
     <strong style="font-size: 1.15em;">Edit Indicium</strong>
-  </row>
+  </div>
 </div>
 
 <%= render "form", usps_indicium: @usps_indicium %>

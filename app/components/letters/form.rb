@@ -17,9 +17,9 @@ class Components::Letters::Form < Components::Base
 
     form_with(model: letter, url: form_url) do |f|
       # Letter Specs
-      div("box-": "round", style: "margin-bottom: 2lh;") do
-        h2(style: "margin: 0;") { "Letter Specs" }
-        div("is-": "separator")
+      section(style: "margin-bottom:2rem;") do
+        h2(style: "margin:0;") { "Letter Specs" }
+        hr
         div(
           data_svelte_component: "letter-attributes-picker",
           data_form_scope: "letter",
@@ -35,25 +35,25 @@ class Components::Letters::Form < Components::Base
       end
 
       # Recipient Address
-      div("box-": "round", style: "margin-bottom: 2lh;") do
-        h2(style: "margin: 0;") { "Recipient Address" }
-        div("is-": "separator")
+      section(style: "margin-bottom:2rem;") do
+        h2(style: "margin:0;") { "Recipient Address" }
+        hr
         address_fields(f)
       end
 
       # Sender & Postage
-      div("box-": "round", style: "margin-bottom: 2lh;") do
-        h2(style: "margin: 0;") { "Sender & Postage" }
-        div("is-": "separator")
+      section(style: "margin-bottom:2rem;") do
+        h2(style: "margin:0;") { "Sender & Postage" }
+        hr
         sender_postage_fields(f)
       end
 
       postage_script
 
       # Extras
-      div("box-": "round", style: "margin-bottom: 2lh;") do
-        h2(style: "margin: 0;") { "Extras" }
-        div("is-": "separator")
+      section(style: "margin-bottom:2rem;") do
+        h2(style: "margin:0;") { "Extras" }
+        hr
         field_group(label: "Title", caption: "Optional — shown on the letter list") do
           input(
             type: "text",
@@ -86,8 +86,8 @@ class Components::Letters::Form < Components::Base
 
       # Actions
       div(class: "page-actions") do
-        a(href: letters_path) { button("size-": "small") { "Cancel" } }
-        button(type: "submit", "variant-": "green") do
+        a(href: letters_path) { button(class: "btn-sm") { "Cancel" } }
+        button(type: "submit", class: "btn-success") do
           plain letter.persisted? ? "✓ Update Letter" : "✓ Create Letter"
         end
       end
@@ -99,11 +99,11 @@ class Components::Letters::Form < Components::Base
   attr_reader :letter
 
   def field_group(label:, caption: nil, &block)
-    div(style: "margin-bottom: 1lh;") do
-      tag(:label, style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { label }
+    div(style: "margin-bottom:1rem;") do
+      tag(:label, style: "display:block;color:GrayText;margin-bottom:0.25rem;") { label }
       yield
       if caption
-        span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") { caption }
+        span(style: "display:block;color:GrayText;font-size:0.85em;margin-top:0.25rem;") { caption }
       end
     end
   end
@@ -115,7 +115,7 @@ class Components::Letters::Form < Components::Base
   def error_messages
     return unless letter.errors.any?
 
-    div("box-": "square", class: "tui-banner tui-banner-error", style: "margin-bottom: 1lh;") do
+    div(class: "banner banner-error", style: "margin-bottom:1rem;") do
       strong { "[!] Hey, slight issue:" }
       ul(class: "error-list") do
         letter.errors.each do |error|
@@ -126,26 +126,26 @@ class Components::Letters::Form < Components::Base
   end
 
   def mailing_date_field(f)
-    div(style: "margin-bottom: 1lh;") do
-      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Mailing date" }
+    div(style: "margin-bottom:1rem;") do
+      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Mailing date" }
       input(
         type: "date",
         name: "letter[mailing_date]",
         id: "letter_mailing_date",
         value: (letter.mailing_date || letter.default_mailing_date)&.iso8601,
         min: letter.new_record? ? Date.current.iso8601 : nil,
-        style: "width: 20ch;"
+        style: "width:10rem;"
       )
-      row("gap-": "1", style: "margin-top: 0.5lh;") do
+      div(style: "display:flex;gap:0.5rem;margin-top:0.5rem;") do
         button(
           type: "button",
           data_mailing_date: Date.tomorrow.iso8601,
-          style: "font-size: 0.85em;"
+          style: "font-size:0.85em;"
         ) { "Tomorrow" }
         button(
           type: "button",
           data_mailing_date: Date.current.next_occurring(:monday).iso8601,
-          style: "font-size: 0.85em;"
+          style: "font-size:0.85em;"
         ) { "Next Monday" }
       end
     end
@@ -169,13 +169,13 @@ class Components::Letters::Form < Components::Base
 
       div(id: form_id) do
         # Name row
-        row("gap-": "2") do
-          div(style: "flex: 1;") do
+        div(style: "display:flex;gap:1rem;") do
+          div(style: "flex:1;") do
             field_group(label: "First name") do
               input(type: "text", name: a.field_name(:first_name), value: a.object&.first_name, required: true, style: "width: 100%;")
             end
           end
-          div(style: "flex: 1;") do
+          div(style: "flex:1;") do
             field_group(label: "Last name") do
               input(type: "text", name: a.field_name(:last_name), value: a.object&.last_name, style: "width: 100%;")
             end
@@ -191,18 +191,18 @@ class Components::Letters::Form < Components::Base
         end
 
         # City / State / Postal row
-        row("gap-": "2") do
-          div(style: "flex: 2;") do
+        div(style: "display:flex;gap:1rem;") do
+          div(style: "flex:2;") do
             field_group(label: "City") do
               input(type: "text", name: a.field_name(:city), value: a.object&.city, required: true, style: "width: 100%;")
             end
           end
-          div(style: "flex: 1;") do
+          div(style: "flex:1;") do
             field_group(label: "State") do
               input(type: "text", name: a.field_name(:state), value: a.object&.state, required: true, style: "width: 100%;")
             end
           end
-          div(style: "flex: 1;") do
+          div(style: "flex:1;") do
             field_group(label: "Postal code") do
               input(type: "text", name: a.field_name(:postal_code), value: a.object&.postal_code, required: true, style: "width: 100%;")
             end
@@ -234,7 +234,7 @@ class Components::Letters::Form < Components::Base
           var filterInput = document.createElement('input');
           filterInput.type = 'text';
           filterInput.placeholder = 'Filter countries...';
-          filterInput.style.cssText = 'width: 100%; margin-bottom: 0.5lh;';
+          filterInput.style.cssText = 'width: 100%; margin-bottom: 0.5rem;';
           select.parentNode.insertBefore(filterInput, select);
           var options = Array.from(select.options);
           filterInput.addEventListener('input', function() {
@@ -262,7 +262,7 @@ class Components::Letters::Form < Components::Base
           option(value: addr.id, selected: addr.id == letter.return_address_id) { addr.display_name }
         end
       end
-      span(style: "display: block; margin-top: 0.25lh; font-size: 0.85em;") do
+      span(style: "display:block;margin-top:0.25rem;font-size:0.85em;") do
         a(href: return_addresses_path(from_letter: true)) { "Manage return addresses" }
       end
     end
@@ -272,9 +272,9 @@ class Components::Letters::Form < Components::Base
     end
 
     # Postage type (hidden by default, shown by JS for US addresses)
-    div(id: "postage-options", style: "display: none; margin-bottom: 1lh;") do
-      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25lh;") { "Postage type" }
-      row("gap-": "2") do
+    div(id: "postage-options", style: "display:none;margin-bottom:1rem;") do
+      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Postage type" }
+      div(style: "display:flex;gap:1rem;") do
         label do
           input(type: "radio", name: "letter[postage_type]", value: "stamps", checked: letter.postage_type == "stamps" || letter.postage_type.blank?)
           plain " Stamps"
@@ -284,7 +284,7 @@ class Components::Letters::Form < Components::Base
           plain " Indicia (Metered)"
         end
       end
-      span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") { "Indicia is slightly cheaper for standard letters" }
+      span(style: "display:block;color:GrayText;font-size:0.85em;margin-top:0.25rem;") { "Indicia is slightly cheaper for standard letters" }
     end
 
     # Mailer ID
@@ -297,7 +297,7 @@ class Components::Letters::Form < Components::Base
       end
     end
 
-    div("box-": "square", class: "tui-banner tui-banner-warning", style: "margin-top: 0.5lh;") do
+    div(class: "banner banner-warning", style: "margin-top:0.5rem;") do
       plain "[!] Leave the mailer ID at the default if mailing from HQ."
     end
   end
@@ -317,12 +317,12 @@ class Components::Letters::Form < Components::Base
 
             function updatePostageOptions() {
     field_group(label: "Tags") do
-      select(name: "letter[tags][]", multiple: true, style: "width: 100%; min-height: 3lh;") do
+      select(name: "letter[tags][]", multiple: true, style: "width: 100%; min-height: 3rem;") do
         available_tags.each do |tag|
           option(value: tag, selected: letter.tags&.include?(tag)) { tag }
         end
       end
-      span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") do
+      span(style: "display: block; color: GrayText; font-size: 0.85em; margin-top: 0.25rem;") do
         plain "Select from common tags or create your own"
       end
     end
@@ -356,12 +356,12 @@ class Components::Letters::Form < Components::Base
 
   def tag_picker(f)
     field_group(label: "Tags") do
-      select(name: "letter[tags][]", multiple: true, style: "width: 100%; min-height: 3lh;") do
+      select(name: "letter[tags][]", multiple: true, class: "selectize-tags", style: "width: 100%;") do
         available_tags.each do |tag|
           option(value: tag, selected: letter.tags&.include?(tag)) { tag }
         end
       end
-      span(style: "display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25lh;") do
+      span(style: "display:block;color:GrayText;font-size:0.85em;margin-top:0.25rem;") do
         plain "Select from common tags or create your own"
       end
     end

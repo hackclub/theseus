@@ -2,12 +2,3 @@
 .pointer { cursor: pointer; }
 .w-100 { width: 100%; }
 #confetti { pointer-events: none; }
-
-.dev-border-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  border: 5px dashed #00FF00;
-  box-sizing: border-box;
-}

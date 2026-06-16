@@ -1,11 +1,11 @@
 <% content_for :title, "Edit Order #{@warehouse_order.hc_id}" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: var(--foreground2);">← Order <%= @warehouse_order.hc_id %></a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: GrayText;">← Order <%= @warehouse_order.hc_id %></a>
     <strong style="font-size: 1.15em;">Edit Order</strong>
     <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -14,10 +14,10 @@
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Order Info</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">ID</span>
         <span><%= @warehouse_order.hc_id %></span>
         <span class="detail-label">Created</span>
@@ -27,6 +27,6 @@
         <span class="detail-label">Created by</span>
         <span><%= @warehouse_order.user&.email || "—" %></span>
       </div>
-    </div>
+    </section>
   </div>
 </div>

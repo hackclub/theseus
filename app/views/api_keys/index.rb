@@ -29,14 +29,14 @@ class Views::APIKeys::Index < Views::Base
             api_keys.each do |key|
               tr do
                 td do
-                  a(href: api_key_path(key), style: "text-decoration: none; color: var(--foreground0);") do
+                  a(href: api_key_path(key), style: "text-decoration: none;") do
                     plain key.pretty_name
                   end
                 end
-                td(style: "color: var(--foreground2); font-size: 0.85em;") do
+                td(class: "text-muted", style: "font-size: 0.85em;") do
                   plain (key.abbreviated rescue "••••••••")
                 end
-                td(style: "color: var(--foreground2);") { plain key.created_at.strftime("%b %d, %Y") }
+                td(class: "text-muted") { plain key.created_at.strftime("%b %d, %Y") }
                 td do
                   status_badges(key)
                 end
@@ -45,7 +45,7 @@ class Views::APIKeys::Index < Views::Base
           end
         end
       else
-        div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+        div(style: "text-align: center; padding: 2rem;") do
           h2(style: "margin: 0;") { "🔑" }
           h3(style: "margin: 0;") { "No API keys yet" }
         end
@@ -59,17 +59,17 @@ class Views::APIKeys::Index < Views::Base
 
   def status_badges(key)
     if key.active?
-      span("is-": "badge", "variant-": "green") { "Active" }
+      span(class: "badge badge-success") { "Active" }
     else
-      span("is-": "badge", "variant-": "background2") { "Revoked" }
+      span(class: "badge") { "Revoked" }
     end
     whitespace
     if key.pii
-      span("is-": "badge", "variant-": "yellow") { "PII" }
+      span(class: "badge badge-warning") { "PII" }
       whitespace
     end
     if key.may_impersonate?
-      span("is-": "badge", "variant-": "red") { "Impersonate" }
+      span(class: "badge badge-danger") { "Impersonate" }
     end
   end
 end

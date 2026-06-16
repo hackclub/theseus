@@ -1,10 +1,10 @@
 <% content_for :title, "New Source Tag" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= source_tags_path %>" style="text-decoration: none; color: var(--foreground2);">← Source Tags</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= source_tags_path %>" class="text-muted" style="text-decoration: none;">← Source Tags</a>
     <strong style="font-size: 1.15em;">New Source Tag</strong>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -13,12 +13,12 @@
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>About Source Tags</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh; color: var(--foreground2);">
+      <hr>
+      <div style="margin-top: 0.5rem; color: GrayText;">
         <p style="margin: 0;">Source tags identify where mail originates from. Use a short slug for programmatic access.</p>
       </div>
-    </div>
+    </section>
   </div>
 </div>

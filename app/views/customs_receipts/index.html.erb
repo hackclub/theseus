@@ -1,20 +1,20 @@
 <% content_for :title, "Customs Receipts" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <strong style="font-size: 1.15em;">Generate Customs Receipt</strong>
-  <span class="toolbar-spacer"></span>
+  <span class="spacer"></span>
 </div>
 
-<div box-="round">
+<section>
   <strong>Search</strong>
-  <div is-="separator"></div>
-  <div style="margin-top: 0.5lh;">
+  <hr>
+  <div style="margin-top: 0.5rem;">
     <%= form_with url: generate_customs_receipts_path, method: :get do |f| %>
-      <div style="margin-bottom: 1lh;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25lh;">ID or Tracking Number</label>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">ID or Tracking Number</label>
         <input type="text" name="search" autofocus placeholder="ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)" style="width: 100%;">
       </div>
-      <button type="submit" variant-="green">⎘ Generate</button>
+      <button type="submit" class="btn-success">⎘ Generate</button>
     <% end %>
   </div>
-</div>
+</section>

@@ -8,15 +8,15 @@ class Views::APIKeys::Show < Views::Base
   end
 
   def view_template
-    div(class: "page-toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      row("gap-": "1", "align-": "center") do
-        a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
+    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+      div(style: "display:flex;align-items:center;gap:0.5rem") do
+        a(href: api_keys_path, style: "text-decoration: none; color: GrayText;") { "← API Keys" }
         strong(style: "font-size: 1.15em;") { api_key.pretty_name }
-        span("is-": "badge", "variant-": api_key.active? ? "green" : "red") do
+        span(class: api_key.active? ? "badge badge-success" : "badge badge-danger") do
           api_key.active? ? "Active" : "Revoked"
         end
       end
-      span(class: "toolbar-spacer")
+      span(class: "spacer")
     end
 
     div(class: "show-layout") do
@@ -28,18 +28,18 @@ class Views::APIKeys::Show < Views::Base
 
       div(class: "show-sidebar") do
         if api_key.active?
-          div("box-": "round") do
+          section do
             strong { "Actions" }
-            div("is-": "separator")
-            div(style: "margin-top: 0.5lh;") do
+            hr
+            div(style: "margin-top: 0.5rem;") do
               render_revoke_dialog
             end
           end
         else
-          div("box-": "round") do
-            div(style: "text-align: center; padding: 1lh 0; color: var(--red);") do
+          section do
+            div(style: "text-align: center; padding: 1rem 0; color: var(--red);") do
               span(style: "font-size: 2em;") { "✗" }
-              div(style: "margin-top: 0.5lh;") { strong { "Revoked" } }
+              div(style: "margin-top: 0.5rem;") { strong { "Revoked" } }
             end
           end
         end
@@ -52,28 +52,28 @@ class Views::APIKeys::Show < Views::Base
   attr_reader :api_key
 
   def secret_key_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Secret Key" }
-      div("is-": "separator")
-      div(style: "margin-top: 0.5lh;") do
-        row("gap-": "1", "align-": "center") do
+      hr
+      div(style: "margin-top: 0.5rem;") do
+        div(style: "display:flex;align-items:center;gap:0.5rem") do
           code(data_copy_to_clipboard: api_key.token) { api_key.token }
           button(
-            "size-": "small",
+            class: "btn-sm",
             data_copy_to_clipboard: api_key.token,
             aria: { label: "Copy to clipboard" }
           ) { "⎘" }
         end
-        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25lh 0 0;") { "Keep this secret. Don't share it with anyone." }
+        p(style: "color: GrayText; font-size: 0.85em; margin: 0.25rem 0 0;") { "Keep this secret. Don't share it with anyone." }
       end
     end
   end
 
   def details_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Details" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Name" }
         span { api_key.pretty_name }
         span(class: "detail-label") { "Created" }
@@ -87,51 +87,51 @@ class Views::APIKeys::Show < Views::Base
   end
 
   def permissions_box
-    div("box-": "round", style: "margin-bottom: 1lh;") do
+    section(style: "margin-bottom: 1rem;") do
       strong { "Permissions" }
-      div("is-": "separator")
-      div(class: "detail-grid", style: "margin-top: 0.5lh;") do
+      hr
+      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "PII Access" }
         if api_key.pii
           span(style: "color: var(--green);") { "✓ Enabled" }
         else
-          span(style: "color: var(--foreground2);") { "✗ Disabled" }
+          span(class: "text-muted") { "✗ Disabled" }
         end
 
         span(class: "detail-label") { "Impersonation" }
         if api_key.may_impersonate?
           span(style: "color: var(--red);") { "✓ Enabled" }
         else
-          span(style: "color: var(--foreground2);") { "✗ Disabled" }
+          span(class: "text-muted") { "✗ Disabled" }
         end
       end
     end
   end
 
   def render_revoke_dialog
-    dialog(id: "revoke-dialog", "size-": "large", "position-": "center", "container-": "fill") do
-      column("box-": "round", "shear-": "top") do
-        row("align-": "center between") do
-          span("is-": "badge", "variant-": "background0") { "Revoking #{api_key.pretty_name}..." }
-          button("variant-": "foreground0", onclick: safe("this.closest('dialog').close()")) { "×" }
+    dialog(id: "revoke-dialog") do
+      div(style: "padding: 1rem;") do
+        div(style: "display:flex;align-items:center;justify-content:space-between") do
+          span(class: "badge") { "Revoking #{api_key.pretty_name}..." }
+          button(onclick: safe("this.closest('dialog').close()")) { "×" }
         end
-        p(style: "color: var(--foreground2); margin: 0 0 1lh;") { "That which thou canst not undo." }
-        div("is-": "separator")
+        p(class: "text-muted", style: "margin: 0 0 1rem;") { "That which thou canst not undo." }
+        hr
 
         form_with url: revoke_api_key_path(api_key), method: :post, local: true do |f|
-          div("box-": "square", class: "tui-banner tui-banner-error", style: "margin: 1lh 0;") do
+          div(class: "banner banner-error", style: "margin: 1rem 0;") do
             plain "⚠ This is irreversible and painful! Are you sure you want to revoke this key? Everything that relies on it will unceremoniously break."
           end
 
-          div("is-": "separator")
-          row("gap-": "1", style: "justify-content: flex-end; padding: 1lh 0;") do
+          hr
+          div(style: "display:flex;gap:0.5rem;justify-content: flex-end; padding: 1rem 0;") do
             button(onclick: safe("document.getElementById('revoke-dialog').close()")) { "Cancel" }
-            button("variant-": "red", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
+            button(class: "btn-danger", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
           end
         end
       end
     end
 
-    button("variant-": "red", style: "width: 100%;", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
+    button(class: "btn-danger", style: "width: 100%;", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
   end
 end

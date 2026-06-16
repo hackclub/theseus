@@ -26,7 +26,7 @@ class Components::StaticPages::APIDocs < Components::Base
 
   def api_key_button
     a(href: new_api_key_path, target: "_blank") do
-      button("size-": "small") { "🔑 make one right now!" }
+      button(class: "btn-sm") { "🔑 make one right now!" }
     end
   end
 

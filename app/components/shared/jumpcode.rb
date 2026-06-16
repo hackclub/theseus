@@ -8,19 +8,19 @@ class Components::Shared::Jumpcode < Components::Base
   def view_template
     return unless @code
 
-    row( "gap-": "1", "align-": "center", class: "jumpcode") do
+    div(style: "display:flex;gap:0.5rem;align-items:center", class: "jumpcode") do
       span(
-        "is-": "badge", "variant-": "background2",
+        class: "badge",
         title: "Press ⌘K and type #{@code}",
         onclick: safe("window.openKbar?.()")
       ) do
-        span(style: "color: var(--foreground2);") { "⌘K" }
+        span(style: "color:GrayText") { "⌘K" }
         plain " #{@code}"
       end
 
-      details("is-": "popover", "position-": "bottom baseline-right", class: "jumpcode-help") do
-        summary(tabindex: "0", size: "small") { "?" }
-        div(style: "padding: 1lh 1ch; max-width: 48ch;") do
+      details(class: "popover jumpcode-help", style: "position:relative") do
+        summary(tabindex: "0", class: "btn-sm") { "?" }
+        div(style: "position:absolute;right:0;top:100%;padding:1rem;max-width:24rem;background:Canvas;border:1px solid var(--background2)") do
           p do
             plain "these are jumpcodes. hit "
             code { "⌘K" }
@@ -28,17 +28,17 @@ class Components::Shared::Jumpcode < Components::Base
           end
           p do
             plain "letter pages: "
-            span("is-": "badge", "variant-": "background2") { "MAIL" }
+            span(class: "badge") { "MAIL" }
             plain " "
-            span("is-": "badge", "variant-": "background2") { "SCAN" }
+            span(class: "badge") { "SCAN" }
             plain " "
-            span("is-": "badge", "variant-": "background2") { "LBAT" }
+            span(class: "badge") { "LBAT" }
           end
           p do
             plain "warehouse: "
-            span("is-": "badge", "variant-": "background2") { "WORD" }
+            span(class: "badge") { "WORD" }
             plain " "
-            span("is-": "badge", "variant-": "background2") { "SKUS" }
+            span(class: "badge") { "SKUS" }
           end
           p do
             plain "also try "

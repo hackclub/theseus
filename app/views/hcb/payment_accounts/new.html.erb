@@ -1,35 +1,35 @@
 <% content_for :title, "Add HCB Organization" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= hcb_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← HCB Accounts</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= hcb_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">← HCB Accounts</a>
     <strong style="font-size: 1.15em;">Add Organization</strong>
-  </row>
+  </div>
 </div>
 
 <% if @organizations.any? %>
   <%= form_with url: hcb_payment_accounts_path, method: :post do |f| %>
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Select Organization</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh; color: var(--foreground2);">Choose which HCB organization to use for paying postage.</div>
+      <hr>
+      <div style="margin-top: 0.5rem; color: GrayText;">Choose which HCB organization to use for paying postage.</div>
       <% @organizations.each do |org| %>
-        <label style="display: flex; align-items: center; gap: 1ch; padding: 0.5lh 0; border-bottom: 1px solid var(--background2); cursor: pointer;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--background2); cursor: pointer;">
           <%= f.radio_button :organization_id, org.id %>
           <span style="font-weight: 500;"><%= org.name %></span>
         </label>
       <% end %>
-    </div>
+    </section>
 
-    <row gap-="1" align-="center" style="justify-content: flex-end;">
-      <a href="<%= hcb_payment_accounts_path %>" style="color: var(--foreground2); text-decoration: none;">Cancel</a>
-      <button type="submit" variant-="green">Add Organization</button>
-    </row>
+    <div style="display:flex;align-items:center;gap:0.5rem;justify-content: flex-end;">
+      <a href="<%= hcb_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">Cancel</a>
+      <button type="submit" class="btn-success">Add Organization</button>
+    </div>
   <% end %>
 <% else %>
-  <div box-="round" style="text-align: center; padding: 2lh 2ch;">
+  <section style="text-align: center; padding: 2rem;">
     <strong>No organizations available</strong>
-    <div style="color: var(--foreground2); margin-top: 0.25lh;">You don't belong to any HCB organizations, or all your organizations are already linked.</div>
-    <div style="margin-top: 1lh;"><a href="<%= hcb_payment_accounts_path %>" style="color: var(--foreground2);">← Back</a></div>
-  </div>
+    <div class="text-muted" style="margin-top: 0.25rem;">You don't belong to any HCB organizations, or all your organizations are already linked.</div>
+    <div style="margin-top: 1rem;"><a href="<%= hcb_payment_accounts_path %>" class="text-muted">← Back</a></div>
+  </section>
 <% end %>

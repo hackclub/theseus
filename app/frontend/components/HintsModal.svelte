@@ -76,55 +76,58 @@
   onclick={(e) => { if (e.target === dialogEl) close(); }}
   onkeydown={() => {}}
 >
-  <column box-="round" id="hints-content">
-    <row align-="center between">
+  <div class="kbar-box" id="hints-content">
+    <div class="kbar-row kbar-row-between">
       <b>Keyboard shortcuts</b>
-      <button size-="small" variant-="foreground0" onclick={close}>×</button>
-    </row>
+      <button class="kbar-btn" onclick={close}>×</button>
+    </div>
 
-    <div is-="separator"></div>
+    <hr>
 
     <span style="color: var(--foreground2);">Global</span>
     <div class="hints-grid">
       {#each [{ keys: ['⌘K'], action: 'command bar' }, { keys: ['?'], action: 'this dialog' }, { keys: ['/'], action: 'focus search' }, { keys: ['n'], action: 'next page' }, { keys: ['p'], action: 'prev page' }] as shortcut}
-        <row gap-="1" align-="center">
+        <div class="kbar-row">
           {#each shortcut.keys as key}
-            <span is-="badge" variant-="background2">{key}</span>
+            <kbd>{key}</kbd>
           {/each}
           {shortcut.action}
-        </row>
+        </div>
       {/each}
     </div>
 
     {#if hints.length > 0}
-      <div is-="separator"></div>
+      <hr>
       <span style="color: var(--foreground2);">This page</span>
       <div class="hints-grid">
         {#each hints as hint}
           {#each hint.shortcuts as shortcut}
-            <row gap-="1" align-="center">
+            <div class="kbar-row">
               {#each shortcut.keys as key}
-                <span is-="badge" variant-="background2">{key}</span>
+                <kbd>{key}</kbd>
               {/each}
               {shortcut.action}
-            </row>
+            </div>
           {/each}
         {/each}
       </div>
     {/if}
 
-    <div is-="separator"></div>
-    <row gap-="1" align-="center" style="color: var(--foreground2);">
-      <button size-="small" variant-="background2" onclick={close}>esc</button>
+    <hr>
+    <div class="kbar-row" style="color: var(--foreground2);">
+      <kbd>esc</kbd>
       close
-    </row>
-  </column>
+    </div>
+  </div>
 </dialog>
 
 <style>
   #hints-dialog {
     position: fixed;
     z-index: 1000;
+    border: none;
+    padding: 0;
+    background: transparent;
 
     &::backdrop {
       backdrop-filter: grayscale(100%);
@@ -132,16 +135,63 @@
     }
   }
 
+  .kbar-box {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--foreground2);
+    border-radius: 4px;
+    background: var(--background0);
+    padding: 0.5rem;
+    gap: 0.25rem;
+  }
+
   #hints-content {
-    --box-border-color: var(--foreground2);
-    min-width: 44ch;
-    max-width: 64ch;
+    min-width: 22rem;
+    max-width: 32rem;
+  }
+
+  .kbar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .kbar-row-between {
+    justify-content: space-between;
+  }
+
+  kbd {
+    font-family: monospace;
+    font-size: 0.85em;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    background: var(--background2);
+    white-space: nowrap;
+  }
+
+  .kbar-btn {
+    background: none;
+    border: 1px solid var(--foreground2);
+    border-radius: 3px;
+    color: var(--foreground0);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85em;
+    padding: 0.1em 0.4em;
+    line-height: 1;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--background2);
+    margin: 0;
+    width: 100%;
   }
 
   .hints-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5lh 2ch;
-    padding: 0.25lh 0;
+    gap: 0.25rem 1rem;
+    padding: 0.25rem 0;
   }
 </style>

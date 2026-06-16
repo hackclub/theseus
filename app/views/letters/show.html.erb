@@ -1,9 +1,9 @@
 <% content_for :title, "#{@letter.user_facing_title || 'Letter'} #{@letter.public_id}" %>
 
 <!-- Header -->
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= letters_path %>" style="text-decoration: none; color: var(--foreground2);">← Letters</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= letters_path %>" style="text-decoration: none; color: GrayText;">← Letters</a>
     <strong style="font-size: 1.15em;">
       <% if @letter.user_facing_title.present? %>
         <%= @letter.user_facing_title %>
@@ -12,21 +12,21 @@
       <% end %>
     </strong>
     <%= render Components::Shared::StatusBadge.new(status: @letter.aasm_state, type: :letter) %>
-  </row>
-  <row gap-="1" align-="center">
+  </div>
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <%= render Components::Shared::PublicId.new(value: @letter.public_id) %>
     <% @letter.tags.compact_blank.each do |tag| %>
-      <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span is-="badge" variant-="background2"><%= tag %></span></a>
+      <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span class="badge"><%= tag %></span></a>
     <% end %>
-  </row>
-  <span class="toolbar-spacer"></span>
-  <row gap-="1" align-="center">
+  </div>
+  <span class="spacer"></span>
+  <div style="display:flex;align-items:center;gap:0.5rem">
     <a href="<%= edit_letter_path(@letter) %>">✎ Edit</a>
     <a href="<%= public_letter_path(@letter) %>" target="_blank">↗ Public</a>
     <%= form_with url: letter_path(@letter), method: :delete, data: { turbo_confirm: "Delete this letter?" }, class: "form-inline" do %>
-      <button type="submit" variant-="red" size-="small">✕</button>
+      <button type="submit" class="btn-danger btn-sm">✕</button>
     <% end %>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -34,7 +34,7 @@
   <div class="show-main">
 
     <!-- Details -->
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <div class="detail-grid">
         <span class="detail-label">Created</span>
         <span><%= @letter.created_at.strftime("%b %d, %Y %H:%M") %></span>
@@ -57,17 +57,17 @@
           <span><%= @letter.recipient_email %></span>
         <% end %>
       </div>
-    </div>
+    </section>
 
     <!-- Addresses -->
-    <row gap-="2" style="margin-bottom: 1lh;">
-      <div box-="round" style="flex: 1;">
+    <div style="display:flex;gap:1rem;margin-bottom:1rem;">
+      <section style="flex: 1;">
         <strong>From</strong>
-        <div is-="separator"></div>
+        <hr>
         <% if @letter.return_address.present? %>
-          <div style="margin-top: 0.5lh;">
+          <div style="margin-top: 0.5rem;">
             <strong><%= @letter.return_address_name_line %></strong><br>
-            <span style="color: var(--foreground2);">
+            <span style="color: GrayText;">
               <%= @letter.return_address.line_1 %><br>
               <% if @letter.return_address.line_2.present? %><%= @letter.return_address.line_2 %><br><% end %>
               <%= @letter.return_address.city %>, <%= @letter.return_address.state %> <%= @letter.return_address.postal_code %><br>
@@ -75,40 +75,40 @@
             </span>
           </div>
         <% else %>
-          <span style="color: var(--foreground2);">No return address</span>
+          <span style="color: GrayText;">No return address</span>
         <% end %>
-      </div>
+      </section>
 
-      <div box-="round" style="flex: 1;">
+      <section style="flex: 1;">
         <strong>To</strong>
-        <div is-="separator"></div>
-        <div style="margin-top: 0.5lh;">
+        <hr>
+        <div style="margin-top: 0.5rem;">
           <strong><%= @letter.address.name_line %></strong><br>
-          <span style="color: var(--foreground2);">
+          <span style="color: GrayText;">
             <%= @letter.address.line_1 %><br>
             <% if @letter.address.line_2.present? %><%= @letter.address.line_2 %><br><% end %>
             <%= @letter.address.city %>, <%= @letter.address.state %> <%= @letter.address.postal_code %><br>
             <%= @letter.address.country %>
           </span>
         </div>
-      </div>
-    </row>
+      </section>
+    </div>
 
     <!-- Postage -->
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Postage</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh;">
+      <hr>
+      <div style="margin-top: 0.5rem;">
         <% if @letter.postage_type == "indicia" %>
           <% if @letter.usps_indicium.present? %>
-            <row gap-="1" align-="center" style="margin-bottom: 0.5lh;">
-              <span is-="badge" variant-="green">✓ Indicia Purchased</span>
-            </row>
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+              <span class="badge badge-success">✓ Indicia Purchased</span>
+            </div>
             <div class="detail-grid">
               <span class="detail-label">Cost</span>
               <span>
                 <%= number_to_currency(@letter.usps_indicium.cost) %>
-                <span style="color: var(--foreground2);">(<%= number_to_currency(@letter.usps_indicium.postage) %> + <%= number_to_currency(@letter.usps_indicium.fees || 0) %> fees)</span>
+                <span style="color: GrayText;">(<%= number_to_currency(@letter.usps_indicium.postage) %> + <%= number_to_currency(@letter.usps_indicium.fees || 0) %> fees)</span>
               </span>
               <span class="detail-label">Mailing date</span>
               <span><%= @letter.usps_indicium.mailing_date %></span>
@@ -119,63 +119,63 @@
             </div>
             <% admin_tool do %>
               <% if @letter.usps_indicium.raw_json_response.nil? %>
-                <div is-="separator" style="margin: 0.5lh 0;"></div>
+                <hr style="margin:0.5rem 0">
                 <%= form_with url: clear_indicium_letter_path(@letter), method: :post, data: { turbo_confirm: "This will destroy the orphaned indicium. Are you sure?" }, class: "form-inline" do %>
-                  <button type="submit" variant-="red" size-="small">✕ Clear Orphaned Indicium</button>
+                  <button type="submit" class="btn-danger btn-sm">✕ Clear Orphaned Indicium</button>
                 <% end %>
               <% end %>
             <% end %>
             <%= render 'admin_inspector', record: @letter.usps_indicium %>
           <% else %>
-            <row gap-="1" align-="center" style="margin-bottom: 0.5lh;">
-              <span is-="badge" variant-="yellow">⚠ Indicia Not Purchased</span>
-            </row>
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+              <span class="badge badge-warning">⚠ Indicia Not Purchased</span>
+            </div>
             <% if @letter.batch_id.nil? %>
               <%= render 'buy_indicia_form', letter: @letter %>
             <% else %>
-              <span style="color: var(--foreground2);">Postage will be purchased when processing the batch.</span>
+              <span style="color: GrayText;">Postage will be purchased when processing the batch.</span>
             <% end %>
           <% end %>
         <% elsif @letter.postage_type == "international_origin" %>
-          <span is-="badge" variant-="blue">International Origin</span>
-          <span style="color: var(--foreground2);">Postage paid at origin (<%= @letter.return_address&.country %>)</span>
+          <span class="badge badge-info">International Origin</span>
+          <span style="color: GrayText;">Postage paid at origin (<%= @letter.return_address&.country %>)</span>
         <% else %>
-          <row align-="center between">
-            <span style="color: var(--foreground2);">Using physical stamps</span>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="color: GrayText;">Using physical stamps</span>
             <% if @letter.batch_id.nil? %>
               <%= form_with url: letter_path(@letter), method: :patch, class: "form-inline" do |f| %>
                 <%= f.hidden_field :postage_type, value: "indicia", name: "letter[postage_type]" %>
-                <button type="submit" size-="small">Switch to Indicia</button>
+                <button type="submit" class="btn-sm">Switch to Indicia</button>
               <% end %>
             <% end %>
-          </row>
+          </div>
         <% end %>
       </div>
-    </div>
+    </section>
 
     <% if @letter.batch.present? %>
       <%= render 'shared/batch_info', record: @letter %>
     <% end %>
 
     <% if @letter.imb_serial_number.present? && @letter.address.country&.upcase == 'US' %>
-      <div box-="round" style="margin-bottom: 1lh;">
+      <section style="margin-bottom: 1rem;">
         <strong>IMb Tracking</strong>
-        <div is-="separator"></div>
-        <div class="detail-grid" style="margin-top: 0.5lh;">
+        <hr>
+        <div class="detail-grid" style="margin-top: 0.5rem;">
           <span class="detail-label">Serial</span>
           <span><code><%= @letter.imb_serial_number.to_s.rjust(6, '0') %></code></span>
           <span class="detail-label">Epoch</span>
           <span><%= @letter.imb_rollover_count %></span>
         </div>
-      </div>
+      </section>
     <% end %>
 
     <% if @letter.rubber_stamps.present? %>
-      <div box-="round" style="margin-bottom: 1lh;">
+      <section style="margin-bottom: 1rem;">
         <strong>Rubber Stamps</strong>
-        <div is-="separator"></div>
-        <pre style="margin: 0.5lh 0 0; white-space: pre-wrap;"><%= @letter.rubber_stamps %></pre>
-      </div>
+        <hr>
+        <pre style="margin: 0.5rem 0 0; white-space: pre-wrap;"><%= @letter.rubber_stamps %></pre>
+      </section>
     <% end %>
 
     <%= render partial: "admin_inspector", locals: { record: @letter } %>
@@ -183,77 +183,77 @@
 
   <!-- Sidebar -->
   <div class="show-sidebar">
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Actions</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh;">
+      <hr>
+      <div style="margin-top: 0.5rem;">
         <% case @letter.aasm_state %>
         <% when 'pending' %>
           <% if @letter.label.attached? %>
-            <div style="margin-bottom: 0.5lh; color: var(--foreground2);">Label ready</div>
-            <row gap-="1" style="margin-bottom: 1lh;">
-              <a href="<%= rails_blob_path(@letter.label, disposition: 'inline') %>" target="_blank"><button size-="small">👁 View</button></a>
+            <div style="margin-bottom: 0.5rem; color: GrayText;">Label ready</div>
+            <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+              <a href="<%= rails_blob_path(@letter.label, disposition: 'inline') %>" target="_blank"><button class="btn-sm">👁 View</button></a>
               <%= form_with url: clear_label_letter_path(@letter), method: :post, data: { turbo_confirm: "Clear this label?" }, class: "form-inline" do %>
-                <button type="submit" size-="small">× Clear</button>
+                <button type="submit" class="btn-sm">× Clear</button>
               <% end %>
-            </row>
-            <div is-="separator"></div>
-            <div style="margin-top: 0.5lh;">
+            </div>
+            <hr>
+            <div style="margin-top: 0.5rem;">
               <%= form_with url: mark_printed_letter_path(@letter), method: :post do %>
-                <button type="submit" variant-="green" style="width: 100%;">✓ Mark as Printed</button>
+                <button type="submit" class="btn-success" style="width: 100%;">✓ Mark as Printed</button>
               <% end %>
             </div>
           <% elsif @letter.batch.present? %>
             <%= form_with url: mark_printed_letter_path(@letter), method: :post do %>
-              <button type="submit" variant-="green" style="width: 100%;">✓ Mark as Printed</button>
+              <button type="submit" class="btn-success" style="width: 100%;">✓ Mark as Printed</button>
             <% end %>
           <% else %>
-            <div style="color: var(--foreground2); margin-bottom: 0.5lh;">Generate label</div>
+            <div style="color: GrayText; margin-bottom: 0.5rem;">Generate label</div>
             <%= form_with(url: generate_label_letter_path(@letter), method: :post) do |f| %>
-              <div style="margin-bottom: 0.5lh;">
+              <div style="margin-bottom: 0.5rem;">
                 <%= render Components::Shared::TemplatePicker.new(form: f, name: :template) %>
               </div>
-              <label style="display: block; margin-bottom: 0.5lh;">
+              <label style="display: block; margin-bottom: 0.5rem;">
                 <input type="checkbox" name="qr" value="1" checked>
                 Include QR code
               </label>
-              <button type="submit" variant-="green" style="width: 100%;">⎘ Generate Label</button>
+              <button type="submit" class="btn-success" style="width: 100%;">⎘ Generate Label</button>
             <% end %>
             <% dev_tool do %>
-              <div style="margin-top: 0.5lh;">
-                <%= link_to "preview label?", preview_template_letter_path(@letter), style: "color: var(--foreground2);" %>
+              <div style="margin-top: 0.5rem;">
+                <%= link_to "preview label?", preview_template_letter_path(@letter), style: "color: GrayText;" %>
               </div>
             <% end %>
           <% end %>
         <% when 'printed' %>
           <%= form_with url: mark_mailed_letter_path(@letter), method: :post do %>
-            <button type="submit" variant-="green" style="width: 100%;">✉ Mark as Mailed</button>
+            <button type="submit" class="btn-success" style="width: 100%;">✉ Mark as Mailed</button>
           <% end %>
         <% when 'mailed' %>
           <%= form_with url: mark_received_letter_path(@letter), method: :post do %>
-            <button type="submit" variant-="green" style="width: 100%;">✓ Mark as Received</button>
+            <button type="submit" class="btn-success" style="width: 100%;">✓ Mark as Received</button>
           <% end %>
         <% when 'received' %>
-          <div style="text-align: center; padding: 1lh 0; color: var(--green);">
+          <div style="text-align: center; padding: 1rem 0; color: var(--green);">
             <span style="font-size: 2em;">✓</span>
-            <div style="margin-top: 0.5lh;"><strong>Delivered</strong></div>
+            <div style="margin-top: 0.5rem;"><strong>Delivered</strong></div>
           </div>
         <% end %>
       </div>
-    </div>
+    </section>
 
     <% if @letter.label.attached? %>
       <%= render 'shared/instant_print_window', url: rails_blob_path(@letter.label, disposition: 'inline') %>
-      <div box-="round">
+      <section>
         <strong>Label Preview</strong>
-        <div is-="separator"></div>
-        <div style="margin-top: 0.5lh;">
-          <iframe src="<%= rails_blob_path(@letter.label, disposition: 'inline') %>" style="width: 100%; height: 20lh; border: 1px solid var(--background2);"></iframe>
-          <div style="margin-top: 0.5lh;">
-            <a href="<%= rails_blob_path(@letter.label, disposition: 'attachment') %>" style="color: var(--foreground2);">↓ Download</a>
+        <hr>
+        <div style="margin-top: 0.5rem;">
+          <iframe src="<%= rails_blob_path(@letter.label, disposition: 'inline') %>" style="width: 100%; height: 20rem; border: 1px solid var(--background2);"></iframe>
+          <div style="margin-top: 0.5rem;">
+            <a href="<%= rails_blob_path(@letter.label, disposition: 'attachment') %>" style="color: GrayText;">↓ Download</a>
           </div>
         </div>
-      </div>
+      </section>
     <% end %>
   </div>
 </div>

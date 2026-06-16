@@ -1,10 +1,10 @@
 <% content_for :title, "Edit Template" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_template_path(@warehouse_template) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @warehouse_template.name %></a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_template_path(@warehouse_template) %>" style="text-decoration: none; color: GrayText;">← <%= @warehouse_template.name %></a>
     <strong style="font-size: 1.15em;">Edit Template</strong>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -12,10 +12,10 @@
     <%= render "form", warehouse_template: @warehouse_template %>
   </div>
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Template Info</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Name</span>
         <span><%= @warehouse_template.name %></span>
         <span class="detail-label">Items</span>
@@ -23,6 +23,6 @@
         <span class="detail-label">Shared</span>
         <span><%= @warehouse_template.public ? "Yes" : "No" %></span>
       </div>
-    </div>
+    </section>
   </div>
 </div>

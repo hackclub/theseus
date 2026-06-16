@@ -11,7 +11,7 @@ class Components::Shared::Tags < Components::Base
     div(class: "tags-list") do
       tags.compact_blank.each do |tag|
         a(href: tag_stats_path(tag), class: "link-reset") do
-          span("is-": "badge", "variant-": "blue") { tag }
+          span(class: "badge badge-info") { tag }
         end
       end
     end

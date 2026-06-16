@@ -1,10 +1,10 @@
 <% content_for :title, "New SKU" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: GrayText;">← SKUs</a>
     <strong style="font-size: 1.15em;">New SKU</strong>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -12,12 +12,12 @@
     <%= render "form", warehouse_sku: @warehouse_sku %>
   </div>
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Help</strong>
-      <div is-="separator"></div>
-      <div style="margin-top: 0.5lh; color: var(--foreground2);">
+      <hr>
+      <div style="margin-top: 0.5rem; color: GrayText;">
         Fill in the SKU code, name, and cost details. AI-enabled SKUs can be selected by the AI ordering service.
       </div>
-    </div>
+    </section>
   </div>
 </div>

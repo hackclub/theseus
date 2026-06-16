@@ -16,17 +16,17 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   end
 
   def view_template
-    div(class: "line-items-editor", "x-data": alpine_data_json, "x-cloak": true) do
-      div(class: "li-editor-border", "x-ref": "list") do
+    div("x-data": alpine_data_json, "x-cloak": true) do
+      section("x-ref": "list", style: "padding:0;") do
         div("x-show": "visibleItems().length > 0") do
-          table(class: "li-editor-table") do
-            thead(class: "li-editor-thead") do
+          table do
+            thead do
               tr do
-                th(class: "li-editor-th") { "Item" }
-                th(class: "li-editor-th", style: "width: 120px;") { "Stock" }
-                th(class: "li-editor-th", style: "width: 100px;") { "Quantity" }
-                th(class: "li-editor-th", style: "width: 120px;") { "Unit Cost" } if @show_unit_cost
-                th(class: "li-editor-th", style: "width: 50px;")
+                th { "Item" }
+                th(style: "width:8rem") { "Stock" }
+                th(style: "width:6rem") { "Qty" }
+                th(style: "width:8rem") { "Unit Cost" } if @show_unit_cost
+                th(style: "width:3rem")
               end
             end
             tbody do
@@ -36,12 +36,10 @@ class Components::Warehouse::LineItemsEditor < Components::Base
             end
           end
         end
-
         render_empty_state
       end
 
-      div(class: "form-field") { add_item_panel }
-
+      div(style: "margin-top:0.75rem;") { add_item_panel }
       hidden_fields
       sku_filter_script
     end
@@ -56,101 +54,100 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   # Line item row
 
   def render_line_item_row
-    tr(class: "li-editor-row", "x-show": "!item._destroy", "x-transition.opacity": true) do
-      td(class: "li-editor-td") do
-        div(class: "li-editor-name", "x-text": "item.sku_name")
-        code(class: "li-editor-sku", "x-text": "item.sku_code")
+    tr("x-show": "!item._destroy", "x-transition.opacity": true) do
+      td do
+        strong("x-text": "item.sku_name")
+        whitespace
+        code(class: "text-muted", style: "font-size:0.85em;", "x-text": "item.sku_code")
       end
-      td(class: "li-editor-td") do
+      td do
         template_tag("x-if": "item.sku_stock != null") do
           span(
-            class: "li-editor-stock-badge",
+            class: "badge",
             ":style": "stockStyle(item.sku_stock)",
             "x-text": "item.sku_stock + ' in stock'"
           )
         end
       end
-      td(class: "li-editor-td") do
+      td do
         input(
           type: "number",
           "x-model.number": "item.quantity",
           min: 1,
-          class: "li-editor-qty-input"
+          style: "width:4rem;text-align:center;"
         )
       end
       if @show_unit_cost
-        td(class: "li-editor-td") do
-          div(class: "li-editor-cost-group") do
-            span(class: "li-editor-cost-prefix") { "$" }
+        td do
+          div(style: "display:flex;align-items:center;gap:0.2rem;") do
+            span(class: "text-muted") { "$" }
             input(
               type: "number",
               "x-model": "item.unit_cost",
               min: 0,
               step: "0.01",
               placeholder: "0.00",
-              class: "li-editor-cost-input"
+              style: "width:5rem;"
             )
           end
         end
       end
-      td(class: "li-editor-td text-right") do
+      td(style: "text-align:right;") do
         button(
           type: "button",
-          class: "li-editor-remove-btn",
+          class: "btn-sm",
+          style: "color:var(--red);border-color:var(--red);",
           "aria-label": "Remove item",
           "@click": "removeItem(item._index)"
-        ) do
-          plain "✕"
-        end
+        ) { "✕" }
       end
     end
   end
 
   def render_empty_state
-    div(class: "li-editor-empty", "x-show": "visibleItems().length === 0") do
-      div(class: "text-center") do
-        div(class: "li-editor-empty-icon") do
-          plain "📦"
-        end
-        h3(class: "li-editor-empty-title") { "No items added" }
-        p(class: "li-editor-empty-text") { "Click the button below to add SKUs." }
+    div("x-show": "visibleItems().length === 0", style: "text-align:center;padding:2rem 1rem;color:GrayText;") do
+      div(style: "font-size:2em;margin-bottom:0.5rem;") { "📦" }
+      p(style: "margin:0;") do
+        strong { "No items added" }
       end
+      p(style: "margin:0.25rem 0 0;") { "Click the button below to add SKUs." }
     end
   end
 
   # SKU Select Panel
 
   def add_item_panel
-    details("is-": "popover", "position-": "bottom baseline-left", id: "sku-select-panel") do
-      summary(tabindex: "0") do
-        button("variant-": "green", type: "button") { "+ #{@add_button_text}" }
-      end
-      column( "gap-": "0", style: "max-height: 40lh; overflow-y: auto;") do
-        div(style: "padding: 0.5lh 1ch;") do
+    details(class: "popover", id: "sku-select-panel", style: "position:relative;display:inline-block;") do
+      summary(tabindex: "0", class: "btn-success", style: "display:inline-flex;width:auto;") { "+ #{@add_button_text}" }
+      div(style: "position:absolute;left:0;top:100%;min-width:24rem;max-height:40rem;overflow-y:auto;background:Canvas;border:1px solid var(--background2);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:20;") do
+        div(style: "padding:0.5rem;position:sticky;top:0;background:Canvas;border-bottom:1px solid var(--background2);") do
           input(
             type: "text",
             placeholder: "Filter SKUs...",
-            style: "width: 100%;",
+            class: "toolbar-search",
+            style: "width:100%;",
             "x-ref": "skuFilter",
             "x-on:input.debounce.150ms": "filterSkus($event.target.value)"
           )
         end
         div(id: "sku-select-list") do
           skus_by_category.each do |category, category_skus|
-            div(style: "padding: 0.25lh 1ch; color: var(--foreground2); font-weight: bold;") do
+            div(style: "padding:0.4rem 0.75rem;color:GrayText;font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;") do
               plain (category || "uncategorized").to_s.humanize
             end
             category_skus.each do |sku|
               a(
                 href: "#",
-                style: "display: block; padding: 0.25lh 1ch;",
+                class: "sku-pick-item",
                 "data-filter-string": "#{sku.sku} #{sku.name} #{category}",
                 "@click.prevent": add_item_js(sku)
               ) do
                 strong { sku.name }
-                plain " "
-                code { sku.sku }
-                plain sku_description_text(sku)
+                whitespace
+                code(style: "font-size:0.85em;color:GrayText;") { sku.sku }
+                if (desc = sku_description_text(sku)).present?
+                  span(style: "color:GrayText;font-size:0.85em;") { desc }
+                end
               end
             end
           end
@@ -281,7 +278,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
         },
         visibleItems() { return this.items.filter(i => !i._destroy); },
         stockStyle(stock) {
-          if (stock == null) return 'background: var(--background2); color: var(--foreground2);';
+          if (stock == null) return 'background: var(--background2); color: GrayText;';
           if (stock <= 0) return 'background: var(--background1); color: var(--red);';
           if (stock < 10) return 'background: var(--background1); color: var(--yellow);';
           return 'background: var(--background1); color: var(--green);';

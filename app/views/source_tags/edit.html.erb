@@ -1,10 +1,10 @@
 <% content_for :title, "Edit #{@source_tag.name}" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= source_tag_path(@source_tag) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @source_tag.name %></a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= source_tag_path(@source_tag) %>" class="text-muted" style="text-decoration: none;">← <%= @source_tag.name %></a>
     <strong style="font-size: 1.15em;">Edit Source Tag</strong>
-  </row>
+  </div>
 </div>
 
 <div class="show-layout">
@@ -13,10 +13,10 @@
   </div>
 
   <div class="show-sidebar">
-    <div box-="round">
+    <section>
       <strong>Current Values</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Slug</span>
         <code><%= @source_tag.slug %></code>
         <span class="detail-label">Name</span>
@@ -24,6 +24,6 @@
         <span class="detail-label">Owner</span>
         <span><%= @source_tag.owner.presence || "—" %></span>
       </div>
-    </div>
+    </section>
   </div>
 </div>

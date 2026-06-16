@@ -33,17 +33,17 @@ class Views::Letter::Queues::Index < Views::Base
       end
 
       a(href: new_letter_instant_queue_path) do
-        button("variant-": "blue") { "+ Instant Queue" }
+        button(class: "btn-info") { "+ Instant Queue" }
       end
 
       admin_tool do
         button_to mark_printed_instants_mailed_letter_queues_path, method: :post, style: "display: inline;" do
-          button("variant-": "red", "size-": "small") { "Mark printed instants mailed" }
+          button(class: "btn-danger btn-sm") { "Mark printed instants mailed" }
         end
       end
 
       if user_id.present? || queue_type.present?
-        a(href: letter_queues_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
+        a(href: letter_queues_path, style: "color: GrayText; white-space: nowrap;") { "× Clear" }
       end
     end
 
@@ -87,29 +87,29 @@ class Views::Letter::Queues::Index < Views::Base
 
           tr do
             td do
-              a(href: href, style: "text-decoration: none; color: var(--foreground0); font-weight: 500;") { queue.name }
+              a(href: href, style: "text-decoration: none; font-weight: 500;") { queue.name }
             end
             td do
               if is_instant
-                span("is-": "badge", "variant-": "green") { "Instant" }
+                span(class: "badge badge-success") { "Instant" }
               else
-                span("is-": "badge", "variant-": "blue") { "Batch" }
+                span(class: "badge badge-info") { "Batch" }
               end
             end
-            td(style: queued > 0 ? "color: var(--color-blue);" : "color: var(--foreground2);") do
+            td(style: queued > 0 ? "color: var(--blue);" : "color: GrayText;") do
               plain fmt(queued)
             end
-            td(style: printed > 0 ? "color: var(--color-green);" : "color: var(--foreground2);") do
+            td(style: printed > 0 ? "color: var(--green);" : "color: GrayText;") do
               plain fmt(printed)
             end
-            td(style: "color: var(--foreground2);") { plain fmt(mailed) }
+            td(class: "text-muted") { plain fmt(mailed) }
             td { plain fmt(total) }
             td do
               if action > 0
                 label = is_instant ? "#{fmt(action)} awaiting mail" : "#{fmt(action)} queued"
-                span("is-": "badge", "variant-": is_instant ? "green" : "blue") { label }
+                span(class: is_instant ? "badge badge-success" : "badge badge-info") { label }
               else
-                span(style: "color: var(--foreground2);") { "Idle" }
+                span(class: "text-muted") { "Idle" }
               end
             end
           end
@@ -131,13 +131,13 @@ class Views::Letter::Queues::Index < Views::Base
   end
 
   def blankslate
-    div("box-": "round", style: "text-align: center; padding: 2lh 2ch;") do
+    section(style: "text-align: center; padding: 2rem;") do
       h2(style: "margin: 0;") { "No queues found" }
       if queue_type.present? || user_id.present?
-        p(style: "color: var(--foreground2);") { "Try adjusting your filters." }
+        p(class: "text-muted") { "Try adjusting your filters." }
       else
-        p(style: "color: var(--foreground2);") { "Create a queue to get started." }
-        a(href: new_letter_queue_path) { button("variant-": "green") { "New Queue" } }
+        p(class: "text-muted") { "Create a queue to get started." }
+        a(href: new_letter_queue_path) { button(class: "btn-success") { "New Queue" } }
       end
     end
   end

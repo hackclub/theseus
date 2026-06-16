@@ -1,22 +1,22 @@
 <% content_for :title, "#{@payment_account.organization_name} — HCB" %>
 
-<div class="page-toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <row gap-="1" align-="center">
-    <a href="<%= hcb_payment_accounts_path %>" style="text-decoration: none; color: var(--foreground2);">← HCB Accounts</a>
+<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <a href="<%= hcb_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">← HCB Accounts</a>
     <strong style="font-size: 1.15em;"><%= @payment_account.organization_name %></strong>
-  </row>
-  <span class="toolbar-spacer"></span>
+  </div>
+  <span class="spacer"></span>
   <%= form_with url: hcb_payment_account_path(@payment_account), method: :delete, data: { turbo_confirm: "Remove this organization?" }, class: "form-inline" do %>
-    <button type="submit" variant-="red" size-="small">✕ Remove</button>
+    <button type="submit" class="btn-danger btn-sm">✕ Remove</button>
   <% end %>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <div box-="round" style="margin-bottom: 1lh;">
+    <section style="margin-bottom: 1rem;">
       <strong>Organization Details</strong>
-      <div is-="separator"></div>
-      <div class="detail-grid" style="margin-top: 0.5lh;">
+      <hr>
+      <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Organization</span>
         <span><%= @payment_account.organization_name %></span>
         <span class="detail-label">Organization ID</span>
@@ -24,7 +24,7 @@
         <span class="detail-label">Added</span>
         <span><%= @payment_account.created_at.strftime("%b %d, %Y") %></span>
       </div>
-    </div>
+    </section>
   </div>
 
   <div class="show-sidebar">
