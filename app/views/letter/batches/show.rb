@@ -134,35 +134,33 @@ class Views::Letter::Batches::Show < Views::Base
 
   def actions_box
     section(style: "margin-bottom: 1rem;") do
-      strong { "Actions" }
-      hr
-      div(style: "margin-top: 0.5rem;") do
-        if @batch.processed?
-          if @batch.pdf_label.attached?
-            a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", style: "display: block; margin-bottom: 0.5rem;") do
-              button(class: "btn-success", style: "width: 100%;") { "⬇ View Labels PDF" }
-            end
+      if @batch.processed?
+        if @batch.pdf_label.attached?
+          a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", class: "btn-success", style: "display:block;text-align:center;text-decoration:none;margin-bottom:0.75rem;") do
+            plain "⬇ Download Labels"
           end
+        end
 
-          form_with(url: mark_printed_letter_batch_path(@batch), method: :post) do
-            button(type: "submit", style: "width: 100%; margin-bottom: 0.5rem;") { "✓ Mark All Printed" }
+        div(style: "display:flex;flex-direction:column;gap:0.25rem;") do
+          form_with(url: mark_printed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+            button(type: "submit", class: "btn-sm", style: "width:100%;") { "✓ Mark Printed" }
           end
+          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+            button(type: "submit", class: "btn-sm", style: "width:100%;") { "✉ Mark Mailed" }
+          end
+        end
 
-          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post) do
-            button(type: "submit", style: "width: 100%; margin-bottom: 0.5rem;") { "✉ Mark All Mailed" }
-          end
+        hr
+        a(href: regenerate_form_letter_batch_path(@batch), class: "text-muted", style: "font-size:0.85em;") { "⟳ Regenerate labels" }
 
-          a(href: regenerate_form_letter_batch_path(@batch), style: "display: block;") do
-            button(class: "btn-sm", style: "width: 100%;") { "⟳ Regenerate Labels" }
-          end
-        elsif @batch.fields_mapped?
-          a(href: process_confirm_letter_batch_path(@batch), style: "display: block;") do
-            button(class: "btn-success", style: "width: 100%;") { "▶ Process Batch" }
-          end
-        elsif @batch.awaiting_field_mapping?
-          a(href: map_fields_letter_batch_path(@batch), style: "display: block;") do
-            button(class: "btn-success", style: "width: 100%;") { "⇉ Map Fields" }
-          end
+      elsif @batch.fields_mapped?
+        a(href: process_confirm_letter_batch_path(@batch), class: "btn-success", style: "display:block;text-align:center;text-decoration:none;") do
+          plain "▶ Process Batch"
+        end
+
+      elsif @batch.awaiting_field_mapping?
+        a(href: map_fields_letter_batch_path(@batch), class: "btn-success", style: "display:block;text-align:center;text-decoration:none;") do
+          plain "⇉ Map Fields"
         end
       end
     end

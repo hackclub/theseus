@@ -60,7 +60,7 @@ class Views::Letter::Batches::Index < Views::Base
     table do
       thead do
         tr do
-          th { "ID" }
+          th { "Batch" }
           th { "Origin" }
           th { "Letters" }
           th { "Created" }
@@ -78,7 +78,16 @@ class Views::Letter::Batches::Index < Views::Base
   def render_batch_row(batch)
     tr do
       td do
-        a(href: letter_batch_path(batch), style: "text-decoration: none; font-weight: 500;") { "Batch ##{batch.id}" }
+        a(href: letter_batch_path(batch), style: "text-decoration: none; font-weight: 500;") do
+          if batch.user_facing_title.present?
+            plain batch.user_facing_title
+          else
+            plain "##{batch.id}"
+          end
+        end
+        if batch.user_facing_title.present?
+          span(class: "text-muted", style: "margin-left:0.5rem;font-size:0.85em;") { "##{batch.id}" }
+        end
       end
       td(class: "text-muted") { batch.origin || "—" }
       td { format_number(batch.letters.size) }
