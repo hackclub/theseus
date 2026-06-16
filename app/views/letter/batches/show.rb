@@ -52,10 +52,10 @@ class Views::Letter::Batches::Show < Views::Base
             raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
             raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
             div(style: "margin-top: 0.75rem; display: flex; gap: 0.5rem;") do
-              form_with(url: "#", method: :post) do
+              form_with(url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline") do
                 button(type: "submit", class: "btn-warning btn-sm") { "⟳ Retry Failed" }
               end
-              form_with(url: "#", method: :post) do
+              form_with(url: regenerate_labels_letter_batch_path(@batch), method: :post, class: "form-inline") do
                 button(type: "submit", class: "btn-sm") { "⏩ Skip Failed & Regenerate Labels" }
               end
             end
