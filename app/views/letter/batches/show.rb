@@ -3,16 +3,22 @@
 class Views::Letter::Batches::Show < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::NumberToCurrency
+  include Phlex::Rails::Helpers::TurboStreamFrom
 
   def initialize(batch:)
     @batch = batch
   end
 
   def view_template
+    if @batch.purchasing? || @batch.generating_labels?
+      turbo_stream_from(@batch, :progress)
+    end
+
     header_toolbar
     div(class: "show-layout") do
       div(class: "show-main") do
         details_box
+        progress_section if show_progress?
         letters_table if @batch.letters.any?
         addresses_table if @batch.addresses.any?
       end
@@ -24,6 +30,52 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   private
+
+  def show_progress?
+    @batch.purchasing? || @batch.generating_labels? || @batch.processed?
+  end
+
+  def progress_section
+    section(style: "margin-bottom: 1rem;") do
+      strong { "Progress" }
+      hr
+      div(style: "margin-top: 0.5rem;") do
+        if @batch.purchasing? || @batch.generating_labels?
+          unsafe_raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
+          unsafe_raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
+        elsif @batch.processed?
+          failed_letters = @batch.letters.where(indicia_state: "failed")
+          if failed_letters.any?
+            div(style: "margin-bottom: 0.5rem;") do
+              span(class: "text-danger") { "#{failed_letters.count} letter(s) failed indicia purchase" }
+            end
+            unsafe_raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
+            unsafe_raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
+            div(style: "margin-top: 0.75rem; display: flex; gap: 0.5rem;") do
+              form_with(url: "#", method: :post) do
+                button(type: "submit", class: "btn-warning btn-sm") { "⟳ Retry Failed" }
+              end
+              form_with(url: "#", method: :post) do
+                button(type: "submit", class: "btn-sm") { "⏩ Skip Failed & Regenerate Labels" }
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def purchasing_grid_cells
+    @batch.letters.select(:id, :public_id, :indicia_state).map do |letter|
+      state = letter.indicia_state || "pending"
+      icon = case state
+             when "purchased" then "✓"
+             when "failed" then "✗"
+             else ""
+             end
+      { id: letter.id, state: state, title: letter.public_id, icon: icon }
+    end
+  end
 
   def header_toolbar
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do

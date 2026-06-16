@@ -478,9 +478,11 @@ Rails.application.routes.draw do
           post "/process", to: "batches#process_batch", as: :process
           get "/map", to: "batches#map_fields", as: :map_fields
           post "/set_mapping", to: "batches#set_mapping", as: :set_mapping
+          post :import_with_skip
           post :mark_printed
           post :mark_mailed
           post :update_costs
+          post :retry_failed
           get :regen, to: "batches#regenerate_form", as: :regenerate_form
           post :regen, to: "batches#regenerate_labels", as: :regenerate_labels
         end

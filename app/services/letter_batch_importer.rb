@@ -8,12 +8,16 @@ class LetterBatchImporter
     @mapping = batch.field_mapping&.invert || {}
   end
 
-  def call
+  def call(skip_invalid: false)
     raise ArgumentError, "no field mapping" if @mapping.blank?
 
     count = 0
 
     CSV.parse(@batch.csv_data, headers: true).each do |row|
+      if skip_invalid
+        next if validate_row(row).any?
+      end
+
       first_name = get(row, "first_name")
       next if first_name.blank?
 
@@ -42,7 +46,36 @@ class LetterBatchImporter
     count
   end
 
+
+  def validate
+    raise ArgumentError, "no field mapping" if @mapping.blank?
+
+    results = []
+    CSV.parse(@batch.csv_data, headers: true).each_with_index do |row, i|
+      errs = validate_row(row)
+      results << {
+        row: i,
+        status: errs.empty? ? :valid : :error,
+        errors: errs,
+        sample: get(row, "first_name").to_s + " " + get(row, "last_name").to_s,
+      }
+    end
+    results
+  end
+
   private
+
+  def validate_row(row)
+    errs = []
+    errs << "First name blank" if get(row, "first_name").blank?
+    errs << "Address blank" if get(row, "line_1").blank?
+    errs << "City blank" if get(row, "city").blank?
+    errs << "State blank" if get(row, "state").blank?
+    zip = get(row, "postal_code")
+    errs << "ZIP blank" if zip.blank?
+    errs << "ZIP looks invalid (#{zip})" if zip.present? && zip.gsub(/\D/, "").length < 3
+    errs
+  end
 
   # Look up a mapped field from the CSV row. Returns nil if unmapped.
   def get(row, field)

@@ -37,8 +37,15 @@ class Letter::BatchesController < BaseBatchesController
   def set_mapping
     authorize @batch, policy_class: Letter::BatchPolicy
     @batch.update!(field_mapping: params[:field_mapping].to_unsafe_h)
-    count = LetterBatchImporter.new(@batch).call
-    redirect_to process_confirm_letter_batch_path(@batch), notice: "Mapped #{count} letters."
+    importer = LetterBatchImporter.new(@batch)
+    validation = importer.validate
+
+    if validation.any? { |r| r[:status] == :error }
+      render Views::Letter::Batches::Validate.new(batch: @batch, validation: validation)
+    else
+      count = importer.call
+      redirect_to process_confirm_letter_batch_path(@batch), notice: "Imported #{count} letters."
+    end
   rescue => e
     redirect_to map_fields_letter_batch_path(@batch), alert: "Mapping failed: #{e.message}"
   end
@@ -104,59 +111,44 @@ class Letter::BatchesController < BaseBatchesController
 
   def process_batch
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
-    @batch = Batch.find(params[:id])
 
-    if request.post?
-      if letter_batch_params[:letter_mailing_date].blank?
-        redirect_to process_confirm_letter_batch_path(@batch), alert: "Mailing date is required"
+    if letter_batch_params[:letter_mailing_date].blank?
+      redirect_to process_confirm_letter_batch_path(@batch), alert: "Mailing date is required"
+      return
+    end
+
+    # Validate payment accounts if indicia selected
+    if letter_batch_params[:us_postage_type] == "indicia" || letter_batch_params[:intl_postage_type] == "indicia"
+      authorize @batch, :process_batch_with_indicia?, policy_class: Letter::BatchPolicy
+
+      unless USPS::PaymentAccount.exists?(id: letter_batch_params[:usps_payment_account_id])
+        redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select a valid USPS payment account"
         return
       end
 
-      @batch.letter_mailing_date = letter_batch_params[:letter_mailing_date]
-      @batch.save! # Save the mailing date before processing
-
-      non_machinable = ActiveModel::Type::Boolean.new.cast(letter_batch_params[:non_machinable])
-      @batch.letters.update_all(non_machinable: non_machinable)
-
-      # Only require payment account if indicia is selected
-      if letter_batch_params[:us_postage_type] == "indicia" || letter_batch_params[:intl_postage_type] == "indicia"
-        authorize @batch, :process_batch_with_indicia?, policy_class: Letter::BatchPolicy
-
-        payment_account = USPS::PaymentAccount.find_by(id: letter_batch_params[:usps_payment_account_id])
-
-        if payment_account.nil?
-          redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select a valid payment account when using indicia"
-          return
-        end
-
-        hcb_payment_account = current_user.hcb_payment_accounts.find_by(id: letter_batch_params[:hcb_payment_account_id])
-
-        if hcb_payment_account.nil?
-          redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select an HCB payment account to purchase indicia"
-          return
-        end
-      else
-        hcb_payment_account = nil
-      end
-
-      begin
-        @batch.process!(
-          payment_account: payment_account,
-          hcb_payment_account: hcb_payment_account,
-          us_postage_type: letter_batch_params[:us_postage_type],
-          intl_postage_type: letter_batch_params[:intl_postage_type],
-          template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank,
-          user_facing_title: letter_batch_params[:user_facing_title],
-          include_qr_code: letter_batch_params[:include_qr_code],
-        )
-        @batch.mark_processed! if @batch.may_mark_processed?
-
-        redirect_to letter_batch_path(@batch, print_now: letter_batch_params[:print_immediately]), notice: "Batch processed successfully"
-      rescue => e
-        event_id = Sentry.capture_exception(e)&.event_id
-        redirect_to process_confirm_letter_batch_path(@batch), alert: "Failed to process batch: #{e.message} (error: #{event_id})"
+      unless current_user.hcb_payment_accounts.exists?(id: letter_batch_params[:hcb_payment_account_id])
+        redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select an HCB payment account"
+        return
       end
     end
+
+    # Save options and mailing date, then enqueue
+    @batch.update!(
+      letter_mailing_date: letter_batch_params[:letter_mailing_date],
+      process_options: {
+        us_postage_type: letter_batch_params[:us_postage_type],
+        intl_postage_type: letter_batch_params[:intl_postage_type],
+        usps_payment_account_id: letter_batch_params[:usps_payment_account_id],
+        hcb_payment_account_id: letter_batch_params[:hcb_payment_account_id],
+        non_machinable: letter_batch_params[:non_machinable],
+        template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank,
+        user_facing_title: letter_batch_params[:user_facing_title],
+        include_qr_code: letter_batch_params[:include_qr_code],
+      }
+    )
+
+    BatchProcessJob.perform_later(@batch.id)
+    redirect_to letter_batch_path(@batch), notice: "Processing started — watch the grid!"
   end
 
   def mark_printed
@@ -184,6 +176,13 @@ class Letter::BatchesController < BaseBatchesController
     else
       redirect_to letter_batch_path(@batch), alert: "Cannot mark letters as mailed. Batch must be processed."
     end
+  end
+
+  def retry_failed
+    authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    @batch.letters.where(indicia_state: "failed").update_all(indicia_state: nil, indicia_error: nil)
+    BatchProcessJob.perform_later(@batch.id)
+    redirect_to letter_batch_path(@batch), notice: "Retrying failed letters..."
   end
 
   def update_costs
@@ -223,6 +222,12 @@ class Letter::BatchesController < BaseBatchesController
       include_qr_code: letter_batch_params[:include_qr_code],
     )
     redirect_to letter_batch_path(@batch), notice: "Labels regenerated successfully"
+  end
+
+  def import_with_skip
+    authorize @batch, policy_class: Letter::BatchPolicy
+    count = LetterBatchImporter.new(@batch).call(skip_invalid: true)
+    redirect_to process_confirm_letter_batch_path(@batch), notice: "Imported #{count} letters (skipped invalid rows)."
   end
 
   private

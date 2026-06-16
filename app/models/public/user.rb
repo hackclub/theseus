@@ -7,6 +7,11 @@
 #  opted_out_of_map :boolean          default(FALSE)
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  hca_id           :string
+#
+# Indexes
+#
+#  index_public_users_on_hca_id  (hca_id) UNIQUE
 #
 class Public::User < ApplicationRecord
   has_many :login_codes

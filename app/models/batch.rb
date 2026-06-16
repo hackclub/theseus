@@ -12,6 +12,8 @@
 #  letter_return_address_name  :string
 #  letter_weight               :decimal(, )
 #  letter_width                :decimal(, )
+#  process_error               :string
+#  process_options             :jsonb
 #  tags                        :citext           default([]), is an Array
 #  type                        :string           not null
 #  warehouse_user_facing_title :string
@@ -57,14 +59,24 @@ class Batch < ApplicationRecord
   aasm timestamps: true do
     state :awaiting_field_mapping, initial: true
     state :fields_mapped
+    state :purchasing
+    state :generating_labels
     state :processed
 
     event :mark_fields_mapped do
       transitions from: :awaiting_field_mapping, to: :fields_mapped
     end
 
+    event :mark_purchasing do
+      transitions from: :fields_mapped, to: :purchasing
+    end
+
+    event :mark_generating_labels do
+      transitions from: [:fields_mapped, :purchasing], to: :generating_labels
+    end
+
     event :mark_processed do
-      transitions from: :fields_mapped, to: :processed
+      transitions from: [:fields_mapped, :purchasing, :generating_labels], to: :processed
       after do
         User::UpdateTasksJob.perform_later(user)
       end

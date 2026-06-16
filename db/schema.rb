@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_205314) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -73,6 +73,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "may_impersonate"
+    t.boolean "qz_only"
     t.index ["token_bidx"], name: "index_api_keys_on_token_bidx", unique: true
     t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
@@ -99,6 +100,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
     t.bigint "letter_queue_id"
     t.bigint "hcb_payment_account_id"
     t.string "hcb_transfer_id"
+    t.jsonb "process_options"
+    t.string "process_error"
     t.index ["hcb_payment_account_id"], name: "index_batches_on_hcb_payment_account_id"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
     t.index ["letter_queue_id"], name: "index_batches_on_letter_queue_id"
@@ -269,6 +272,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
     t.datetime "expires_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "invalidated_at"
     t.index ["user_id"], name: "index_hcb_oauth_connections_on_user_id"
   end
 
@@ -344,6 +348,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
     t.bigint "letter_queue_id"
     t.string "idempotency_key"
     t.integer "created_via", default: 0, null: false
+    t.string "indicia_state"
+    t.string "indicia_error"
     t.index ["aasm_state"], name: "index_letters_on_aasm_state"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
@@ -393,6 +399,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_192245) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "opted_out_of_map", default: false
+    t.string "hca_id"
+    t.index ["hca_id"], name: "index_public_users_on_hca_id", unique: true
   end
 
   create_table "return_addresses", force: :cascade do |t|

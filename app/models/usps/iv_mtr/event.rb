@@ -15,9 +15,11 @@
 #
 # Indexes
 #
-#  index_usps_iv_mtr_events_on_batch_id      (batch_id)
-#  index_usps_iv_mtr_events_on_letter_id     (letter_id)
-#  index_usps_iv_mtr_events_on_mailer_id_id  (mailer_id_id)
+#  index_usps_iv_mtr_events_on_batch_id                      (batch_id)
+#  index_usps_iv_mtr_events_on_letter_id                     (letter_id)
+#  index_usps_iv_mtr_events_on_mailer_id_id                  (mailer_id_id)
+#  index_usps_iv_mtr_events_on_mailer_id_id_and_happened_at  (mailer_id_id,happened_at)
+#  index_usps_iv_mtr_events_on_mailer_id_id_and_opcode       (mailer_id_id,opcode)
 #
 # Foreign Keys
 #

@@ -467,6 +467,62 @@ $gate-green: #14a314;
   color: inherit;
   &:hover { background: var(--background1); }
 }
+
+// ── Batch grid ─────────────────────────────────────────
+
+.batch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 1.25rem);
+  gap: 2px;
+  margin: 1rem 0;
+}
+
+.batch-cell {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 2px;
+  font-size: 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.batch-cell-pending    { background: var(--background2); color: transparent; }
+.batch-cell-valid      { background: var(--green); color: rgba(255,255,255,0.7); }
+.batch-cell-warning    { background: var(--yellow); color: rgba(0,0,0,0.5); }
+.batch-cell-error      { background: var(--red); color: rgba(255,255,255,0.8); }
+.batch-cell-purchased  { background: var(--green); color: rgba(255,255,255,0.7); }
+.batch-cell-failed     { background: var(--red); color: rgba(255,255,255,0.8); }
+
+.batch-cell-error,
+.batch-cell-failed {
+  cursor: pointer;
+  position: relative;
+}
+
+.batch-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.75rem 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.batch-progress-bar {
+  flex: 1;
+  height: 0.5rem;
+  background: var(--background2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.batch-progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
 // ── Misc ───────────────────────────────────────────────
 
 #confetti { pointer-events: none; }

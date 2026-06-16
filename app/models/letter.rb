@@ -5,11 +5,13 @@
 #  id                  :bigint           not null, primary key
 #  aasm_state          :string
 #  body                :text
-#  created_via         :integer          default(0), not null
+#  created_via         :integer          default("manual"), not null
 #  height              :decimal(, )
 #  idempotency_key     :string
 #  imb_rollover_count  :integer
 #  imb_serial_number   :integer
+#  indicia_error       :string
+#  indicia_state       :string
 #  mailed_at           :datetime
 #  mailing_date        :date
 #  metadata            :jsonb

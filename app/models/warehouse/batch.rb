@@ -12,8 +12,9 @@
 #  letter_return_address_name  :string
 #  letter_weight               :decimal(, )
 #  letter_width                :decimal(, )
+#  process_error               :string
+#  process_options             :jsonb
 #  tags                        :citext           default([]), is an Array
-#  template_cycle              :string           default([]), is an Array
 #  type                        :string           not null
 #  warehouse_user_facing_title :string
 #  created_at                  :datetime         not null

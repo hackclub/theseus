@@ -1,0 +1,27 @@
+<div class="batch-summary" id="batch-summary">
+  <% if defined?(phase) && phase == :purchasing %>
+    <span><strong><%= purchased %></strong> / <%= total %></span>
+    <div class="batch-progress-bar">
+      <div class="batch-progress-fill" style="width: <%= total > 0 ? (purchased * 100.0 / total).round(1) : 0 %>%"></div>
+    </div>
+    <% if failed > 0 %>
+      <span class="text-danger"><%= failed %> failed</span>
+    <% end %>
+  <% elsif defined?(phase) && phase == :generating_labels %>
+    <span>Generating labels…</span>
+  <% elsif defined?(phase) && phase == :done %>
+    <span class="badge badge-success">✓ Done</span>
+  <% else %>
+    <% total_count = batch.letters.count %>
+    <% purchased_count = batch.letters.where(indicia_state: "purchased").count %>
+    <% failed_count = batch.letters.where(indicia_state: "failed").count %>
+    <% pending_count = total_count - purchased_count - failed_count %>
+    <span><strong><%= purchased_count %></strong> purchased</span>
+    <% if failed_count > 0 %>
+      <span class="text-danger"><strong><%= failed_count %></strong> failed</span>
+    <% end %>
+    <% if pending_count > 0 %>
+      <span class="text-muted"><%= pending_count %> pending</span>
+    <% end %>
+  <% end %>
+</div>

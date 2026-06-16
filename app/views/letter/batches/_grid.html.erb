@@ -1,0 +1,10 @@
+<div class="batch-grid" id="batch-grid">
+  <% cells.each do |cell| %>
+    <div
+      id="cell-<%= cell[:id] %>"
+      class="batch-cell batch-cell-<%= cell[:state] %>"
+      <% if cell[:title] %>title="<%= cell[:title] %>"<% end %>
+      <% if cell[:href] %>onclick="window.location='<%= cell[:href] %>'"<% end %>
+    ><%= cell[:icon] %></div>
+  <% end %>
+</div>
