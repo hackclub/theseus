@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Views::Letter::Batches::Map < Views::Base
+  include Phlex::Rails::Helpers::FormWith
+
   ADDRESS_FIELDS = [
     ["", "— skip —"],
     ["first_name", "First Name *"],

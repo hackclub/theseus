@@ -2,9 +2,9 @@ module API
   module V1
     class QZTraysController < ApplicationController
       before_action :set_cors_headers
-      skip_before_action :verify_authenticity_token, only: [:sign]
-      skip_before_action :require_not_qz_only!
-      skip_before_action :authenticate!, only: [:preflight]
+ #     skip_before_action :verify_authenticity_token, only: [:sign]
+  #    skip_before_action :require_not_qz_only!
+   #   skip_before_action :authenticate!, only: [:preflight]
 
       def cert
         send_data QZTrayService.certificate

@@ -1,7 +1,6 @@
 import { mount } from 'svelte';
 import LetterAttributesPicker from '../components/LetterAttributesPicker.svelte';
 import MailScanner from '../components/MailScanner.svelte';
-import BatchCsvMapper from '../components/BatchCsvMapper.svelte';
 import CommandPalette from '../components/CommandPalette.svelte';
 import HintsModal from '../components/HintsModal.svelte';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.svelte';
@@ -9,7 +8,6 @@ import KeyboardShortcuts from '../components/KeyboardShortcuts.svelte';
 const components = {
   'letter-attributes-picker': LetterAttributesPicker,
   'mail-scanner': MailScanner,
-  'batch-csv-mapper': BatchCsvMapper,
   'command-palette': CommandPalette,
   'hints-modal': HintsModal,
   'keyboard-shortcuts': KeyboardShortcuts,

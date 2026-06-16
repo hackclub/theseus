@@ -37,7 +37,7 @@ class Letter::BatchesController < BaseBatchesController
   def set_mapping
     authorize @batch, policy_class: Letter::BatchPolicy
     @batch.update!(field_mapping: params[:field_mapping].to_unsafe_h)
-    count = Letter::BatchImporter.new(@batch).call
+    count = LetterBatchImporter.new(@batch).call
     redirect_to process_confirm_letter_batch_path(@batch), notice: "Mapped #{count} letters."
   rescue => e
     redirect_to map_fields_letter_batch_path(@batch), alert: "Mapping failed: #{e.message}"
