@@ -40,7 +40,7 @@ class Letter::BatchesController < BaseBatchesController
   # GET /letter/batches/:id/processing
   def processing
     authorize @batch, :show?, policy_class: Letter::BatchPolicy
-    @cells = @batch.letters.select(:id, :public_id, :indicia_state, :postage_type).order(:id).map do |letter|
+    @cells = @batch.letters.includes(:address).order(:id).map do |letter|
       state = case letter.indicia_state
               when "purchased" then "purchased"
               when "failed" then "failed"

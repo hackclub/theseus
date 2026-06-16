@@ -23,7 +23,14 @@ class BatchProcessJob < ApplicationJob
       batch.mark_purchasing! if batch.may_mark_purchasing?
       total = batch.letters.where(postage_type: "indicia").count
       broadcast_summary(batch, phase: :purchasing, purchased: 0, total: total, failed: 0)
-      purchase_indicia(batch, options)
+
+      begin
+        purchase_indicia(batch, options)
+      rescue => e
+        batch.update!(process_error: e.message)
+        Sentry.capture_exception(e, tags: { money: true }, extra: { batch_id: batch.id })
+        return # stop — don't generate labels if payment failed
+      end
     end
 
     # Phase 3: generate labels
@@ -71,13 +78,26 @@ class BatchProcessJob < ApplicationJob
       batch.update!(hcb_transfer_id: "mock_#{SecureRandom.hex(4)}")
       nil
     else
+      # Check balance before charging
+      begin
+        org = hcb_account.organization
+        if org.balance_cents < estimated_cents
+          raise "Insufficient HCB balance: #{org.name} has $#{'%.2f' % (org.balance_cents / 100.0)} " \
+                "but postage costs $#{'%.2f' % (estimated_cents / 100.0)}"
+        end
+      rescue => e
+        raise if e.message.include?("Insufficient HCB balance")
+        Rails.logger.warn "[BatchProcessJob] Could not check HCB balance: #{e.message}"
+        # proceed anyway — the transfer itself will fail if insufficient funds
+      end
+
       xfer = HCB::TransferService.new(
         hcb_payment_account: hcb_account,
         amount_cents: estimated_cents,
         name: "Postage for #{batch.public_id}",
         memo: "[theseus] batch postage",
       ).call
-      raise "HCB transfer failed" unless xfer
+      raise "HCB transfer failed: #{xfer.errors.join(', ') if xfer.respond_to?(:errors)}" unless xfer
 
       batch.update!(hcb_payment_account: hcb_account, hcb_transfer_id: xfer.id)
       xfer

@@ -6,6 +6,12 @@
   <%= render Components::Shared::StatusBadge.new(status: @batch.aasm_state, type: :batch) %>
 </div>
 
+<% if @batch.process_error.present? %>
+  <div class="banner banner-error" style="margin-bottom:1rem;">
+    <strong>Error:</strong> <%= @batch.process_error %>
+  </div>
+<% end %>
+
 <%# ── Summary counters ── %>
 <% total = @batch.letters.count %>
 <% purchased = @batch.letters.where(indicia_state: "purchased").count %>
