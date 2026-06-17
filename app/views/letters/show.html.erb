@@ -1,7 +1,7 @@
 <% content_for :title, "#{@letter.user_facing_title || 'Letter'} #{@letter.public_id}" %>
 
 <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:1rem;">
-  <a href="<%= letters_path %>" style="text-decoration:none;color:GrayText;">← Letters</a>
+  <a href="<%= letters_path %>" style="text-decoration:none;color:GrayText;font-size:0.85em;">← Letters</a>
   <h2 style="margin:0;font-size:1.25em;">
     <%= @letter.user_facing_title.presence || @letter.address&.name_line || "Letter" %>
   </h2>
@@ -10,9 +10,6 @@
   <% @letter.tags.compact_blank.each do |tag| %>
     <a href="<%= tag_stats_path(tag) %>" style="text-decoration:none;font-size:0.85em;color:GrayText;">#<%= tag %></a>
   <% end %>
-  <span style="flex:1;"></span>
-  <a href="<%= edit_letter_path(@letter) %>" style="font-size:0.85em;">edit</a>
-  <a href="<%= public_letter_path(@letter) %>" target="_blank" style="font-size:0.85em;">public ↗</a>
 </div>
 
 <div class="show-layout">
@@ -20,126 +17,107 @@
 
     <%# ── Addresses ── %>
     <div style="display:flex;gap:1.5rem;margin-bottom:1.5rem;">
-      <div style="flex:1;font-family:monospace;font-size:0.9em;line-height:1.6;">
-        <span style="color:GrayText;font-family:system-ui;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">From</span><br>
-        <% if @letter.return_address.present? %>
-          <strong><%= @letter.return_address_name_line %></strong><br>
-          <%= @letter.return_address.line_1 %><br>
-          <% if @letter.return_address.line_2.present? %><%= @letter.return_address.line_2 %><br><% end %>
-          <%= @letter.return_address.city %>, <%= @letter.return_address.state %> <%= @letter.return_address.postal_code %><br>
-          <%= @letter.return_address.country %>
-        <% else %>
-          <span style="color:GrayText;">—</span>
-        <% end %>
+      <div style="flex:1;">
+        <span style="color:GrayText;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">From</span>
+        <div style="font-family:monospace;font-size:0.9em;line-height:1.6;margin-top:0.25rem;">
+          <% if @letter.return_address.present? %>
+            <strong><%= @letter.return_address_name_line %></strong><br>
+            <%= @letter.return_address.line_1 %><br>
+            <% if @letter.return_address.line_2.present? %><%= @letter.return_address.line_2 %><br><% end %>
+            <%= @letter.return_address.city %>, <%= @letter.return_address.state %> <%= @letter.return_address.postal_code %>
+          <% else %>
+            <span style="color:GrayText;">—</span>
+          <% end %>
+        </div>
       </div>
-      <div style="flex:1;font-family:monospace;font-size:0.9em;line-height:1.6;">
-        <span style="color:GrayText;font-family:system-ui;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">To</span><br>
-        <strong><%= @letter.address.name_line %></strong><br>
-        <%= @letter.address.line_1 %><br>
-        <% if @letter.address.line_2.present? %><%= @letter.address.line_2 %><br><% end %>
-        <%= @letter.address.city %>, <%= @letter.address.state %> <%= @letter.address.postal_code %><br>
-        <%= @letter.address.country %>
+      <div style="flex:1;">
+        <span style="color:GrayText;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">To</span>
+        <div style="font-family:monospace;font-size:0.9em;line-height:1.6;margin-top:0.25rem;">
+          <strong><%= @letter.address.name_line %></strong><br>
+          <%= @letter.address.line_1 %><br>
+          <% if @letter.address.line_2.present? %><%= @letter.address.line_2 %><br><% end %>
+          <%= @letter.address.city %>, <%= @letter.address.state %> <%= @letter.address.postal_code %>
+        </div>
       </div>
     </div>
+
+    <hr>
 
     <%# ── Specs ── %>
-    <div style="display:flex;gap:3rem;margin-bottom:1.5rem;font-size:0.9em;">
-      <div>
-        <span style="color:GrayText;font-size:0.8em;text-transform:uppercase;letter-spacing:0.05em;">Size</span><br>
-        <code><%= @letter.height %> × <%= @letter.width %> in</code>
-      </div>
-      <div>
-        <span style="color:GrayText;font-size:0.8em;text-transform:uppercase;letter-spacing:0.05em;">Weight</span><br>
-        <code><%= @letter.weight %> oz</code>
-      </div>
-      <div>
-        <span style="color:GrayText;font-size:0.8em;text-transform:uppercase;letter-spacing:0.05em;">Category</span><br>
-        <code><%= @letter.processing_category %></code>
-      </div>
-      <div>
-        <span style="color:GrayText;font-size:0.8em;text-transform:uppercase;letter-spacing:0.05em;">Mailing</span><br>
-        <code><%= @letter.mailing_date&.strftime("%Y-%m-%d") || "—" %></code>
-      </div>
+    <div class="detail-grid" style="margin:1rem 0;">
+      <span class="detail-label">Size</span>
+      <code><%= @letter.height %> × <%= @letter.width %> in, <%= @letter.weight %> oz</code>
+
+      <span class="detail-label">Category</span>
+      <code><%= @letter.processing_category %><%= " · non-machinable" if @letter.non_machinable %></code>
+
+      <span class="detail-label">Mailing date</span>
+      <code><%= @letter.mailing_date&.strftime("%Y-%m-%d") || "—" %></code>
+
+      <span class="detail-label">Created</span>
+      <span><%= @letter.created_at.strftime("%b %-d, %Y %H:%M") %> · <%= @letter.created_via || "manual" %></span>
+
+      <% if @letter.batch.present? %>
+        <span class="detail-label">Batch</span>
+        <span><a href="<%= letter_batch_path(@letter.batch) %>"><%= @letter.batch.user_facing_title || @letter.batch.public_id %></a></span>
+      <% end %>
+
+      <% if @letter.recipient_email.present? %>
+        <span class="detail-label">Email</span>
+        <span><%= @letter.recipient_email %></span>
+      <% end %>
     </div>
 
-    <hr style="margin:0 0 1.5rem;">
+    <hr>
 
     <%# ── Postage ── %>
-    <div style="margin-bottom:1.5rem;">
+    <div style="margin:1rem 0;">
       <% if @letter.postage_type == "indicia" && @letter.usps_indicium.present? %>
-        <div style="display:flex;align-items:baseline;gap:1rem;margin-bottom:0.5rem;">
-          <span style="font-family:monospace;color:var(--green);">[✓] indicia purchased</span>
-          <strong style="font-variant-numeric:tabular-nums;"><%= number_to_currency(@letter.usps_indicium.cost) %></strong>
-          <span style="color:GrayText;font-size:0.85em;">
-            (<%= number_to_currency(@letter.usps_indicium.postage) %> postage
-            <% if @letter.usps_indicium.fees.to_f > 0 %>+ <%= number_to_currency(@letter.usps_indicium.fees) %> fees<% end %>)
+        <div style="display:flex;align-items:baseline;gap:0.75rem;">
+          <span style="font-family:monospace;color:var(--green);">[✓] indicia</span>
+          <strong style="font-size:1.1em;font-variant-numeric:tabular-nums;"><%= number_to_currency(@letter.usps_indicium.cost) %></strong>
+          <span class="text-muted" style="font-size:0.85em;">
+            <%= number_to_currency(@letter.usps_indicium.postage) %> postage<% if @letter.usps_indicium.fees.to_f > 0 %> + <%= number_to_currency(@letter.usps_indicium.fees) %> fees<% end %>
           </span>
         </div>
-        <div style="font-family:monospace;font-size:0.85em;color:GrayText;">
-          sku:<%= @letter.usps_indicium.usps_sku %>
-          mid:<%= @letter.usps_mailer_id&.mid %>
-          date:<%= @letter.usps_indicium.mailing_date %>
-          id:<%= @letter.usps_indicium.public_id %>
+        <div style="font-family:monospace;font-size:0.8em;color:GrayText;margin-top:0.25rem;">
+          <%= @letter.usps_indicium.usps_sku %> · <%= @letter.usps_indicium.mailing_date %> · <%= @letter.usps_indicium.public_id %>
         </div>
-        <% admin_tool do %>
-          <% if @letter.usps_indicium.raw_json_response.nil? %>
-            <div style="margin-top:0.5rem;">
-              <%= form_with url: clear_indicium_letter_path(@letter), method: :post, data: { turbo_confirm: "Destroy orphaned indicium?" }, class: "form-inline" do %>
-                <button type="submit" class="btn-danger btn-sm">✕ clear orphaned indicium</button>
-              <% end %>
-            </div>
-          <% end %>
-        <% end %>
       <% elsif @letter.postage_type == "indicia" %>
-        <span style="font-family:monospace;color:var(--yellow);">[!] indicia not purchased</span>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <span style="font-family:monospace;color:var(--yellow);">[!] indicia not purchased</span>
+          <span class="text-muted">est. <%= number_to_currency(@letter.postage) %></span>
+        </div>
         <% if @letter.batch_id.nil? %>
           <div style="margin-top:0.5rem;">
             <%= render 'buy_indicia_form', letter: @letter %>
           </div>
         <% end %>
       <% elsif @letter.postage_type == "stamps" %>
-        <span style="font-family:monospace;color:GrayText;">[ ] stamps — <%= number_to_currency(@letter.postage) %></span>
+        <span style="font-family:monospace;color:GrayText;">[ ] stamps · <%= number_to_currency(@letter.postage) %></span>
       <% else %>
-        <span style="font-family:monospace;color:GrayText;">[ ] no postage configured</span>
+        <span style="font-family:monospace;color:GrayText;">[ ] no postage</span>
       <% end %>
     </div>
 
     <%# ── Timeline ── %>
-    <div style="font-family:monospace;font-size:0.85em;line-height:2;">
-      <div>
-        <span style="color:GrayText;min-width:8rem;display:inline-block;"><%= @letter.created_at.strftime("%Y-%m-%d %H:%M") %></span>
-        created
-        <span style="color:GrayText;">via <%= @letter.created_via || "manual" %></span>
-        <% if @letter.origin_label.present? %><span style="color:GrayText;">(<%= @letter.origin_label %>)</span><% end %>
+    <% if @letter.printed_at || @letter.mailed_at || @letter.received_at %>
+      <hr>
+      <div style="margin:1rem 0;font-size:0.9em;">
+        <% if @letter.printed_at %>
+          <div><span style="font-family:monospace;color:var(--green);">[✓]</span> Printed <span class="text-muted"><%= @letter.printed_at.strftime("%b %-d, %Y %H:%M") %></span></div>
+        <% end %>
+        <% if @letter.mailed_at %>
+          <div><span style="font-family:monospace;color:var(--green);">[✓]</span> Mailed <span class="text-muted"><%= @letter.mailed_at.strftime("%b %-d, %Y %H:%M") %></span></div>
+        <% end %>
+        <% if @letter.received_at %>
+          <div><span style="font-family:monospace;color:var(--green);">[✓]</span> Received <span class="text-muted"><%= @letter.received_at.strftime("%b %-d, %Y %H:%M") %></span></div>
+        <% end %>
       </div>
-      <% if @letter.batch.present? %>
-        <div>
-          <span style="color:GrayText;min-width:8rem;display:inline-block;"></span>
-          batch <a href="<%= letter_batch_path(@letter.batch) %>"><%= @letter.batch.public_id %></a>
-        </div>
-      <% end %>
-      <% if @letter.printed_at.present? %>
-        <div>
-          <span style="color:GrayText;min-width:8rem;display:inline-block;"><%= @letter.printed_at.strftime("%Y-%m-%d %H:%M") %></span>
-          <span style="color:var(--green);">printed</span>
-        </div>
-      <% end %>
-      <% if @letter.mailed_at.present? %>
-        <div>
-          <span style="color:GrayText;min-width:8rem;display:inline-block;"><%= @letter.mailed_at.strftime("%Y-%m-%d %H:%M") %></span>
-          <span style="color:var(--green);">mailed</span>
-        </div>
-      <% end %>
-      <% if @letter.received_at.present? %>
-        <div>
-          <span style="color:GrayText;min-width:8rem;display:inline-block;"><%= @letter.received_at.strftime("%Y-%m-%d %H:%M") %></span>
-          <span style="color:var(--green);">received</span>
-        </div>
-      <% end %>
-    </div>
+    <% end %>
 
     <% if @letter.label.attached? %>
-      <hr style="margin:1.5rem 0;">
+      <hr>
       <a href="<%= rails_blob_path(@letter.label, disposition: :inline) %>" target="_blank">⬇ Label PDF</a>
     <% end %>
 
@@ -148,18 +126,39 @@
 
   <%# ── Sidebar ── %>
   <div class="show-sidebar">
+    <%# Preview ── %>
     <% if @letter.label.attached? %>
       <div style="margin-bottom:1rem;border:1px solid var(--background2);border-radius:4px;overflow:hidden;">
-        <iframe src="<%= rails_blob_path(@letter.label, disposition: :inline) %>" style="width:100%;height:20rem;border:none;"></iframe>
+        <iframe src="<%= rails_blob_path(@letter.label, disposition: :inline) %>" style="width:100%;height:18rem;border:none;"></iframe>
       </div>
     <% end %>
 
-    <% unless @letter.printed? || @letter.mailed? || @letter.received? %>
-      <div style="display:flex;flex-direction:column;gap:0.25rem;margin-bottom:1rem;">
-        <% if @letter.usps_indicium.nil? && @letter.batch_id.nil? %>
-          <%= form_with url: letter_path(@letter), method: :delete, class: "form-inline" do %>
-            <button type="submit" class="btn-danger btn-sm" style="width:100%;" data-turbo-confirm="Delete this letter?">✕ Delete</button>
+    <%# Actions ── %>
+    <section style="margin-bottom:1rem;">
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        <a href="<%= edit_letter_path(@letter) %>" style="display:block;padding:0.3rem 0.5rem;text-decoration:none;color:inherit;border:1px solid var(--background2);border-radius:4px;text-align:center;">✎ Edit</a>
+
+        <% if @letter.pending? && !@letter.printed? %>
+          <%= form_with url: mark_printed_letter_path(@letter), method: :post, class: "form-inline" do %>
+            <button type="submit" style="width:100%;" class="btn-sm">🖨 Mark Printed</button>
           <% end %>
+        <% end %>
+
+        <% if @letter.printed? || @letter.pending? %>
+          <%= form_with url: mark_mailed_letter_path(@letter), method: :post, class: "form-inline" do %>
+            <button type="submit" style="width:100%;" class="btn-sm">✉ Mark Mailed</button>
+          <% end %>
+        <% end %>
+
+        <a href="<%= public_letter_path(@letter) %>" target="_blank" style="display:block;padding:0.3rem 0.5rem;text-decoration:none;color:GrayText;text-align:center;font-size:0.85em;">Public page ↗</a>
+      </div>
+    </section>
+
+    <%# Danger zone ── %>
+    <% if @letter.pending? && @letter.usps_indicium.nil? && @letter.batch_id.nil? %>
+      <div style="margin-top:1rem;">
+        <%= form_with url: letter_path(@letter), method: :delete, class: "form-inline" do %>
+          <button type="submit" class="btn-danger btn-sm" style="width:100%;" data-turbo-confirm="Delete this letter?">✕ Delete Letter</button>
         <% end %>
       </div>
     <% end %>
