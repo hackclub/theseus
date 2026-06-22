@@ -135,23 +135,61 @@ class Views::Letter::Batches::Show < Views::Base
   def actions_box
     section(style: "margin-bottom: 1rem;") do
       if @batch.processed?
-        if @batch.pdf_label.attached?
-          a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", class: "btn-success", style: "display:block;text-align:center;text-decoration:none;margin-bottom:0.75rem;") do
-            plain "⬇ Download Labels"
+        printed = @batch.letters.where.not(printed_at: nil).count
+        total = @batch.letters.count
+        unprinted = total - printed
+
+        # Print status
+        div(class: "detail-grid", style: "margin-bottom:0.75rem;") do
+          span(class: "detail-label") { "Printed" }
+          span { "#{printed} / #{total}" }
+          if unprinted > 0
+            span(class: "detail-label") { "Remaining" }
+            strong { unprinted.to_s }
           end
         end
 
-        div(style: "display:flex;flex-direction:column;gap:0.25rem;") do
-          form_with(url: mark_printed_letter_batch_path(@batch), method: :post, class: "form-inline") do
-            button(type: "submit", class: "btn-sm", style: "width:100%;") { "✓ Mark Printed" }
+        # Print next N
+        if unprinted > 0
+          div(style: "display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.75rem;") do
+            [100, 500].each do |n|
+              next if n > unprinted
+              form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
+                input(type: "hidden", name: "count", value: n)
+                button(type: "submit", class: "btn-sm") { "🖨 Print #{n}" }
+              end
+            end
+            form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
+              input(type: "hidden", name: "count", value: unprinted)
+              button(type: "submit", class: "btn-success btn-sm") { "🖨 Print all #{unprinted}" }
+            end
           end
-          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
-            button(type: "submit", class: "btn-sm", style: "width:100%;") { "✉ Mark Mailed" }
+
+          # Confirm last print
+          form_with(url: confirm_printed_letter_batch_path(@batch), method: :post, class: "form-inline", style: "margin-bottom:0.75rem;") do
+            button(type: "submit", class: "btn-sm") { "✓ Confirm last print" }
           end
         end
 
         hr
-        a(href: regenerate_form_letter_batch_path(@batch), class: "text-muted", style: "font-size:0.85em;") { "⟳ Regenerate labels" }
+
+        # Secondary actions
+        div(style: "display:flex;flex-direction:column;gap:0.25rem;font-size:0.9em;") do
+          if @batch.pdf_label.attached?
+            a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", style: "text-decoration:none;color:inherit;") { "⬇ Full batch PDF" }
+          end
+          a(href: regenerate_form_letter_batch_path(@batch), style: "text-decoration:none;color:GrayText;") { "⟳ Regenerate labels" }
+
+          if printed > 0
+            hr
+            reprint_warning
+          end
+
+          hr
+          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+            button(type: "submit", class: "btn-sm", style: "width:100%;") { "✉ Mark all mailed" }
+          end
+        end
 
       elsif @batch.fields_mapped?
         a(href: process_confirm_letter_batch_path(@batch), class: "btn-success", style: "display:block;text-align:center;text-decoration:none;") do
@@ -161,6 +199,32 @@ class Views::Letter::Batches::Show < Views::Base
       elsif @batch.awaiting_field_mapping?
         a(href: map_fields_letter_batch_path(@batch), class: "btn-success", style: "display:block;text-align:center;text-decoration:none;") do
           plain "⇉ Map Fields"
+        end
+      end
+    end
+  end
+
+  def reprint_warning
+    details(style: "margin:0.25rem 0;") do
+      summary(style: "color:var(--yellow);font-size:0.85em;cursor:pointer;") { "⚠ Reprint letters…" }
+      div(style: "margin-top:0.5rem;padding:0.75rem;background:var(--error-bg);border:1px solid var(--error-border);border-radius:4px;") do
+        p(style: "margin:0 0 0.5rem;color:var(--error-fg);font-weight:600;") do
+          plain "⚠ REPRINTING INDICIA LABELS CREATES DUPLICATE POSTAGE MARKS"
+        end
+        p(style: "margin:0 0 0.5rem;font-size:0.85em;color:var(--error-fg);") do
+          plain "Each indicia label has a unique tracking number tied to paid postage. "
+          plain "Printing the same label twice and mailing both copies is mail fraud "
+          plain "under 18 U.S.C. § 1341. USPIS investigates duplicate indicia."
+        end
+        p(style: "margin:0 0 0.5rem;font-size:0.85em;color:var(--error-fg);") do
+          strong { "Only reprint if the original was damaged, misprinted, or lost before mailing." }
+        end
+        form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
+          div(style: "display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;") do
+            input(type: "number", name: "count", value: "1", min: "1", max: @batch.letters.count.to_s, style: "width:4rem;")
+            plain " letters from the start"
+            button(type: "submit", class: "btn-sm btn-warning") { "Reprint" }
+          end
         end
       end
     end
@@ -191,6 +255,7 @@ class Views::Letter::Batches::Show < Views::Base
       table do
         thead do
           tr do
+            th { "" }
             th { "ID" }
             th { "Recipient" }
             th { "Postage" }
@@ -198,8 +263,10 @@ class Views::Letter::Batches::Show < Views::Base
           end
         end
         tbody do
-          @batch.letters.includes(:address).limit(100).each do |letter|
+          @batch.letters.includes(:address).order(:id).limit(100).each do |letter|
+            printed = letter.printed_at.present?
             tr do
+              td(style: "font-family:monospace;color:#{printed ? 'var(--green)' : 'var(--background2)'};") { printed ? "[✓]" : "[ ]" }
               td do
                 a(href: letter_path(letter), style: "text-decoration: none;") { letter.public_id }
               end
