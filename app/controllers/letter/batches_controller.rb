@@ -202,6 +202,58 @@ class Letter::BatchesController < BaseBatchesController
     end
   end
 
+  def print_subset
+    authorize @batch, :show?, policy_class: Letter::BatchPolicy
+
+    letters = if params[:letter_ids].present?
+      # Reprint specific letters
+      @batch.letters.where(id: params[:letter_ids])
+    else
+      # Next N unprinted
+      count = (params[:count] || 100).to_i.clamp(1, 5000)
+      @batch.letters.where(printed_at: nil).order(:id).limit(count)
+    end
+
+    if letters.none?
+      redirect_to letter_batch_path(@batch), alert: "No letters to print."
+      return
+    end
+
+    letters = letters.includes(:address, :usps_indicium, :usps_mailer_id, :return_address)
+
+    template_cycle = (@batch.process_options || {})["template_cycle"]
+    template_cycle = [SnailMail::PhlexService.templates_for_size(:standard).first].compact if template_cycle.blank?
+
+    pdf = SnailMail::PhlexService.generate_batch_labels(letters, template_cycle: template_cycle)
+
+    # Store the letter IDs in session so confirm_printed knows what was printed
+    session[:last_print_letter_ids] = letters.pluck(:id)
+    @batch.audit!(:print_subset, count: letters.size, reprint: params[:letter_ids].present?)
+
+    send_data pdf.render,
+      filename: "batch_#{@batch.public_id}_#{letters.size}letters.pdf",
+      type: "application/pdf",
+      disposition: params[:download] ? "attachment" : "inline"
+  end
+
+  def confirm_printed
+    authorize @batch, :mark_printed?, policy_class: Letter::BatchPolicy
+
+    letter_ids = params[:letter_ids] || session.delete(:last_print_letter_ids) || []
+    letters = @batch.letters.where(id: letter_ids)
+    count = 0
+
+    letters.find_each do |letter|
+      if letter.may_mark_printed?
+        letter.mark_printed!
+        count += 1
+      end
+    end
+
+    @batch.audit!(:confirmed_printed, count: count)
+    redirect_to letter_batch_path(@batch), notice: "Marked #{count} letters as printed."
+  end
+
   def retry_failed
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
     @batch.letters.where(indicia_state: "failed").update_all(indicia_state: nil, indicia_error: nil)
