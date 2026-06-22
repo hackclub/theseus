@@ -182,7 +182,18 @@ class Views::Letter::Batches::Show < Views::Base
 
           if printed > 0
             hr
-            reprint_warning
+            has_indicia = @batch.letters.where(postage_type: "indicia").where.not(indicia_state: nil).exists?
+            if has_indicia
+              reprint_warning
+            else
+              # Stamps only — reprint is harmless
+              form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
+                div(style: "display:flex;gap:0.5rem;align-items:center;") do
+                  input(type: "number", name: "count", value: "1", min: "1", max: @batch.letters.count.to_s, style: "width:4rem;")
+                  button(type: "submit", class: "btn-sm") { "🖨 Reprint" }
+                end
+              end
+            end
           end
 
           hr
