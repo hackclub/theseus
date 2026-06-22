@@ -1,8 +1,8 @@
-<div class="batch-grid" id="batch-grid"><% cells.each do |cell|
+<div class="batch-grid" id="batch-grid"<% if defined?(picklist) && picklist %> data-picklist<% end %>><% cells.each do |cell|
   icon = case cell[:state].to_s
          when "valid", "purchased" then "✓"
          when "error", "failed" then "x"
          when "warning" then "!"
          else " "
          end
-%><span id="cell-<%= cell[:id] %>" class="batch-cell batch-cell-<%= cell[:state] %>"<% if cell[:title] %> title="<%= cell[:title] %>"<% end %><% if cell[:href] %> onclick="window.location='<%= cell[:href] %>'"<% end %>>[<%= icon %>]</span><% end %></div>
+%><span id="cell-<%= cell[:id] %>" class="batch-cell batch-cell-<%= cell[:state] %>"<% if cell[:title] %> title="<%= cell[:title] %>"<% end %><% if cell[:letter_id] %> data-letter-id="<%= cell[:letter_id] %>"<% end %>>[<%= icon %>]</span><% end %></div>

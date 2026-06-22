@@ -259,6 +259,10 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def letters_table
+    if @batch.processed?
+      picklist_section
+    end
+
     section(style: "margin-bottom: 1rem;") do
       strong { "Letters" }
       span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{@batch.letters.count})" }
@@ -291,6 +295,46 @@ class Views::Letter::Batches::Show < Views::Base
       if @batch.letters.count > 100
         div(style: "padding: 0.5rem 0;", class: "text-muted") do
           plain "Showing first 100 of #{helpers.number_with_delimiter(@batch.letters.count)} letters"
+        end
+      end
+    end
+  end
+
+  def picklist_section
+    cells = @batch.letters.order(:id).pluck(:id, :public_id, :printed_at, :indicia_state).map do |id, pub_id, printed_at, istate|
+      state = printed_at ? "purchased" : "pending"
+      state = "failed" if istate == "failed"
+      { id: "pick-#{id}", letter_id: id, state: state, title: pub_id }
+    end
+
+    div("data-picklist-container": true, style: "margin-bottom:1.5rem;") do
+      strong { "Select Letters" }
+      span(class: "text-muted", style: "margin-left:0.5rem;font-size:0.85em;") { "click to select, shift-click for range" }
+
+      div(style: "display:flex;gap:0.5rem;align-items:center;margin:0.5rem 0;font-size:0.85em;") do
+        button(type: "button", class: "btn-sm", "data-select-all": true) { "All" }
+        button(type: "button", class: "btn-sm", "data-select-none": true) { "None" }
+        button(type: "button", class: "btn-sm", "data-select-unprinted": true) { "Unprinted" }
+        button(type: "button", class: "btn-sm", "data-select-printed": true) { "Printed" }
+        span(class: "spacer")
+        strong("data-picklist-count": true) { "0" }
+        span(class: "text-muted") { " selected" }
+      end
+
+      raw helpers.render(partial: "letter/batches/grid", locals: { cells: cells, picklist: true })
+
+      div(style: "display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;") do
+        form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
+          input(type: "hidden", name: "letter_ids", "data-picklist-ids": true)
+          button(type: "submit", class: "btn-sm", "data-picklist-action": true, disabled: true) { "🖨 Print" }
+        end
+        form_with(url: confirm_printed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+          input(type: "hidden", name: "letter_ids", "data-picklist-ids": true)
+          button(type: "submit", class: "btn-sm", "data-picklist-action": true, disabled: true) { "✓ Printed" }
+        end
+        form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+          input(type: "hidden", name: "letter_ids", "data-picklist-ids": true)
+          button(type: "submit", class: "btn-sm", "data-picklist-action": true, disabled: true) { "✉ Mailed" }
         end
       end
     end

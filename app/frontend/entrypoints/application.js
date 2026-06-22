@@ -2,6 +2,7 @@ import Alpine from 'alpinejs'
 import '@hotwired/turbo-rails'
 import '~/js/click-to-copy.js'
 import '~/js/mount-svelte.js'
+import '~/js/grid-picklist.js'
 window.Alpine = Alpine
 Alpine.start()
 

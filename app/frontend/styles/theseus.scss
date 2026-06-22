@@ -484,12 +484,16 @@ $gate-green: #14a314;
   white-space: nowrap;
 }
 
+[data-picklist] .batch-cell { cursor: pointer; user-select: none; }
+[data-picklist] .batch-cell:hover { opacity: 0.7; }
+
 .batch-cell-pending    { color: var(--background2); }
 .batch-cell-valid,
 .batch-cell-purchased  { color: var(--green); }
 .batch-cell-warning    { color: var(--yellow); }
 .batch-cell-error,
 .batch-cell-failed     { color: var(--red); font-weight: bold; }
+.batch-cell-selected   { color: var(--blue) !important; font-weight: bold; }
 
 .batch-cell-error,
 .batch-cell-failed     { cursor: pointer; }
