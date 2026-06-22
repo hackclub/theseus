@@ -21,17 +21,46 @@ function initPicklist(grid) {
       const id = cell.dataset.letterId
       cell.classList.toggle('batch-cell-selected', selected.has(id))
     })
-    // Update toolbar count
-    const toolbar = grid.closest('[data-picklist-container]')?.querySelector('[data-picklist-count]')
-    if (toolbar) toolbar.textContent = selected.size
+    const container = grid.closest('[data-picklist-container]')
+    if (!container) return
+
+    // Update count
+    const counter = container.querySelector('[data-picklist-count]')
+    if (counter) counter.textContent = selected.size
 
     // Enable/disable action buttons
-    const actions = grid.closest('[data-picklist-container]')?.querySelectorAll('[data-picklist-action]')
-    actions?.forEach(btn => { btn.disabled = selected.size === 0 })
+    container.querySelectorAll('[data-picklist-action]').forEach(btn => {
+      btn.disabled = selected.size === 0
+    })
 
-    // Update hidden field with selected IDs
-    const hiddenField = grid.closest('[data-picklist-container]')?.querySelector('[data-picklist-ids]')
-    if (hiddenField) hiddenField.value = Array.from(selected).join(',')
+    // Update ALL hidden fields with selected IDs (multiple forms)
+    const ids = Array.from(selected).join(',')
+    container.querySelectorAll('[data-picklist-ids]').forEach(field => {
+      field.value = ids
+    })
+
+    // Update selection preview
+    const preview = container.querySelector('[data-picklist-preview]')
+    if (preview) {
+      if (selected.size === 0) {
+        preview.style.display = 'none'
+        preview.textContent = ''
+      } else {
+        preview.style.display = ''
+        const names = []
+        cells().forEach(cell => {
+          if (selected.has(cell.dataset.letterId)) {
+            names.push(cell.title || cell.dataset.letterId)
+          }
+        })
+        // Show first 20, then "and N more"
+        const shown = names.slice(0, 20)
+        let text = shown.join('\n')
+        if (names.length > 20) text += '\n… and ' + (names.length - 20) + ' more'
+        preview.textContent = text
+        preview.style.whiteSpace = 'pre-line'
+      }
+    }
   }
 
   grid.addEventListener('click', (e) => {

@@ -301,10 +301,16 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def picklist_section
-    cells = @batch.letters.order(:id).pluck(:id, :public_id, :printed_at, :indicia_state).map do |id, pub_id, printed_at, istate|
-      state = printed_at ? "purchased" : "pending"
-      state = "failed" if istate == "failed"
-      { id: "pick-#{id}", letter_id: id, state: state, title: pub_id }
+    rows = @batch.letters.joins(:address).order("letters.id")
+      .pluck("letters.id", "letters.public_id", "letters.printed_at", "letters.indicia_state",
+             "addresses.first_name", "addresses.last_name", "addresses.city", "addresses.state")
+
+    cells = rows.map do |id, pub_id, printed_at, istate, fname, lname, city, state|
+      name = [fname, lname].compact_blank.join(" ")
+      loc = [city, state].compact_blank.join(", ")
+      state_class = printed_at ? "purchased" : "pending"
+      state_class = "failed" if istate == "failed"
+      { id: "pick-#{id}", letter_id: id, state: state_class, title: "#{name} — #{loc} (#{pub_id})" }
     end
 
     div("data-picklist-container": true, style: "margin-bottom:1.5rem;") do
@@ -322,6 +328,10 @@ class Views::Letter::Batches::Show < Views::Base
       end
 
       raw helpers.render(partial: "letter/batches/grid", locals: { cells: cells, picklist: true })
+
+      # Selection preview — shows names of selected letters
+      div("data-picklist-preview": true, style: "margin:0.5rem 0;font-size:0.85em;color:GrayText;max-height:6rem;overflow-y:auto;font-family:monospace;display:none;") do
+      end
 
       div(style: "display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;") do
         form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
