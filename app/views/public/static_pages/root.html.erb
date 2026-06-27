@@ -42,13 +42,18 @@
       <%= w95_title_button_to("Maximize", map_path) %>
     </div>
   </div>
-  <div class="window-body" style="padding: 0">
-    <iframe id="map-iframe" data-src="<%= map_path %>" style="width: 320px; height: 200px; border: none;" title="Letter Tracking Map"></iframe>
+  <div class="window-body" style="padding: 0; text-align: center;">
+    <div id="map-placeholder" style="padding: 16px;">
+      <button id="load-map-btn" onclick="loadMap('<%= map_path %>')">load me!!</button>
+    </div>
+    <iframe id="map-iframe" style="width: 320px; height: 200px; border: none; display: none;" title="Letter Tracking Map"></iframe>
   </div>
 </div>
 <script>
-  window.addEventListener("load", function() {
+  function loadMap(src) {
+    document.getElementById("map-placeholder").style.display = "none";
     var iframe = document.getElementById("map-iframe");
-    if (iframe) iframe.src = iframe.dataset.src;
-  });
+    iframe.src = src;
+    iframe.style.display = "block";
+  }
 </script>
