@@ -57,14 +57,14 @@
       </section>
     <% end %>
 
-    <% if batch.is_a?(Letter::Batch) && batch.labels_pdf.attached? %>
+    <% if batch.is_a?(Letter::Batch) && batch.pdf_label.attached? %>
       <section style="margin-bottom: 1rem;">
         <strong>Labels</strong>
         <hr>
         <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem">
           <span style="color: GrayText;">PDF labels available</span>
           <span class="spacer"></span>
-          <a href="<%= rails_blob_path(batch.labels_pdf, disposition: "attachment") %>" target="_blank"><button class="btn-success btn-sm">↓ Download PDF</button></a>
+          <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>" target="_blank"><button class="btn-success btn-sm">↓ Download PDF</button></a>
         </div>
       </section>
     <% end %>
