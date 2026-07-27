@@ -80,6 +80,6 @@ class ReturnAddressesController < ApplicationController
   end
 
   def return_address_params
-    params.require(:return_address).permit(:name, :line_1, :line_2, :city, :state, :postal_code, :country, :shared, :user_id, :from_letter)
+    params.require(:return_address).permit(:name, :line_1, :line_2, :city, :state, :postal_code, :country, :shared)
   end
 end
