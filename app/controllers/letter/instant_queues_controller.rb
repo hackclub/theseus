@@ -2,15 +2,18 @@ class Letter::InstantQueuesController < Letter::QueuesController
   before_action :set_letter_queue, only: %i[ show edit update destroy ]
 
   def new
+    authorize Letter::Queue
     @letter_queue = Letter::InstantQueue.new
     render Views::Letter::InstantQueues::New.new(queue: @letter_queue)
   end
 
   def edit
+    authorize @letter_queue
     render Views::Letter::InstantQueues::Edit.new(queue: @letter_queue)
   end
 
   def create
+    authorize Letter::Queue
     @letter_queue = Letter::InstantQueue.new(letter_queue_params.merge(user: current_user))
 
     if @letter_queue.save
@@ -21,6 +24,7 @@ class Letter::InstantQueuesController < Letter::QueuesController
   end
 
   def update
+    authorize @letter_queue
     if @letter_queue.update(letter_queue_params)
       redirect_to @letter_queue, notice: "Queue was successfully updated."
     else
@@ -29,6 +33,7 @@ class Letter::InstantQueuesController < Letter::QueuesController
   end
 
   def show
+    authorize @letter_queue
     letter_counts = @letter_queue.letters
                       .group(:aasm_state)
                       .count

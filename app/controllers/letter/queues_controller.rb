@@ -1,6 +1,5 @@
 class Letter::QueuesController < ApplicationController
   before_action :set_letter_queue, only: %i[ show edit update destroy batch ]
-  skip_after_action :verify_authorized
   def index
     authorize Letter::Queue, policy_class: Letter::QueuePolicy
     all_queues = policy_scope(Letter::Queue, policy_scope_class: Letter::QueuePolicy::Scope)
@@ -36,6 +35,7 @@ class Letter::QueuesController < ApplicationController
   end
 
   def show
+    authorize @letter_queue
     letter_counts = @letter_queue.letters
                       .group(:aasm_state)
                       .count
@@ -57,15 +57,18 @@ class Letter::QueuesController < ApplicationController
   end
 
   def new
+    authorize Letter::Queue
     @letter_queue = Letter::Queue.new
     render Views::Letter::Queues::New.new(queue: @letter_queue)
   end
 
   def edit
+    authorize @letter_queue
     render Views::Letter::Queues::Edit.new(queue: @letter_queue)
   end
 
   def create
+    authorize Letter::Queue
     @letter_queue = letter_queue_class.new(letter_queue_params.merge(user: current_user))
 
     if @letter_queue.save
@@ -76,6 +79,7 @@ class Letter::QueuesController < ApplicationController
   end
 
   def update
+    authorize @letter_queue
     if @letter_queue.update(letter_queue_params)
       redirect_to @letter_queue, notice: "Queue was successfully updated."
     else
@@ -84,6 +88,7 @@ class Letter::QueuesController < ApplicationController
   end
 
   def destroy
+    authorize @letter_queue
     @letter_queue.destroy!
     redirect_to letter_queues_path, status: :see_other, notice: "Queue was successfully destroyed."
   end
