@@ -133,6 +133,12 @@ class Letter::Batch < Batch
 
   alias_method :total_cost, :postage_cost
 
+  def actual_spent_cents
+    (letters.where(indicia_state: "purchased")
+      .joins(:usps_indicium)
+      .sum("COALESCE(usps_indicia.postage, 0) + COALESCE(usps_indicia.fees, 0)") * 100).ceil
+  end
+
   def postage_cost_difference(us_postage_type: nil, intl_postage_type: nil, non_machinable: nil)
     # Preload associations to avoid N+1 queries
     letters.includes(:address, :usps_indicium).each_with_object({ us: 0, intl: 0 }) do |letter, differences|
