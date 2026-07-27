@@ -67,47 +67,6 @@ module USPS
         end.sort_by { |s| -s[:count] }
       end
 
-      def find_optimal_stamp_combination(amount)
-        return {} unless amount
-
-        remaining = amount.round(2)
-        all_stamps = (common_stamps + UNCOMMON_STAMPS).sort_by { |s| -s[:value] }
-        memo = {}
-
-        combination = min_stamps(remaining, all_stamps, memo)
-        return nil if combination.nil?
-
-        grouped = combination.group_by { |s| s[:name] }
-        grouped.map do |name, stamps|
-          { name: "#{name} stamp", count: stamps.count, value: stamps.first[:value] }
-        end.sort_by { |s| -s[:count] }
-      end
-
-      private
-
-      def min_stamps(amount, stamps, memo)
-        return [] if amount == 0
-        return nil if amount < 0
-        return memo[amount] if memo.key?(amount)
-
-        best_combination = nil
-        min_count = Float::INFINITY
-
-        stamps.each do |stamp|
-          next if stamp[:value] > amount
-
-          sub = min_stamps((amount - stamp[:value]).round(2), stamps, memo)
-          if sub
-            current = [stamp] + sub
-            if current.size < min_count
-              min_count = current.size
-              best_combination = current
-            end
-          end
-        end
-
-        memo[amount] = best_combination
-      end
     end
   end
 end

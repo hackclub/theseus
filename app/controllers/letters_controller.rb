@@ -198,7 +198,7 @@ class LettersController < ApplicationController
 
     if @letter.mailed? || @letter.received?
       previous_state = @letter.printed_at.present? ? 'printed' : 'pending'
-      @letter.update!(aasm_state: previous_state, mailed_at: nil)
+      @letter.update!(aasm_state: previous_state, mailed_at: nil, received_at: nil)
 
       respond_to do |format|
         format.html { redirect_to @letter, notice: "Letter unmarked as mailed." }

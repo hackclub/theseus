@@ -89,12 +89,6 @@ class Letter::BatchesController < BaseBatchesController
   def update
     authorize @batch, policy_class: Letter::BatchPolicy
     if @batch.update(batch_params)
-      validate_postage_types
-      if @batch.errors.any?
-        render :edit, status: :unprocessable_entity
-        return
-      end
-
       # Update associated letters if the batch hasn't been processed
       if @batch.may_mark_processed?
         @batch.letters.update_all(
@@ -395,18 +389,4 @@ class Letter::BatchesController < BaseBatchesController
     )
   end
 
-  def validate_postage_types
-    return unless @batch.letter_return_address&.us?
-
-    us_postage_type = batch_params[:us_postage_type]
-    intl_postage_type = batch_params[:intl_postage_type]
-
-    if us_postage_type.present? && !%w[stamps indicia].include?(us_postage_type)
-      @batch.errors.add(:us_postage_type, "must be either 'stamps' or 'indicia'")
-    end
-
-    if intl_postage_type.present? && !%w[stamps indicia].include?(intl_postage_type)
-      @batch.errors.add(:intl_postage_type, "must be either 'stamps' or 'indicia'")
-    end
-  end
 end
