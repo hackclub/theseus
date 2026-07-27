@@ -263,7 +263,7 @@ class USPS::APIService
     # @param [Float] length length in inches
     # @param [Float] height height in inches
     # @param [Float] thickness thickness in inches
-    def international_letter_price(processing_category:, weight:, destination_country_code:, length: 6.0, height: 4.0, thickness: 0.25)
+    def international_letter_price(processing_category:, weight:, destination_country_code:, length: 6.0, height: 4.0, thickness: 0.25, non_machinable_indicators: {})
       conn.post("/international-prices/v3/letter-rates/search", {
         weight: weight,
         length: length,
@@ -272,6 +272,7 @@ class USPS::APIService
         processingCategory: processing_category,
         destinationCountryCode: destination_country_code,
         mailingDate: Date.today.to_s,
+        nonMachinableIndicators: non_machinable_indicators.presence,
       }.compact_blank).body
     end
 

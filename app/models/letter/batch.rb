@@ -159,7 +159,7 @@ class Letter::Batch < Batch
 
         # Indicia price is metered_price
         indicia_price = if letter.usps_indicium.present?
-            letter.usps_indicium.postage
+            letter.usps_indicium.cost
           else
             USPS::PricingEngine.metered_price(
               letter.processing_category,
@@ -180,7 +180,7 @@ class Letter::Batch < Batch
         )
 
         indicia_price = if letter.usps_indicium.present?
-            letter.usps_indicium.postage
+            letter.usps_indicium.cost
           else
             USPS::PricingEngine.fcmi_price(letter.processing_category, letter.weight, letter.address.country)
           end

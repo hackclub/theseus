@@ -18,6 +18,7 @@ module USPS
             processing_category: processing_category.to_s.pluralize.upcase,
             weight: weight.to_f,
             destination_country_code: country,
+            non_machinable_indicators: non_machinable ? { isRigid: true } : {},
           )
           extract_price(response)
         end
