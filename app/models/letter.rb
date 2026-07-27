@@ -277,10 +277,8 @@ class Letter < ApplicationRecord
         end
       when "stamps"
         if %i(queued).include?(aasm.current_state)
-          return 0
-        end
-        # For stamps, use stamp price for US and desired price for international
-        if address.us?
+          0
+        elsif address.us?
           USPS::PricingEngine.domestic_stamp_price(
             processing_category,
             weight,
@@ -308,11 +306,10 @@ class Letter < ApplicationRecord
   end
 
   def set_created_via_defaults
-    if letter_queue_id.present? && created_via.blank?
+    if letter_queue_id.present?
       self.created_via = queue.is_a?(Letter::InstantQueue) ? :api : :queue
-    elsif batch_id.present? && created_via.blank?
+    elsif batch_id.present?
       self.created_via = :bulk_upload
     end
-    self.created_via ||= :manual
   end
 end

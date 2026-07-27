@@ -393,10 +393,9 @@ class Warehouse::Order < ApplicationRecord
   end
 
   def set_created_via_defaults
-    if batch_id.present? && created_via.blank?
+    if batch_id.present?
       self.created_via = :bulk_upload
     end
     self.origin_batch_id ||= batch_id if bulk_upload?
-    self.created_via ||= :manual
   end
 end
