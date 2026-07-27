@@ -71,7 +71,8 @@ class USPS::Indicium < ApplicationRecord
 
     self.raw_json_response = response
 
-    meta = response[:indiciaMetadata]
+    meta = response[:indiciaMetadata] || response[:internationalIndiciaMetadata]
+    raise "unexpected USPS response shape: #{response.keys}" unless meta
     self.postage = meta[:postage]
     self.fees = meta[:fees]&.sum { |fee| fee[:price] }
     self.usps_sku = meta[:SKU]
