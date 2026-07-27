@@ -1,8 +1,8 @@
 <%= turbo_stream_from @batch, :progress %>
 
-<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:1rem;">
-  <a href="<%= letter_batch_path(@batch) %>" style="text-decoration:none;color:GrayText;font-size:0.85em;">← <%= @batch.user_facing_title || "Batch ##{@batch.id}" %></a>
-  <h2 style="margin:0;">Processing</h2>
+<div class="batch-header">
+  <a href="<%= letter_batch_path(@batch) %>" class="batch-breadcrumb">← <%= @batch.user_facing_title || "Batch ##{@batch.id}" %></a>
+  <h2>Processing</h2>
   <%= render Components::Shared::StatusBadge.new(status: @batch.aasm_state, type: :batch) %>
 </div>
 
@@ -21,7 +21,7 @@
 <%# ── Breakdown ── %>
 <% us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
 <% intl_count = total - us_count %>
-<div style="display:flex;gap:2rem;margin-bottom:0.75rem;font-size:0.85em;color:GrayText;">
+<div class="batch-breakdown">
   <span>US: <%= us_count %></span>
   <% if intl_count > 0 %><span>Intl: <%= intl_count %></span><% end %>
   <% stamps = @batch.letters.where(postage_type: "stamps").count %>
@@ -37,13 +37,13 @@
 
 <%# ── Error table (turbo appends here) ── %>
 <% failed_letters = @batch.letters.where(indicia_state: "failed").includes(:address) %>
-<div style="margin-top:1.25rem;">
+<div class="batch-failed-section">
   <% if failed_letters.any? %>
-    <strong style="font-size:0.85em;color:GrayText;text-transform:uppercase;letter-spacing:0.04em;">
+    <strong class="section-label">
       <%= failed_letters.count %> failed
     </strong>
   <% end %>
-  <table style="margin-top:0.25rem;<%= 'display:none;' unless failed_letters.any? %>" id="batch-error-table">
+  <table class="<%= 'hidden' unless failed_letters.any? %>" id="batch-error-table">
     <thead>
       <tr><th>Letter</th><th>Recipient</th><th>Error</th></tr>
     </thead>
@@ -60,45 +60,45 @@
   <% charged = @batch.hcb_transfer_amount_cents.to_i %>
   <% spent_cents = @batch.actual_spent_cents %>
   <% overpaid = charged - spent_cents %>
-  <div class="detail-grid" style="margin-top:1rem;font-size:0.9em;">
+  <div class="detail-grid batch-money">
     <span class="detail-label">Charged HCB</span>
     <span>$<%= '%.2f' % (charged / 100.0) %></span>
     <span class="detail-label">USPS spent</span>
     <span>$<%= '%.2f' % (spent_cents / 100.0) %></span>
     <% if overpaid > 0 && @batch.processed? %>
-      <span class="detail-label" style="color:var(--yellow);font-weight:bold;">⚠ Overpaid</span>
+      <strong class="detail-label text-warning">⚠ Overpaid</strong>
       <span>
-        <strong style="color:var(--yellow);">$<%= '%.2f' % (overpaid / 100.0) %></strong>
+        <strong class="text-warning">$<%= '%.2f' % (overpaid / 100.0) %></strong>
         <% if current_user&.admin? %>
-          <%= form_with url: refund_overpayment_letter_batch_path(@batch), method: :post, class: "form-inline", style: "display:inline;margin-left:0.5rem;" do %>
+          <%= form_with url: refund_overpayment_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
             <button type="submit" class="btn-sm btn-warning">Refund $<%= '%.2f' % (overpaid / 100.0) %></button>
           <% end %>
         <% end %>
       </span>
     <% elsif overpaid > 0 %>
       <span class="detail-label">Overpaid (so far)</span>
-      <span style="color:GrayText;">$<%= '%.2f' % (overpaid / 100.0) %></span>
+      <span class="text-muted">$<%= '%.2f' % (overpaid / 100.0) %></span>
     <% end %>
   </div>
 <% end %>
 
 <%# ── Actions (turbo target) ── %>
-<div id="batch-actions" style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--background2);display:flex;gap:0.75rem;align-items:center;">
+<div id="batch-actions" class="batch-actions">
   <% if @batch.processed? %>
     <% if @batch.pdf_label.attached? %>
-      <a href="<%= rails_blob_path(@batch.pdf_label, disposition: :inline) %>" target="_blank" class="btn-success" style="text-decoration:none;">⬇ Download Labels</a>
+      <a href="<%= rails_blob_path(@batch.pdf_label, disposition: :inline) %>" target="_blank" class="btn-success">⬇ Download Labels</a>
     <% end %>
     <% if failed_letters.any? %>
       <%= form_with url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
         <button type="submit" class="btn-warning">⟳ Retry <%= failed_letters.count %> failed</button>
       <% end %>
     <% end %>
-    <a href="<%= letter_batch_path(@batch) %>" style="color:GrayText;">← Back to batch</a>
+    <a href="<%= letter_batch_path(@batch) %>" class="text-muted">← Back to batch</a>
   <% elsif @batch.failed? %>
     <%= form_with url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
       <button type="submit" class="btn-warning">⟳ Retry</button>
     <% end %>
-    <a href="<%= letter_batch_path(@batch) %>" style="color:GrayText;">← Back to batch</a>
+    <a href="<%= letter_batch_path(@batch) %>" class="text-muted">← Back to batch</a>
   <% else %>
     <span class="text-muted">Working…</span>
   <% end %>
@@ -106,16 +106,16 @@
 
 <%# ── Audit trail ── %>
 <% if @batch.audit_log.present? && current_user&.admin? %>
-  <details style="margin-top:1rem;">
-    <summary style="color:GrayText;font-size:0.85em;cursor:pointer;">Audit trail (<%= @batch.audit_log.size %> events)</summary>
-    <table style="margin-top:0.25rem;font-size:0.85em;">
+  <details class="batch-audit">
+    <summary>Audit trail (<%= @batch.audit_log.size %> events)</summary>
+    <table>
       <thead>
-        <tr><th style="width:10rem;">Time</th><th style="width:12rem;">Event</th><th>Details</th></tr>
+        <tr><th>Time</th><th>Event</th><th>Details</th></tr>
       </thead>
       <tbody>
         <% @batch.audit_log.reverse.each do |entry| %>
           <tr>
-            <td class="text-muted" style="font-variant-numeric:tabular-nums;"><%= Time.parse(entry["at"]).strftime("%H:%M:%S") %></td>
+            <td class="text-muted"><%= Time.parse(entry["at"]).strftime("%H:%M:%S") %></td>
             <td><code><%= entry["event"] %></code></td>
             <td class="text-muted"><%= entry.except("at", "event").map { |k, v| "#{k}: #{v}" }.join(", ") %></td>
           </tr>
@@ -129,7 +129,7 @@
   // Show error table when turbo stream appends a row
   document.addEventListener('turbo:before-stream-render', function() {
     var table = document.getElementById('batch-error-table');
-    if (table) table.style.display = '';
+    if (table) table.classList.remove('hidden');
     // Cancel fallback refresh — turbo is working
     if (window._batchRefresh) { clearTimeout(window._batchRefresh); window._batchRefresh = null; }
   });

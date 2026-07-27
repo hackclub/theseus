@@ -176,6 +176,8 @@ input[type=submit], .btn-success { background: var(--green); }
 .btn-warning { background: var(--yellow); color: #333; }
 .btn-info { background: var(--blue); }
 
+a.btn-success, a.btn-danger, a.btn-warning, a.btn-info { text-decoration: none; }
+
 .btn-sm { padding: 0.2rem 0.5rem; font-size: 0.85em; }
 
 
@@ -415,8 +417,10 @@ $gate-green: #14a314;
 
 .text-muted   { color: GrayText; }
 .text-danger  { color: var(--red); }
+.text-warning { color: var(--yellow); }
 .float-right  { float: right; }
 .w-100        { width: 100%; }
+.hidden       { display: none; }
 .form-inline  { display: inline; }
 .page-actions { display: flex; gap: 0.5rem; align-items: center; }
 .pointer      { cursor: pointer; }
@@ -520,6 +524,71 @@ $gate-green: #14a314;
   border-radius: 4px;
   transition: width 0.3s;
 }
+// ── Batch processing ──────────────────────────────────
+
+.batch-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  h2 { margin: 0; }
+}
+
+.batch-breadcrumb {
+  text-decoration: none;
+  color: GrayText;
+  font-size: 0.85em;
+}
+
+.batch-breakdown {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85em;
+  color: GrayText;
+}
+
+.batch-failed-section {
+  margin-top: 1.25rem;
+
+  table { margin-top: 0.25rem; }
+}
+
+.section-label {
+  font-size: 0.85em;
+  color: GrayText;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.batch-money {
+  margin-top: 1rem;
+  font-size: 0.9em;
+
+  .form-inline { margin-left: 0.5rem; }
+}
+
+.batch-actions {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--background2);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.batch-audit {
+  margin-top: 1rem;
+
+  > summary { color: GrayText; font-size: 0.85em; }
+  table { margin-top: 0.25rem; font-size: 0.85em; }
+  th:nth-child(1) { width: 10rem; }
+  th:nth-child(2) { width: 12rem; }
+  td:nth-child(1) { font-variant-numeric: tabular-nums; }
+}
+
+
 // ── Misc ───────────────────────────────────────────────
 
 #confetti { pointer-events: none; }
