@@ -170,9 +170,7 @@ class BatchProcessJob < ApplicationJob
     pool.shutdown
     pool.wait_for_termination
 
-    # NOTE: reconciliation happens in perform after mark_processed,
-    # NOT here. refunding inside purchase_indicia caused a money bug:
-    # failed batch → full refund → retry skips charge → free postage.
+    # overpayment refunds are manual via the refund_overpayment controller action.
   end
 
   def auto_refund_if_nothing_spent(batch, options)

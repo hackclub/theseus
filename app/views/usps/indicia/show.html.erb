@@ -42,12 +42,12 @@
       <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Weight</span>
         <span><%= @usps_indicium.postage_weight %> oz</span>
-        <span class="detail-label">Length</span>
-        <span><%= @usps_indicium.postage_length %>"</span>
-        <span class="detail-label">Height</span>
-        <span><%= @usps_indicium.postage_height %>"</span>
-        <span class="detail-label">Thickness</span>
-        <span><%= @usps_indicium.postage_thickness %>"</span>
+        <% if @usps_indicium.letter %>
+          <span class="detail-label">Length</span>
+          <span><%= @usps_indicium.letter.width %>"</span>
+          <span class="detail-label">Height</span>
+          <span><%= @usps_indicium.letter.height %>"</span>
+        <% end %>
         <span class="detail-label">Non-machinable</span>
         <span><%= @usps_indicium.nonmachinable ? "Yes" : "No" %></span>
       </div>

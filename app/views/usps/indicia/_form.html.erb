@@ -46,20 +46,6 @@
           <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Weight (oz)</label>
           <input type="text" name="usps_indicium[postage_weight]" value="<%= usps_indicium.postage_weight %>" style="width: 100%;">
         </div>
-        <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Length (in)</label>
-          <input type="text" name="usps_indicium[postage_length]" value="<%= usps_indicium.postage_length %>" style="width: 100%;">
-        </div>
-      </div>
-      <div style="display:flex;gap:1rem;margin-top: 1rem;">
-        <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Height (in)</label>
-          <input type="text" name="usps_indicium[postage_height]" value="<%= usps_indicium.postage_height %>" style="width: 100%;">
-        </div>
-        <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Thickness (in)</label>
-          <input type="text" name="usps_indicium[postage_thickness]" value="<%= usps_indicium.postage_thickness %>" style="width: 100%;">
-        </div>
       </div>
       <div style="margin-top: 1rem;">
         <label><input type="checkbox" name="usps_indicium[nonmachinable]" value="1" <%= "checked" if usps_indicium.nonmachinable %>> Non-machinable</label>
@@ -72,7 +58,7 @@
     <hr>
     <div style="margin-top: 0.5rem;">
       <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Raw USPS response</label>
-      <textarea name="usps_indicium[raw_usps_response]" rows="4" style="width: 100%;"><%= usps_indicium.raw_usps_response %></textarea>
+      <textarea name="usps_indicium[raw_json_response]" rows="4" style="width: 100%;"><%= usps_indicium.raw_json_response %></textarea>
     </div>
   </section>
 

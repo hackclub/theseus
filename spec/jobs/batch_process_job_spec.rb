@@ -309,51 +309,6 @@ RSpec.describe BatchProcessJob, type: :job do
     end
   end
 
-  describe "HCB reconciliation" do
-    it "refunds overpayment when actual cost < estimated and difference > $1" do
-      letters = create_letters(3)
-
-      # Letters estimate postage via set_postage; stub buy! to return cheaper actual
-      stub_buy_success(cost: 0.50)
-
-      # The estimated_cents is calculated from letters.sum(&:postage) * 100
-      # After configure_letters sets postage_type to indicia, set_postage fires on save
-      # We need estimated > actual for a refund. Let's set postage high on letters before job runs.
-      # Actually the job calls letters_to_buy.sum(&:postage) after configure_letters.
-      # The set_postage callback sets postage based on USPS::PricingEngine.metered_price.
-      # We'll stub that to return a high estimate.
-      allow(USPS::PricingEngine).to receive(:metered_price).and_return(2.00)
-
-      perform_job
-
-      # estimated = 3 * 2.00 * 100 = 600 cents
-      # actual = 3 * 0.50 * 100 = 150 cents
-      # overpaid = 450 cents > 100 cent threshold → refund
-      expect(HCB::PaymentAccount).to have_received(:refund_to_organization!).with(
-        hash_including(
-          organization_id: hcb_account.organization_id,
-          amount_cents: 450,
-          name: "Adjustment for #{batch.public_id}",
-        ),
-      )
-    end
-
-    it "does NOT refund when overpayment is under $1" do
-      letter = create_letters(1).first
-
-      # Make estimated and actual close enough that overpayment < $1
-      allow(USPS::PricingEngine).to receive(:metered_price).and_return(0.68)
-      stub_buy_success(cost: 0.10)
-
-      perform_job
-
-      # estimated = 0.68 * 100 = 68 cents
-      # actual = 0.10 * 100 = 10 cents
-      # overpaid = 58 cents < 100 cent threshold → no refund
-      expect(HCB::PaymentAccount).not_to have_received(:refund_to_organization!)
-    end
-  end
-
   describe "broadcasting" do
     it "broadcasts cell updates for each letter" do
       letters = create_letters(2)

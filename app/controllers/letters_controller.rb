@@ -319,6 +319,7 @@ class LettersController < ApplicationController
       return
     end
 
+    @letter.update_columns(indicia_state: "purchased")
     redirect_to @letter, notice: "Indicia purchased successfully (charged to #{hcb_payment_account.organization_name})."
   end
 
