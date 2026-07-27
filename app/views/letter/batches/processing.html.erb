@@ -65,16 +65,19 @@
     <span>$<%= '%.2f' % (charged / 100.0) %></span>
     <span class="detail-label">USPS spent</span>
     <span>$<%= '%.2f' % (spent_cents / 100.0) %></span>
-    <% if overpaid > 0 %>
-      <span class="detail-label">Overpaid</span>
-      <span style="color:var(--yellow);">
-        $<%= '%.2f' % (overpaid / 100.0) %>
-        <% if current_user&.admin? && @batch.processed? %>
+    <% if overpaid > 0 && @batch.processed? %>
+      <span class="detail-label" style="color:var(--yellow);font-weight:bold;">⚠ Overpaid</span>
+      <span>
+        <strong style="color:var(--yellow);">$<%= '%.2f' % (overpaid / 100.0) %></strong>
+        <% if current_user&.admin? %>
           <%= form_with url: refund_overpayment_letter_batch_path(@batch), method: :post, class: "form-inline", style: "display:inline;margin-left:0.5rem;" do %>
-            <button type="submit" class="btn-sm btn-warning">Refund</button>
+            <button type="submit" class="btn-sm btn-warning">Refund $<%= '%.2f' % (overpaid / 100.0) %></button>
           <% end %>
         <% end %>
       </span>
+    <% elsif overpaid > 0 %>
+      <span class="detail-label">Overpaid (so far)</span>
+      <span style="color:GrayText;">$<%= '%.2f' % (overpaid / 100.0) %></span>
     <% end %>
   </div>
 <% end %>
