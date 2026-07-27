@@ -97,6 +97,8 @@ class BatchProcessJob < ApplicationJob
         batch.audit!(:hcb_balance_checked, balance_cents: org.balance_cents, estimated_cents: estimated_cents)
       rescue => e
         raise if e.message.include?("Insufficient HCB balance")
+        batch.audit!(:hcb_balance_check_failed, error: e.message)
+        Sentry.capture_exception(e, level: :warning, extra: { batch_id: batch.id })
       end
 
       xfer = HCB::TransferService.new(
@@ -136,10 +138,14 @@ class BatchProcessJob < ApplicationJob
             actual_cents.increment((indicium.cost * 100).ceil)
             purchased_count.increment
             broadcast_cell(batch, letter, "purchased")
-          rescue Faraday::UnauthorizedError, USPS::USPSError => e
-            # Token expired — refresh and retry once
+          rescue Faraday::UnauthorizedError, Faraday::ForbiddenError => e
+            # Token expired — refresh and retry once (double-check to avoid thundering herd)
+            stale_tok = tok
             new_tok = token_lock.synchronize do
-              payment_token = usps_account.create_payment_token
+              if payment_token == stale_tok
+                payment_token = usps_account.create_payment_token
+              end
+              payment_token
             end
             begin
               indicium = buy_indicium(letter, usps_account, hcb_account, batch, new_tok)
