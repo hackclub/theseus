@@ -316,17 +316,14 @@ class Components::Letters::Form < Components::Base
             var returnAddresses = #{address_data.to_json};
 
             function updatePostageOptions() {
-    field_group(label: "Tags") do
-      select(name: "letter[tags][]", multiple: true, style: "width: 100%; min-height: 3rem;") do
-        available_tags.each do |tag|
-          option(value: tag, selected: letter.tags&.include?(tag)) { tag }
-        end
-      end
-      span(style: "display: block; color: GrayText; font-size: 0.85em; margin-top: 0.25rem;") do
-        plain "Select from common tags or create your own"
-      end
-    end
-  end
+              var selectedId = parseInt(returnAddressSelect.value);
+              var address = returnAddresses.find(function(a) { return a.id === selectedId; });
+
+              var existingHidden = postageOptions.querySelector('input[type="hidden"][name="letter[postage_type]"]');
+              if (existingHidden) existingHidden.remove();
+
+              if (address && address.country === 'US') {
+                postageOptions.style.display = '';
                 if (!document.querySelector('input[name="letter[postage_type]"]:checked')) {
                   stampsRadio.checked = true;
                 }
