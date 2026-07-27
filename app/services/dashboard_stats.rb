@@ -20,7 +20,7 @@ class DashboardStats
   end
 
   def open_letter_batches
-    @open_letter_batches ||= Letter::Batch.where(aasm_state: "open").count
+    @open_letter_batches ||= Letter::Batch.where(aasm_state: %w[awaiting_field_mapping fields_mapped]).count
   end
 
   def my_queued_letters

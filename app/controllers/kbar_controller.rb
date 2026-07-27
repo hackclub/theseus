@@ -26,7 +26,7 @@ class KbarController < ApplicationController
     clazz = clazzes.find { |c| c.public_id_prefix == prefix }
     return [] unless clazz
 
-    record = clazz.find_by_public_id(q)
+    record = policy_scope(clazz).find_by_public_id(q)
     return [] unless record
 
     [{ label: record_label(record), sublabel: record.public_id, path: url_for(record) }]
@@ -46,10 +46,11 @@ class KbarController < ApplicationController
   end
 
   def search_letters(q)
+    scope = policy_scope(Letter)
     letters = if q.match?(/\A\d+\z/)
-      Letter.where(id: q).limit(8)
+      scope.where(id: q).limit(8)
     else
-      Letter.search(q).limit(8)
+      scope.search(q).limit(8)
     end
 
     letters.includes(:address, :user).map do |l|
@@ -64,12 +65,13 @@ class KbarController < ApplicationController
   end
 
   def search_orders(q)
+    scope = policy_scope(Warehouse::Order)
     orders = if q.match?(/\A\d+\z/)
-      Warehouse::Order.where(id: q).or(Warehouse::Order.where(hc_id: q)).limit(8)
+      scope.where(id: q).or(scope.where(hc_id: q)).limit(8)
     elsif q.match?(/\A[A-Z0-9]{10,}\z/i)
-      Warehouse::Order.where(tracking_number: q).limit(8)
+      scope.where(tracking_number: q).limit(8)
     else
-      Warehouse::Order.search(q).limit(8)
+      scope.search(q).limit(8)
     end
 
     orders.includes(:address, :user).map do |o|

@@ -116,7 +116,6 @@ class LettersController < ApplicationController
         redirect_to @letter, alert: "Failed to generate label: #{@letter.errors.full_messages.join(", ")}"
       end
     rescue => e
-      raise
       redirect_to @letter, alert: "Error generating label: #{e.message}"
     end
   end

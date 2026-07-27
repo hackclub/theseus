@@ -236,7 +236,7 @@ class Letter::Batch < Batch
   end
 
   def regenerate_labels!(options = {})
-    labels_pdf.purge
+    pdf_label.purge
     generate_labels(options)
   end
 
