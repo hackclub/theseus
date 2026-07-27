@@ -282,7 +282,7 @@ class Letter::BatchesController < BaseBatchesController
 
     @batch.with_lock do
       charged = @batch.hcb_transfer_amount_cents.to_i
-      spent = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil
+      spent = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("COALESCE(usps_indicia.postage, 0) + COALESCE(usps_indicia.fees, 0)") * 100).ceil
       overpaid = charged - spent
 
       if overpaid <= 0

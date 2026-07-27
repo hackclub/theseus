@@ -106,7 +106,7 @@ class Letter::Batch < Batch
       if letter.postage_type == "indicia"
         if letter.usps_indicium.present?
           # Use actual indicia price if indicia are bought
-          letter.usps_indicium.postage + letter.usps_indicium.fees
+          letter.usps_indicium.cost
         elsif letter.address.us?
           USPS::PricingEngine.metered_price(letter.processing_category, letter.weight, effective_non_machinable)
         else

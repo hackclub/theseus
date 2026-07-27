@@ -58,7 +58,7 @@
 <%# ── Money summary ── %>
 <% if @batch.hcb_transfer_id.present? && !@batch.hcb_transfer_id.start_with?("mock") %>
   <% charged = @batch.hcb_transfer_amount_cents.to_i %>
-  <% spent_cents = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil %>
+  <% spent_cents = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("COALESCE(usps_indicia.postage, 0) + COALESCE(usps_indicia.fees, 0)") * 100).ceil %>
   <% overpaid = charged - spent_cents %>
   <div class="detail-grid" style="margin-top:1rem;font-size:0.9em;">
     <span class="detail-label">Charged HCB</span>
