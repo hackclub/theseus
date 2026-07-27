@@ -275,6 +275,47 @@ class USPS::APIService
       }.compact_blank).body
     end
 
+    # buys a piece of international first-class postage!
+    def create_fcmi_indicia(
+      payment_token:,
+      processing_category:,
+      weight:,
+      mailing_date:,
+      destination_country_code:,
+      length:,
+      height:,
+      thickness:,
+      non_machinable_indicators: nil,
+      receipt_option: "NONE",
+      image_type: "SVG",
+      label_type: "2X1.5LABEL"
+    )
+      conn.post(
+        "/international-labels/v3/indicia",
+        {
+          indiciaDescription: {
+            processingCategory: processing_category,
+            weight: weight,
+            mailingDate: mailing_date.to_s,
+            destinationCountryCode: destination_country_code,
+            length: length,
+            height: height,
+            thickness: thickness,
+            nonMachinableIndicators: non_machinable_indicators,
+          }.compact,
+          imageInfo: {
+            receiptOption: receipt_option,
+            imageType: image_type,
+            labelType: label_type,
+          },
+        },
+        {
+          "X-Payment-Authorization-Token" => payment_token,
+          "Accept" => "application/vnd.usps.labels+json",
+        },
+      ).body
+    end
+
     private
 
     def api_host

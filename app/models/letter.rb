@@ -155,15 +155,6 @@ class Letter < ApplicationRecord
     )
   end
 
-  def flirt
-    desired_price = USPS::PricingEngine.fcmi_price(
-      processing_category,
-      weight,
-      address.country
-    )
-    USPS::FLIRTEngine.closest_us_price(desired_price)
-  end
-
   def self.find_by_imb_sn(imb_sn, mailer_id = nil)
     query = where(imb_serial_number: imb_sn.to_i)
     query = query.where(usps_mailer_id: mailer_id) if mailer_id
@@ -278,23 +269,11 @@ class Letter < ApplicationRecord
     self.postage = case postage_type
       when "indicia"
         if usps_indicium.present?
-          # Use actual indicia price if indicia are bought
           usps_indicium.cost
         elsif address.us?
-          # For US mail without bought indicia, use metered price
-          USPS::PricingEngine.metered_price(
-            processing_category,
-            weight,
-            non_machinable
-          )
+          USPS::PricingEngine.metered_price(processing_category, weight, non_machinable)
         else
-          # For international mail without bought indicia, use FLIRT-ed price
-          flirted = flirt
-          USPS::PricingEngine.metered_price(
-            flirted[:processing_category],
-            flirted[:weight],
-            flirted[:non_machinable]
-          )
+          USPS::PricingEngine.fcmi_price(processing_category, weight, address.country, non_machinable)
         end
       when "stamps"
         if %i(queued).include?(aasm.current_state)

@@ -108,20 +108,9 @@ class Letter::Batch < Batch
           # Use actual indicia price if indicia are bought
           letter.usps_indicium.postage + letter.usps_indicium.fees
         elsif letter.address.us?
-          # For US mail without bought indicia, use metered price
-          USPS::PricingEngine.metered_price(
-            letter.processing_category,
-            letter.weight,
-            effective_non_machinable
-          )
+          USPS::PricingEngine.metered_price(letter.processing_category, letter.weight, effective_non_machinable)
         else
-          # For international mail without bought indicia, use FLIRT-ed price
-          flirted = letter.flirt
-          USPS::PricingEngine.metered_price(
-            flirted[:processing_category],
-            flirted[:weight],
-            flirted[:non_machinable]
-          )
+          USPS::PricingEngine.fcmi_price(letter.processing_category, letter.weight, letter.address.country, effective_non_machinable)
         end
       else
         # For stamps, use stamp price for US and desired price for international
@@ -190,20 +179,12 @@ class Letter::Batch < Batch
           letter.address.country
         )
 
-        # Indicia price is flirted price (higher than retail)
         indicia_price = if letter.usps_indicium.present?
             letter.usps_indicium.postage
           else
-            # Use flirt to get the closest US price that's higher than the FCMI rate
-            flirted = letter.flirt
-            USPS::PricingEngine.metered_price(
-              flirted[:processing_category],
-              flirted[:weight],
-              flirted[:non_machinable]
-            )
+            USPS::PricingEngine.fcmi_price(letter.processing_category, letter.weight, letter.address.country)
           end
 
-        # Difference should be positive (additional cost)
         differences[:intl] += indicia_price - retail_price
       end
     end

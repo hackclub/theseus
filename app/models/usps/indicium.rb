@@ -47,36 +47,27 @@ class USPS::Indicium < ApplicationRecord
   def buy!(payment_token = nil)
     raise ArgumentError, "for what?" unless letter
     payment_token ||= payment_account.create_payment_token
-    indicium_opts = if letter.address.us?
-      {
-        processing_category: usps_proc_cat(letter.processing_category),
-        weight: letter.weight.to_f,
-        mailing_date: letter.mailing_date,
-        length: letter.width.to_f,
-        height: letter.height.to_f,
-        thickness: 0.1,
-        non_machinable_indicators: letter.non_machinable? ? { isRigid: true } : nil,
-      }
-    else
-      self.flirted = true
-      attrs = letter.flirt
 
-      {
-        processing_category: usps_proc_cat(attrs[:processing_category]),
-        weight: attrs[:weight],
-        non_machinable_indicators: attrs[:non_machinable] ? { isRigid: true } : nil,
-        length: 7,
-        height: 5,
-        thickness: 0.1,
-      }
-    end.compact
-
-    response = USPS::APIService.create_fcm_indicia(
+    common_opts = {
       payment_token:,
+      processing_category: usps_proc_cat(letter.processing_category),
+      weight: letter.weight.to_f,
       mailing_date: letter.mailing_date,
+      length: letter.width.to_f,
+      height: letter.height.to_f,
+      thickness: 0.1,
+      non_machinable_indicators: letter.non_machinable? ? { isRigid: true } : nil,
       image_type: "SVG",
-      **indicium_opts,
-    )
+    }.compact
+
+    response = if letter.address.us?
+      USPS::APIService.create_fcm_indicia(**common_opts)
+    else
+      USPS::APIService.create_fcmi_indicia(
+        destination_country_code: letter.address.country,
+        **common_opts,
+      )
+    end
 
     self.raw_json_response = response
 
