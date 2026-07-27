@@ -256,14 +256,21 @@ class Letter::BatchesController < BaseBatchesController
 
   def retry_failed
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
-    @batch.letters.where(indicia_state: "failed").update_all(indicia_state: nil, indicia_error: nil)
-    @batch.update!(process_error: nil)
 
-    # Fix empty template_cycle if that's what caused the failure
-    opts = @batch.process_options || {}
-    if opts["template_cycle"].blank?
-      opts["template_cycle"] = [SnailMail::PhlexService.templates_for_size(:standard).first].compact
-      @batch.update!(process_options: opts)
+    unless @batch.failed?
+      redirect_to processing_letter_batch_path(@batch), alert: "Batch is not in a failed state."
+      return
+    end
+
+    @batch.with_lock do
+      @batch.letters.where(indicia_state: "failed").update_all(indicia_state: nil, indicia_error: nil)
+      @batch.update!(process_error: nil)
+
+      opts = @batch.process_options || {}
+      if opts["template_cycle"].blank?
+        opts["template_cycle"] = [SnailMail::PhlexService.templates_for_size(:standard).first].compact
+        @batch.update!(process_options: opts)
+      end
     end
 
     BatchProcessJob.perform_later(@batch.id)
@@ -272,25 +279,29 @@ class Letter::BatchesController < BaseBatchesController
 
   def refund_overpayment
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
-    charged = @batch.hcb_transfer_amount_cents.to_i
-    spent = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil
-    overpaid = charged - spent
 
-    if overpaid <= 0
-      redirect_to processing_letter_batch_path(@batch), alert: "Nothing to refund."
-      return
+    @batch.with_lock do
+      charged = @batch.hcb_transfer_amount_cents.to_i
+      spent = (@batch.letters.where(indicia_state: "purchased").joins(:usps_indicium).sum("usps_indicia.cost") * 100).ceil
+      overpaid = charged - spent
+
+      if overpaid <= 0
+        redirect_to processing_letter_batch_path(@batch), alert: "Nothing to refund."
+        return
+      end
+
+      hcb_account = @batch.hcb_payment_account
+      HCB::PaymentAccount.refund_to_organization!(
+        organization_id: hcb_account.organization_id,
+        amount_cents: overpaid,
+        name: "Refund for #{@batch.public_id}",
+        memo: "[theseus] overpayment refund",
+      )
+      @batch.update_columns(hcb_transfer_amount_cents: spent)
+      @batch.audit!(:hcb_refunded, amount_cents: overpaid, admin: current_user.email)
+
+      redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % (overpaid / 100.0)}"
     end
-
-    hcb_account = @batch.hcb_payment_account
-    HCB::PaymentAccount.refund_to_organization!(
-      organization_id: hcb_account.organization_id,
-      amount_cents: overpaid,
-      name: "Refund for #{@batch.public_id}",
-      memo: "[theseus] overpayment refund",
-    )
-    @batch.audit!(:hcb_refunded, amount_cents: overpaid, admin: current_user.email)
-
-    redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % (overpaid / 100.0)}"
   rescue => e
     redirect_to processing_letter_batch_path(@batch), alert: "Refund failed: #{e.message}"
   end

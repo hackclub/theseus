@@ -107,7 +107,13 @@ class BatchProcessJob < ApplicationJob
       ).call
       raise "HCB transfer failed" unless xfer
 
-      batch.update_columns(hcb_payment_account_id: hcb_account.id, hcb_transfer_id: xfer.id, hcb_transfer_amount_cents: estimated_cents)
+      begin
+        batch.update_columns(hcb_payment_account_id: hcb_account.id, hcb_transfer_id: xfer.id, hcb_transfer_amount_cents: estimated_cents)
+      rescue => db_err
+        Sentry.capture_exception(db_err, level: :fatal, tags: { money: true, orphaned_charge: true },
+          extra: { batch_id: batch.id, transfer_id: xfer.id, amount_cents: estimated_cents })
+        raise "HCB charge succeeded (transfer #{xfer.id}) but DB update failed: #{db_err.message}"
+      end
       batch.audit!(:hcb_charged, amount_cents: estimated_cents, transfer_id: xfer.id)
       xfer
     end
