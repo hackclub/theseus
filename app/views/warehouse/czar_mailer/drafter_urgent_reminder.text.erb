@@ -1,0 +1,9 @@
+hey <%= @user.username %>, you have <%= @purchase_orders.size %> purchase order<%= @purchase_orders.size == 1 ? '' : 's' %> approaching their due date that haven't been submitted yet!
+
+<ul>
+<% @purchase_orders.each do |po| -%>
+  <li><%= link_to "PO ##{po.id}", warehouse_purchase_order_url(po) %> — <%= po.supplier_name %> — due <%= po.required_by_date.strftime("%b %d, %Y") %></li>
+<% end -%>
+</ul>
+
+submit them for approval so the warehouse knows what's coming!

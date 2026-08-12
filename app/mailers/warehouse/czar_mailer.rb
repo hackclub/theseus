@@ -62,6 +62,28 @@ class Warehouse::CzarMailer < GenericTextMailer
     mail(to: purchase_order.user.email)
   end
 
+  # Daily digest for czars — stale, blocked, urgent items
+  def digest(stale_sku_requests:, stale_pos:, blocked_pos:, urgent_pos:)
+    @stale_sku_requests = stale_sku_requests
+    @stale_pos = stale_pos
+    @blocked_pos = blocked_pos
+    @urgent_pos = urgent_pos
+    @subject = "[theseus] [warehouse] daily approval digest"
+    czar_emails.each do |email|
+      @recipient = email
+      mail(to: email)
+    end
+  end
+
+  # Nudge drafter about their own POs approaching required_by_date
+  def drafter_urgent_reminder(user:, purchase_orders:)
+    @user = user
+    @purchase_orders = purchase_orders
+    @subject = "[theseus] [warehouse] #{purchase_orders.size} PO#{purchase_orders.size == 1 ? '' : 's'} approaching due date"
+    @recipient = user.email
+    mail(to: user.email)
+  end
+
   private
 
   def czar_emails

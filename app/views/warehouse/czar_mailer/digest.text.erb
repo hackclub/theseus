@@ -1,0 +1,39 @@
+warehouse approval digest for <%= Date.today.strftime("%b %d, %Y") %>
+
+<% if @urgent_pos.any? %>
+<b>⚠ URGENT — approaching due date (<%= @urgent_pos.size %>)</b>
+<ul>
+<% @urgent_pos.each do |po| -%>
+  <li><%= link_to "PO ##{po.id}", warehouse_purchase_order_url(po) %> — <%= po.supplier_name %> — due <%= po.required_by_date.strftime("%b %d") %> — status: <%= po.humanized_state %></li>
+<% end -%>
+</ul>
+<% end %>
+
+<% if @stale_sku_requests.any? %>
+<b>stale SKU requests (waiting > 2 days) — <%= @stale_sku_requests.size %></b>
+<ul>
+<% @stale_sku_requests.each do |req| -%>
+  <li><%= link_to req.name, warehouse_sku_request_url(req) %> — from <%= req.user.username %> — submitted <%= time_ago_in_words(req.submitted_at) %> ago</li>
+<% end -%>
+</ul>
+<% end %>
+
+<% if @stale_pos.any? %>
+<b>stale POs (waiting > 2 days) — <%= @stale_pos.size %></b>
+<ul>
+<% @stale_pos.each do |po| -%>
+  <li><%= link_to "PO ##{po.id}", warehouse_purchase_order_url(po) %> — <%= po.supplier_name %> — submitted <%= time_ago_in_words(po.submitted_at) %> ago</li>
+<% end -%>
+</ul>
+<% end %>
+
+<% if @blocked_pos.any? %>
+<b>approved but blocked on SKUs — <%= @blocked_pos.size %></b>
+<ul>
+<% @blocked_pos.each do |po| -%>
+  <li><%= link_to "PO ##{po.id}", warehouse_purchase_order_url(po) %> — waiting on: <%= po.unresolved_sku_requests.map(&:name).join(", ") %></li>
+<% end -%>
+</ul>
+<% end %>
+
+<%= link_to "open approval queue →", warehouse_approvals_url %>

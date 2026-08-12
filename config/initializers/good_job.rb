@@ -48,5 +48,9 @@ Rails.application.configure do
       cron: "*/15 * * * *",
       class: "Warehouse::SyncPurchaseOrdersJob",
     },
+    czar_digest: {
+      cron: "0 14 * * 1-5",  # 14:00 UTC = 9am EST, weekdays only
+      class: "Warehouse::CzarDigestJob",
+    },
   }
 end
