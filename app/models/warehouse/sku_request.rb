@@ -54,9 +54,14 @@ class Warehouse::SKURequest < ApplicationRecord
   has_one_attached :image
 
   validates :name, presence: true
-  validates :unit_cost, presence: true, numericality: { greater_than: 0 }
+  validates :description, presence: true
   validates :category, presence: true, inclusion: { in: Warehouse::SKU.categories.keys }
-  validates :expected_quantity, numericality: { greater_than: 0 }, allow_nil: true
+  validates :unit_cost, presence: true, numericality: { greater_than: 0 }
+  validates :country_of_origin, presence: true
+  validates :expected_arrival, presence: true
+  validates :expected_quantity, presence: true, numericality: { greater_than: 0 }
+  validates :program, presence: true
+  validate :image_must_be_attached
   validates :assigned_sku_code, presence: true, if: -> { approved? || synced? }
 
   CATEGORY_PREFIXES = {
@@ -169,6 +174,12 @@ class Warehouse::SKURequest < ApplicationRecord
       next unless po.may_revise?
       po.revise!
       Warehouse::CzarMailer.po_auto_returned(po, self).deliver_later
+    end
+  end
+
+  def image_must_be_attached
+    unless image.attached?
+      errors.add(:image, "must be uploaded — Zenventory needs a photo of the item")
     end
   end
 end
