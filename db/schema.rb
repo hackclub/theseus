@@ -352,7 +352,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_233530) do
     t.integer "created_via", default: 0, null: false
     t.string "indicia_state"
     t.string "indicia_error"
-    t.index ["aasm_state"], name: "index_letters_on_aasm_state"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
     t.index ["created_via"], name: "index_letters_on_created_via"

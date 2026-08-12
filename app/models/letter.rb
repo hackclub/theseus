@@ -39,7 +39,6 @@
 #
 # Indexes
 #
-#  index_letters_on_aasm_state         (aasm_state)
 #  index_letters_on_address_id         (address_id)
 #  index_letters_on_batch_id           (batch_id)
 #  index_letters_on_created_via        (created_via)
