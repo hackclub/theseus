@@ -32,8 +32,8 @@ module Admin
 
     def user_params
       params.require(:user).permit(
-        :username, :email, :is_admin, :can_use_indicia, :can_warehouse,
-        :can_impersonate_public, :slack_id, :hca_id, :icon_url,
+        :username, :email, :is_admin, :is_warehouse_czar, :can_use_indicia,
+        :can_warehouse, :can_impersonate_public, :slack_id, :hca_id, :icon_url,
         :home_mid_id, :home_return_address_id
       )
     end

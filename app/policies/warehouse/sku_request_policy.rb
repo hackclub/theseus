@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Warehouse::PurchaseOrderPolicy < ApplicationPolicy
+class Warehouse::SKURequestPolicy < ApplicationPolicy
   def index?
     user_can_warehouse
   end
@@ -25,10 +25,6 @@ class Warehouse::PurchaseOrderPolicy < ApplicationPolicy
     edit?
   end
 
-  def destroy?
-    (record_belongs_to_user || user_is_admin) && record.draft?
-  end
-
   def submit?
     record_belongs_to_user && record.draft?
   end
@@ -39,14 +35,6 @@ class Warehouse::PurchaseOrderPolicy < ApplicationPolicy
 
   def reject?
     user.warehouse_czar? && record.submitted?
-  end
-
-  def send_to_zenventory?
-    user.warehouse_czar? && record.approved? && record.all_skus_resolved?
-  end
-
-  def sync?
-    user_is_admin && record.zenventory_id.present?
   end
 
   class Scope < ApplicationPolicy::Scope

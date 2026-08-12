@@ -446,6 +446,7 @@ Rails.application.routes.draw do
         get :badge
         post :refresh
       end
+      resource :settings, only: %i[show update]
     end
     get "/tags", to: "tags#index"
     get "/tags/:id", to: "tags#show", as: :tag_stats
@@ -550,8 +551,18 @@ Rails.application.routes.draw do
       end
       resources :purchase_orders do
         member do
+          post :submit_for_approval
+          post :approve
+          post :reject
           post :send_to_zenventory
           post :sync
+        end
+      end
+      resources :sku_requests do
+        member do
+          post :submit
+          post :approve
+          post :reject
         end
       end
       resources :batches do

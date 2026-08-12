@@ -9,6 +9,8 @@
 #  email                  :string
 #  icon_url               :string
 #  is_admin               :boolean
+#  is_warehouse_czar      :boolean          default(FALSE), not null
+#  settings               :jsonb            not null
 #  username               :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
@@ -46,12 +48,20 @@ class User < ApplicationRecord
   set_public_id_prefix "usr"
 
   def admin? = is_admin
-
+  def warehouse_czar? = is_warehouse_czar
   def can_use_indicia? = can_use_indicia
 
   def hcb_connected? = hcb_oauth_connection.present? && !hcb_oauth_connection.invalidated?
 
   def hcb_connection_invalidated? = hcb_oauth_connection&.invalidated? || false
+
+  def setting(key)
+    settings&.dig(key.to_s)
+  end
+
+  def update_setting(key, value)
+    update!(settings: (settings || {}).merge(key.to_s => value))
+  end
 
   def make_admin! = update!(is_admin: true)
 

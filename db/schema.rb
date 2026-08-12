@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_16_233530) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_12_194305) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -441,6 +441,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_233530) do
     t.bigint "home_return_address_id", default: 1, null: false
     t.string "hca_id"
     t.boolean "can_use_indicia", default: false, null: false
+    t.boolean "is_warehouse_czar", default: false, null: false
+    t.jsonb "settings", default: {}, null: false
     t.index ["hca_id"], name: "index_users_on_hca_id", unique: true
     t.index ["home_mid_id"], name: "index_users_on_home_mid_id"
     t.index ["home_return_address_id"], name: "index_users_on_home_return_address_id"
@@ -588,13 +590,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_233530) do
 
   create_table "warehouse_purchase_order_line_items", force: :cascade do |t|
     t.bigint "purchase_order_id", null: false
-    t.bigint "sku_id", null: false
+    t.bigint "sku_id"
     t.integer "quantity", null: false
     t.decimal "unit_cost", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "sku_request_id"
     t.index ["purchase_order_id"], name: "index_warehouse_purchase_order_line_items_on_purchase_order_id"
     t.index ["sku_id"], name: "index_warehouse_purchase_order_line_items_on_sku_id"
+    t.index ["sku_request_id"], name: "index_warehouse_purchase_order_line_items_on_sku_request_id"
   end
 
   create_table "warehouse_purchase_orders", force: :cascade do |t|
@@ -608,7 +612,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_233530) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "reviewed_by_id"
+    t.datetime "submitted_at"
+    t.datetime "reviewed_at"
+    t.text "rejection_reason"
     t.index ["order_number"], name: "index_warehouse_purchase_orders_on_order_number"
+    t.index ["reviewed_by_id"], name: "index_warehouse_purchase_orders_on_reviewed_by_id"
     t.index ["user_id"], name: "index_warehouse_purchase_orders_on_user_id"
     t.index ["zenventory_id"], name: "index_warehouse_purchase_orders_on_zenventory_id", unique: true
   end
@@ -620,6 +629,34 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_233530) do
     t.datetime "updated_at", null: false
     t.integer "sequence_number"
     t.index ["code"], name: "index_warehouse_purpose_codes_on_code"
+  end
+
+  create_table "warehouse_sku_requests", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "reviewed_by_id"
+    t.bigint "warehouse_sku_id"
+    t.string "name", null: false
+    t.text "description"
+    t.string "category"
+    t.decimal "unit_cost", precision: 10, scale: 2
+    t.string "country_of_origin"
+    t.string "hs_code"
+    t.text "customs_description"
+    t.string "program"
+    t.date "expected_arrival"
+    t.integer "expected_quantity"
+    t.string "suggested_sku_code"
+    t.string "assigned_sku_code"
+    t.string "aasm_state", default: "draft", null: false
+    t.text "rejection_reason"
+    t.datetime "submitted_at"
+    t.datetime "reviewed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["aasm_state"], name: "index_warehouse_sku_requests_on_aasm_state"
+    t.index ["reviewed_by_id"], name: "index_warehouse_sku_requests_on_reviewed_by_id"
+    t.index ["user_id"], name: "index_warehouse_sku_requests_on_user_id"
+    t.index ["warehouse_sku_id"], name: "index_warehouse_sku_requests_on_warehouse_sku_id"
   end
 
   create_table "warehouse_skus", force: :cascade do |t|
@@ -701,8 +738,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_233530) do
   add_foreign_key "warehouse_orders", "users"
   add_foreign_key "warehouse_orders", "warehouse_templates", column: "template_id"
   add_foreign_key "warehouse_purchase_order_line_items", "warehouse_purchase_orders", column: "purchase_order_id"
+  add_foreign_key "warehouse_purchase_order_line_items", "warehouse_sku_requests", column: "sku_request_id"
   add_foreign_key "warehouse_purchase_order_line_items", "warehouse_skus", column: "sku_id"
   add_foreign_key "warehouse_purchase_orders", "users"
+  add_foreign_key "warehouse_purchase_orders", "users", column: "reviewed_by_id"
+  add_foreign_key "warehouse_sku_requests", "users"
+  add_foreign_key "warehouse_sku_requests", "users", column: "reviewed_by_id"
+  add_foreign_key "warehouse_sku_requests", "warehouse_skus"
   add_foreign_key "warehouse_templates", "source_tags"
   add_foreign_key "warehouse_templates", "users"
 end

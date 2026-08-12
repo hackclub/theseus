@@ -30,6 +30,7 @@ class Components::Admin::Users::Form < Components::Base
           checkbox_field("Admin", "user[is_admin]", @user.is_admin)
           checkbox_field("Can Use Indicia", "user[can_use_indicia]", @user.can_use_indicia)
           checkbox_field("Can Warehouse", "user[can_warehouse]", @user.can_warehouse)
+          checkbox_field("Warehouse Czar", "user[is_warehouse_czar]", @user.is_warehouse_czar)
           checkbox_field("Can Impersonate Public", "user[can_impersonate_public]", @user.can_impersonate_public)
         end
 
