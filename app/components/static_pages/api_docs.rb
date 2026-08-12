@@ -33,10 +33,10 @@ class Components::StaticPages::APIDocs < Components::Base
   def ai_copy_button
     button(
       class: "api-docs-copy-btn",
-      onclick: safe("let b=this;fetch('#{api_docs_path(format: :md)}').then(r=>r.text()).then(t=>navigator.clipboard.writeText(t)).then(()=>{b.querySelector('span').textContent='Copied!';setTimeout(()=>b.querySelector('span').textContent='Copy LLM-friendly version as Markdown',2000)})")
+      onclick: safe("let b=this,s=b.querySelector('.copy-label');fetch('#{api_docs_path(format: :md)}').then(r=>r.text()).then(t=>navigator.clipboard.writeText(t)).then(()=>{s.textContent='Copied!';setTimeout(()=>s.textContent='Copy LLM-friendly version as Markdown',2000)})")
     ) do
       span { "⎘" }
-      span { "Copy LLM-friendly version as Markdown" }
+      span(class: "copy-label") { "Copy LLM-friendly version as Markdown" }
     end
   end
 end
