@@ -77,6 +77,7 @@ the body of your request should look like this:
 ```
 
 **the fields:**
+
 - `address` — required. the recipient's mailing address. we'll do our best to figure out country names and state abbreviations, but ISO 3166 alpha-2 country codes and standard state abbreviations are safest.
 - `recipient_email` — the recipient's email. not required, but very helpful for us to have.
 - `rubber_stamps` — optional. custom text that gets printed on the letter. use this for personalized messages!
@@ -144,6 +145,7 @@ same body as Batch Queues:
 
 #### the tradeoffs:
 Instant Queues are a fundamentally different primitive from Batch Queues. when you submit a letter to an Instant Queue, it gets printed as a postcard and dropped straight into the outbox — no batching, no label generation, no human in the loop. this means:
+
 - **they're postcards.** Instant Queues print postcards, not letters in envelopes. if your content doesn't fit on a postcard, you want a Batch Queue.
 - **they're slower per-request** than Batch Queue requests. the request does real work (printing, postage) and you should expect it to take a few seconds.
 - **errors are louder.** if something breaks, you'll get an error on the spot. with Batch Queues, that stuff happens later when a human is watching.
@@ -168,6 +170,7 @@ an idempotency key is a unique string you make up that represents "this specific
 ```
 
 the key just needs to be unique within your usage. some good patterns:
+
 - `"{program}_{env}-{user_id}-{action}"` — e.g. `"high-seas_prod-usr_abc123-welcome-letter"`
 - whatever your system already uses to deduplicate work
 
@@ -259,11 +262,13 @@ POST /api/v1/warehouse_orders
 `contents` is required for freeform orders — you need at least one item.
 
 **required fields for all warehouse orders:**
+
 - `address` — where it's going.
 - `warehouse_order.recipient_email` — who it's for. we use this for shipping notifications.
 - `warehouse_order.tags` — at least one tag. this is how we categorize and track shipments internally.
 
 **optional fields:**
+
 - `warehouse_order.idempotency_key` — you know the drill. use it. please.
 - `warehouse_order.user_facing_title` — a friendly name for the shipment that might show up in recipient-facing contexts.
 - `warehouse_order.metadata` — same as with letters, a JSON object that's all yours.
@@ -315,12 +320,14 @@ GET /packages/:id/embed
 where `:id` is the order's ID (e.g. `pkg_abc123`). this is a public endpoint — no API key needed.
 
 the widget is a self-contained HTML page designed to be iframed. it shows:
+
 - **order timeline:** Order Placed → Sent to Warehouse → Shipped, with dates as they become available.
 - **backorder info:** if any items are out of stock, the widget shows which ones and whether more are on the way.
 - **tracking info:** once the order ships, the carrier and a clickable tracking number show up.
 - **contents:** a list of what's in the box (unless you've marked the order as a surprise).
 
 embed it like this:
+
 ```html
 <iframe
   src="https://theseus.hackclub.com/packages/pkg_abc123/embed"
@@ -329,6 +336,7 @@ embed it like this:
 ```
 
 a few things to know:
+
 - **draft orders return an error state.** if the order hasn't been dispatched yet, the widget will show "Order not found or not ready yet" — so don't embed it until the order is dispatched.
 - **no auth required.** the embed is public. anyone with the order ID can see it. this is by design — it's meant for recipient-facing contexts.
 - **frameable from anywhere.** the CSP is wide open on this endpoint, so you can iframe it from any domain.
@@ -338,6 +346,7 @@ a few things to know:
 **a note on countries:** we do our best to parse whatever you throw at us ("United States", "US", "USA", "us", etc.) but the safest bet is always ISO 3166 alpha-2 codes. same goes for states — "Vermont" and "VT" both work, but abbreviations are less likely to surprise you.
 
 **a note on errors:** if something goes wrong, you'll get back a JSON object with an `error` field and usually a `messages` array. common errors:
+
 - `invalid_auth` (401) — your API key is missing or dead.
 - `not_authorized` (403) — your API key is valid but doesn't have permission to do that.
 - `missing_parameter` (400) — you forgot a required field.
