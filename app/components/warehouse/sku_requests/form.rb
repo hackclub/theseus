@@ -93,7 +93,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
       end
       select(name: "warehouse_sku_request[category]", required: true, style: "width:100%;") do
         option(value: "") { "Select a category..." }
-        Warehouse::SKU.categories.keys.each do |cat|
+        ::Warehouse::SKU.categories.keys.each do |cat|
           if @sku_request.category == cat
             option(value: cat, selected: true) { cat.humanize }
           else

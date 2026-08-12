@@ -408,6 +408,7 @@ $gate-green: #14a314;
   white-space: normal;
   p { margin: 0.4rem 0; }
   .badge { white-space: nowrap; }
+  .jumpcode-chip { cursor: pointer; &:hover { opacity: 0.7; } }
 }
 
 

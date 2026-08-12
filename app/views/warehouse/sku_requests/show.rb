@@ -134,12 +134,12 @@ class Views::Warehouse::SKURequests::Show < Views::Base
         end
         div(class: "text-muted") do
           plain "Please contact "
-          strong { @sku_request.user&.name || "the requester" }
+          strong { @sku_request.user&.username || "the requester" }
           plain " to discuss."
         end
         if @sku_request.reviewed_by
           div(class: "text-muted", style: "margin-top: 0.25rem;") do
-            plain "Reviewed by #{@sku_request.reviewed_by.name}"
+            plain "Reviewed by #{@sku_request.reviewed_by.username}"
             if @sku_request.reviewed_at
               plain " on #{@sku_request.reviewed_at.strftime('%b %d, %Y %H:%M')}"
             end
@@ -165,7 +165,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
         detail_row("Expected Arrival", @sku_request.expected_arrival&.strftime("%b %d, %Y"))
         detail_row("Expected Quantity", @sku_request.expected_quantity&.to_s)
         detail_row("Suggested SKU Code", @sku_request.suggested_sku_code)
-        detail_row("Requested By", @sku_request.user&.name)
+        detail_row("Requested By", @sku_request.user&.username)
         detail_row("Created", @sku_request.created_at.strftime("%b %d, %Y %H:%M"))
         if @sku_request.submitted_at
           detail_row("Submitted", @sku_request.submitted_at.strftime("%b %d, %Y %H:%M"))

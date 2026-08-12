@@ -28,17 +28,17 @@ class Components::Shared::Jumpcode < Components::Base
           end
           p do
             plain "letter pages: "
-            span(class: "badge") { "MAIL" }
+            jumpcode_chip("MAIL")
             plain " "
-            span(class: "badge") { "SCAN" }
+            jumpcode_chip("SCAN")
             plain " "
-            span(class: "badge") { "LBAT" }
+            jumpcode_chip("LBAT")
           end
           p do
             plain "warehouse: "
-            span(class: "badge") { "WORD" }
+            jumpcode_chip("WORD")
             plain " "
-            span(class: "badge") { "SKUS" }
+            jumpcode_chip("SKUS")
           end
           p do
             plain "also try "
@@ -50,5 +50,12 @@ class Components::Shared::Jumpcode < Components::Base
         end
       end
     end
+  end
+
+  def jumpcode_chip(code)
+    span(
+      class: "badge jumpcode-chip",
+      onclick: safe("window.openKbar?.('#{code}')"),
+    ) { code }
   end
 end

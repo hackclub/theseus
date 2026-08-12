@@ -47,7 +47,7 @@ class Views::Warehouse::SKURequests::Index < Views::Base
               end
               td { span(class: "badge") { req.category&.humanize || "—" } }
               td { status_badge(req.aasm_state) }
-              td(class: "text-muted") { req.user&.name || "—" }
+              td(class: "text-muted") { req.user&.username || "—" }
               td(class: "text-muted") { req.created_at.strftime("%b %d, %Y") }
               td(style: "text-align:right;") do
                 if policy(req).edit?

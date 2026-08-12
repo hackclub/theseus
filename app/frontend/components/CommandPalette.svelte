@@ -29,8 +29,8 @@
     activeIndex = 0;
   });
 
-  function open() {
-    query = '';
+  function open(initialQuery = '') {
+    query = initialQuery;
     activeScope = null;
     scopedResults = [];
     publicIdResult = null;
