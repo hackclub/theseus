@@ -12,11 +12,11 @@ class Views::Letter::Batches::Validate < Views::Base
 
   def view_template
     div(style: "display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.25rem;") do
-      a(href: letter_batch_path(@batch), style: "text-decoration:none;color:GrayText;font-size:0.85em;") { "← #{@batch.public_id}" }
+      a(href: letter_batch_path(@batch), style: "text-decoration:none;color:var(--foreground2);font-size:0.85em;") { "← #{@batch.public_id}" }
       h2(style: "margin:0;") { "Validate CSV" }
     end
 
-    p(style: "margin:0 0 0.25rem;color:GrayText;") do
+    p(style: "margin:0 0 0.25rem;color:var(--foreground2);") do
       strong(style: "color:inherit;") { @valid_count.to_s }
       plain " valid"
       if @error_count > 0
@@ -36,7 +36,7 @@ class Views::Letter::Batches::Validate < Views::Base
 
     if @error_count > 0
       div(style: "margin-top:1.25rem;") do
-        strong(style: "font-size:0.85em;color:GrayText;text-transform:uppercase;letter-spacing:0.04em;") { "#{@error_count} invalid rows" }
+        strong(style: "font-size:0.85em;color:var(--foreground2);text-transform:uppercase;letter-spacing:0.04em;") { "#{@error_count} invalid rows" }
         table(style: "margin-top:0.25rem;") do
           thead do
             tr do
@@ -71,7 +71,7 @@ class Views::Letter::Batches::Validate < Views::Base
           class: "btn-success"
       end
 
-      a(href: new_letter_batch_path, style: "color:GrayText;") { "Fix CSV & re-upload" }
+      a(href: new_letter_batch_path, style: "color:var(--foreground2);") { "Fix CSV & re-upload" }
     end
   end
 end

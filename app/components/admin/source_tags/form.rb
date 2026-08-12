@@ -37,7 +37,7 @@ class Components::Admin::SourceTags::Form < Components::Base
 
   def form_field(label_text, name, value, required: false, type: "text", hint: nil)
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
         plain label_text
         plain " *" if required
       end

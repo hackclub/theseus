@@ -15,7 +15,7 @@
     <hr>
     <div style="margin-top: 0.5rem;">
       <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Template name <span style="color: var(--red);">*</span></label>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Template name <span style="color: var(--red);">*</span></label>
         <input type="text" name="warehouse_template[name]" value="<%= warehouse_template.name %>" required style="width: 100%;">
       </div>
       <label>
@@ -41,7 +41,7 @@
 
   <div style="display:flex;align-items:center;gap:0.5rem">
     <span class="spacer"></span>
-    <a href="<%= warehouse_templates_path %>" style="color: GrayText;">Cancel</a>
+    <a href="<%= warehouse_templates_path %>" style="color: var(--foreground2);">Cancel</a>
     <button type="submit" class="btn-success">✓ <%= warehouse_template.persisted? ? "Update Template" : "Create Template" %></button>
   </div>
 <% end %>

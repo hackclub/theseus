@@ -8,7 +8,7 @@ class Views::ReturnAddresses::New < Views::Base
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: return_addresses_path, style: "text-decoration: none; color: GrayText;") { "← Return Addresses" }
+        a(href: return_addresses_path, style: "text-decoration: none; color: var(--foreground2);") { "← Return Addresses" }
         strong(style: "font-size: 1.15em;") { "New Return Address" }
       end
     end
@@ -26,7 +26,7 @@ class Views::ReturnAddresses::New < Views::Base
         section do
           strong { "Info" }
           hr
-          div(style: "margin-top: 0.5rem; color: GrayText;") do
+          div(style: "margin-top: 0.5rem; color: var(--foreground2);") do
             p(style: "margin: 0;") { "Return addresses appear as the sender on outgoing mail." }
           end
         end

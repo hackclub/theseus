@@ -15,7 +15,7 @@ class Views::Letter::Batches::Edit < Views::Base
 
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: GrayText;") { "← Batch ##{@batch.id}" }
+        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Edit Batch" }
       end
     end
@@ -112,7 +112,7 @@ class Views::Letter::Batches::Edit < Views::Base
     end
 
     div(style: "margin-bottom: 1rem;") do
-      label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Custom Return Address Name" }
+      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Custom Return Address Name" }
       input(type: "text", name: "letter_batch[letter_return_address_name]", value: @batch.letter_return_address_name, style: "width: 100%;")
       p(class: "form-hint") { "Leave blank to use the return address name" }
     end

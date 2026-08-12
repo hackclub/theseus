@@ -84,13 +84,13 @@ class Views::ReturnAddresses::Index < Views::Base
   def render_actions(address)
     return unless address.user == current_user || current_user&.admin?
 
-    a(href: edit_return_address_path(address), style: "color: GrayText; margin-right: 0.5rem;") { "✎" }
+    a(href: edit_return_address_path(address), style: "color: var(--foreground2); margin-right: 0.5rem;") { "✎" }
 
     unless address == current_user&.home_return_address
       a(
         href: set_as_home_return_address_path(address),
         data: { turbo_method: :post },
-        style: "color: GrayText; margin-right: 0.5rem;"
+        style: "color: var(--foreground2); margin-right: 0.5rem;"
       ) { "⌂" }
     end
 

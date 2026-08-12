@@ -27,7 +27,7 @@ class Views::Letter::Batches::Index < Views::Base
       action_label: "+ New Batch"
     ) do
       if @state.present? || @search.present?
-        a(href: letter_batches_path, style: "color: GrayText; white-space: nowrap;") { "× Clear" }
+        a(href: letter_batches_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
       end
     end
   end

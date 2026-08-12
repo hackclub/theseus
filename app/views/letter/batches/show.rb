@@ -80,7 +80,7 @@ class Views::Letter::Batches::Show < Views::Base
   def header_toolbar
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: letter_batches_path, style: "text-decoration: none; color: GrayText;") { "← Batches" }
+        a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
@@ -178,7 +178,7 @@ class Views::Letter::Batches::Show < Views::Base
           if @batch.pdf_label.attached?
             a(href: rails_blob_path(@batch.pdf_label, disposition: :inline), target: "_blank", style: "text-decoration:none;color:inherit;") { "⬇ Full batch PDF" }
           end
-          a(href: regenerate_form_letter_batch_path(@batch), style: "text-decoration:none;color:GrayText;") { "⟳ Regenerate labels" }
+          a(href: regenerate_form_letter_batch_path(@batch), style: "text-decoration:none;color:var(--foreground2);") { "⟳ Regenerate labels" }
 
           if printed > 0
             hr
@@ -330,7 +330,7 @@ class Views::Letter::Batches::Show < Views::Base
       raw helpers.render(partial: "letter/batches/grid", locals: { cells: cells, picklist: true })
 
       # Selection preview — shows names of selected letters
-      div("data-picklist-preview": true, style: "margin:0.5rem 0;font-size:0.85em;color:GrayText;max-height:6rem;overflow-y:auto;font-family:monospace;display:none;") do
+      div("data-picklist-preview": true, style: "margin:0.5rem 0;font-size:0.85em;color:var(--foreground2);max-height:6rem;overflow-y:auto;font-family:monospace;display:none;") do
       end
 
       div(style: "display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;") do

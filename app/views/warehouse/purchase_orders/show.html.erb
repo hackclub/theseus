@@ -5,7 +5,7 @@
     "draft" => "badge",
     "submitted" => "badge badge-info",
     "approved" => "badge badge-success",
-    "rejected" => "badge badge-danger",
+    "returned" => "badge badge-warning",
     "open" => "badge badge-info",
     "completed" => "badge badge-success",
     "deleted" => "badge badge-danger"
@@ -14,12 +14,12 @@
 
 <div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_purchase_orders_path %>" style="text-decoration: none; color: GrayText;">&larr; Purchase Orders</a>
+    <a href="<%= warehouse_purchase_orders_path %>" style="text-decoration: none; color: var(--foreground2);">&larr; Purchase Orders</a>
     <strong style="font-size: 1.15em;"><%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></strong>
     <span class="<%= badge_class %>"><%= @purchase_order.humanized_state %></span>
   </div>
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <span style="color: GrayText;"><%= @purchase_order.supplier_name %></span>
+    <span style="color: var(--foreground2);"><%= @purchase_order.supplier_name %></span>
   </div>
   <span class="spacer"></span>
   <div style="display:flex;align-items:center;gap:0.5rem">
@@ -28,10 +28,29 @@
       <%= button_to "Submit for Approval", submit_for_approval_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-success", data: { confirm: "Submit this purchase order for approval?" } %>
     <% end %>
 
-    <%# Submitted + czar: Approve / Reject %>
+    <%# Returned + owner: Submit for Review again %>
+    <% if @purchase_order.returned? && policy(@purchase_order).edit? %>
+      <%= button_to "Submit for Approval", submit_for_approval_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-success", data: { confirm: "Re-submit this purchase order for approval?" } %>
+    <% end %>
+
+    <%# Submitted + czar: Approve / Return for Revision %>
     <% if policy(@purchase_order).approve? %>
       <%= button_to "✓ Approve", approve_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-success", data: { confirm: "Approve this purchase order?" } %>
-      <%= button_to "✕ Reject", reject_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-danger", data: { confirm: "Reject this purchase order?" } %>
+    <% end %>
+    <% if policy(@purchase_order).return_for_revision? %>
+      <details class="popover">
+        <summary tabindex="0" class="btn-warning" style="cursor:pointer;">↩ Return</summary>
+        <div style="padding: 0.75rem; min-width: 20rem;">
+          <form action="<%= reject_warehouse_purchase_order_path(@purchase_order) %>" method="post">
+            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+            <div style="margin-bottom: 0.5rem;">
+              <label style="display:block;color:var(--foreground2);margin-bottom:0.25rem;">Notes for drafter</label>
+              <textarea name="reviewer_notes" rows="3" style="width:100%;" placeholder="What needs to be revised?"></textarea>
+            </div>
+            <button type="submit" class="btn-warning" onclick="return confirm('Return this purchase order for revision?')">↩ Return for Revision</button>
+          </form>
+        </div>
+      </details>
     <% end %>
 
     <%# Approved + czar + all SKUs resolved: Send to Zenventory %>
@@ -53,14 +72,13 @@
   </div>
 </div>
 
-<%# Rejection banner %>
-<% if @purchase_order.status == "rejected" %>
-  <div class="banner banner-alert" style="margin-bottom: 1rem;">
-    <strong>Purchase order rejected.</strong>
-    <% if @purchase_order.rejection_reason.present? %>
-      <div style="margin-top: 0.25rem;"><%= @purchase_order.rejection_reason %></div>
+<%# Returned banner %>
+<% if @purchase_order.returned? %>
+  <div class="banner banner-warning" style="margin-bottom: 1rem;">
+    <strong>Returned for revision<%= @purchase_order.reviewed_by ? " by #{@purchase_order.reviewed_by.username || @purchase_order.reviewed_by.email}" : "" %>.</strong>
+    <% if @purchase_order.reviewer_notes.present? %>
+      <div style="margin-top: 0.25rem;"><strong>Notes:</strong> <%= @purchase_order.reviewer_notes %></div>
     <% end %>
-    <div style="margin-top: 0.25rem; color: GrayText;">Please contact <strong><%= @purchase_order.user&.username || @purchase_order.user&.email || "the drafter" %></strong> to discuss this purchase order.</div>
   </div>
 <% end %>
 
@@ -109,18 +127,26 @@
     </section>
 
     <%# Blocking SKU requests section %>
-    <% if @purchase_order.blocked_on_skus? %>
+    <% if @purchase_order.blocked_on_skus? || @purchase_order.has_returned_sku_requests? %>
       <section style="margin-bottom: 1rem; border: 1px solid var(--yellow); padding: 0.75rem;">
-        <strong style="color: var(--yellow);">&#x26A0; Blocking SKU Requests</strong>
-        <div style="color: GrayText; margin-top: 0.25rem;">This purchase order is approved but waiting on the following SKU requests before it can be sent to Zenventory.</div>
+        <strong style="color: var(--yellow);">&#x26A0; SKU Requests Requiring Attention</strong>
+        <% if @purchase_order.has_returned_sku_requests? %>
+          <div style="color: var(--red); margin-top: 0.25rem;">Some SKU requests have been returned and need to be revised before this purchase order can proceed.</div>
+        <% elsif @purchase_order.blocked_on_skus? %>
+          <div style="color: var(--foreground2); margin-top: 0.25rem;">This purchase order is approved but waiting on the following SKU requests before it can be sent to Zenventory.</div>
+        <% end %>
         <hr>
         <% @purchase_order.unresolved_sku_requests.each do |req| %>
           <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color, #333);">
             <div style="flex: 1;">
               <a href="<%= warehouse_sku_request_path(req) %>" style="text-decoration: none; font-weight: 600;"><%= req.name %></a>
-              <span class="badge badge-info" style="margin-left: 0.25rem;"><%= req.aasm_state.humanize %></span>
+              <% if req.returned? %>
+                <span class="badge badge-danger" style="margin-left: 0.25rem;">Returned</span>
+              <% else %>
+                <span class="badge badge-info" style="margin-left: 0.25rem;"><%= req.aasm_state.humanize %></span>
+              <% end %>
               <% if req.suggested_sku_code.present? %>
-                <span style="color: GrayText; margin-left: 0.25rem;">suggested: <code><%= req.suggested_sku_code %></code></span>
+                <span style="color: var(--foreground2); margin-left: 0.25rem;">suggested: <code><%= req.suggested_sku_code %></code></span>
               <% end %>
             </div>
             <% if current_user.warehouse_czar? && req.aasm_state == "submitted" %>
@@ -154,12 +180,18 @@
               <td style="padding: 0.25rem 0.5rem;">
                 <% if li.sku.present? %>
                   <a href="<%= warehouse_sku_path(li.sku) %>" style="text-decoration: none;"><%= li.sku.name %></a>
-                  <span style="color: GrayText;"> (<code><%= li.sku.sku %></code>)</span>
+                  <span style="color: var(--foreground2);"> (<code><%= li.sku.sku %></code>)</span>
                 <% elsif li.sku_request.present? %>
                   <a href="<%= warehouse_sku_request_path(li.sku_request) %>" style="text-decoration: none;"><%= li.sku_request.name %></a>
-                  <span class="badge badge-warning" style="margin-left: 0.25rem;">pending</span>
+                  <% if li.sku_request.returned? %>
+                    <span class="badge badge-danger" style="margin-left: 0.25rem;">returned</span>
+                  <% elsif li.sku_request.aasm_state.in?(%w[submitted approved]) %>
+                    <span class="badge badge-info" style="margin-left: 0.25rem;">pending</span>
+                  <% else %>
+                    <span class="badge" style="margin-left: 0.25rem;"><%= li.sku_request.aasm_state %></span>
+                  <% end %>
                 <% else %>
-                  <span style="color: GrayText;">Unknown</span>
+                  <span style="color: var(--foreground2);">Unknown</span>
                 <% end %>
               </td>
               <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= li.quantity %></td>

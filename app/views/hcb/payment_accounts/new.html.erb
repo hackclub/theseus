@@ -12,7 +12,7 @@
     <section style="margin-bottom: 1rem;">
       <strong>Select Organization</strong>
       <hr>
-      <div style="margin-top: 0.5rem; color: GrayText;">Choose which HCB organization to use for paying postage.</div>
+      <div style="margin-top: 0.5rem; color: var(--foreground2);">Choose which HCB organization to use for paying postage.</div>
       <% @organizations.each do |org| %>
         <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--background2); cursor: pointer;">
           <%= f.radio_button :organization_id, org.id %>

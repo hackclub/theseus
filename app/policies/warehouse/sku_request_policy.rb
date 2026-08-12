@@ -26,7 +26,7 @@ class Warehouse::SKURequestPolicy < ApplicationPolicy
   end
 
   def submit?
-    record_belongs_to_user && record.draft?
+    record_belongs_to_user && (record.draft? || record.returned?)
   end
 
   def approve?

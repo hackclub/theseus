@@ -18,7 +18,7 @@
             <a href="<%= letter_path(letter) %>" style="font-weight: bold; text-decoration: none;"><%= letter.public_id %></a>
             <span class="row-tag"><%= letter.address.name_line %></span>
           </td>
-          <td style="padding: 0.25rem 0.5rem; color: GrayText;"><%= letter.return_address.present? ? letter.return_address_name_line : "—" %></td>
+          <td style="padding: 0.25rem 0.5rem; color: var(--foreground2);"><%= letter.return_address.present? ? letter.return_address_name_line : "—" %></td>
           <td style="padding: 0.25rem 0.5rem;"><%= letter.height %> × <%= letter.width %> in</td>
           <td style="padding: 0.25rem 0.5rem;"><%= letter.created_at.strftime(letter.created_at.year == Date.current.year ? "%b %d" : "%b %d, %Y") %></td>
           <td style="padding: 0.25rem 0.5rem;">

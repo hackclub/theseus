@@ -1,14 +1,14 @@
 <% content_for :title, "#{@letter.user_facing_title || 'Letter'} #{@letter.public_id}" %>
 
 <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:1rem;">
-  <a href="<%= letters_path %>" style="text-decoration:none;color:GrayText;font-size:0.85em;">← Letters</a>
+  <a href="<%= letters_path %>" style="text-decoration:none;color:var(--foreground2);font-size:0.85em;">← Letters</a>
   <h2 style="margin:0;font-size:1.25em;">
     <%= @letter.user_facing_title.presence || @letter.address&.name_line || "Letter" %>
   </h2>
-  <code style="color:GrayText;font-size:0.85em;"><%= @letter.public_id %></code>
+  <code style="color:var(--foreground2);font-size:0.85em;"><%= @letter.public_id %></code>
   <span style="font-family:monospace;color:<%= status_color(@letter.aasm_state) %>;">[<%= @letter.aasm_state %>]</span>
   <% @letter.tags.compact_blank.each do |tag| %>
-    <a href="<%= tag_stats_path(tag) %>" style="text-decoration:none;font-size:0.85em;color:GrayText;">#<%= tag %></a>
+    <a href="<%= tag_stats_path(tag) %>" style="text-decoration:none;font-size:0.85em;color:var(--foreground2);">#<%= tag %></a>
   <% end %>
 </div>
 
@@ -18,7 +18,7 @@
     <%# ── Addresses ── %>
     <div style="display:flex;gap:1.5rem;margin-bottom:1.5rem;">
       <div style="flex:1;">
-        <span style="color:GrayText;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">From</span>
+        <span style="color:var(--foreground2);font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">From</span>
         <div style="font-family:monospace;font-size:0.9em;line-height:1.6;margin-top:0.25rem;">
           <% if @letter.return_address.present? %>
             <strong><%= @letter.return_address_name_line %></strong><br>
@@ -26,12 +26,12 @@
             <% if @letter.return_address.line_2.present? %><%= @letter.return_address.line_2 %><br><% end %>
             <%= @letter.return_address.city %>, <%= @letter.return_address.state %> <%= @letter.return_address.postal_code %>
           <% else %>
-            <span style="color:GrayText;">—</span>
+            <span style="color:var(--foreground2);">—</span>
           <% end %>
         </div>
       </div>
       <div style="flex:1;">
-        <span style="color:GrayText;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">To</span>
+        <span style="color:var(--foreground2);font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;">To</span>
         <div style="font-family:monospace;font-size:0.9em;line-height:1.6;margin-top:0.25rem;">
           <strong><%= @letter.address.name_line %></strong><br>
           <%= @letter.address.line_1 %><br>
@@ -100,12 +100,12 @@
         <% end %>
       <% elsif @letter.postage_type == "stamps" %>
         <div style="display:flex;align-items:baseline;gap:0.5rem;">
-          <code style="color:GrayText;">[ ]</code>
+          <code style="color:var(--foreground2);">[ ]</code>
           <span>stamps</span>
           <span class="text-muted" style="font-size:0.85em;"><%= number_to_currency(@letter.postage) %></span>
         </div>
       <% else %>
-        <code style="color:GrayText;">[ ] no postage</code>
+        <code style="color:var(--foreground2);">[ ] no postage</code>
       <% end %>
 
       <% if @letter.rubber_stamps.present? %>
@@ -174,10 +174,10 @@
 
       <%# Secondary actions %>
       <a href="<%= edit_letter_path(@letter) %>" style="text-decoration:none;color:inherit;padding:0.2rem 0;">✎ Edit</a>
-      <a href="<%= public_letter_path(@letter) %>" target="_blank" style="text-decoration:none;color:GrayText;padding:0.2rem 0;">Public page ↗</a>
+      <a href="<%= public_letter_path(@letter) %>" target="_blank" style="text-decoration:none;color:var(--foreground2);padding:0.2rem 0;">Public page ↗</a>
       <% if @letter.label.attached? %>
         <a href="<%= rails_blob_path(@letter.label, disposition: 'attachment') %>" style="text-decoration:none;color:inherit;padding:0.2rem 0;">⬇ Download label</a>
-        <a href="<%= preview_template_letter_path(@letter) %>" style="text-decoration:none;color:GrayText;padding:0.2rem 0;">Preview template</a>
+        <a href="<%= preview_template_letter_path(@letter) %>" style="text-decoration:none;color:var(--foreground2);padding:0.2rem 0;">Preview template</a>
       <% end %>
 
       <%# Destructive actions %>

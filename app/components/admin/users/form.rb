@@ -53,7 +53,7 @@ class Components::Admin::Users::Form < Components::Base
 
   def form_field(label_text, name, value, required: false, type: "text", hint: nil)
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
         plain label_text
         plain " *" if required
       end
@@ -68,13 +68,13 @@ class Components::Admin::Users::Form < Components::Base
     div(style: "margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;") do
       input(type: "hidden", name: name, value: "0")
       input(type: "checkbox", name: name, value: "1", checked: value, style: "margin:0;")
-      label(style: "color:GrayText;margin:0;") { label_text }
+      label(style: "color:var(--foreground2);margin:0;") { label_text }
     end
   end
 
   def select_field(label_text, name, options, selected_value)
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { label_text }
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { label_text }
       select(name: name, style: "width:100%;") do
         option(value: "") { "— None —" }
         options.each do |label, id|

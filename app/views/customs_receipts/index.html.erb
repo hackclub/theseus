@@ -11,7 +11,7 @@
   <div style="margin-top: 0.5rem;">
     <%= form_with url: generate_customs_receipts_path, method: :get do |f| %>
       <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">ID or Tracking Number</label>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">ID or Tracking Number</label>
         <input type="text" name="search" autofocus placeholder="ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)" style="width: 100%;">
       </div>
       <button type="submit" class="btn-success">⎘ Generate</button>

@@ -9,14 +9,14 @@
       <div style="margin-top: 0.5rem;">
         <% if batch.letter_return_address.present? %>
           <strong><%= batch.letter_return_address.name %></strong><br>
-          <span style="color: GrayText;">
+          <span style="color: var(--foreground2);">
             <%= batch.letter_return_address.line_1 %><br>
             <% if batch.letter_return_address.line_2.present? %><%= batch.letter_return_address.line_2 %><br><% end %>
             <%= batch.letter_return_address.city %>, <%= batch.letter_return_address.state %> <%= batch.letter_return_address.postal_code %><br>
             <%= batch.letter_return_address.country %>
           </span>
         <% else %>
-          <span style="color: GrayText;">No return address</span>
+          <span style="color: var(--foreground2);">No return address</span>
         <% end %>
       </div>
     </section>
@@ -42,7 +42,7 @@
       <strong>Generated Labels</strong>
       <hr>
       <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem">
-        <span style="color: GrayText;">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
+        <span style="color: var(--foreground2);">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
         <span class="spacer"></span>
         <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>"><button class="btn-success btn-sm">↓ Download PDF</button></a>
         <% if batch.letters.any? && batch.letters.all?(&:pending?) %>
@@ -58,7 +58,7 @@
       </div>
     </section>
   <% else %>
-    <div style="text-align: center; padding: 1rem 0; color: GrayText;">
+    <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">
       No labels generated yet.
     </div>
   <% end %>

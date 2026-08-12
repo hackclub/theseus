@@ -37,7 +37,7 @@ class Views::Batches::Show < Views::Base
   def toolbar
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: batches_path, style: "text-decoration: none; color: GrayText;") { "← Batches" }
+        a(href: batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "#{@batch.type.split('::').first.titleize} Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
@@ -51,7 +51,7 @@ class Views::Batches::Show < Views::Base
       strong { "Danger Zone" }
       hr
       div(style: "margin-top: 0.5rem;") do
-        span(style: "color: GrayText;") { "This action cannot be undone." }
+        span(style: "color: var(--foreground2);") { "This action cannot be undone." }
         div(style: "margin-top: 0.5rem;") do
           form(id: "delete-batch-form", method: :post, action: batch_path(@batch), style: "display: none;") do
             input(type: :hidden, name: :_method, value: :delete)

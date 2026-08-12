@@ -10,12 +10,12 @@ class Views::Warehouse::Batches::Show < Views::Base
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: warehouse_batches_path, style: "text-decoration: none; color: GrayText;") { "← Batches" }
+        a(href: warehouse_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "Warehouse Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        span(style: "color: GrayText;") { "#{helpers.pluralize(@batch.addresses.count, 'address')}" }
+        span(style: "color: var(--foreground2);") { "#{helpers.pluralize(@batch.addresses.count, 'address')}" }
         if @batch.tags.any?
           render Components::Shared::Tags.new(tags: @batch.tags)
         end
@@ -138,7 +138,7 @@ class Views::Warehouse::Batches::Show < Views::Base
             div(style: "margin-top: 0.5rem;") { strong { "Processed" } }
           end
         else
-          span(style: "color: GrayText;") { "Map fields before processing" }
+          span(style: "color: var(--foreground2);") { "Map fields before processing" }
         end
       end
     end

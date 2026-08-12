@@ -5,7 +5,7 @@
 
   --foreground0: CanvasText;
   --foreground1: color-mix(in srgb, CanvasText 80%, Canvas);
-  --foreground2: GrayText;
+  --foreground2: color-mix(in srgb, CanvasText 60%, Canvas);
   --background0: Canvas;
   --background1: light-dark(#f5f5f5, #1e1e1e);
   --background2: light-dark(#ddd, #3a3a3a);
@@ -136,7 +136,7 @@ table {
   th {
     font-weight: normal;
     font-style: italic;
-    color: GrayText;
+    color: var(--foreground2);
   }
 
   tbody tr:hover { background: var(--background1); }
@@ -242,7 +242,7 @@ section {
   grid-template-columns: 14ch 1fr;
   gap: 0.25rem 1rem;
 }
-.detail-label { color: GrayText; }
+.detail-label { color: var(--foreground2); }
 
 
 // ── Show layout ────────────────────────────────────────
@@ -288,14 +288,14 @@ section {
   align-items: baseline;
   gap: 0.25rem;
   text-decoration: none;
-  color: GrayText;
+  color: var(--foreground2);
   padding: 0.25rem 0;
   border-bottom: 2px solid transparent;
   &.active, &:hover { color: inherit; border-bottom-color: currentColor; }
 }
 .stat-count { font-weight: bold; font-variant-numeric: tabular-nums; font-size: 1.1em; }
 .stat-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05ch; }
-.stat-total { color: GrayText; margin-left: 0.5rem; white-space: nowrap; }
+.stat-total { color: var(--foreground2); margin-left: 0.5rem; white-space: nowrap; }
 
 
 // ── Origin tabs ────────────────────────────────────────
@@ -306,7 +306,7 @@ section {
 
   a {
     text-decoration: none;
-    color: GrayText;
+    color: var(--foreground2);
     padding: 0.2rem 0.4rem;
     border-bottom: 2px solid transparent;
     &.active, &:hover { color: inherit; border-bottom-color: currentColor; }
@@ -450,7 +450,7 @@ $gate-green: #14a314;
 
 // ── Utilities ──────────────────────────────────────────
 
-.text-muted   { color: GrayText; }
+.text-muted   { color: var(--foreground2); }
 .text-danger  { color: var(--red); }
 .text-warning { color: var(--yellow); }
 .float-right  { float: right; }
@@ -468,7 +468,7 @@ $gate-green: #14a314;
   bottom: 0; right: 0;
   padding: 0.2rem 0.5rem;
   font-size: 0.75em;
-  color: GrayText;
+  color: var(--foreground2);
   background: var(--background1);
 }
 
@@ -572,7 +572,7 @@ $gate-green: #14a314;
 
 .batch-breadcrumb {
   text-decoration: none;
-  color: GrayText;
+  color: var(--foreground2);
   font-size: 0.85em;
 }
 
@@ -581,7 +581,7 @@ $gate-green: #14a314;
   gap: 2rem;
   margin-bottom: 0.75rem;
   font-size: 0.85em;
-  color: GrayText;
+  color: var(--foreground2);
 }
 
 .batch-failed-section {
@@ -592,7 +592,7 @@ $gate-green: #14a314;
 
 .section-label {
   font-size: 0.85em;
-  color: GrayText;
+  color: var(--foreground2);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -616,7 +616,7 @@ $gate-green: #14a314;
 .batch-audit {
   margin-top: 1rem;
 
-  > summary { color: GrayText; font-size: 0.85em; }
+  > summary { color: var(--foreground2); font-size: 0.85em; }
   table { margin-top: 0.25rem; font-size: 0.85em; }
   th:nth-child(1) { width: 10rem; }
   th:nth-child(2) { width: 12rem; }

@@ -8,7 +8,7 @@ class Views::Letters::Edit < Views::Base
   def view_template
     div(class: "toolbar", style: "border-bottom:none;margin-bottom:0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: letter_path(@letter), style: "text-decoration:none;color:GrayText;") { "← #{@letter.public_id}" }
+        a(href: letter_path(@letter), style: "text-decoration:none;color:var(--foreground2);") { "← #{@letter.public_id}" }
         strong(style: "font-size:1.15em;") { "Edit Letter" }
       end
     end

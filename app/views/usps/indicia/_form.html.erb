@@ -16,21 +16,21 @@
     <div style="margin-top: 0.5rem;">
       <div style="display:flex;gap:1rem">
         <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Postage</label>
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Postage</label>
           <input type="text" name="usps_indicium[postage]" value="<%= usps_indicium.postage %>" style="width: 100%;">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Mailing Date</label>
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Mailing Date</label>
           <%= form.date_field :mailing_date, style: "width: 100%;" %>
         </div>
       </div>
       <div style="display:flex;gap:1rem;margin-top: 1rem;">
         <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">USPS SKU</label>
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">USPS SKU</label>
           <input type="text" name="usps_indicium[usps_sku]" value="<%= usps_indicium.usps_sku %>" style="width: 100%;">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Processing Category</label>
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Processing Category</label>
           <input type="text" name="usps_indicium[processing_category]" value="<%= usps_indicium.processing_category %>" style="width: 100%;">
         </div>
       </div>
@@ -43,7 +43,7 @@
     <div style="margin-top: 0.5rem;">
       <div style="display:flex;gap:1rem">
         <div style="flex: 1;">
-          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Weight (oz)</label>
+          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Weight (oz)</label>
           <input type="text" name="usps_indicium[postage_weight]" value="<%= usps_indicium.postage_weight %>" style="width: 100%;">
         </div>
       </div>
@@ -57,7 +57,7 @@
     <strong>Raw Response</strong>
     <hr>
     <div style="margin-top: 0.5rem;">
-      <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Raw USPS response</label>
+      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Raw USPS response</label>
       <textarea name="usps_indicium[raw_json_response]" rows="4" style="width: 100%;"><%= usps_indicium.raw_json_response %></textarea>
     </div>
   </section>

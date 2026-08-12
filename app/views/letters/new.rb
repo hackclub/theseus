@@ -7,7 +7,7 @@ class Views::Letters::New < Views::Base
 
   def view_template
     div(style: "display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;") do
-      a(href: letters_path, style: "text-decoration:none;color:GrayText;") { "← Letters" }
+      a(href: letters_path, style: "text-decoration:none;color:var(--foreground2);") { "← Letters" }
       strong(style: "font-size:1.15em;") { "New Letter" }
     end
 

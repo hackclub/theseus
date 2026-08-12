@@ -2,7 +2,7 @@
 
 <div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: GrayText;">← SKUs</a>
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
     <strong style="font-size: 1.15em;"><%= @warehouse_sku.sku %></strong>
     <% if @warehouse_sku.in_stock.to_i > 10 %>
       <span class="badge badge-success">In stock</span>
@@ -21,7 +21,7 @@
     <% unless @warehouse_sku.enabled %><span class="badge">Disabled</span><% end %>
   </div>
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <span style="color: GrayText;"><%= @warehouse_sku.name %></span>
+    <span style="color: var(--foreground2);"><%= @warehouse_sku.name %></span>
   </div>
   <span class="spacer"></span>
   <div style="display:flex;align-items:center;gap:0.5rem">
@@ -107,9 +107,9 @@
                 <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
                 <td style="padding: 0.25rem 0.5rem;">
                   <% if order.tracking_number.present? %>
-                    <a href="<%= order.tracking_url %>" target="_blank" style="color: GrayText;"><%= order.pretty_via %> ↗</a>
+                    <a href="<%= order.tracking_url %>" target="_blank" style="color: var(--foreground2);"><%= order.pretty_via %> ↗</a>
                   <% else %>
-                    <span style="color: GrayText;">—</span>
+                    <span style="color: var(--foreground2);">—</span>
                   <% end %>
                 </td>
                 <td style="padding: 0.25rem 0.5rem;">
@@ -121,7 +121,7 @@
           </tbody>
         </table>
       <% else %>
-        <div style="text-align: center; padding: 1rem 0; color: GrayText;">No orders yet.</div>
+        <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">No orders yet.</div>
       <% end %>
     </section>
 
@@ -146,7 +146,7 @@
                 <td style="padding: 0.25rem 0.5rem;">
                   <a href="<%= warehouse_purchase_order_path(po) %>" style="font-weight: bold; text-decoration: none;"><%= po.order_number.presence || "##{po.id}" %></a>
                 </td>
-                <td style="padding: 0.25rem 0.5rem; color: GrayText;"><%= po.supplier_name %></td>
+                <td style="padding: 0.25rem 0.5rem; color: var(--foreground2);"><%= po.supplier_name %></td>
                 <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
                 <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(line_item&.unit_cost) %></td>
                 <td style="padding: 0.25rem 0.5rem;">
@@ -158,7 +158,7 @@
           </tbody>
         </table>
       <% else %>
-        <div style="text-align: center; padding: 1rem 0; color: GrayText;">No purchase orders yet.</div>
+        <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">No purchase orders yet.</div>
       <% end %>
     </section>
 

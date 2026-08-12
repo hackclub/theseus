@@ -29,7 +29,7 @@ class Views::Admin::USPS::MailerIds::Index < Views::Base
             td(class: "text-muted") { mailer_id.crid }
             td(class: "text-muted") { mailer_id.mid }
             td(style: "text-align:right;white-space:nowrap;") do
-              a(href: edit_admin_usps_mailer_id_path(mailer_id), style: "color:GrayText;margin-right:0.5rem;") { "✎" }
+              a(href: edit_admin_usps_mailer_id_path(mailer_id), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
               button_to "✕", admin_usps_mailer_id_path(mailer_id), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this mailer ID?')"
             end
           end

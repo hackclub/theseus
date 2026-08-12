@@ -2,14 +2,14 @@
 
 <div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_orders_path %>" style="text-decoration: none; color: GrayText;">← Orders</a>
+    <a href="<%= warehouse_orders_path %>" style="text-decoration: none; color: var(--foreground2);">← Orders</a>
     <strong style="font-size: 1.15em;">Order <%= @warehouse_order.hc_id %></strong>
     <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
   </div>
   <div style="display:flex;align-items:center;gap:0.5rem">
     <%= render Components::Shared::PublicId.new(value: @warehouse_order.hc_id) %>
     <% if @warehouse_order.user_facing_title.present? %>
-      <span style="color: GrayText;"><%= @warehouse_order.user_facing_title %></span>
+      <span style="color: var(--foreground2);"><%= @warehouse_order.user_facing_title %></span>
     <% end %>
     <% @warehouse_order.tags.compact_blank.each do |tag| %>
       <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span class="badge"><%= tag %></span></a>
@@ -73,11 +73,11 @@
             <tr>
               <td>
                 <%= link_to li.sku.name, warehouse_sku_path(li.sku) %>
-                <span style="color: GrayText;"><code><%= li.sku.sku %></code></span>
+                <span style="color: var(--foreground2);"><code><%= li.sku.sku %></code></span>
               </td>
               <td style="text-align: right; font-variant-numeric: tabular-nums;"><strong><%= li.quantity %></strong></td>
-              <td style="text-align: right; font-variant-numeric: tabular-nums; color: GrayText;"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
-              <td style="text-align: right; font-variant-numeric: tabular-nums; color: GrayText;"><%= number_to_currency(li.sku.declared_unit_cost) %></td>
+              <td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--foreground2);"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
+              <td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--foreground2);"><%= number_to_currency(li.sku.declared_unit_cost) %></td>
             </tr>
           <% end %>
         </tbody>
@@ -98,7 +98,7 @@
       <hr>
       <div style="margin-top: 0.5rem;">
         <strong><%= @warehouse_order.address.first_name %> <%= @warehouse_order.address.last_name %></strong><br>
-        <span style="color: GrayText;">
+        <span style="color: var(--foreground2);">
           <%= @warehouse_order.address.line_1 %><br>
           <% if @warehouse_order.address.line_2.present? %><%= @warehouse_order.address.line_2 %><br><% end %>
           <%= @warehouse_order.address.city %>, <%= @warehouse_order.address.state %> <%= @warehouse_order.address.postal_code %><br>
@@ -106,7 +106,7 @@
         </span>
         <% if @warehouse_order.recipient_email.present? %>
           <hr style="margin:0.5rem 0">
-          <span style="color: GrayText;">✉</span> <%= link_to @warehouse_order.recipient_email, "mailto:#{@warehouse_order.recipient_email}" %>
+          <span style="color: var(--foreground2);">✉</span> <%= link_to @warehouse_order.recipient_email, "mailto:#{@warehouse_order.recipient_email}" %>
         <% end %>
       </div>
     </section>
@@ -150,7 +150,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between">
             <span>
               <strong>Batch #<%= @warehouse_order.batch.id %></strong>
-              <span style="color: GrayText;"><%= @warehouse_order.batch.aasm.current_state.to_s.titleize %></span>
+              <span style="color: var(--foreground2);"><%= @warehouse_order.batch.aasm.current_state.to_s.titleize %></span>
             </span>
             <a href="<%= letter_batch_path(@warehouse_order.batch) %>">View Batch →</a>
           </div>
@@ -199,12 +199,12 @@
               <div style="margin-top: 0.5rem;"><strong>Shipped</strong></div>
             </div>
           <% elsif @warehouse_order.canceled_at.present? %>
-            <div style="text-align: center; padding: 1rem 0; color: GrayText;">
+            <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">
               <span style="font-size: 2em;">×</span>
               <div style="margin-top: 0.5rem;"><strong>Canceled</strong></div>
             </div>
           <% else %>
-            <span style="color: GrayText;">No actions available</span>
+            <span style="color: var(--foreground2);">No actions available</span>
           <% end %>
         <% end %>
       </div>

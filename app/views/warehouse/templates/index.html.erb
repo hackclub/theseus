@@ -6,7 +6,7 @@
     <%= render Components::Shared::Jumpcode.new(path: warehouse_templates_path) %>
   </div>
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <span style="color: GrayText;">Reusable order configurations</span>
+    <span style="color: var(--foreground2);">Reusable order configurations</span>
   </div>
   <span class="spacer"></span>
   <a href="<%= new_warehouse_template_path %>" class="btn-success btn-sm">+ New Template</a>
@@ -20,7 +20,7 @@
       <% if i > 0 %><hr><% end %>
       <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
         <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
-        <span style="color: GrayText;"><%= template.line_items.count %> items</span>
+        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
         <% if template.public %>
           <span class="badge badge-info">Shared</span>
         <% end %>
@@ -38,12 +38,12 @@
       <% if i > 0 %><hr><% end %>
       <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
         <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
-        <span style="color: GrayText;"><%= template.line_items.count %> items</span>
-        <span style="color: GrayText;">by <%= template.user&.username || "unknown" %></span>
+        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
+        <span style="color: var(--foreground2);">by <%= template.user&.username || "unknown" %></span>
       </a>
     <% end %>
   <% else %>
-    <div style="text-align: center; padding: 2rem; color: GrayText;">
+    <div style="text-align: center; padding: 2rem; color: var(--foreground2);">
       No public templates yet. Shared templates from other users will appear here.
     </div>
   <% end %>

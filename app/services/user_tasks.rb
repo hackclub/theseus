@@ -12,7 +12,7 @@ class UserTasks
   end
 
   def all
-    @all ||= queued_letters + pending_batches + printed_letters
+    @all ||= queued_letters + pending_batches + printed_letters + returned_sku_requests + returned_purchase_orders
   end
 
   def all_cached
@@ -73,6 +73,30 @@ class UserTasks
         name: "Letter #{letter.public_id} – #{letter.user_facing_title || letter.tags.join(", ")}",
         subtitle: "to #{letter.address.name_line}",
         link: Rails.application.routes.url_helpers.letter_path(letter)
+      }
+    end
+  end
+
+  def returned_sku_requests
+    Warehouse::SKURequest.where(user: @user, aasm_state: "returned")
+      .map do |req|
+      {
+        type: "SKU requests returned for revision",
+        name: req.name,
+        subtitle: req.reviewer_notes.present? ? "Notes: #{req.reviewer_notes.truncate(60)}" : "Returned by czar",
+        link: Rails.application.routes.url_helpers.warehouse_sku_request_path(req)
+      }
+    end
+  end
+
+  def returned_purchase_orders
+    Warehouse::PurchaseOrder.where(user: @user, status: "returned")
+      .map do |po|
+      {
+        type: "Purchase orders returned for revision",
+        name: "PO ##{po.id} — #{po.supplier_name}",
+        subtitle: po.reviewer_notes.present? ? "Notes: #{po.reviewer_notes.truncate(60)}" : "Returned by czar",
+        link: Rails.application.routes.url_helpers.warehouse_purchase_order_path(po)
       }
     end
   end

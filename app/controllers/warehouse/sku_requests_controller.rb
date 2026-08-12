@@ -46,6 +46,7 @@ class Warehouse::SKURequestsController < ApplicationController
 
   def submit
     authorize @sku_request
+    @sku_request.revise! if @sku_request.returned?
     @sku_request.submit!
     Warehouse::CzarMailer.sku_request_submitted(@sku_request).deliver_later
     redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request submitted for review." }

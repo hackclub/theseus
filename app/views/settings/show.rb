@@ -21,17 +21,17 @@ class Views::Settings::Show < Views::Base
         if @user.warehouse_czar?
           div(style: "margin-top:0.5rem;") do
             div(style: "display:flex;align-items:center;gap:0.5rem;") do
-              input(type: "hidden", name: "settings[czar_po_emails]", value: "0")
+              input(type: "hidden", name: "settings[czar_notifications]", value: "0")
               input(
                 type: "checkbox",
-                name: "settings[czar_po_emails]",
+                name: "settings[czar_notifications]",
                 value: "1",
-                checked: @user.setting("czar_po_emails")
+                checked: @user.setting("czar_notifications")
               )
-              label { "Email me when new purchase orders are submitted for approval" }
+              label { "Email me about warehouse approvals" }
             end
             small(class: "text-muted", style: "display:block;margin-top:0.25rem;margin-left:1.5rem;") do
-              plain "You'll get an email each time a warehouse user submits a PO for czar review."
+              plain "You'll get an email when SKU requests and purchase orders are submitted for review."
             end
           end
         else

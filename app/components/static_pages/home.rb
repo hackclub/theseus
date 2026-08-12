@@ -36,7 +36,7 @@ class Components::StaticPages::Home < Components::Base
   end
 
   def section_header(text)
-    strong(style: "font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.025rem; color: GrayText;") { text }
+    strong(style: "font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.025rem; color: var(--foreground2);") { text }
   end
 
   def needs_attention_section

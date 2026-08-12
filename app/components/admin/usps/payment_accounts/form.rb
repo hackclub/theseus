@@ -20,7 +20,7 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
 
         # Account type select
         div(style: "margin-bottom:1rem;") do
-          label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
             plain "Account Type *"
           end
           select(name: "usps_payment_account[account_type]", required: true, style: "width:100%;") do
@@ -49,7 +49,7 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
 
         # Mailer ID select
         div(style: "margin-bottom:1rem;") do
-          label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
             plain "Mailer ID *"
           end
           select(name: "usps_payment_account[usps_mailer_id_id]", required: true, style: "width:100%;") do
@@ -67,7 +67,7 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
 
         # ACH checkbox
         div(style: "margin-bottom:1rem;") do
-          label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "ACH" }
+          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "ACH" }
           input(type: "hidden", name: "usps_payment_account[ach]", value: "0")
           label(style: "display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;") do
             if @payment_account.ach?
@@ -100,7 +100,7 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
 
   def form_field(label_text, name, value, required: false, type: "text", hint: nil)
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
         plain label_text
         plain " *" if required
       end

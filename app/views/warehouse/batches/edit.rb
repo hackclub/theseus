@@ -16,7 +16,7 @@ class Views::Warehouse::Batches::Edit < Views::Base
 
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: GrayText;") { "← Batch ##{@batch.id}" }
+        a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Edit Warehouse Batch" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
@@ -33,7 +33,7 @@ class Views::Warehouse::Batches::Edit < Views::Base
             div(style: "margin-top: 0.5rem;") do
               if @allowed_templates.any?
                 div(style: "margin-bottom: 1rem;") do
-                  label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;", for: "batch_warehouse_template_id") { "Template" }
+                  label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;", for: "batch_warehouse_template_id") { "Template" }
                   select(
                     name: "batch[warehouse_template_id]",
                     id: "batch_warehouse_template_id",
@@ -47,7 +47,7 @@ class Views::Warehouse::Batches::Edit < Views::Base
               end
 
               div(style: "margin-bottom: 1rem;") do
-                label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Title" }
+                label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Title" }
                 input(type: "text", name: "batch[warehouse_user_facing_title]", value: @batch.warehouse_user_facing_title, style: "width: 100%;")
               end
             end
@@ -110,7 +110,7 @@ class Views::Warehouse::Batches::Edit < Views::Base
             option(value: tag, selected: @batch.tags&.include?(tag)) { tag }
           end
         end
-        p(style: "color: GrayText; font-size: 0.85em; margin: 0;") { "Select from common tags or create your own" }
+        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0;") { "Select from common tags or create your own" }
       end
     end
   end

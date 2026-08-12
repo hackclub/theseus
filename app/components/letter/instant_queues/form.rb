@@ -20,11 +20,11 @@ class Components::Letter::InstantQueues::Form < Components::Base
 
       div(class: "form-grid mb-3") do
         div(style: "margin-bottom: 1rem;") do
-          label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Name *" }
+          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Name *" }
           input(type: :text, name: "letter_instant_queue[name]", value: queue.name, required: true, style: "width: 100%;")
         end
         div(style: "margin-bottom: 1rem;") do
-          label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Display Title" }
+          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Display Title" }
           input(type: :text, name: "letter_instant_queue[user_facing_title]", value: queue.user_facing_title, style: "width: 100%;")
           span(class: "text-muted", style: "font-size: 0.9em;") { "Optional title shown to users" }
         end
@@ -74,7 +74,7 @@ class Components::Letter::InstantQueues::Form < Components::Base
       )
 
       div(class: "form-field-lg") do
-        label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Custom return address name" }
+        label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Custom return address name" }
         input(type: :text, name: "letter_instant_queue[letter_return_address_name]", value: queue.letter_return_address_name, style: "width: 100%;")
         span(class: "text-muted", style: "font-size: 0.9em;") { "Leave blank to use the address' default name" }
       end
@@ -131,7 +131,7 @@ class Components::Letter::InstantQueues::Form < Components::Base
       # Admin slug
       admin_tool do
         div(class: "form-field-lg") do
-          label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "Slug" }
+          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Slug" }
           input(type: :text, name: "letter_instant_queue[slug]", value: queue.slug, style: "width: 100%;")
         end
       end

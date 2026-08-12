@@ -2,7 +2,7 @@
 
 <div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: GrayText;">← Order <%= @warehouse_order.hc_id %></a>
+    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: var(--foreground2);">← Order <%= @warehouse_order.hc_id %></a>
     <strong style="font-size: 1.15em;">Edit Order</strong>
     <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
   </div>

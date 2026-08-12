@@ -21,7 +21,7 @@ class Views::Warehouse::SKURequests::Index < Views::Base
     end
 
     if @sku_requests.empty?
-      div(style: "text-align: center; padding: 3rem 0; color: GrayText;") do
+      div(style: "text-align: center; padding: 3rem 0; color: var(--foreground2);") do
         p { "No SKU requests yet." }
         a(href: new_warehouse_sku_request_path) do
           button(class: "btn-success") { "+ New Request" }
@@ -51,7 +51,7 @@ class Views::Warehouse::SKURequests::Index < Views::Base
               td(class: "text-muted") { req.created_at.strftime("%b %d, %Y") }
               td(style: "text-align:right;") do
                 if policy(req).edit?
-                  a(href: edit_warehouse_sku_request_path(req), style: "color:GrayText;margin-right:0.5rem;") { "✎" }
+                  a(href: edit_warehouse_sku_request_path(req), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
                 end
               end
             end

@@ -41,7 +41,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
   def header_section
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: letter_queues_path, style: "text-decoration: none; color: GrayText;") { "← Queues" }
+        a(href: letter_queues_path, style: "text-decoration: none; color: var(--foreground2);") { "← Queues" }
         strong(style: "font-size: 1.15em;") { queue.name }
         type_badge
         queue_status_badge
@@ -134,7 +134,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
         span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{letters.count})" } if letters.any?
         span(style: "flex: 1;")
         if search.present? || status.present?
-          a(href: queue_show_path, style: "color: GrayText; font-size: 0.9em;") { "× Clear filters" }
+          a(href: queue_show_path, style: "color: var(--foreground2); font-size: 0.9em;") { "× Clear filters" }
         end
       end
       hr
@@ -198,7 +198,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
             button(class: "#{state_badge_class(state)} btn-sm") { "#{count} #{state}" }
           end
         else
-          a(href: href, style: "text-decoration: none; color: GrayText;") { "#{count} #{state}" }
+          a(href: href, style: "text-decoration: none; color: var(--foreground2);") { "#{count} #{state}" }
         end
       end
     end
@@ -311,7 +311,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
   def admin_inspector(record)
     admin_tool do
       details(style: "margin-top: 1rem;") do
-        summary(style: "color: GrayText; cursor: pointer;") { "Inspect #{record.class.name.underscore}" }
+        summary(style: "color: var(--foreground2); cursor: pointer;") { "Inspect #{record.class.name.underscore}" }
         section(style: "margin-top: 0.5rem;") do
           pre(style: "margin: 0; overflow-x: auto; font-size: 0.85em;") { JSON.pretty_generate(record.as_json) }
         end

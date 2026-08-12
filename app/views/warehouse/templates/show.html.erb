@@ -2,7 +2,7 @@
 
 <div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_templates_path %>" style="text-decoration: none; color: GrayText;">← Templates</a>
+    <a href="<%= warehouse_templates_path %>" style="text-decoration: none; color: var(--foreground2);">← Templates</a>
     <strong style="font-size: 1.15em;"><%= @warehouse_template.name %></strong>
     <% if @warehouse_template.public %>
       <span class="badge badge-info">Shared</span>
@@ -10,7 +10,7 @@
   </div>
   <div style="display:flex;align-items:center;gap:0.5rem">
     <%= render Components::Shared::PublicId.new(value: @warehouse_template.public_id) %>
-    <span style="color: GrayText;">by <%= @warehouse_template.user&.username || "—" %></span>
+    <span style="color: var(--foreground2);">by <%= @warehouse_template.user&.username || "—" %></span>
   </div>
   <span class="spacer"></span>
   <div style="display:flex;align-items:center;gap:0.5rem">

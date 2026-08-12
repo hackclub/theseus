@@ -105,7 +105,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   end
 
   def render_empty_state
-    div("x-show": "visibleItems().length === 0", style: "text-align:center;padding:2rem 1rem;color:GrayText;") do
+    div("x-show": "visibleItems().length === 0", style: "text-align:center;padding:2rem 1rem;color:var(--foreground2);") do
       div(style: "font-size:2em;margin-bottom:0.5rem;") { "📦" }
       p(style: "margin:0;") do
         strong { "No items added" }
@@ -146,14 +146,14 @@ class Components::Warehouse::LineItemsEditor < Components::Base
                 whitespace
                 span(class: "badge badge-warning", style: "font-size:0.75em;") { "pending" }
                 if req.category.present?
-                  span(style: "color:GrayText;font-size:0.85em;margin-left:0.5rem;") { req.category.humanize }
+                  span(style: "color:var(--foreground2);font-size:0.85em;margin-left:0.5rem;") { req.category.humanize }
                 end
               end
             end
             hr(style: "margin:0.25rem 0;")
           end
           skus_by_category.each do |category, category_skus|
-            div(style: "padding:0.4rem 0.75rem;color:GrayText;font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;") do
+            div(style: "padding:0.4rem 0.75rem;color:var(--foreground2);font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;") do
               plain (category || "uncategorized").to_s.humanize
             end
             category_skus.each do |sku|
@@ -165,9 +165,9 @@ class Components::Warehouse::LineItemsEditor < Components::Base
               ) do
                 strong { sku.name }
                 whitespace
-                code(style: "font-size:0.85em;color:GrayText;") { sku.sku }
+                code(style: "font-size:0.85em;color:var(--foreground2);") { sku.sku }
                 if (desc = sku_description_text(sku)).present?
-                  span(style: "color:GrayText;font-size:0.85em;") { desc }
+                  span(style: "color:var(--foreground2);font-size:0.85em;") { desc }
                 end
               end
             end
@@ -318,7 +318,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
         },
         visibleItems() { return this.items.filter(i => !i._destroy); },
         stockStyle(stock) {
-          if (stock == null) return 'background: var(--background2); color: GrayText;';
+          if (stock == null) return 'background: var(--background2); color: var(--foreground2);';
           if (stock <= 0) return 'background: var(--background1); color: var(--red);';
           if (stock < 10) return 'background: var(--background1); color: var(--yellow);';
           return 'background: var(--background1); color: var(--green);';

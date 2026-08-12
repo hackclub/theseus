@@ -40,7 +40,7 @@ class Views::Letter::Batches::Map < Views::Base
 
   def view_template
     div(style: "display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;") do
-      a(href: letter_batch_path(@batch), style: "text-decoration:none;color:GrayText;") { "← Batch ##{@batch.public_id}" }
+      a(href: letter_batch_path(@batch), style: "text-decoration:none;color:var(--foreground2);") { "← Batch ##{@batch.public_id}" }
       strong(style: "font-size:1.15em;") { "Map CSV Fields" }
     end
 

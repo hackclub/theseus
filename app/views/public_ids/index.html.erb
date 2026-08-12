@@ -12,7 +12,7 @@
     <p class="text-muted" style="margin: 0 0 0.5rem;">Enter a Theseus ID or tracking number to look it up.</p>
     <%= form_with url: lookup_public_ids_path, method: :post do |f| %>
       <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">ID</label>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">ID</label>
         <input type="text" name="id" autofocus placeholder="e.g. ltr!abc123, 9400111..." style="width: 100%;">
       </div>
       <button type="submit" class="btn-success">⌕ Look up</button>

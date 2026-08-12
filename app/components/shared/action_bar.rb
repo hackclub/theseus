@@ -19,7 +19,7 @@ class Components::Shared::ActionBar < Components::Base
         a(href: root_path, style: "text-decoration:none;color:inherit") do
           b { "Theseus" }
           if Rails.env.development?
-            sup(style: "color:GrayText;font-size:0.7em;margin-left:0.15rem") { "dev" }
+            sup(style: "color:var(--foreground2);font-size:0.7em;margin-left:0.15rem") { "dev" }
           end
         end
       end
@@ -47,7 +47,7 @@ class Components::Shared::ActionBar < Components::Base
 
   def render_user_context
     return unless current_user
-    span(style: "color:GrayText") do
+    span(style: "color:var(--foreground2)") do
       plain current_user.username
     end
   end
@@ -70,7 +70,7 @@ class Components::Shared::ActionBar < Components::Base
       end
 
       div(style: "position:absolute;right:0;top:100%;min-width:8rem;background:Canvas;border:1px solid var(--background2);padding:0.5rem;display:flex;flex-direction:column") do
-        span(style: "color:GrayText;padding-bottom:0.5rem") do
+        span(style: "color:var(--foreground2);padding-bottom:0.5rem") do
           plain current_user.username
         end
         hr

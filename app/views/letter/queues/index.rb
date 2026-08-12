@@ -43,7 +43,7 @@ class Views::Letter::Queues::Index < Views::Base
       end
 
       if user_id.present? || queue_type.present?
-        a(href: letter_queues_path, style: "color: GrayText; white-space: nowrap;") { "× Clear" }
+        a(href: letter_queues_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
       end
     end
 
@@ -96,10 +96,10 @@ class Views::Letter::Queues::Index < Views::Base
                 span(class: "badge badge-info") { "Batch" }
               end
             end
-            td(style: queued > 0 ? "color: var(--blue);" : "color: GrayText;") do
+            td(style: queued > 0 ? "color: var(--blue);" : "color: var(--foreground2);") do
               plain fmt(queued)
             end
-            td(style: printed > 0 ? "color: var(--green);" : "color: GrayText;") do
+            td(style: printed > 0 ? "color: var(--green);" : "color: var(--foreground2);") do
               plain fmt(printed)
             end
             td(class: "text-muted") { plain fmt(mailed) }

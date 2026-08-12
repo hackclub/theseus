@@ -2,10 +2,10 @@ module LettersHelper
   def status_color(state)
     case state.to_s
     when "mailed", "received" then "var(--green)"
-    when "printed", "processed" then "color-mix(in srgb, var(--green) 60%, GrayText)"
+    when "printed", "processed" then "color-mix(in srgb, var(--green) 60%, var(--foreground2))"
     when "queued" then "var(--yellow)"
     when "failed" then "var(--red)"
-    else "GrayText"
+    else "var(--foreground2)"
     end
   end
 end

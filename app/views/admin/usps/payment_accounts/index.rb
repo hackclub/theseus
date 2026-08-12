@@ -39,7 +39,7 @@ class Views::Admin::USPS::PaymentAccounts::Index < Views::Base
               td(class: "text-muted") { mailer_id_label(account) }
               td { ach_badge(account) }
               td(style: "text-align:right;white-space:nowrap;") do
-                a(href: edit_admin_usps_payment_account_path(account), style: "color:GrayText;margin-right:0.5rem;") { "✎" }
+                a(href: edit_admin_usps_payment_account_path(account), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
                 button_to "✕", admin_usps_payment_account_path(account), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this payment account?')"
               end
             end

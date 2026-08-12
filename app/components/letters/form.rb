@@ -100,10 +100,10 @@ class Components::Letters::Form < Components::Base
 
   def field_group(label:, caption: nil, &block)
     div(style: "margin-bottom:1rem;") do
-      tag(:label, style: "display:block;color:GrayText;margin-bottom:0.25rem;") { label }
+      tag(:label, style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { label }
       yield
       if caption
-        span(style: "display:block;color:GrayText;font-size:0.85em;margin-top:0.25rem;") { caption }
+        span(style: "display:block;color:var(--foreground2);font-size:0.85em;margin-top:0.25rem;") { caption }
       end
     end
   end
@@ -127,7 +127,7 @@ class Components::Letters::Form < Components::Base
 
   def mailing_date_field(f)
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Mailing date" }
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Mailing date" }
       input(
         type: "date",
         name: "letter[mailing_date]",
@@ -273,7 +273,7 @@ class Components::Letters::Form < Components::Base
 
     # Postage type (hidden by default, shown by JS for US addresses)
     div(id: "postage-options", style: "display:none;margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Postage type" }
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Postage type" }
       div(style: "display:flex;gap:1rem;") do
         label do
           input(type: "radio", name: "letter[postage_type]", value: "stamps", checked: letter.postage_type == "stamps" || letter.postage_type.blank?)
@@ -284,7 +284,7 @@ class Components::Letters::Form < Components::Base
           plain " Indicia (Metered)"
         end
       end
-      span(style: "display:block;color:GrayText;font-size:0.85em;margin-top:0.25rem;") { "Indicia is slightly cheaper for standard letters" }
+      span(style: "display:block;color:var(--foreground2);font-size:0.85em;margin-top:0.25rem;") { "Indicia is slightly cheaper for standard letters" }
     end
 
     # Mailer ID
@@ -358,7 +358,7 @@ class Components::Letters::Form < Components::Base
           option(value: tag, selected: letter.tags&.include?(tag)) { tag }
         end
       end
-      span(style: "display:block;color:GrayText;font-size:0.85em;margin-top:0.25rem;") do
+      span(style: "display:block;color:var(--foreground2);font-size:0.85em;margin-top:0.25rem;") do
         plain "Select from common tags or create your own"
       end
     end

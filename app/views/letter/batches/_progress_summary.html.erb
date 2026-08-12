@@ -2,13 +2,13 @@
   <div style="display:flex;gap:1.5rem;align-items:center;margin-bottom:0.5rem;">
     <div>
       <strong style="font-size:1.5em;font-variant-numeric:tabular-nums;"><%= purchased %></strong>
-      <span style="color:GrayText"> / <%= total %> purchased</span>
+      <span style="color:var(--foreground2)"> / <%= total %> purchased</span>
     </div>
     <% if failed > 0 %>
       <div style="color:var(--red);"><strong style="font-size:1.5em;"><%= failed %></strong> failed</div>
     <% end %>
     <% if (remaining = total - purchased - failed) > 0 %>
-      <div style="color:GrayText;"><%= remaining %> remaining</div>
+      <div style="color:var(--foreground2);"><%= remaining %> remaining</div>
     <% end %>
   </div>
   <div class="batch-progress-bar" style="margin-bottom:0.75rem;">

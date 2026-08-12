@@ -145,7 +145,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
                 end
               end
               td(style: "text-align:right;font-variant-numeric:tabular-nums;") { sku.in_stock&.to_s || "—" }
-              td(style: "text-align:right;color:GrayText;font-variant-numeric:tabular-nums;") { sku.inbound&.to_s || "—" }
+              td(style: "text-align:right;color:var(--foreground2);font-variant-numeric:tabular-nums;") { sku.inbound&.to_s || "—" }
               td(style: "text-align:right;font-variant-numeric:tabular-nums;") { helpers.number_to_currency(sku.declared_unit_cost) }
               td { stock_badge(sku) }
               td(style: "text-align:center") { sku_actions(sku) }
@@ -192,7 +192,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
             td { sku.name }
             td(class: "text-muted") { sku.category&.humanize || "—" }
             td(style: "text-align:right;font-weight:600;font-variant-numeric:tabular-nums;") { sku.in_stock&.to_s || "—" }
-            td(style: "text-align:right;color:GrayText;font-variant-numeric:tabular-nums;") { sku.inbound&.to_s || "—" }
+            td(style: "text-align:right;color:var(--foreground2);font-variant-numeric:tabular-nums;") { sku.inbound&.to_s || "—" }
             td(style: "text-align:right;font-variant-numeric:tabular-nums;") { helpers.number_to_currency(sku.declared_unit_cost) }
             td { stock_badge(sku) }
             td(style: "text-align:center") { sku_actions(sku) }

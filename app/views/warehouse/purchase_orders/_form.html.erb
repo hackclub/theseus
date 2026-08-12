@@ -15,19 +15,19 @@
     <hr>
     <div style="margin-top: 0.5rem;">
       <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Supplier name <span style="color: var(--red);">*</span></label>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Supplier name <span style="color: var(--red);">*</span></label>
         <input type="text" name="warehouse_purchase_order[supplier_name]" value="<%= purchase_order.supplier_name %>" required style="width: 100%;">
       </div>
       <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Supplier ID</label>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Supplier ID</label>
         <input type="text" name="warehouse_purchase_order[supplier_id]" value="<%= purchase_order.supplier_id %>" style="width: 100%;">
       </div>
       <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Required by date</label>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Required by date</label>
         <%= form.date_field :required_by_date, style: "width: 100%;" %>
       </div>
       <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Notes</label>
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Notes</label>
         <textarea name="warehouse_purchase_order[notes]" rows="3" style="width: 100%;"><%= purchase_order.notes %></textarea>
       </div>
     </div>
@@ -48,7 +48,7 @@
 
   <div style="display:flex;align-items:center;gap:0.5rem">
     <span class="spacer"></span>
-    <a href="<%= warehouse_purchase_orders_path %>" style="color: GrayText;">Cancel</a>
+    <a href="<%= warehouse_purchase_orders_path %>" style="color: var(--foreground2);">Cancel</a>
     <button type="submit" class="btn-success">✓ <%= purchase_order.persisted? ? "Update Purchase Order" : "Create Purchase Order" %></button>
   </div>
 <% end %>

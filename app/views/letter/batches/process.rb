@@ -11,7 +11,7 @@ class Views::Letter::Batches::Process < Views::Base
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: GrayText;") { "← Batch ##{@batch.id}" }
+        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Process Batch" }
       end
     end
@@ -27,7 +27,7 @@ class Views::Letter::Batches::Process < Views::Base
 
           div(style: "display:flex;gap:0.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--background2);") do
             button(type: "submit", class: "btn-success", data: { disable_with: "Processing…" }) { "▶ Start Processing" }
-            a(href: letter_batch_path(@batch), style: "color:GrayText;align-self:center;") { "Cancel" }
+            a(href: letter_batch_path(@batch), style: "color:var(--foreground2);align-self:center;") { "Cancel" }
           end
         end
 
@@ -48,7 +48,7 @@ class Views::Letter::Batches::Process < Views::Base
       hr
 
       div(style: "margin-top:0.75rem;") do
-        label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Batch Title" }
+        label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Batch Title" }
         input(
           type: "text",
           name: "batch[user_facing_title]",
@@ -60,7 +60,7 @@ class Views::Letter::Batches::Process < Views::Base
       end
 
       div(style: "margin-top:0.75rem;") do
-        label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Mailing Date" }
+        label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Mailing Date" }
         input(
           type: "date",
           name: "batch[letter_mailing_date]",
@@ -189,7 +189,7 @@ class Views::Letter::Batches::Process < Views::Base
       if current_user&.admin?
         admin_tool(element: "div") do
           div(style: "margin-top:0.75rem;") do
-            label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "USPS Payment Account" }
+            label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "USPS Payment Account" }
             select(name: "batch[usps_payment_account_id]", style: "width:100%;") do
               USPS::PaymentAccount.all.each do |pa|
                 option(value: pa.id, selected: pa.id == default_usps_id.to_i) { pa.display_name }
@@ -204,7 +204,7 @@ class Views::Letter::Batches::Process < Views::Base
       # HCB account
       if current_user.hcb_payment_accounts.any?
         div(style: "margin-top:0.75rem;") do
-          label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "HCB Payment Account" }
+          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "HCB Payment Account" }
           select(name: "batch[hcb_payment_account_id]", style: "width:100%;") do
             current_user.hcb_payment_accounts.each do |hcb|
               option(value: hcb.id) { hcb.display_name }

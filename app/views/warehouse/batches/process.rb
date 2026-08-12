@@ -10,7 +10,7 @@ class Views::Warehouse::Batches::Process < Views::Base
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: GrayText;") { "← Batch ##{@batch.id}" }
+        a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Process Warehouse Batch" }
       end
     end
@@ -40,7 +40,7 @@ class Views::Warehouse::Batches::Process < Views::Base
             span(class: "detail-label") { "Labor" }
             span { number_to_currency(@batch.labor_cost) }
             span(class: "detail-label") { "Postage" }
-            span(style: "color: GrayText;") { "TBD" }
+            span(style: "color: var(--foreground2);") { "TBD" }
           end
           hr(style: "margin:0.5rem 0")
           div(class: "detail-grid") do
@@ -60,7 +60,7 @@ class Views::Warehouse::Batches::Process < Views::Base
               button(type: "submit", class: "btn-success", style: "width: 100%;") { "▶ Process Batch" }
             end
             div(style: "margin-top: 0.5rem;") do
-              a(href: warehouse_batch_path(@batch), style: "color: GrayText;") { "Cancel" }
+              a(href: warehouse_batch_path(@batch), style: "color: var(--foreground2);") { "Cancel" }
             end
           end
         end

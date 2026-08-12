@@ -62,7 +62,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
   def form_field(label_text, name, value, required: false, type: "text", hint: nil)
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
         plain label_text
         plain " *" if required
       end
@@ -77,7 +77,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
   def form_textarea(label_text, name, value, hint: nil)
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { label_text }
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { label_text }
       textarea(name: name, rows: 3, style: "width:100%;") { value }
       if hint
         small(class: "text-muted", style: "display:block;") { hint }
@@ -87,7 +87,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
   def category_select
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
         plain "Category"
         plain " *"
       end
@@ -106,7 +106,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
   def image_field
     div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Image" }
+      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Image" }
       input(type: "file", name: "warehouse_sku_request[image]", accept: "image/*")
       if @sku_request.persisted? && @sku_request.image.attached?
         small(class: "text-muted", style: "display:block;") { "Current image attached. Upload a new one to replace." }

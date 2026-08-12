@@ -8,7 +8,7 @@ class Views::Letter::Queues::Edit < Views::Base
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: letter_queue_path(@queue), style: "text-decoration: none; color: GrayText;") { "← #{@queue.name}" }
+        a(href: letter_queue_path(@queue), style: "text-decoration: none; color: var(--foreground2);") { "← #{@queue.name}" }
         strong(style: "font-size: 1.15em;") { "Edit Queue" }
       end
     end

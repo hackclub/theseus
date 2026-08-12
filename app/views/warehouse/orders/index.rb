@@ -95,7 +95,7 @@ class Views::Warehouse::Orders::Index < Views::Base
               td do
                 a(href: warehouse_order_path(order), style: "text-decoration: none;") { order.hc_id }
               end
-              td(style: "color: GrayText;") { plain order.created_at.strftime("%b %d") }
+              td(style: "color: var(--foreground2);") { plain order.created_at.strftime("%b %d") }
               td { plain order.address&.name_line || "—" }
               td(style: "text-align: right;") { plain order.line_items.sum(&:quantity).to_s }
               td { status_badge(order) }
@@ -107,9 +107,9 @@ class Views::Warehouse::Orders::Index < Views::Base
       section(style: "text-align: center; padding: 2rem;") do
         h2(style: "margin: 0;") { "No orders found" }
         if search.present? || state.present?
-          p(style: "color: GrayText;") { "Try adjusting your search or filters." }
+          p(style: "color: var(--foreground2);") { "Try adjusting your search or filters." }
         else
-          p(style: "color: GrayText;") { "Create your first order to get started." }
+          p(style: "color: var(--foreground2);") { "Create your first order to get started." }
           a(href: new_warehouse_order_path) do
             button(class: "btn-success") { "+ New Order" }
           end

@@ -17,7 +17,7 @@ class Views::Batches::Index < Views::Base
     else
       section(style: "text-align: center; padding: 2rem;") do
         strong { "No batches yet" }
-        div(style: "margin-top: 0.5rem; color: GrayText;") { "Upload a CSV to create your first batch." }
+        div(style: "margin-top: 0.5rem; color: var(--foreground2);") { "Upload a CSV to create your first batch." }
       end
     end
   end

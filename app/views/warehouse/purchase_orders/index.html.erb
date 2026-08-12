@@ -2,12 +2,12 @@
 
 <div class="toolbar">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: GrayText;">&larr; SKUs</a>
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">&larr; SKUs</a>
     <strong style="font-size: 1.15em;">Purchase Orders</strong>
     <%= render Components::Shared::Jumpcode.new(path: warehouse_purchase_orders_path) %>
   </div>
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <span style="color: GrayText;"><%= @purchase_orders.count %> orders</span>
+    <span style="color: var(--foreground2);"><%= @purchase_orders.count %> orders</span>
   </div>
   <span class="spacer"></span>
   <a href="<%= new_warehouse_purchase_order_path %>" class="btn-success btn-sm">+ New Purchase Order</a>
@@ -50,6 +50,12 @@
         <span class="stat-label">Completed</span>
       </button>
     <% end %>
+    <% if grouped["returned"]&.any? %>
+      <button class="stat-filter" data-filter="returned">
+        <span class="stat-count"><%= grouped["returned"].count %></span>
+        <span class="stat-label">Returned</span>
+      </button>
+    <% end %>
   </div>
 
   <%
@@ -57,7 +63,7 @@
       "draft" => "badge",
       "submitted" => "badge badge-info",
       "approved" => "badge badge-success",
-      "rejected" => "badge badge-danger",
+      "returned" => "badge badge-warning",
       "open" => "badge badge-info",
       "completed" => "badge badge-success",
       "deleted" => "badge badge-danger"
@@ -71,20 +77,20 @@
         <div style="display:flex;align-items:center;gap:0.5rem">
           <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
           <span class="<%= badge_classes[po.status] || "badge" %>"><%= po.humanized_state %></span>
-          <span style="color: GrayText;"><%= po.supplier_name %></span>
+          <span style="color: var(--foreground2);"><%= po.supplier_name %></span>
           <span style="flex: 1;"></span>
           <span class="fw-medium"><%= po.line_items.sum(&:quantity) %> units</span>
-          <span style="color: GrayText;"><%= number_to_currency(po.total_cost) %></span>
+          <span style="color: var(--foreground2);"><%= number_to_currency(po.total_cost) %></span>
           <% if po.required_by_date.present? %>
-            <span style="color: GrayText;">due <%= po.required_by_date.strftime("%b %d") %></span>
+            <span style="color: var(--foreground2);">due <%= po.required_by_date.strftime("%b %d") %></span>
           <% end %>
-          <span style="color: GrayText;"><%= time_ago_in_words(po.created_at) %> ago</span>
+          <span style="color: var(--foreground2);"><%= time_ago_in_words(po.created_at) %> ago</span>
           <% admin_tool do %>
             <details class="popover">
               <summary tabindex="0" class="btn-sm">&ctdot;</summary>
               <div style="display:flex;flex-direction:column">
                 <a href="<%= warehouse_purchase_order_path(po) %>">&nbsp;&#x1F441; View</a>
-                <% if po.draft? %>
+                <% if po.draft? || po.returned? %>
                   <a href="<%= edit_warehouse_purchase_order_path(po) %>">&#x270E; Edit</a>
                 <% end %>
                 <% if po.zenventory_id.present? %>
@@ -101,7 +107,7 @@
 <% else %>
   <section style="text-align: center; padding: 2rem;">
     <strong>No purchase orders yet</strong>
-    <div style="color: GrayText; margin-top: 0.5rem;">Create your first purchase order to get started.</div>
+    <div style="color: var(--foreground2); margin-top: 0.5rem;">Create your first purchase order to get started.</div>
     <div style="margin-top: 1rem;"><a href="<%= new_warehouse_purchase_order_path %>">Create Purchase Order</a></div>
   </section>
 <% end %>

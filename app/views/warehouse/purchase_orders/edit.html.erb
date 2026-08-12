@@ -2,7 +2,7 @@
 
 <div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_purchase_order_path(@purchase_order) %>" style="text-decoration: none; color: GrayText;">← <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></a>
+    <a href="<%= warehouse_purchase_order_path(@purchase_order) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></a>
     <strong style="font-size: 1.15em;">Edit Purchase Order</strong>
     <% badge_class = { "draft" => "badge", "open" => "badge badge-info", "completed" => "badge badge-success", "deleted" => "badge badge-danger" }[@purchase_order.status] || "badge" %>
     <span class="<%= badge_class %>"><%= @purchase_order.humanized_state %></span>

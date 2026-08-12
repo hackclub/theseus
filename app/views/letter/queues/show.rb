@@ -31,7 +31,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
       div(style: "margin-top: 0.5rem;") do
         form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
           div(style: "margin-bottom: 0.5rem;") do
-            label(style: "display: block; color: GrayText; margin-bottom: 0.25rem;") { "How many letters?" }
+            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "How many letters?" }
             input(type: "text", name: "limit", style: "width: 100%;")
             small(class: "text-muted") { "Blank = all #{queued_count}" }
           end

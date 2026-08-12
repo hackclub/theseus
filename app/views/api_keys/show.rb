@@ -10,7 +10,7 @@ class Views::APIKeys::Show < Views::Base
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
-        a(href: api_keys_path, style: "text-decoration: none; color: GrayText;") { "← API Keys" }
+        a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
         strong(style: "font-size: 1.15em;") { api_key.pretty_name }
         span(class: api_key.active? ? "badge badge-success" : "badge badge-danger") do
           api_key.active? ? "Active" : "Revoked"
@@ -64,7 +64,7 @@ class Views::APIKeys::Show < Views::Base
             aria: { label: "Copy to clipboard" }
           ) { "⎘" }
         end
-        p(style: "color: GrayText; font-size: 0.85em; margin: 0.25rem 0 0;") { "Keep this secret. Don't share it with anyone." }
+        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0;") { "Keep this secret. Don't share it with anyone." }
       end
     end
   end

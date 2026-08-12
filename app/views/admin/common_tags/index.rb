@@ -14,7 +14,7 @@ class Views::Admin::CommonTags::Index < Views::Base
     )
 
     if @common_tags.empty?
-      div(style: "text-align:center;padding:3rem 1rem;color:GrayText;") do
+      div(style: "text-align:center;padding:3rem 1rem;color:var(--foreground2);") do
         p { "No common tags yet." }
         a(href: new_admin_common_tag_path) do
           button(class: "btn-success") { "+ New Tag" }
@@ -43,7 +43,7 @@ class Views::Admin::CommonTags::Index < Views::Base
                 end
               end
               td(style: "text-align:right;white-space:nowrap;") do
-                a(href: edit_admin_common_tag_path(common_tag), style: "color:GrayText;margin-right:0.5rem;") { "✎" }
+                a(href: edit_admin_common_tag_path(common_tag), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
                 button_to "✕", admin_common_tag_path(common_tag), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this tag?')"
               end
             end

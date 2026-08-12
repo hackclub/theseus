@@ -70,7 +70,7 @@
 
   .price-indicia {
     font-size: 0.85em;
-    color: GrayText;
+    color: var(--foreground2);
     font-variant-numeric: tabular-nums;
   }
 

@@ -2,7 +2,7 @@
 
 <div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= letter_path(@letter) %>" style="text-decoration: none; color: GrayText;">← <%= @letter.public_id %></a>
+    <a href="<%= letter_path(@letter) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @letter.public_id %></a>
     <strong style="font-size: 1.15em;">Buy Indicia</strong>
   </div>
 </div>
@@ -34,7 +34,7 @@
       <div style="margin-top: 0.5rem;">
         <%= form_with(url: buy_indicia_letter_path(@letter), method: :post) do |form| %>
           <div style="margin-bottom: 0.5rem;">
-            <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">USPS Payment Account</label>
+            <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">USPS Payment Account</label>
             <select name="usps_payment_account_id" required style="width: 100%;">
               <option value="">Select account…</option>
               <% USPS::PaymentAccount.all.each do |account| %>
@@ -45,7 +45,7 @@
 
           <% if current_user.hcb_payment_accounts.any? %>
             <div style="margin-bottom: 0.5rem;">
-              <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">HCB Organization</label>
+              <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">HCB Organization</label>
               <select name="hcb_payment_account_id" required style="width: 100%;">
                 <option value="">Select organization…</option>
                 <% current_user.hcb_payment_accounts.each do |account| %>
@@ -54,14 +54,14 @@
               </select>
             </div>
           <% else %>
-            <div style="margin-bottom: 0.5rem; color: GrayText;">
+            <div style="margin-bottom: 0.5rem; color: var(--foreground2);">
               <%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to pay for postage.
             </div>
           <% end %>
 
           <div style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;">
             <span class="spacer"></span>
-            <a href="<%= letter_path(@letter) %>" style="color: GrayText;">Cancel</a>
+            <a href="<%= letter_path(@letter) %>" style="color: var(--foreground2);">Cancel</a>
             <button type="submit" class="btn-success" <%= "disabled" if current_user.hcb_payment_accounts.empty? %>>✓ Buy Indicia</button>
           </div>
         <% end %>
@@ -73,7 +73,7 @@
     <section>
       <strong>Info</strong>
       <hr>
-      <div style="margin-top: 0.5rem; color: GrayText;">
+      <div style="margin-top: 0.5rem; color: var(--foreground2);">
         Purchasing indicia buys USPS postage for this letter. The cost is charged to the selected HCB organization.
       </div>
     </section>
