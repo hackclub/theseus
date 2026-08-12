@@ -1,5 +1,0 @@
-<tr id="<%= dom_id payment_account %>">
-  <td><a href="<%= usps_payment_account_path(payment_account) %>" style="text-decoration: none;"><strong><%= payment_account.display_name %></strong></a></td>
-  <td><span class="badge"><%= payment_account.account_type %></span></td>
-  <td class="text-muted"><%= payment_account.usps_mailer_id&.name || "—" %></td>
-</tr>

@@ -509,27 +509,14 @@ Rails.application.routes.draw do
     end
 
     namespace :admin do
-      resources :addresses
-      resources :return_addresses
-      resources :source_tags
       resources :users
-
-      namespace :warehouse do
-        resources :templates
-        resources :orders
-        resources :skus do
-          member do
-            post :sync_to_zenventory
-          end
-        end
-      end
+      resources :common_tags
+      resources :source_tags
 
       namespace :usps do
         resources :mailer_ids
         resources :payment_accounts
       end
-
-      resources :common_tags
 
       root to: "users#index"
     end
@@ -544,8 +531,6 @@ Rails.application.routes.draw do
 
     namespace :usps do
       resources :indicia
-      resources :payment_accounts
-      resources :mailer_ids
     end
 
     namespace :hcb do
@@ -554,7 +539,6 @@ Rails.application.routes.draw do
       end
       resources :payment_accounts, only: [:index, :new, :create, :show]
     end
-    resources :source_tags
     namespace :warehouse do
       resources :templates
       resources :orders do
@@ -576,7 +560,11 @@ Rails.application.routes.draw do
           post "/process", to: "batches#process_batch", as: :process_batch
         end
       end
-      resources :skus
+      resources :skus do
+        member do
+          post :sync_to_zenventory
+        end
+      end
     end
     resources :return_addresses do
       member do
