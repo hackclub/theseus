@@ -64,7 +64,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
       # Approve with SKU code
       div(style: "margin-top: 0.5rem; margin-bottom: 1rem;") do
         form(method: "post", action: approve_warehouse_sku_request_path(@sku_request)) do
-          input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
+          input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
           div(style: "display:flex;align-items:flex-end;gap:0.5rem;") do
             div(style: "flex:1;") do
               label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Assigned SKU Code *" }
@@ -76,7 +76,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
                 style: "width:100%;"
               )
             end
-            button(type: "submit", class: "btn-success", onclick: "return confirm('Approve this SKU request and create the SKU?')") { "✓ Approve" }
+            button(type: "submit", class: "btn-success", onclick: safe("return confirm('Approve this SKU request and create the SKU?')")) { "✓ Approve" }
           end
         end
       end
@@ -84,7 +84,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
       # Reject
       div do
         form(method: "post", action: reject_warehouse_sku_request_path(@sku_request)) do
-          input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
+          input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
           div(style: "display:flex;align-items:flex-end;gap:0.5rem;") do
             div(style: "flex:1;") do
               label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Rejection Reason (optional)" }
@@ -95,7 +95,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
                 style: "width:100%;"
               )
             end
-            button(type: "submit", class: "btn-danger", onclick: "return confirm('Reject this SKU request?')") { "✕ Reject" }
+            button(type: "submit", class: "btn-danger", onclick: safe("return confirm('Reject this SKU request?')")) { "✕ Reject" }
           end
         end
       end
