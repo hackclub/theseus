@@ -26,6 +26,15 @@ class Components::Shared::Sidebar < Components::Base
         nav_link("Batches", warehouse_batches_path)
         nav_link("SKUs", warehouse_skus_path)
         nav_link("Purchase Orders", warehouse_purchase_orders_path)
+        if current_user&.warehouse_czar?
+          approval_count = Warehouse::SKURequest.where(aasm_state: "submitted").count +
+                           Warehouse::PurchaseOrder.where(status: "submitted").count
+          selected = active?(warehouse_approvals_path)
+          a(href: warehouse_approvals_path, class: ("selected" if selected), style: "display:flex;justify-content:space-between;align-items:center;") do
+            plain "Approvals"
+            span(class: "badge") { approval_count.to_s } if approval_count > 0
+          end
+        end
         nav_link("Templates", warehouse_templates_path)
       end
 

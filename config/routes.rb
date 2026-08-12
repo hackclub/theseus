@@ -565,13 +565,14 @@ Rails.application.routes.draw do
           post :reject
         end
       end
+      resources :approvals, only: [:index]
       resources :batches do
         member do
           get "/process", to: "batches#process_form", as: :process_confirm
           post "/process", to: "batches#process_batch", as: :process_batch
         end
       end
-      resources :skus do
+      resources :skus, except: %i[new create] do
         member do
           post :sync_to_zenventory
         end

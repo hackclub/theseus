@@ -9,6 +9,8 @@
 #  email                  :string
 #  icon_url               :string
 #  is_admin               :boolean
+#  is_warehouse_czar      :boolean          default(FALSE), not null
+#  settings               :jsonb            not null
 #  username               :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null

@@ -53,6 +53,26 @@ class Warehouse::PurchaseOrdersController < ApplicationController
     redirect_to warehouse_purchase_orders_path, status: :see_other, notice: "Purchase order was deleted."
   end
 
+  def submit_for_approval
+    authorize @purchase_order, :submit?
+    @purchase_order.submit_for_approval!
+    redirect_to warehouse_purchase_order_path(@purchase_order), flash: { success: "Purchase order submitted for approval." }
+  end
+
+  def approve
+    authorize @purchase_order
+    @purchase_order.reviewed_by = current_user
+    @purchase_order.approve!
+    redirect_to warehouse_purchase_order_path(@purchase_order), flash: { success: "Purchase order approved." }
+  end
+
+  def reject
+    authorize @purchase_order
+    @purchase_order.update!(reviewed_by: current_user, rejection_reason: params[:rejection_reason])
+    @purchase_order.reject!
+    redirect_to warehouse_purchase_order_path(@purchase_order), flash: { success: "Purchase order rejected." }
+  end
+
   def send_to_zenventory
     authorize @purchase_order
 
@@ -97,7 +117,7 @@ class Warehouse::PurchaseOrdersController < ApplicationController
       :supplier_id,
       :notes,
       :required_by_date,
-      line_items_attributes: %i[id sku_id quantity unit_cost _destroy]
+      line_items_attributes: %i[id sku_id sku_request_id quantity unit_cost _destroy]
     )
   end
 end

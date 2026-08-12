@@ -7,6 +7,7 @@ class Public::UpdateMapDataJob < ApplicationJob
   )
 
   def perform
+	return
     map_data = fetch_recent_letters_data
     Rails.cache.write("map_data", map_data, expires_in: 1.hour)
     map_data

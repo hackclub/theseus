@@ -7,7 +7,7 @@
 #  canceled_at             :datetime
 #  carrier                 :string
 #  contents_cost           :decimal(10, 2)
-#  created_via             :integer          default("manual"), not null
+#  created_via             :integer          default(0), not null
 #  dispatched_at           :datetime
 #  idempotency_key         :string
 #  internal_notes          :text

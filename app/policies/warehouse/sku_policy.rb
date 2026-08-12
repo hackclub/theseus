@@ -6,10 +6,10 @@ class Warehouse::SKUPolicy < ApplicationPolicy
     user_can_warehouse
   end
   def create?
-    user_is_admin
+    false
   end
   def new?
-    user_is_admin
+    false
   end
   def update?
     user_is_admin

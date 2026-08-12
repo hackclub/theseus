@@ -5,7 +5,7 @@
 #  id                  :bigint           not null, primary key
 #  aasm_state          :string
 #  body                :text
-#  created_via         :integer          default("manual"), not null
+#  created_via         :integer          default(0), not null
 #  height              :decimal(, )
 #  idempotency_key     :string
 #  imb_rollover_count  :integer

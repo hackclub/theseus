@@ -27,32 +27,9 @@ class Warehouse::SKUsController < ApplicationController
     @recent_purchase_orders = (outstanding_pos + completed_pos).sort_by(&:created_at).reverse
   end
 
-  # GET /warehouse/skus/new
-  def new
-    authorize Warehouse::SKU
-    @warehouse_sku = Warehouse::SKU.new
-  end
-
   # GET /warehouse/skus/1/edit
   def edit
     authorize @warehouse_sku
-  end
-
-  # POST /warehouse/skus or /warehouse/skus.json
-  def create
-    @warehouse_sku = Warehouse::SKU.new(warehouse_sku_params)
-
-    authorize @warehouse_sku
-
-    respond_to do |format|
-      if @warehouse_sku.save
-        format.html { redirect_to @warehouse_sku, notice: "WarehouseSKU was successfully created." }
-        format.json { render :show, status: :created, location: @warehouse_sku }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @warehouse_sku.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
   # PATCH/PUT /warehouse/skus/1 or /warehouse/skus/1.json
@@ -76,7 +53,6 @@ class Warehouse::SKUsController < ApplicationController
   rescue Zenventory::ZenventoryError => e
     redirect_to @warehouse_sku, alert: "Zenventory sync failed: #{e.message}"
   end
-
 
   private
     # Use callbacks to share common setup or constraints between actions.

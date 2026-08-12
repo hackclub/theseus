@@ -8,8 +8,8 @@ class SettingsController < ApplicationController
   end
 
   def update
-    settings = params.require(:settings).permit(:czar_po_emails)
-    settings.each { |key, value| current_user.update_setting(key, value == "1") }
+    settings = params.fetch(:settings, {}).permit(:czar_po_emails)
+    current_user.update_setting("czar_po_emails", settings[:czar_po_emails] == "1")
     redirect_to settings_path, notice: "Settings saved."
   end
 end

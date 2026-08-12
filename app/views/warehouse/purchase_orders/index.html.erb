@@ -2,7 +2,7 @@
 
 <div class="toolbar">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: GrayText;">← SKUs</a>
+    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: GrayText;">&larr; SKUs</a>
     <strong style="font-size: 1.15em;">Purchase Orders</strong>
     <%= render Components::Shared::Jumpcode.new(path: warehouse_purchase_orders_path) %>
   </div>
@@ -16,34 +16,61 @@
 <% if @purchase_orders.any? %>
   <% grouped = @purchase_orders.group_by(&:status) %>
   <div class="stat-filters" id="stats-container" style="margin-bottom: 1rem;">
+    <button class="stat-filter" data-filter="all">
+      <span class="stat-count"><%= @purchase_orders.count %></span>
+      <span class="stat-label">All</span>
+    </button>
     <% if grouped["draft"]&.any? %>
       <button class="stat-filter" data-filter="draft">
-        <span class="stat-count"><%= grouped["draft"]&.count || 0 %></span>
+        <span class="stat-count"><%= grouped["draft"].count %></span>
         <span class="stat-label">Draft</span>
+      </button>
+    <% end %>
+    <% if grouped["submitted"]&.any? %>
+      <button class="stat-filter" data-filter="submitted">
+        <span class="stat-count"><%= grouped["submitted"].count %></span>
+        <span class="stat-label">Pending Approval</span>
+      </button>
+    <% end %>
+    <% if grouped["approved"]&.any? %>
+      <button class="stat-filter" data-filter="approved">
+        <span class="stat-count"><%= grouped["approved"].count %></span>
+        <span class="stat-label">Approved</span>
       </button>
     <% end %>
     <% if grouped["open"]&.any? %>
       <button class="stat-filter" data-filter="open">
-        <span class="stat-count"><%= grouped["open"]&.count || 0 %></span>
-        <span class="stat-label">Open</span>
+        <span class="stat-count"><%= grouped["open"].count %></span>
+        <span class="stat-label">Sent</span>
       </button>
     <% end %>
     <% if grouped["completed"]&.any? %>
       <button class="stat-filter" data-filter="completed">
-        <span class="stat-count"><%= grouped["completed"]&.count || 0 %></span>
+        <span class="stat-count"><%= grouped["completed"].count %></span>
         <span class="stat-label">Completed</span>
       </button>
     <% end %>
   </div>
 
+  <%
+    badge_classes = {
+      "draft" => "badge",
+      "submitted" => "badge badge-info",
+      "approved" => "badge badge-success",
+      "rejected" => "badge badge-danger",
+      "open" => "badge badge-info",
+      "completed" => "badge badge-success",
+      "deleted" => "badge badge-danger"
+    }
+  %>
+
   <section>
-    <% @purchase_orders.each_with_index do |po, i|
-      badge_class = { "draft" => "badge", "open" => "badge badge-info", "completed" => "badge badge-success", "deleted" => "badge badge-danger" }[po.status] || "badge" %>
+    <% @purchase_orders.each_with_index do |po, i| %>
       <% if i > 0 %><hr><% end %>
       <div class="po-row" data-status="<%= po.status %>" style="padding: 0.5rem 0;">
         <div style="display:flex;align-items:center;gap:0.5rem">
           <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
-          <span class="<%= badge_class %>"><%= po.humanized_state %></span>
+          <span class="<%= badge_classes[po.status] || "badge" %>"><%= po.humanized_state %></span>
           <span style="color: GrayText;"><%= po.supplier_name %></span>
           <span style="flex: 1;"></span>
           <span class="fw-medium"><%= po.line_items.sum(&:quantity) %> units</span>
@@ -54,15 +81,15 @@
           <span style="color: GrayText;"><%= time_ago_in_words(po.created_at) %> ago</span>
           <% admin_tool do %>
             <details class="popover">
-              <summary tabindex="0" class="btn-sm">⋯</summary>
+              <summary tabindex="0" class="btn-sm">&ctdot;</summary>
               <div style="display:flex;flex-direction:column">
-                <a href="<%= warehouse_purchase_order_path(po) %>">👁 View</a>
+                <a href="<%= warehouse_purchase_order_path(po) %>">&nbsp;&#x1F441; View</a>
                 <% if po.draft? %>
-                  <a href="<%= edit_warehouse_purchase_order_path(po) %>">✎ Edit</a>
+                  <a href="<%= edit_warehouse_purchase_order_path(po) %>">&#x270E; Edit</a>
                 <% end %>
                 <% if po.zenventory_id.present? %>
-                  <a href="<%= po.zenventory_url %>" target="_blank">↗ Zenventory</a>
-                  <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= po.zenventory_id %>" target="_blank">⎘ Zenv PDF</a>
+                  <a href="<%= po.zenventory_url %>" target="_blank">&nearr; Zenventory</a>
+                  <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= po.zenventory_id %>" target="_blank">&#x2398; Zenv PDF</a>
                 <% end %>
               </div>
             </details>
@@ -88,7 +115,15 @@
 
   function updateDisplay() {
     getRows().forEach(row => {
-      row.style.display = (!selectedStatus || row.dataset.status === selectedStatus) ? '' : 'none';
+      row.style.display = (!selectedStatus || selectedStatus === 'all' || row.dataset.status === selectedStatus) ? '' : 'none';
+    });
+    // Also hide <hr> separators between hidden rows
+    document.querySelectorAll('section hr').forEach(hr => {
+      const prev = hr.previousElementSibling;
+      const next = hr.nextElementSibling;
+      if (prev && prev.classList.contains('po-row') && next && next.classList.contains('po-row')) {
+        hr.style.display = (prev.style.display === 'none' || next.style.display === 'none') ? 'none' : '';
+      }
     });
     getFilters().forEach(f => {
       f.style.outline = (f.dataset.filter === selectedStatus) ? '1px solid currentColor' : 'none';
@@ -98,7 +133,8 @@
   document.addEventListener('click', function(e) {
     const filter = e.target.closest('.stat-filter');
     if (filter) {
-      selectedStatus = (selectedStatus === filter.dataset.filter) ? null : filter.dataset.filter;
+      const val = filter.dataset.filter;
+      selectedStatus = (selectedStatus === val || val === 'all') && selectedStatus === val ? null : val;
       updateDisplay();
     }
   });

@@ -23,6 +23,7 @@ module Shortcodes
         Shortcode.new(code: "WNEW", label: "New Warehouse Order", icon: "⊡", path: new_warehouse_order_path, admin_only: false),
         Shortcode.new(code: "PONE", label: "New Purchase Order", icon: "⊟", path: new_warehouse_purchase_order_path, admin_only: false),
         Shortcode.new(code: "WTNE", label: "New Order Template", icon: "⎘", path: new_warehouse_template_path, admin_only: false),
+        Shortcode.new(code: "CZAR", label: "Approval Queue", icon: "⊙", path: warehouse_approvals_path, admin_only: false),
 
         # mail
         Shortcode.new(code: "MAIL", label: "Letters", icon: "◇", path: letters_path, admin_only: false),
