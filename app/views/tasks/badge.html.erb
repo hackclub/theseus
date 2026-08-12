@@ -5,19 +5,9 @@
     <%= vite_stylesheet_tag 'app_style.scss' %>
   </head>
   <body style="margin: 0 !important;">
-    <% if @tasks.any? %>
-      <%= link_to tasks_path, target: "_top" do%>
-        <div class="badge
-        <% if @tasks.count < 10 %>
-          success
-        <% elsif @tasks.count < 50 %>
-          info
-        <% else %>
-          warning
-        <% end %>
-        " style="margin: 0 !important;">
-          <%= @tasks.count %><% if @tasks.count > 50 %>?<% end %>
-        </div>
+    <% if @count && @count > 0 %>
+      <%= link_to tasks_path, target: "_top" do %>
+        <span class="badge badge-info"><%= @count %></span>
       <% end %>
     <% end %>
   </body>

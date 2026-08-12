@@ -1,25 +1,21 @@
 class TasksController < ApplicationController
   skip_after_action :verify_authorized
-  before_action :find_tasks
+
+  def show
+    render Components::Tasks::Show.new(tasks: user_tasks.all_cached)
+  end
 
   def badge
+    @count = user_tasks.count_cached
     render :badge, layout: false
   end
 
-  def show
-    render :show
-  end
-
   def refresh
-    User::UpdateTasksJob.perform_later(current_user)
+    user_tasks.warm_cache!
     redirect_to tasks_path
   end
 
-  def find_tasks
-    @tasks = Rails.cache.read("user_tasks/#{current_user.id}")
-    if @tasks.nil?
-      User::UpdateTasksJob.perform_later(current_user)
-      @tasks = []
-    end
-  end
+  private
+
+  def user_tasks = @user_tasks ||= UserTasks.new(current_user)
 end
