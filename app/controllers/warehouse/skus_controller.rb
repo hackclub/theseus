@@ -1,5 +1,5 @@
 class Warehouse::SKUsController < ApplicationController
-  before_action :set_warehouse_sku, only: %i[ show edit update sync_to_zenventory ]
+  before_action :set_warehouse_sku, only: %i[ show edit update ]
 
   # GET /warehouse/skus or /warehouse/skus.json
   def index
@@ -46,13 +46,6 @@ class Warehouse::SKUsController < ApplicationController
     end
   end
 
-  def sync_to_zenventory
-    authorize @warehouse_sku
-    @warehouse_sku.sync_to_zenventory!
-    redirect_to @warehouse_sku, notice: "Synced to Zenventory."
-  rescue Zenventory::ZenventoryError => e
-    redirect_to @warehouse_sku, alert: "Zenventory sync failed: #{e.message}"
-  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

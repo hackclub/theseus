@@ -33,9 +33,6 @@
         <a href="<%= @warehouse_sku.zenventory_url %>" target="_blank">↗ Zenventory</a>
       <% end %>
     <% end %>
-    <% admin_tool do %>
-      <%= button_to "⟳ Sync to Zenventory", sync_to_zenventory_warehouse_sku_path(@warehouse_sku), method: :post, class: "btn-sm", data: { confirm: "Sync this SKU to Zenventory?" } %>
-    <% end %>
   </div>
 </div>
 

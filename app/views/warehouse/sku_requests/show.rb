@@ -218,10 +218,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
   def approved_info
     section(style: "margin-bottom: 1rem;") do
-      strong { "Approval" }
+      strong { "✓ Approved" }
       hr
       div(class: "detail-grid", style: "margin-top: 0.5rem;") do
-        span(class: "detail-label") { "Assigned SKU Code" }
+        span(class: "detail-label") { "SKU Code" }
         if @sku_request.warehouse_sku
           a(href: warehouse_sku_path(@sku_request.warehouse_sku), style: "font-weight:600;font-family:monospace;") { @sku_request.assigned_sku_code }
         else
@@ -231,6 +231,29 @@ class Views::Warehouse::SKURequests::Show < Views::Base
         span { @sku_request.reviewed_by&.username || "—" }
         span(class: "detail-label") { "Reviewed At" }
         span(class: "text-muted") { @sku_request.reviewed_at&.strftime("%b %d, %Y %H:%M") || "—" }
+      end
+
+      if @sku_request.image.attached? && @sku_request.warehouse_sku&.zenventory_url.present?
+        hr
+        div(style: "margin-top:0.75rem;padding:0.75rem;background:var(--info-bg);border:1px solid var(--info-border);border-radius:4px;") do
+          strong(style: "color:var(--info-fg);") { "📷 Upload this image to Zenventory" }
+          p(style: "margin:0.25rem 0 0.75rem;color:var(--info-fg);font-size:0.9em;") do
+            plain "Zenventory doesn't support image upload via API — download it here and upload it in their UI."
+          end
+          div(style: "display:flex;gap:0.5rem;align-items:center;") do
+            a(
+              href: helpers.rails_blob_path(@sku_request.image, disposition: "attachment"),
+              class: "btn-sm btn-success",
+              style: "text-decoration:none;"
+            ) { "⬇ Download Image" }
+            a(
+              href: @sku_request.warehouse_sku.zenventory_url,
+              target: "_blank",
+              class: "btn-sm btn-info",
+              style: "text-decoration:none;"
+            ) { "↗ Edit in Zenventory" }
+          end
+        end
       end
     end
   end

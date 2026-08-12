@@ -1,5 +1,9 @@
 hey <%= @sku_request.user.username %>, your SKU request was approved!
 
 <b><%= @sku_request.name %></b> is now SKU <code><%= @sku_request.assigned_sku_code %></code> in Zenventory.
+<% if @sku_request.image.attached? && @sku_request.warehouse_sku&.zenventory_url.present? %>
+<b>📷 czar reminder:</b> don't forget to upload the item image to Zenventory!
+<%= link_to "download image", rails_blob_url(@sku_request.image, disposition: "attachment") %> · <%= link_to "edit in zenventory →", @sku_request.warehouse_sku.zenventory_url %>
+<% end %>
 
 <%= link_to "view it →", warehouse_sku_request_url(@sku_request) %>
