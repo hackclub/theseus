@@ -180,6 +180,19 @@ a.btn-success, a.btn-danger, a.btn-warning, a.btn-info { text-decoration: none; 
 
 .btn-sm { padding: 0.2rem 0.5rem; font-size: 0.85em; }
 
+.api-docs-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85em;
+  border: 1px solid var(--foreground2);
+  border-radius: 4px;
+  background: var(--background1);
+  color: var(--foreground2);
+  &:hover { background: var(--background2); color: var(--foreground); }
+}
+
 
 // ── Badges ─────────────────────────────────────────────
 
@@ -372,6 +385,7 @@ $gate-green: #14a314;
 // tone down inside toolbar
 .toolbar .admin-tool {
   border: none;
+  margin-left: auto;
   &::before { display: none; }
   &::after { display: none; }
 }
