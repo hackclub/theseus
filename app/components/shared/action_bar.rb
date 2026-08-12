@@ -28,6 +28,9 @@ class Components::Shared::ActionBar < Components::Base
         render_user_context
         render_impersonation_banner if current_user && impersonating?
 
+        # tasks badge
+        render_tasks_badge if current_user
+
         # hints button
         button(class: "btn-sm", onclick: safe("window.openHints && window.openHints()")) { "?" }
 
@@ -76,6 +79,17 @@ class Components::Shared::ActionBar < Components::Base
           data: { method: :delete },
           style: "text-decoration:none;padding-top:0.5rem"
         ) { "Log out" }
+      end
+    end
+  end
+
+  def render_tasks_badge
+    count = Rails.cache.read("user_tasks/#{current_user.id}")&.size
+    a(href: tasks_path, style: "text-decoration:none;") do
+      if count && count > 0
+        span(class: "badge badge-info", style: "font-size:0.8em;") { count.to_s }
+      else
+        button(class: "btn-sm") { "✓" }
       end
     end
   end

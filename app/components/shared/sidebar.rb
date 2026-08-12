@@ -17,6 +17,7 @@ class Components::Shared::Sidebar < Components::Base
     nav(class: "theseus-sidebar", id: "sidebar") do
       div(class: "sidebar-section") do
         nav_link("Home", root_path, exact: true)
+        nav_link("Tasks", tasks_path)
       end
 
       div(class: "sidebar-section") do
