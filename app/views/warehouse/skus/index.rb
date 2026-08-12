@@ -37,7 +37,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
       end
 
       admin_tool(element: "span") do
-        a(href: new_admin_warehouse_sku_path) { button(class: "btn-success btn-sm") { "+ New SKU" } }
+        a(href: new_warehouse_sku_path) { button(class: "btn-success btn-sm") { "+ New SKU" } }
       end
     end
   end
@@ -239,7 +239,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
           a(href: sku.zenventory_url, target: "_blank", style: "text-decoration:none;color:inherit;") { "Open in Zenventory ↗" }
         end
         if current_user&.is_admin?
-          a(href: edit_admin_warehouse_sku_path(sku), style: "text-decoration:none;color:inherit;") { "Edit" }
+          a(href: edit_warehouse_sku_path(sku), style: "text-decoration:none;color:inherit;") { "Edit" }
         end
       end
     end

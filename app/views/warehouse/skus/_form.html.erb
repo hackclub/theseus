@@ -26,6 +26,15 @@
         <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Description</label>
         <textarea name="warehouse_sku[description]" rows="3" style="width: 100%;"><%= warehouse_sku.description %></textarea>
       </div>
+      <div style="margin-bottom: 0.5rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Category</label>
+        <select name="warehouse_sku[category]" style="width: 100%;">
+          <option value="">— Select —</option>
+          <% Warehouse::SKU.categories.keys.each do |cat| %>
+            <option value="<%= cat %>" <%= "selected" if warehouse_sku.category == cat %>><%= cat.humanize %></option>
+          <% end %>
+        </select>
+      </div>
     </div>
   </section>
 
@@ -44,6 +53,30 @@
         <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Customs description</label>
         <textarea name="warehouse_sku[customs_description]" rows="2" style="width: 100%;"><%= warehouse_sku.customs_description %></textarea>
       </div>
+      <div style="margin-bottom: 0.5rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Country of origin</label>
+        <input type="text" name="warehouse_sku[country_of_origin]" value="<%= warehouse_sku.country_of_origin %>" style="width: 100%;">
+      </div>
+      <div style="margin-bottom: 0.5rem;">
+        <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">HS code</label>
+        <input type="text" name="warehouse_sku[hs_code]" value="<%= warehouse_sku.hs_code %>" style="width: 100%;">
+      </div>
+      <% admin_tool do %>
+        <div style="margin-bottom: 0.5rem;">
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Average PO cost</label>
+          <div style="display:flex;align-items:center;gap:0.25rem">
+            <span>$</span>
+            <input type="text" name="warehouse_sku[average_po_cost]" value="<%= warehouse_sku.average_po_cost %>" style="flex: 1;">
+          </div>
+        </div>
+        <div style="margin-bottom: 0.5rem;">
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Declared unit cost override</label>
+          <div style="display:flex;align-items:center;gap:0.25rem">
+            <span>$</span>
+            <input type="text" name="warehouse_sku[declared_unit_cost_override]" value="<%= warehouse_sku.declared_unit_cost_override %>" style="flex: 1;">
+          </div>
+        </div>
+      <% end %>
     </div>
   </section>
 
@@ -55,6 +88,16 @@
         <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">In stock</label>
         <input type="number" name="warehouse_sku[in_stock]" value="<%= warehouse_sku.in_stock %>" style="width: 100%;">
       </div>
+      <% admin_tool do %>
+        <div style="margin-bottom: 0.5rem;">
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Inbound</label>
+          <input type="number" name="warehouse_sku[inbound]" value="<%= warehouse_sku.inbound %>" style="width: 100%;">
+        </div>
+        <div style="margin-bottom: 0.5rem;">
+          <label style="display: block; color: GrayText; margin-bottom: 0.25rem;">Zenventory ID</label>
+          <input type="text" name="warehouse_sku[zenventory_id]" value="<%= warehouse_sku.zenventory_id %>" style="width: 100%;">
+        </div>
+      <% end %>
       <div style="margin-bottom: 0.5rem;">
         <label>
           <input type="checkbox" name="warehouse_sku[ai_enabled]" value="1" <%= "checked" if warehouse_sku.ai_enabled %>>

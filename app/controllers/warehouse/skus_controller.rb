@@ -1,5 +1,5 @@
 class Warehouse::SKUsController < ApplicationController
-  before_action :set_warehouse_sku, only: %i[ show edit update ]
+  before_action :set_warehouse_sku, only: %i[ show edit update sync_to_zenventory ]
 
   # GET /warehouse/skus or /warehouse/skus.json
   def index
@@ -69,6 +69,14 @@ class Warehouse::SKUsController < ApplicationController
     end
   end
 
+  def sync_to_zenventory
+    authorize @warehouse_sku
+    @warehouse_sku.sync_to_zenventory!
+    redirect_to @warehouse_sku, notice: "Synced to Zenventory."
+  rescue Zenventory::ZenventoryError => e
+    redirect_to @warehouse_sku, alert: "Zenventory sync failed: #{e.message}"
+  end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -78,6 +86,11 @@ class Warehouse::SKUsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def warehouse_sku_params
-      params.expect(warehouse_sku: [ :sku, :description, :unit_cost, :customs_description, :in_stock, :ai_enabled, :enabled ])
+      params.expect(warehouse_sku: [
+        :sku, :name, :description, :unit_cost, :customs_description,
+        :in_stock, :ai_enabled, :enabled, :category, :country_of_origin,
+        :hs_code, :average_po_cost, :declared_unit_cost_override,
+        :inbound, :zenventory_id
+      ])
     end
 end
