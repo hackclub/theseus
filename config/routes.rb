@@ -554,6 +554,7 @@ Rails.application.routes.draw do
           post :submit_for_approval
           post :approve
           post :reject
+          post :revise
           post :send_to_zenventory
           post :sync
         end

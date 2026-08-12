@@ -114,7 +114,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
           span(style: "font-weight:600;") { @sku_request.assigned_sku_code }
         end
         span(class: "detail-label") { "Reviewed By" }
-        span { @sku_request.reviewed_by&.name || "—" }
+        span { @sku_request.reviewed_by&.username || "—" }
         span(class: "detail-label") { "Reviewed At" }
         span(class: "text-muted") { @sku_request.reviewed_at&.strftime("%b %d, %Y %H:%M") || "—" }
       end
@@ -208,7 +208,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
               a(href: warehouse_purchase_order_path(po), style: "text-decoration:none;font-weight:600;") do
                 plain "PO ##{po.id}"
               end
-              span(class: "text-muted") { " — #{po.aasm_state.humanize}" }
+              span(class: "text-muted") { " — #{po.humanized_state}" }
             end
           end
         end

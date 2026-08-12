@@ -87,6 +87,10 @@ class Warehouse::PurchaseOrder < ApplicationRecord
       after { update!(reviewed_at: Time.current) }
     end
 
+    event :revise do
+      transitions from: :rejected, to: :draft
+    end
+
     event :mark_open do
       transitions from: :approved, to: :open, guard: :all_skus_resolved?
     end
@@ -96,7 +100,7 @@ class Warehouse::PurchaseOrder < ApplicationRecord
     end
 
     event :mark_deleted do
-      transitions from: %i[draft submitted approved open], to: :deleted
+      transitions from: %i[draft submitted approved rejected open], to: :deleted
     end
   end
 

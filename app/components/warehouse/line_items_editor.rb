@@ -131,6 +131,27 @@ class Components::Warehouse::LineItemsEditor < Components::Base
           )
         end
         div(id: "sku-select-list") do
+          if pending_sku_requests.any?
+            div(style: "padding:0.4rem 0.75rem;color:var(--yellow);font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;") do
+              plain "Pending SKU Requests"
+            end
+            pending_sku_requests.each do |req|
+              a(
+                href: "#",
+                class: "sku-pick-item",
+                "data-filter-string": "#{req.name} #{req.category} pending",
+                "@click.prevent": "addPendingItem(#{req.id}, #{req.name.to_json}, #{req.unit_cost&.to_f || 'null'})"
+              ) do
+                strong { req.name }
+                whitespace
+                span(class: "badge badge-warning", style: "font-size:0.75em;") { "pending" }
+                if req.category.present?
+                  span(style: "color:GrayText;font-size:0.85em;margin-left:0.5rem;") { req.category.humanize }
+                end
+              end
+            end
+            hr(style: "margin:0.25rem 0;")
+          end
           skus_by_category.each do |category, category_skus|
             div(style: "padding:0.4rem 0.75rem;color:GrayText;font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;") do
               plain (category || "uncategorized").to_s.humanize
@@ -214,6 +235,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
         end
 
         input(type: "hidden", ":name": field_name("sku_id"), ":value": "item.sku_id")
+        input(type: "hidden", ":name": field_name("sku_request_id"), ":value": "item.sku_request_id")
         input(type: "hidden", ":name": field_name("quantity"), ":value": "item.quantity")
 
         if @show_unit_cost
@@ -233,17 +255,18 @@ class Components::Warehouse::LineItemsEditor < Components::Base
 
   # Alpine.js data
 
-  def alpine_data_json
     initial_items = @line_items.map.with_index do |li, i|
       {
         id: li.id,
         sku_id: li.sku_id,
-        sku_name: li.sku&.name,
-        sku_code: li.sku&.sku,
+        sku_request_id: li.respond_to?(:sku_request_id) ? li.sku_request_id : nil,
+        sku_name: li.sku&.name || li.try(:sku_request)&.name,
+        sku_code: li.sku&.sku || (li.try(:sku_request) ? "(pending)" : nil),
         sku_stock: li.sku&.in_stock,
         quantity: li.quantity || 1,
         unit_cost: li.respond_to?(:unit_cost) ? li.unit_cost : nil,
-        _index: i
+        _index: i,
+        _pending: li.sku_id.blank? && li.respond_to?(:sku_request_id) && li.sku_request_id.present?
       }
     end
 
@@ -255,19 +278,36 @@ class Components::Warehouse::LineItemsEditor < Components::Base
           const newIndex = this.nextIndex++;
           this.items.push({
             sku_id: skuId,
+            sku_request_id: null,
             sku_name: skuName,
             sku_code: skuCode,
             sku_stock: skuStock,
             quantity: 1,
             unit_cost: skuCost || '',
             _index: newIndex,
-            _new: true
+            _new: true,
+            _pending: false
           });
           setTimeout(() => {
             const rows = this.$refs.list.querySelectorAll('tbody tr');
             const lastInput = rows[rows.length - 1]?.querySelector('input[type="number"]');
             if (lastInput) { lastInput.focus(); lastInput.select(); }
           }, 50);
+        },
+        addPendingItem(reqId, reqName, reqCost) {
+          const newIndex = this.nextIndex++;
+          this.items.push({
+            sku_id: null,
+            sku_request_id: reqId,
+            sku_name: reqName,
+            sku_code: '(pending)',
+            sku_stock: null,
+            quantity: 1,
+            unit_cost: reqCost || '',
+            _index: newIndex,
+            _new: true,
+            _pending: true
+          });
         },
         removeItem(index) {
           const item = this.items.find(i => i._index === index);
@@ -299,5 +339,9 @@ class Components::Warehouse::LineItemsEditor < Components::Base
 
   def skus_by_category
     @skus_by_category ||= skus.group_by(&:category)
+  end
+
+  def pending_sku_requests
+    @pending_sku_requests ||= ::Warehouse::SKURequest.where(aasm_state: %w[submitted approved]).order(:name)
   end
 end

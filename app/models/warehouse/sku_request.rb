@@ -17,7 +17,7 @@ class Warehouse::SKURequest < ApplicationRecord
   validates :unit_cost, presence: true, numericality: { greater_than: 0 }
   validates :category, presence: true, inclusion: { in: Warehouse::SKU.categories.keys }
   validates :expected_quantity, numericality: { greater_than: 0 }, allow_nil: true
-  validates :assigned_sku_code, presence: true, on: :approve
+  validates :assigned_sku_code, presence: true, if: -> { approved? || synced? }
 
   aasm timestamps: true do
     state :draft, initial: true
@@ -33,10 +33,7 @@ class Warehouse::SKURequest < ApplicationRecord
 
     event :approve do
       transitions from: :submitted, to: :approved
-      after do
-        update!(reviewed_at: Time.current)
-        create_sku_in_zenventory!
-      end
+      after { update!(reviewed_at: Time.current) }
     end
 
     event :reject do
@@ -60,9 +57,11 @@ class Warehouse::SKURequest < ApplicationRecord
     name
   end
 
-  private
-
+  # Call AFTER approve! — separated so zenventory failure doesn't
+  # roll back the state transition. Idempotent: checks warehouse_sku.
   def create_sku_in_zenventory!
+    return if warehouse_sku.present?
+
     params = {
       sku: assigned_sku_code,
       description: name,

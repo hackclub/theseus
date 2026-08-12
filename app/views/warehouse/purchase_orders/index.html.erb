@@ -134,7 +134,7 @@
     const filter = e.target.closest('.stat-filter');
     if (filter) {
       const val = filter.dataset.filter;
-      selectedStatus = (selectedStatus === val || val === 'all') && selectedStatus === val ? null : val;
+      selectedStatus = (val === 'all' || selectedStatus === val) ? null : val;
       updateDisplay();
     }
   });

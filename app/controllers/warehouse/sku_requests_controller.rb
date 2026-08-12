@@ -59,8 +59,13 @@ class Warehouse::SKURequestsController < ApplicationController
       return
     end
     begin
+      @sku_request.save!
       @sku_request.approve!
+      @sku_request.create_sku_in_zenventory!
       redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request approved! SKU created in Zenventory." }
+    rescue Zenventory::ZenventoryError => e
+      # Approval stands, but zenventory creation failed — czar can retry
+      redirect_to warehouse_sku_request_path(@sku_request), alert: "Approved, but Zenventory creation failed: #{e.message}. You can retry."
     rescue => e
       redirect_to warehouse_sku_request_path(@sku_request), alert: "Approval failed: #{e.message}"
     end
@@ -68,8 +73,10 @@ class Warehouse::SKURequestsController < ApplicationController
 
   def reject
     authorize @sku_request
-    @sku_request.update!(reviewed_by: current_user, rejection_reason: params[:rejection_reason])
-    @sku_request.reject!
+    ActiveRecord::Base.transaction do
+      @sku_request.reject!
+      @sku_request.update!(reviewed_by: current_user, rejection_reason: params[:rejection_reason])
+    end
     redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request rejected." }
   end
 
