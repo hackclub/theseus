@@ -34,13 +34,9 @@ class Views::Admin::SourceTags::Index < Views::Base
               td(style: "font-weight:600;") { source_tag.name }
               td(class: "text-muted") { source_tag.owner.presence || "—" }
               td(class: "text-muted") { source_tag.warehouse_orders.size.to_s }
-              td(style: "text-align:right;") do
+              td(style: "text-align:right;white-space:nowrap;") do
                 a(href: edit_admin_source_tag_path(source_tag), style: "color:GrayText;margin-right:0.5rem;") { "✎" }
-                a(
-                  href: admin_source_tag_path(source_tag),
-                  data: { turbo_method: :delete, turbo_confirm: "Delete this source tag?" },
-                  style: "color:var(--red);"
-                ) { "✕" }
+                button_to "✕", admin_source_tag_path(source_tag), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this source tag?')"
               end
             end
           end

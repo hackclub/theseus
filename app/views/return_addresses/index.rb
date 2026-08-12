@@ -94,10 +94,6 @@ class Views::ReturnAddresses::Index < Views::Base
       ) { "⌂" }
     end
 
-    a(
-      href: return_address_path(address),
-      data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this return address?" },
-      style: "color: var(--red);"
-    ) { "✕" }
+    button_to "✕", return_address_path(address), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Are you sure you want to delete this return address?')"
   end
 end

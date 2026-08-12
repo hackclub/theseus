@@ -12,13 +12,9 @@ class Views::Admin::SourceTags::Show < Views::Base
         strong(style: "font-size:1.15em;") { @source_tag.name }
         span(class: "badge badge-info") { @source_tag.slug }
       end
-      div(style: "display:flex;gap:0.5rem;") do
+      div(style: "display:flex;gap:0.5rem;align-items:center;") do
         a(href: edit_admin_source_tag_path(@source_tag), class: "btn-sm") { "Edit" }
-        a(
-          href: admin_source_tag_path(@source_tag),
-          data: { turbo_method: :delete, turbo_confirm: "Delete this source tag?" },
-          class: "btn-sm btn-danger"
-        ) { "Delete" }
+        button_to "Delete", admin_source_tag_path(@source_tag), method: :delete, class: "btn-sm btn-danger", onclick: "return confirm('Delete this source tag?')"
       end
     end
 

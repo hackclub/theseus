@@ -74,11 +74,7 @@ class Components::Shared::ActionBar < Components::Base
           plain current_user.username
         end
         hr
-        a(
-          href: signout_path,
-          data: { method: :delete },
-          style: "text-decoration:none;padding-top:0.5rem"
-        ) { "Log out" }
+        button_to "Log out", signout_path, method: :delete, style: "background:none;border:none;color:inherit;cursor:pointer;font:inherit;padding:0.5rem 0 0;text-align:left;text-decoration:none;"
       end
     end
   end

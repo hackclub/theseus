@@ -41,9 +41,9 @@ class Views::Admin::CommonTags::Index < Views::Base
                   span(class: "badge") { "No" }
                 end
               end
-              td(style: "text-align:right;") do
+              td(style: "text-align:right;white-space:nowrap;") do
                 a(href: edit_admin_common_tag_path(common_tag), style: "color:GrayText;margin-right:0.5rem;") { "✎" }
-                a(href: admin_common_tag_path(common_tag), data: { turbo_method: :delete, turbo_confirm: "Delete this tag?" }, style: "color:var(--red);") { "✕" }
+                button_to "✕", admin_common_tag_path(common_tag), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this tag?')"
               end
             end
           end
