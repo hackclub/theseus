@@ -66,7 +66,8 @@ class Components::Warehouse::SKURequests::Form < Components::Base
         plain label_text
         plain " *" if required
       end
-      attrs = { type: type, name: name, value: value, required: required, style: "width:100%;" }
+      coerced_value = value.is_a?(BigDecimal) ? "%.2f" % value : value
+      attrs = { type: type, name: name, value: coerced_value, required: required, style: "width:100%;" }
       attrs[:step] = "0.01" if type == "number"
       input(**attrs)
       if hint
