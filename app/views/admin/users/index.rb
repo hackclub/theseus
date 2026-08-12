@@ -8,6 +8,7 @@ class Views::Admin::Users::Index < Views::Base
   def view_template
     render Components::Shared::PageToolbar.new(
       title: "Users",
+      jumpcode_path: admin_users_path,
       search_path: admin_users_path,
       search_placeholder: "Search users..."
     )

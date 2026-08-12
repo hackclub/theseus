@@ -8,6 +8,7 @@ class Views::Admin::CommonTags::Index < Views::Base
   def view_template
     render Components::Shared::PageToolbar.new(
       title: "Common Tags",
+      jumpcode_path: admin_common_tags_path,
       action_href: new_admin_common_tag_path,
       action_label: "+ New Tag"
     )

@@ -6,6 +6,7 @@ class Views::Admin::USPS::MailerIds::Index < Views::Base
   def view_template
     render Components::Shared::PageToolbar.new(
       title: "Mailer IDs",
+      jumpcode_path: admin_usps_mailer_ids_path,
       action_href: new_admin_usps_mailer_id_path,
       action_label: "+ New Mailer ID"
     )

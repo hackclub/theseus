@@ -45,8 +45,12 @@ module Shortcodes
 
         # admin
         Shortcode.new(code: "JOBS", label: "Good Job", icon: "⊕", path: "/back_office/good_job", admin_only: true),
-        Shortcode.new(code: "ADMN", label: "Admin Panel", icon: "⊛", path: "/back_office/admin", admin_only: true),
         Shortcode.new(code: "FIRE", label: "Blazer", icon: "≋", path: "/back_office/blazer", admin_only: true),
+        Shortcode.new(code: "AUSR", label: "Admin Users", icon: "⊛", path: "/back_office/admin/users", admin_only: true),
+        Shortcode.new(code: "ACTG", label: "Common Tags", icon: "⏿", path: "/back_office/admin/common_tags", admin_only: true),
+        Shortcode.new(code: "ASTG", label: "Source Tags", icon: "⊙", path: "/back_office/admin/source_tags", admin_only: true),
+        Shortcode.new(code: "AMID", label: "USPS Mailer IDs", icon: "⊚", path: "/back_office/admin/usps/mailer_ids", admin_only: true),
+        Shortcode.new(code: "AEPS", label: "USPS Payment Accts", icon: "⊛", path: "/back_office/admin/usps/payment_accounts", admin_only: true),
       ]
 
       if user&.admin?

@@ -8,6 +8,7 @@ class Views::Admin::USPS::PaymentAccounts::Index < Views::Base
   def view_template
     render Components::Shared::PageToolbar.new(
       title: "Payment Accounts",
+      jumpcode_path: admin_usps_payment_accounts_path,
       action_href: new_admin_usps_payment_account_path,
       action_label: "+ New Payment Account"
     )

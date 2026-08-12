@@ -8,6 +8,7 @@ class Views::Admin::SourceTags::Index < Views::Base
   def view_template
     render Components::Shared::PageToolbar.new(
       title: "Source Tags",
+      jumpcode_path: admin_source_tags_path,
       action_href: new_admin_source_tag_path,
       action_label: "+ New Source Tag"
     )
