@@ -42,6 +42,7 @@ module Shortcodes
         Shortcode.new(code: "FIND", label: "ID Lookup", icon: "⌕", path: public_ids_path, admin_only: false),
         Shortcode.new(code: "TASK", label: "My Tasks", icon: "◆", path: tasks_path, admin_only: false),
         Shortcode.new(code: "PROB", label: "Problems", icon: "⊘", path: problems_path, admin_only: false),
+        Shortcode.new(code: "SETT", label: "My Settings", icon: "⚙", path: "/back_office/my/settings", admin_only: false),
 
         # admin
         Shortcode.new(code: "JOBS", label: "Good Job", icon: "⊕", path: "/back_office/good_job", admin_only: true),

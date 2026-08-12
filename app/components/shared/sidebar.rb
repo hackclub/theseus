@@ -52,6 +52,7 @@ class Components::Shared::Sidebar < Components::Base
 
       div(class: "sidebar-section") do
         span(class: "sidebar-label") { "Settings" }
+        nav_link("My Settings", settings_path)
         nav_link("Print", settings_qz_tray_path)
         nav_link("HCB Payment", hcb_payment_accounts_path)
       end
