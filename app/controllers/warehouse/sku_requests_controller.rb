@@ -54,6 +54,13 @@ class Warehouse::SKURequestsController < ApplicationController
     authorize @sku_request
     @sku_request.assigned_sku_code = params[:assigned_sku_code]
     @sku_request.reviewed_by = current_user
+
+    # Apply czar overrides
+    @sku_request.unit_cost = params[:unit_cost_override] if params[:unit_cost_override].present?
+    @sku_request.country_of_origin = params[:country_of_origin_override] if params[:country_of_origin_override].present?
+    @sku_request.hs_code = params[:hs_code_override] if params[:hs_code_override].present?
+    @sku_request.customs_description = params[:customs_description_override] if params[:customs_description_override].present?
+
     if @sku_request.assigned_sku_code.blank?
       redirect_to warehouse_sku_request_path(@sku_request), alert: "SKU code is required to approve."
       return
@@ -64,7 +71,6 @@ class Warehouse::SKURequestsController < ApplicationController
       @sku_request.create_sku_in_zenventory!
       redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request approved! SKU created in Zenventory." }
     rescue Zenventory::ZenventoryError => e
-      # Approval stands, but zenventory creation failed — czar can retry
       redirect_to warehouse_sku_request_path(@sku_request), alert: "Approved, but Zenventory creation failed: #{e.message}. You can retry."
     rescue => e
       redirect_to warehouse_sku_request_path(@sku_request), alert: "Approval failed: #{e.message}"

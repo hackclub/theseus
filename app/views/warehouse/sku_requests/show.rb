@@ -9,6 +9,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
   def view_template
     toolbar
+    summary_banner
     action_section
     details_section
     image_section if @sku_request.image.attached?
@@ -37,18 +38,51 @@ class Views::Warehouse::SKURequests::Show < Views::Base
               submit_warehouse_sku_request_path(@sku_request),
               method: :post,
               class: "btn-success btn-sm",
-              onclick: "return confirm('Submit this SKU request for czar review?')"
+              onclick: safe("return confirm('Submit this SKU request for czar review?')")
           end
         end
       end
     end
   end
 
+  def summary_banner
+    section(style: "margin-bottom: 1rem;") do
+      div(style: "display:flex;gap:2rem;flex-wrap:wrap;") do
+        div do
+          span(class: "detail-label") { "Requested by " }
+          strong { @sku_request.user&.username || "—" }
+          if @sku_request.submitted_at
+            span(class: "text-muted") { " on #{@sku_request.submitted_at.strftime('%b %d, %Y')}" }
+          end
+        end
+        if @sku_request.expected_arrival
+          div do
+            span(class: "detail-label") { "Arriving " }
+            strong { @sku_request.expected_arrival.strftime("%b %d, %Y") }
+          end
+        end
+        if @sku_request.expected_quantity
+          div do
+            span(class: "detail-label") { "Quantity " }
+            strong { @sku_request.expected_quantity.to_s }
+          end
+        end
+        div do
+          span(class: "detail-label") { "Category " }
+          span(class: "badge") { @sku_request.category&.humanize || "—" }
+        end
+        div do
+          span(class: "detail-label") { "Program " }
+          strong { @sku_request.program.presence || "—" }
+        end
+      end
+    end
+  end
 
   def action_section
     case @sku_request.aasm_state
     when "submitted"
-      czar_actions if policy(@sku_request).approve?
+      czar_review_form if policy(@sku_request).approve?
     when "approved", "synced"
       approved_info
     when "rejected"
@@ -56,46 +90,73 @@ class Views::Warehouse::SKURequests::Show < Views::Base
     end
   end
 
-  def czar_actions
+  def czar_review_form
     section(style: "margin-bottom: 1rem;") do
-      strong { "Review" }
+      strong { "Review & Approve" }
       hr
 
-      # Approve with SKU code
-      div(style: "margin-top: 0.5rem; margin-bottom: 1rem;") do
-        form(method: "post", action: approve_warehouse_sku_request_path(@sku_request)) do
-          input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
-          div(style: "display:flex;align-items:flex-end;gap:0.5rem;") do
-            div(style: "flex:1;") do
-              label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Assigned SKU Code *" }
-              input(
-                type: "text",
-                name: "assigned_sku_code",
-                required: true,
-                placeholder: "e.g. STK-ATHENA-001",
-                style: "width:100%;"
-              )
+      form(method: "post", action: approve_warehouse_sku_request_path(@sku_request)) do
+        input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
+
+        div(style: "display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.5rem;") do
+          # SKU code — the big one
+          div(style: "grid-column:1/-1;") do
+            label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") do
+              plain "Assigned SKU Code "
+              span(class: "text-danger") { "*" }
             end
-            button(type: "submit", class: "btn-success", onclick: safe("return confirm('Approve this SKU request and create the SKU?')")) { "✓ Approve" }
+            input(
+              type: "text",
+              name: "assigned_sku_code",
+              required: true,
+              value: @sku_request.suggested_sku_code,
+              placeholder: "e.g. Sti/Ath/Hei/Pls",
+              style: "width:100%;font-family:monospace;font-size:1.1em;"
+            )
+            small(class: "text-muted") { "Format: Category/Program/Description/Attributes (3 letters each)" }
           end
+
+          # Editable fields the czar can adjust
+          div do
+            label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Unit Cost" }
+            div(style: "display:flex;align-items:center;gap:0.25rem;") do
+              span { "$" }
+              input(type: "number", name: "unit_cost_override", step: "0.01", value: (@sku_request.unit_cost ? "%.2f" % @sku_request.unit_cost : nil), style: "width:100%;")
+            end
+          end
+
+          div do
+            label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Country of Origin" }
+            input(type: "text", name: "country_of_origin_override", value: @sku_request.country_of_origin, style: "width:100%;")
+          end
+
+          div do
+            label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "HS Code" }
+            input(type: "text", name: "hs_code_override", value: @sku_request.hs_code, style: "width:100%;")
+          end
+
+          div do
+            label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Customs Description" }
+            input(type: "text", name: "customs_description_override", value: @sku_request.customs_description, style: "width:100%;")
+          end
+        end
+
+        div(style: "margin-top:1rem;display:flex;gap:0.5rem;") do
+          button(type: "submit", class: "btn-success", onclick: safe("return confirm('Approve this SKU request and create the SKU in Zenventory?')")) { "✓ Approve & Create SKU" }
         end
       end
 
-      # Reject
-      div do
+      # Reject — separate form, visually secondary
+      hr
+      div(style: "margin-top:0.5rem;") do
         form(method: "post", action: reject_warehouse_sku_request_path(@sku_request)) do
           input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
           div(style: "display:flex;align-items:flex-end;gap:0.5rem;") do
             div(style: "flex:1;") do
               label(style: "display:block;color:GrayText;margin-bottom:0.25rem;") { "Rejection Reason (optional)" }
-              input(
-                type: "text",
-                name: "rejection_reason",
-                placeholder: "Reason for rejection...",
-                style: "width:100%;"
-              )
+              input(type: "text", name: "rejection_reason", placeholder: "Reason for rejection...", style: "width:100%;")
             end
-            button(type: "submit", class: "btn-danger", onclick: safe("return confirm('Reject this SKU request?')")) { "✕ Reject" }
+            button(type: "submit", class: "btn-danger btn-sm", onclick: safe("return confirm('Reject this SKU request?')")) { "✕ Reject" }
           end
         end
       end
@@ -109,9 +170,9 @@ class Views::Warehouse::SKURequests::Show < Views::Base
       div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         span(class: "detail-label") { "Assigned SKU Code" }
         if @sku_request.warehouse_sku
-          a(href: warehouse_sku_path(@sku_request.warehouse_sku), style: "font-weight:600;") { @sku_request.assigned_sku_code }
+          a(href: warehouse_sku_path(@sku_request.warehouse_sku), style: "font-weight:600;font-family:monospace;") { @sku_request.assigned_sku_code }
         else
-          span(style: "font-weight:600;") { @sku_request.assigned_sku_code }
+          span(style: "font-weight:600;font-family:monospace;") { @sku_request.assigned_sku_code }
         end
         span(class: "detail-label") { "Reviewed By" }
         span { @sku_request.reviewed_by&.username || "—" }
@@ -122,8 +183,8 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def rejected_info
-    section(style: "margin-bottom: 1rem;") do
-      strong { "Rejection" }
+    section(style: "margin-bottom: 1rem; border-color: var(--error-border); background: var(--error-bg);") do
+      strong { "Rejected" }
       hr
       div(style: "margin-top: 0.5rem;") do
         if @sku_request.rejection_reason.present?
@@ -132,7 +193,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
             span { @sku_request.rejection_reason }
           end
         end
-        div(class: "text-muted") do
+        div do
           plain "Please contact "
           strong { @sku_request.user&.username || "the requester" }
           plain " to discuss."
@@ -151,7 +212,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
   def details_section
     section(style: "margin-bottom: 1rem;") do
-      strong { "Details" }
+      strong { "Request Details" }
       hr
       div(class: "detail-grid", style: "margin-top: 0.5rem;") do
         detail_row("Name", @sku_request.name)
@@ -161,14 +222,8 @@ class Views::Warehouse::SKURequests::Show < Views::Base
         detail_row("Country of Origin", @sku_request.country_of_origin)
         detail_row("HS Code", @sku_request.hs_code)
         detail_row("Customs Description", @sku_request.customs_description)
-        detail_row("Program", @sku_request.program)
-        detail_row("Expected Arrival", @sku_request.expected_arrival&.strftime("%b %d, %Y"))
-        detail_row("Expected Quantity", @sku_request.expected_quantity&.to_s)
-        detail_row("Suggested SKU Code", @sku_request.suggested_sku_code)
-        detail_row("Requested By", @sku_request.user&.username)
-        detail_row("Created", @sku_request.created_at.strftime("%b %d, %Y %H:%M"))
-        if @sku_request.submitted_at
-          detail_row("Submitted", @sku_request.submitted_at.strftime("%b %d, %Y %H:%M"))
+        if @sku_request.suggested_sku_code.present?
+          detail_row("Suggested SKU Code", @sku_request.suggested_sku_code)
         end
       end
     end
