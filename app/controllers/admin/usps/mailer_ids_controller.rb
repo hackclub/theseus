@@ -1,46 +1,51 @@
 module Admin
-  class USPS::MailerIdsController < Admin::ApplicationController
-    # Overwrite any of the RESTful controller actions to implement custom behavior
-    # For example, you may want to send an email after a foo is updated.
-    #
-    # def update
-    #   super
-    #   send_foo_updated_email(requested_resource)
-    # end
+  module USPS
+    class MailerIdsController < Admin::ApplicationController
+      skip_after_action :verify_authorized
 
-    # Override this method to specify custom lookup behavior.
-    # This will be used to set the resource for the `show`, `edit`, and `update`
-    # actions.
-    #
-    # def find_resource(param)
-    #   Foo.find_by!(slug: param)
-    # end
+      def index
+        @mailer_ids = ::USPS::MailerId.all.order(:name)
+        render Views::Admin::USPS::MailerIds::Index.new(mailer_ids: @mailer_ids)
+      end
 
-    # The result of this lookup will be available as `requested_resource`
+      def show
+        render Views::Admin::USPS::MailerIds::Show.new(mailer_id: resource)
+      end
 
-    # Override this if you have certain roles that require a subset
-    # this will be used to set the records shown on the `index` action.
-    #
-    # def scoped_resource
-    #   if current_user.super_admin?
-    #     resource_class
-    #   else
-    #     resource_class.with_less_stuff
-    #   end
-    # end
+      def new
+        render Views::Admin::USPS::MailerIds::New.new(mailer_id: ::USPS::MailerId.new)
+      end
 
-    # Override `resource_params` if you want to transform the submitted
-    # data before it's persisted. For example, the following would turn all
-    # empty values into nil values. It uses other APIs such as `resource_class`
-    # and `dashboard`:
-    #
-    # def resource_params
-    #   params.require(resource_class.model_name.param_key).
-    #     permit(dashboard.permitted_attributes(action_name)).
-    #     transform_values { |value| value == "" ? nil : value }
-    # end
+      def create
+        @mailer_id = ::USPS::MailerId.new(mailer_id_params)
+        if @mailer_id.save
+          redirect_to admin_usps_mailer_ids_path, notice: "Created."
+        else
+          render Views::Admin::USPS::MailerIds::New.new(mailer_id: @mailer_id), status: :unprocessable_entity
+        end
+      end
 
-    # See https://administrate-demo.herokuapp.com/customizing_controller_actions
-    # for more information
+      def edit
+        render Views::Admin::USPS::MailerIds::Edit.new(mailer_id: resource)
+      end
+
+      def update
+        if resource.update(mailer_id_params)
+          redirect_to admin_usps_mailer_id_path(resource), notice: "Updated."
+        else
+          render Views::Admin::USPS::MailerIds::Edit.new(mailer_id: resource), status: :unprocessable_entity
+        end
+      end
+
+      def destroy
+        resource.destroy
+        redirect_to admin_usps_mailer_ids_path, notice: "Deleted."
+      end
+
+      private
+
+      def resource = @resource ||= ::USPS::MailerId.find(params[:id])
+      def mailer_id_params = params.require(:usps_mailer_id).permit(:name, :crid, :mid)
+    end
   end
 end

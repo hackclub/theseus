@@ -1,48 +1,59 @@
+# frozen_string_literal: true
+
 module Admin
   module USPS
     class PaymentAccountsController < Admin::ApplicationController
-      # Overwrite any of the RESTful controller actions to implement custom behavior
-      # For example, you may want to send an email after a foo is updated.
-      #
-      # def update
-      #   super
-      #   send_foo_updated_email(requested_resource)
-      # end
+      skip_after_action :verify_authorized
 
-      # Override this method to specify custom lookup behavior.
-      # This will be used to set the resource for the `show`, `edit`, and `update`
-      # actions.
-      #
-      # def find_resource(param)
-      #   Foo.find_by!(slug: param)
-      # end
+      def index
+        @payment_accounts = ::USPS::PaymentAccount.includes(:usps_mailer_id).order(:name)
+        render Views::Admin::USPS::PaymentAccounts::Index.new(payment_accounts: @payment_accounts)
+      end
 
-      # The result of this lookup will be available as `requested_resource`
+      def show
+        render Views::Admin::USPS::PaymentAccounts::Show.new(payment_account: resource)
+      end
 
-      # Override this if you have certain roles that require a subset
-      # this will be used to set the records shown on the `index` action.
-      #
-      # def scoped_resource
-      #   if current_user.super_admin?
-      #     resource_class
-      #   else
-      #     resource_class.with_less_stuff
-      #   end
-      # end
+      def new
+        render Views::Admin::USPS::PaymentAccounts::New.new(payment_account: ::USPS::PaymentAccount.new)
+      end
 
-      # Override `resource_params` if you want to transform the submitted
-      # data before it's persisted. For example, the following would turn all
-      # empty values into nil values. It uses other APIs such as `resource_class`
-      # and `dashboard`:
-      #
-      # def resource_params
-      #   params.require(resource_class.model_name.param_key).
-      #     permit(dashboard.permitted_attributes(action_name)).
-      #     transform_values { |value| value == "" ? nil : value }
-      # end
+      def create
+        @payment_account = ::USPS::PaymentAccount.new(payment_account_params)
+        if @payment_account.save
+          redirect_to admin_usps_payment_accounts_path, notice: "Payment account created."
+        else
+          render Views::Admin::USPS::PaymentAccounts::New.new(payment_account: @payment_account), status: :unprocessable_entity
+        end
+      end
 
-      # See https://administrate-demo.herokuapp.com/customizing_controller_actions
-      # for more information
+      def edit
+        render Views::Admin::USPS::PaymentAccounts::Edit.new(payment_account: resource)
+      end
+
+      def update
+        if resource.update(payment_account_params)
+          redirect_to admin_usps_payment_account_path(resource), notice: "Payment account updated."
+        else
+          render Views::Admin::USPS::PaymentAccounts::Edit.new(payment_account: resource), status: :unprocessable_entity
+        end
+      end
+
+      def destroy
+        resource.destroy
+        redirect_to admin_usps_payment_accounts_path, notice: "Payment account deleted."
+      end
+
+      private
+
+      def resource = @resource ||= ::USPS::PaymentAccount.find(params[:id])
+
+      def payment_account_params
+        params.require(:usps_payment_account).permit(
+          :name, :account_type, :account_number, :permit_number,
+          :permit_zip, :manifest_mid, :ach, :usps_mailer_id_id
+        )
+      end
     end
   end
 end

@@ -1,46 +1,41 @@
+# frozen_string_literal: true
+
 module Admin
   class UsersController < Admin::ApplicationController
-    # Overwrite any of the RESTful controller actions to implement custom behavior
-    # For example, you may want to send an email after a foo is updated.
-    #
-    # def update
-    #   super
-    #   send_foo_updated_email(requested_resource)
-    # end
+    skip_after_action :verify_authorized
 
-    # Override this method to specify custom lookup behavior.
-    # This will be used to set the resource for the `show`, `edit`, and `update`
-    # actions.
-    #
-    # def find_resource(param)
-    #   Foo.find_by!(slug: param)
-    # end
+    def index
+      @users = User.all.order(:username)
+      @users = @users.where("username ILIKE :q OR email ILIKE :q", q: "%#{params[:search]}%") if params[:search].present?
+      render Views::Admin::Users::Index.new(users: @users)
+    end
 
-    # The result of this lookup will be available as `requested_resource`
+    def show
+      render Views::Admin::Users::Show.new(user: resource)
+    end
 
-    # Override this if you have certain roles that require a subset
-    # this will be used to set the records shown on the `index` action.
-    #
-    # def scoped_resource
-    #   if current_user.super_admin?
-    #     resource_class
-    #   else
-    #     resource_class.with_less_stuff
-    #   end
-    # end
+    def edit
+      render Views::Admin::Users::Edit.new(user: resource)
+    end
 
-    # Override `resource_params` if you want to transform the submitted
-    # data before it's persisted. For example, the following would turn all
-    # empty values into nil values. It uses other APIs such as `resource_class`
-    # and `dashboard`:
-    #
-    # def resource_params
-    #   params.require(resource_class.model_name.param_key).
-    #     permit(dashboard.permitted_attributes(action_name)).
-    #     transform_values { |value| value == "" ? nil : value }
-    # end
+    def update
+      if resource.update(user_params)
+        redirect_to admin_user_path(resource), notice: "User updated."
+      else
+        render Views::Admin::Users::Edit.new(user: resource), status: :unprocessable_entity
+      end
+    end
 
-    # See https://administrate-demo.herokuapp.com/customizing_controller_actions
-    # for more information
+    private
+
+    def resource = @resource ||= User.find(params[:id])
+
+    def user_params
+      params.require(:user).permit(
+        :username, :email, :is_admin, :can_use_indicia, :can_warehouse,
+        :can_impersonate_public, :slack_id, :hca_id, :icon_url,
+        :home_mid_id, :home_return_address_id
+      )
+    end
   end
 end
