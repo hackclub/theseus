@@ -20,7 +20,7 @@ class Components::Shared::Jumpcode < Components::Base
 
       details(class: "popover jumpcode-help", style: "position:relative") do
         summary(tabindex: "0", class: "btn-sm") { "?" }
-        div(style: "position:absolute;right:0;top:100%;padding:1rem;max-width:24rem;background:Canvas;border:1px solid var(--background2)") do
+        div(class: "jumpcode-popover") do
           p do
             plain "these are jumpcodes. hit "
             code { "⌘K" }

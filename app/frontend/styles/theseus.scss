@@ -391,6 +391,26 @@ $gate-green: #14a314;
 }
 
 
+// ── Jumpcode help popover ──────────────────────────────
+
+.jumpcode-popover {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 10;
+  min-width: 20rem;
+  max-width: 24rem;
+  padding: 1rem;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  border-radius: 4px;
+  font-size: 0.9em;
+  white-space: normal;
+  p { margin: 0.4rem 0; }
+  .badge { white-space: nowrap; }
+}
+
+
 // ── Tooltips ───────────────────────────────────────────
 
 .tooltipped { position: relative; }

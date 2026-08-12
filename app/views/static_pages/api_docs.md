@@ -278,7 +278,7 @@ POST /api/v1/warehouse_orders
 ```json
 {
   "warehouse_order": {
-    "id": "pkg_abc123",
+    "id": "pkg!abc123",
     "status": "dispatched",
     "tags": ["high-seas", "welcome-kit"],
     "address": { "first_name": "Zach", "last_name": "Latta" },
@@ -317,7 +317,7 @@ want to show your recipients their order status without sending them to a separa
 GET /packages/:id/embed
 ```
 
-where `:id` is the order's ID (e.g. `pkg_abc123`). this is a public endpoint — no API key needed.
+where `:id` is the order's ID (e.g. `pkg!abc123`). this is a public endpoint — no API key needed.
 
 the widget is a self-contained HTML page designed to be iframed. it shows:
 
@@ -330,7 +330,7 @@ embed it like this:
 
 ```html
 <iframe
-  src="https://theseus.hackclub.com/packages/pkg_abc123/embed"
+  src="https://theseus.hackclub.com/packages/pkg!abc123/embed"
   style="width: 100%; border: none; min-height: 200px;"
 ></iframe>
 ```
