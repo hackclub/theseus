@@ -56,6 +56,7 @@ class Warehouse::PurchaseOrdersController < ApplicationController
   def submit_for_approval
     authorize @purchase_order, :submit?
     @purchase_order.submit_for_approval!
+    Warehouse::CzarMailer.po_submitted(@purchase_order).deliver_later
     redirect_to warehouse_purchase_order_path(@purchase_order), flash: { success: "Purchase order submitted for approval." }
   end
 
@@ -65,16 +66,18 @@ class Warehouse::PurchaseOrdersController < ApplicationController
       @purchase_order.update!(reviewed_by: current_user)
       @purchase_order.approve!
     end
+    Warehouse::CzarMailer.po_approved(@purchase_order).deliver_later
     redirect_to warehouse_purchase_order_path(@purchase_order), flash: { success: "Purchase order approved." }
   end
 
   def reject
-    authorize @purchase_order
+    authorize @purchase_order, :return_for_revision?
     ActiveRecord::Base.transaction do
-      @purchase_order.reject!
-      @purchase_order.update!(reviewed_by: current_user, rejection_reason: params[:rejection_reason])
+      @purchase_order.update!(reviewed_by: current_user, reviewer_notes: params[:reviewer_notes])
+      @purchase_order.return_for_revision!
     end
-    redirect_to warehouse_purchase_order_path(@purchase_order), flash: { success: "Purchase order rejected." }
+    Warehouse::CzarMailer.po_returned(@purchase_order).deliver_later
+    redirect_to warehouse_purchase_order_path(@purchase_order), flash: { success: "Purchase order returned for revision." }
   end
 
   def revise

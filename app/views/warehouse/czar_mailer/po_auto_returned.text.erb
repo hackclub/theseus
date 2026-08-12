@@ -1,0 +1,8 @@
+hey <%= @purchase_order.user.username %>, your purchase order was automatically returned to draft.
+
+<b><%= @purchase_order.supplier_name %></b>
+
+the SKU request for <b><%= @sku_request.name %></b> was returned for revision, and your PO references it. once the SKU request is resolved you can resubmit.
+
+<%= link_to "view your PO →", warehouse_purchase_order_url(@purchase_order) %>
+<%= link_to "view the SKU request →", warehouse_sku_request_url(@sku_request) %>

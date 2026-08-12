@@ -1,0 +1,8 @@
+new SKU request from <%= @sku_request.user.username %>!
+
+<b><%= @sku_request.name %></b> (<%= @sku_request.category&.humanize %>)
+<% if @sku_request.program.present? %>program: <%= @sku_request.program %><% end %>
+<% if @sku_request.expected_arrival %>arriving: <%= @sku_request.expected_arrival.strftime("%b %d, %Y") %><% end %>
+<% if @sku_request.expected_quantity %>quantity: <%= @sku_request.expected_quantity %><% end %>
+
+<%= link_to "review it →", warehouse_sku_request_url(@sku_request) %>

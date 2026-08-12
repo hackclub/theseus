@@ -7,9 +7,9 @@
 #  id               :bigint           not null, primary key
 #  notes            :text
 #  order_number     :string
-#  rejection_reason :text
 #  required_by_date :date
 #  reviewed_at      :datetime
+#  reviewer_notes   :text
 #  status           :string           default("draft")
 #  submitted_at     :datetime
 #  supplier_name    :string
@@ -53,7 +53,7 @@ class Warehouse::PurchaseOrder < ApplicationRecord
     draft: "Draft",
     submitted: "Submitted",
     approved: "Approved",
-    rejected: "Rejected",
+    returned: "Returned for Revision",
     open: "Sent to Zenventory",
     completed: "Completed",
     deleted: "Deleted"
@@ -67,7 +67,7 @@ class Warehouse::PurchaseOrder < ApplicationRecord
     state :draft, initial: true
     state :submitted
     state :approved
-    state :rejected
+    state :returned
     state :open
     state :completed
     state :deleted
@@ -82,13 +82,13 @@ class Warehouse::PurchaseOrder < ApplicationRecord
       after { update!(reviewed_at: Time.current) }
     end
 
-    event :reject do
-      transitions from: :submitted, to: :rejected
+    event :return_for_revision do
+      transitions from: :submitted, to: :returned
       after { update!(reviewed_at: Time.current) }
     end
 
     event :revise do
-      transitions from: :rejected, to: :draft
+      transitions from: %i[returned submitted approved], to: :draft
     end
 
     event :mark_open do
@@ -100,7 +100,7 @@ class Warehouse::PurchaseOrder < ApplicationRecord
     end
 
     event :mark_deleted do
-      transitions from: %i[draft submitted approved rejected open], to: :deleted
+      transitions from: %i[draft submitted approved returned open], to: :deleted
     end
   end
 
@@ -124,6 +124,10 @@ class Warehouse::PurchaseOrder < ApplicationRecord
     status == "completed"
   end
 
+  def returned?
+    status == "returned"
+  end
+
   def all_skus_resolved?
     line_items.all? { |li| li.sku_id.present? }
   end
@@ -134,6 +138,11 @@ class Warehouse::PurchaseOrder < ApplicationRecord
 
   def blocked_on_skus?
     approved? && !all_skus_resolved?
+  end
+
+  def has_returned_sku_requests?
+    line_items.joins(:sku_request).where(sku_id: nil)
+      .where(warehouse_sku_requests: { aasm_state: "returned" }).any?
   end
 
   def dispatch!

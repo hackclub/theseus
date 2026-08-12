@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_12_194305) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -615,7 +615,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_194305) do
     t.bigint "reviewed_by_id"
     t.datetime "submitted_at"
     t.datetime "reviewed_at"
-    t.text "rejection_reason"
+    t.text "reviewer_notes"
     t.index ["order_number"], name: "index_warehouse_purchase_orders_on_order_number"
     t.index ["reviewed_by_id"], name: "index_warehouse_purchase_orders_on_reviewed_by_id"
     t.index ["user_id"], name: "index_warehouse_purchase_orders_on_user_id"
@@ -648,7 +648,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_194305) do
     t.string "suggested_sku_code"
     t.string "assigned_sku_code"
     t.string "aasm_state", default: "draft", null: false
-    t.text "rejection_reason"
+    t.text "reviewer_notes"
     t.datetime "submitted_at"
     t.datetime "reviewed_at"
     t.datetime "created_at", null: false

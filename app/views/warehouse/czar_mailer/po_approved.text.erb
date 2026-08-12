@@ -1,0 +1,5 @@
+hey <%= @purchase_order.user.username %>, your purchase order was approved!
+
+<b><%= @purchase_order.supplier_name %></b> — a czar will send it to Zenventory once all SKUs are ready.
+
+<%= link_to "view it →", warehouse_purchase_order_url(@purchase_order) %>

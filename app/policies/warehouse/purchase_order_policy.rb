@@ -18,7 +18,7 @@ class Warehouse::PurchaseOrderPolicy < ApplicationPolicy
   end
 
   def edit?
-    (record_belongs_to_user || user_is_admin) && (record.draft? || record.status == "rejected")
+    (record_belongs_to_user || user_is_admin) && (record.draft? || record.returned?)
   end
 
   def update?
@@ -26,7 +26,7 @@ class Warehouse::PurchaseOrderPolicy < ApplicationPolicy
   end
 
   def destroy?
-    (record_belongs_to_user || user_is_admin) && (record.draft? || record.status == "rejected")
+    (record_belongs_to_user || user_is_admin) && (record.draft? || record.returned?)
   end
 
   def submit?
@@ -34,14 +34,14 @@ class Warehouse::PurchaseOrderPolicy < ApplicationPolicy
   end
 
   def revise?
-    (record_belongs_to_user || user_is_admin) && record.status == "rejected"
+    (record_belongs_to_user || user_is_admin) && record.returned?
   end
 
   def approve?
     user.warehouse_czar? && record.submitted?
   end
 
-  def reject?
+  def return_for_revision?
     user.warehouse_czar? && record.submitted?
   end
 

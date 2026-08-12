@@ -1,0 +1,8 @@
+hey <%= @sku_request.user.username %>, your SKU request was returned for revision.
+
+<b><%= @sku_request.name %></b>
+<% if @sku_request.reviewer_notes.present? %>
+<b>notes from reviewer:</b> <%= @sku_request.reviewer_notes %>
+<% end %>
+
+you can edit and resubmit it here: <%= link_to "edit →", edit_warehouse_sku_request_url(@sku_request) %>

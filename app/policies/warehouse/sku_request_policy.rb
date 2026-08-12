@@ -18,7 +18,7 @@ class Warehouse::SKURequestPolicy < ApplicationPolicy
   end
 
   def edit?
-    (record_belongs_to_user || user_is_admin) && record.draft?
+    (record_belongs_to_user || user_is_admin) && (record.draft? || record.returned?)
   end
 
   def update?
@@ -33,7 +33,7 @@ class Warehouse::SKURequestPolicy < ApplicationPolicy
     user.warehouse_czar? && record.submitted?
   end
 
-  def reject?
+  def return_for_revision?
     user.warehouse_czar? && record.submitted?
   end
 

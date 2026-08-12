@@ -47,6 +47,7 @@ class Warehouse::SKURequestsController < ApplicationController
   def submit
     authorize @sku_request
     @sku_request.submit!
+    Warehouse::CzarMailer.sku_request_submitted(@sku_request).deliver_later
     redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request submitted for review." }
   end
 
@@ -69,6 +70,7 @@ class Warehouse::SKURequestsController < ApplicationController
       @sku_request.save!
       @sku_request.approve!
       @sku_request.create_sku_in_zenventory!
+      Warehouse::CzarMailer.sku_request_approved(@sku_request).deliver_later
       redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request approved! SKU created in Zenventory." }
     rescue Zenventory::ZenventoryError => e
       redirect_to warehouse_sku_request_path(@sku_request), alert: "Approved, but Zenventory creation failed: #{e.message}. You can retry."
@@ -78,12 +80,13 @@ class Warehouse::SKURequestsController < ApplicationController
   end
 
   def reject
-    authorize @sku_request
+    authorize @sku_request, :return_for_revision?
     ActiveRecord::Base.transaction do
-      @sku_request.reject!
-      @sku_request.update!(reviewed_by: current_user, rejection_reason: params[:rejection_reason])
+      @sku_request.update!(reviewed_by: current_user, reviewer_notes: params[:reviewer_notes])
+      @sku_request.return_for_revision!
     end
-    redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request rejected." }
+    Warehouse::CzarMailer.sku_request_returned(@sku_request).deliver_later
+    redirect_to warehouse_sku_request_path(@sku_request), flash: { success: "SKU request returned for revision." }
   end
 
   private

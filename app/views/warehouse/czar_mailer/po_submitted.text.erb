@@ -1,0 +1,6 @@
+new purchase order from <%= @purchase_order.user.username %>!
+
+<b><%= @purchase_order.supplier_name %></b> — <%= @purchase_order.line_items.size %> line item(s), ~<%= number_to_currency(@purchase_order.total_cost) %>
+<% if @purchase_order.required_by_date %>needed by: <%= @purchase_order.required_by_date.strftime("%b %d, %Y") %><% end %>
+
+<%= link_to "review it →", warehouse_purchase_order_url(@purchase_order) %>

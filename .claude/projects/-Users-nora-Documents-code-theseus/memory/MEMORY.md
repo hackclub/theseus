@@ -1,0 +1,1 @@
+- [Zenventory PO costs are immutable](project_zenventory_po_costs.md) — historic zero-cost POs can't be edited, use SKU overrides instead

@@ -1,0 +1,8 @@
+hey <%= @purchase_order.user.username %>, your purchase order was returned for revision.
+
+<b><%= @purchase_order.supplier_name %></b>
+<% if @purchase_order.reviewer_notes.present? %>
+<b>notes from reviewer:</b> <%= @purchase_order.reviewer_notes %>
+<% end %>
+
+you can edit and resubmit it here: <%= link_to "edit →", edit_warehouse_purchase_order_url(@purchase_order) %>

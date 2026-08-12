@@ -1,0 +1,5 @@
+hey <%= @sku_request.user.username %>, your SKU request was approved!
+
+<b><%= @sku_request.name %></b> is now SKU <code><%= @sku_request.assigned_sku_code %></code> in Zenventory.
+
+<%= link_to "view it →", warehouse_sku_request_url(@sku_request) %>
