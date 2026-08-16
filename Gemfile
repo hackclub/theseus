@@ -167,7 +167,7 @@ gem "rmagick", "~> 6.1"
 
 gem "jb", "~> 0.8.2"
 
-gem "ferrum_pdf", "~> 0.3.0"
+gem "ferrum_pdf", "~> 3.1.0"
 
 gem "literal", "~> 1.8"
 

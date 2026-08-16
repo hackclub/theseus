@@ -207,15 +207,15 @@ GEM
     faraday-net_http_persistent (2.3.1)
       faraday (~> 2.5)
       net-http-persistent (>= 4.0.4, < 5)
-    ferrum (0.17.1)
+    ferrum (0.17.2)
       addressable (~> 2.5)
       base64 (~> 0.2)
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
-    ferrum_pdf (0.3.0)
+    ferrum_pdf (3.1.0)
+      actionpack (>= 6.0.0)
       ferrum (~> 0.15)
-      rails (>= 6.0.0)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
     ffi (1.17.2-arm-linux-gnu)
@@ -720,7 +720,7 @@ GEM
       activesupport
       faraday (~> 2.0)
       faraday-follow_redirects
-    webrick (1.9.1)
+    webrick (1.9.2)
     websocket (1.2.11)
     websocket-driver (0.8.2)
       base64
@@ -765,7 +765,7 @@ DEPENDENCIES
   easypost (~> 7.1)
   factory_bot_rails
   faraday (~> 2.13)
-  ferrum_pdf (~> 0.3.0)
+  ferrum_pdf (~> 3.1.0)
   filterrific (~> 5.2)
   foreman (~> 0.88.1)
   good_job (~> 4.11)
