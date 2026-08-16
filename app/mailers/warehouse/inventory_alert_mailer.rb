@@ -6,4 +6,12 @@ class Warehouse::InventoryAlertMailer < GenericTextMailer
 
     mail to: "dinobox@hackclub.com"
   end
+
+  def category_alert(uncategorized_skus:)
+    @uncategorized_skus = uncategorized_skus
+    @subject = "[theseus] [warehouse] #{@uncategorized_skus.length} SKU#{@uncategorized_skus.length == 1 ? '' : 's'} need#{@uncategorized_skus.length == 1 ? 's' : ''} categorization"
+    @recipient = "nora@hackclub.com"
+
+    mail to: "dinobox@hackclub.com"
+  end
 end
