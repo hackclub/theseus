@@ -339,7 +339,7 @@ GEM
     memoizer (1.0.3)
     mini_mime (1.1.5)
     minitest (5.27.0)
-    msgpack (1.8.0)
+    msgpack (1.8.2)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
