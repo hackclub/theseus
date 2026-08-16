@@ -365,209 +365,196 @@
   optionalDependencies:
     jquery-ui "^1.13.2"
 
-"@tsparticles/basic@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/basic/-/basic-3.8.1.tgz"
-  integrity sha512-my114zRmekT/+I2cGuEnHxlX5G/jO0iVtNnsxxlsgspXUTSY+fDixmrNF4UgFkuaIwd9Bv/yH+7S/4HE4qte7A==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
-    "@tsparticles/move-base" "3.8.1"
-    "@tsparticles/plugin-hex-color" "3.8.1"
-    "@tsparticles/plugin-hsl-color" "3.8.1"
-    "@tsparticles/plugin-rgb-color" "3.8.1"
-    "@tsparticles/shape-circle" "3.8.1"
-    "@tsparticles/updater-color" "3.8.1"
-    "@tsparticles/updater-opacity" "3.8.1"
-    "@tsparticles/updater-out-modes" "3.8.1"
-    "@tsparticles/updater-size" "3.8.1"
+"@tsparticles/animation-utils@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/animation-utils/-/animation-utils-4.3.2.tgz#2ed81b0bfce0936bc0f0cd8d1ba92ddcd21e77ac"
+  integrity sha512-x4i/F24myZsk/qJEkREbOpzoWJtAbW8cL0Pan0Y5SdmKkG0dyLHw/fTG2uttIA3eeXhPH8JN648pSZMvbNJItw==
 
-"@tsparticles/confetti@^3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/confetti/-/confetti-3.8.1.tgz"
-  integrity sha512-ahtLeGiPwTXiWFAEnJHTOIFteYwjRJDpPEr4ohMSEHWD8Y0HkgtLQMzWgWMGYH/Q+ibi6DR5RGhXq6ndWkj/ag==
+"@tsparticles/basic@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/basic/-/basic-4.3.2.tgz#dc270be8910f60d0d34d8b9acb80a34a833e6382"
+  integrity sha512-8XTjwZqrxdfT1WUBvhjip1uksdeYBG0k0mr87vebIs7EwCSO//Rau1XYrHE69mSBwYvIqEhLNcwAixHbypG44Q==
   dependencies:
-    "@tsparticles/basic" "3.8.1"
-    "@tsparticles/engine" "3.8.1"
-    "@tsparticles/plugin-emitters" "3.8.1"
-    "@tsparticles/plugin-motion" "3.8.1"
-    "@tsparticles/shape-cards" "3.8.1"
-    "@tsparticles/shape-emoji" "3.8.1"
-    "@tsparticles/shape-heart" "3.8.1"
-    "@tsparticles/shape-image" "3.8.1"
-    "@tsparticles/shape-polygon" "3.8.1"
-    "@tsparticles/shape-square" "3.8.1"
-    "@tsparticles/shape-star" "3.8.1"
-    "@tsparticles/updater-life" "3.8.1"
-    "@tsparticles/updater-roll" "3.8.1"
-    "@tsparticles/updater-rotate" "3.8.1"
-    "@tsparticles/updater-tilt" "3.8.1"
-    "@tsparticles/updater-wobble" "3.8.1"
+    "@tsparticles/engine" "4.3.2"
+    "@tsparticles/plugin-blend" "4.3.2"
+    "@tsparticles/plugin-hex-color" "4.3.2"
+    "@tsparticles/plugin-hsl-color" "4.3.2"
+    "@tsparticles/plugin-move" "4.3.2"
+    "@tsparticles/plugin-rgb-color" "4.3.2"
+    "@tsparticles/shape-circle" "4.3.2"
+    "@tsparticles/updater-opacity" "4.3.2"
+    "@tsparticles/updater-out-modes" "4.3.2"
+    "@tsparticles/updater-paint" "4.3.2"
+    "@tsparticles/updater-size" "4.3.2"
 
-"@tsparticles/engine@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/engine/-/engine-3.8.1.tgz"
-  integrity sha512-S8h10nuZfElY7oih//NUHnT5qf4v3/dnsU8CMs7dz5lBEGr3amrYrXk0V+YKPTIQwfdmJHUaSBoAqFiv4aEGIA==
+"@tsparticles/canvas-utils@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/canvas-utils/-/canvas-utils-4.3.2.tgz#c80d5d4b137dccd51718d80653a59411efb8891b"
+  integrity sha512-SN0O1sFhaCH5NfkZK9KawY9dK8YhiDqwPbqv7/Y9/oKmdreXQ2GSkaPOHOGmVDAkl3LYTI8Ip/JfNZaJ1GxDJQ==
 
-"@tsparticles/move-base@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/move-base/-/move-base-3.8.1.tgz"
-  integrity sha512-DNFRL1QT8ZQYLg3fIk74EbHJq5HGOq9CM2bCci9dDcdymvN4L7aWVFQavRiWDbi3y1EUW3+jeHSMbD3qHAfOeA==
+"@tsparticles/confetti@^4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/confetti/-/confetti-4.3.2.tgz#42d4ff3320fea3f4254155f279d088cb8c12686b"
+  integrity sha512-YkWrrHBxcwxKhpXcpAe8GHkS/OyUDOOLnXQx8rSi4/4Jcqlp5x+JvfQAU632RXucTN30to/iXo9s6Az7kBl8gQ==
   dependencies:
-    "@tsparticles/engine" "3.8.1"
+    "@tsparticles/basic" "4.3.2"
+    "@tsparticles/engine" "4.3.2"
+    "@tsparticles/plugin-emitters" "4.3.2"
+    "@tsparticles/plugin-motion" "4.3.2"
+    "@tsparticles/shape-cards" "4.3.2"
+    "@tsparticles/shape-emoji" "4.3.2"
+    "@tsparticles/shape-heart" "4.3.2"
+    "@tsparticles/shape-image" "4.3.2"
+    "@tsparticles/shape-polygon" "4.3.2"
+    "@tsparticles/shape-square" "4.3.2"
+    "@tsparticles/shape-star" "4.3.2"
+    "@tsparticles/updater-life" "4.3.2"
+    "@tsparticles/updater-roll" "4.3.2"
+    "@tsparticles/updater-rotate" "4.3.2"
+    "@tsparticles/updater-tilt" "4.3.2"
+    "@tsparticles/updater-wobble" "4.3.2"
 
-"@tsparticles/plugin-emitters@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/plugin-emitters/-/plugin-emitters-3.8.1.tgz"
-  integrity sha512-PGldE3OHs1hsZM6a8qHpXvKIMhaWAqZNwq8v7FwgJGxikXVvYtkKSaWslTpID3hYvtB6+whKig2uWURmq2TUsg==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/engine@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/engine/-/engine-4.3.2.tgz#7aa1670267fb3a50fbc06cfac7b5f6a9b87b9083"
+  integrity sha512-k4U7uahhxt7bPjEPHu+qrJXjHRysy/QMN+2/KK4d0/V7CElt5/oeR+H9QB95Osy/PtUCCi6EH/LS7k0443qlJA==
 
-"@tsparticles/plugin-hex-color@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/plugin-hex-color/-/plugin-hex-color-3.8.1.tgz"
-  integrity sha512-AmgB7XIYBCvg5HcqYb19YpcjEx2k4DpU2e24n0rradDDeqKKcz7EWI/08FlAnDb5HUs1em63vaAanl1vdm3+OA==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/path-utils@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/path-utils/-/path-utils-4.3.2.tgz#f396f259b8eefc40d54ada600881734b4b540e8e"
+  integrity sha512-77TVHDiJYfin9D2R3l8nqcZPh9dClmE36E8h+wBh1gfdKjau8a/8SiNIzSFdVYexyZUwilvyBRLe7x2z5XKnJQ==
 
-"@tsparticles/plugin-hsl-color@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/plugin-hsl-color/-/plugin-hsl-color-3.8.1.tgz"
-  integrity sha512-Ja6oEX6yu0064e4a+Fv1TBJiG5y0hqWwoOKSqf/Ra/zo01ageOEvDVX70FOVSrP+iEPGPznKVNcZs1tEOOvO0g==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/plugin-blend@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/plugin-blend/-/plugin-blend-4.3.2.tgz#5e46d3940ec73666510680dbd0494de01b58f7ec"
+  integrity sha512-5iUDwzvcOtiaFvsbL3y+UzneGrlNwITB8HlNCfjp675wrg9xh7ILHa3/ZYHii1qC8gkKNva0w2N+wET9n+XWBQ==
 
-"@tsparticles/plugin-motion@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/plugin-motion/-/plugin-motion-3.8.1.tgz"
-  integrity sha512-UL/C1OKlysSdNf4ZMz8va1IaGbFuAAZE2hbkEE8B9It0N6Su3SyZtfssSDDQGAU4UQLmwRFd1HQ1M452X7d5+A==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/plugin-emitters@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/plugin-emitters/-/plugin-emitters-4.3.2.tgz#fc0f2159fa49fb2e66f180e3ec92cd25122b2e6f"
+  integrity sha512-wKUw3lkGwUOBNtRC2XuzVLwh6Nur112GG9T+O43quio+J5YjOMGEsfeFaWL3R7kgrj0d+VvQlJESsyZeccgQlg==
 
-"@tsparticles/plugin-rgb-color@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/plugin-rgb-color/-/plugin-rgb-color-3.8.1.tgz"
-  integrity sha512-xNLqnaFUYjU+7dCHQXjZdM4UojUAVorPVmXlYmkh1xmujLljEaFTwCg1UJVlNq+fXENIFkeaf3/XT0U/q0ZBTA==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/plugin-hex-color@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/plugin-hex-color/-/plugin-hex-color-4.3.2.tgz#1ec401076bd2d41338c8af70cbc1f1610a2a59c5"
+  integrity sha512-uRNSHx/d3hByVYAwPHKKoKxy7s0QujhNUpsgDuL92JODKCjCFm8SudbkW3STSXVznhY5bCcu4iAF+7zKVgVXCg==
 
-"@tsparticles/shape-cards@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-cards/-/shape-cards-3.8.1.tgz"
-  integrity sha512-RpShXeYERR23mxoMOMQfCuewZveH0+3c4IvJCJFzXLadGTLdfbZyhCZVv1+v2nS9rDAacnRK7hJRwM2qOph4TA==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/plugin-hsl-color@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/plugin-hsl-color/-/plugin-hsl-color-4.3.2.tgz#31bbd06565d1a317ed442e896f7a4b64be31426c"
+  integrity sha512-kvRux8WnToyy9Dr8ROYvNDnE0HPW5h7x3wBROOghlazGYvYPO4nJBFvcmvvISRF6Ghsm9bzY255Qun2vACv2tA==
 
-"@tsparticles/shape-circle@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-circle/-/shape-circle-3.8.1.tgz"
-  integrity sha512-dM/f+qcpd8/KfviuVuKiTS8KLDE/T7xxHK7EI2S49yPW6yrJJBXdL7T4N9/n/6PF+Wslcl+kf/eTDjEAI3WjNQ==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/plugin-motion@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/plugin-motion/-/plugin-motion-4.3.2.tgz#e835e46f1c0f9201d8af99de8dca596b1e78ef23"
+  integrity sha512-LHoYSctcLbbG/5nifCuWUfwgN8Rl7lYHwvT8AerjXffIWeOcHQcxfjWQ0PqALX8NDhtwvDoaGUq+Es/0/oM9Qg==
 
-"@tsparticles/shape-emoji@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-emoji/-/shape-emoji-3.8.1.tgz"
-  integrity sha512-xiXNZ/afdecengUXhOqgUwR+vysgaseVpzEjoGoliOMWq4WHWv+S6ujNfes2oz3x736mTlvKdXcEWRncSXaKWw==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/plugin-move@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/plugin-move/-/plugin-move-4.3.2.tgz#ebb3e99a8a1357be5dac47f8af7362abbb247496"
+  integrity sha512-8nSDxWhxVWl9JzX/fSZwz5ZVzEMMFJLF3vizjfag2zE+jc4Nidfs9ZOPrD4yxpKSfZiv1ZwJpoOhT2ch4sVTug==
 
-"@tsparticles/shape-heart@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-heart/-/shape-heart-3.8.1.tgz"
-  integrity sha512-mUk3ZMp/f7FXDL3LseaDCTDaJSnWdja/MGwUOaGPNoyr0GwjeRxYUB0aSo+clpUiFEjJKAuzbgnGOc+AXokpvw==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/plugin-rgb-color@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/plugin-rgb-color/-/plugin-rgb-color-4.3.2.tgz#e74675f687358c60b9379ff703c109c21856ec11"
+  integrity sha512-/4xZBlEWqqG7VscJzC2VimA62fxDboe4XO1+m8LeM2ytxrhEpNk14TeBJt+zCc8jBkFjpKOdmTZ0VYyuK4FtDQ==
 
-"@tsparticles/shape-image@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-image/-/shape-image-3.8.1.tgz"
-  integrity sha512-7Yi25uLXvcY5A6TzyVBjYPsTmeTrE+0a2YO8kdp3O7V9NRGCSfXKnPRFp+lNOTiQRRvOG+SSzx2G18dfc/jwQg==
+"@tsparticles/shape-cards@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-cards/-/shape-cards-4.3.2.tgz#c360ddc2cd6abc36e6afe2da7683ffdfaaca49f3"
+  integrity sha512-gdjg/ECxIBeWd5BPsC7vhAawffI2EyrWitVteSoHAPOTN1RKVkavaLE5dHuhWVwZQzZutB9xdUynHs4di4YYBg==
   dependencies:
-    "@tsparticles/engine" "3.8.1"
+    "@tsparticles/path-utils" "4.3.2"
 
-"@tsparticles/shape-polygon@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-polygon/-/shape-polygon-3.8.1.tgz"
-  integrity sha512-1pAx85NJbgmsOngl+ZAYH8vxwPJmoddjWCbWTD0wlp/x+2NRjn1iaGBKObPKLgwVzsAXb9qNHMsUX/x0C54svw==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/shape-circle@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-circle/-/shape-circle-4.3.2.tgz#0b3ce5336d70ba38e4cf44c84a34b8d8608290b2"
+  integrity sha512-IOStpEafsK9vIZsXtrO1zpqF3pW5ydstD8db4omioAnoYFfKwbgyfkQz9l4pDnJy8636RbnQNVbYGlyxKuJ0cw==
 
-"@tsparticles/shape-square@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-square/-/shape-square-3.8.1.tgz"
-  integrity sha512-4cjDt6542dkc15zxG1VYT7ScgPXM3+5VGtwMfh5CYNBx+GZZ3R+XUo1Q66JadcqKcNdHXfMWbXCMxs0GaiTtSw==
+"@tsparticles/shape-emoji@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-emoji/-/shape-emoji-4.3.2.tgz#b748c7244dd1c7280756e01785b6a5f50c29b42d"
+  integrity sha512-et8OLZpt1fJsBBEhb0NHp++MeMF3Q3VZq1JMzdaI6i1rCm8h8yfEbi96Izz+e1OFYKpY/qZfyVxrLnW33VYFJg==
   dependencies:
-    "@tsparticles/engine" "3.8.1"
+    "@tsparticles/canvas-utils" "4.3.2"
 
-"@tsparticles/shape-star@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/shape-star/-/shape-star-3.8.1.tgz"
-  integrity sha512-wBxnawqan/ocguNxY6cOEXF+YVnLIUmGBlnVGYx/7U9E2UHuHEKkoumob4fUflKISjvj5eQLpm/E1eUfYMd6RA==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/shape-heart@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-heart/-/shape-heart-4.3.2.tgz#ac02237fc954fb481228fba1b35c2fdb5570a096"
+  integrity sha512-pObey0akiZRxakdjcHyoTRvtk9gMhC0eqv6xgHe/UKKJox/HbrO0KG2c0GIdKb0yMFgJL4oCXB5zAptGEG5EgA==
 
-"@tsparticles/updater-color@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-color/-/updater-color-3.8.1.tgz"
-  integrity sha512-HKrZzrF8YJ+TD+FdIwaWOPV565bkBhe+Ewj7CwKblG7H/SG+C6n1xIYobXkGP5pYkkQ+Cm1UV/Aq0Ih7sa+rJg==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/shape-image@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-image/-/shape-image-4.3.2.tgz#cc25a62157ea42830c45fd63683f252e198fcb5f"
+  integrity sha512-EtKkH7DMI+2rcF9n5VCJWKcyI/jX+B/OfucM/9MThG5qApqLBzfZvxRQRFG2agZKIHByGmXtfZyou4y2XPuq9g==
 
-"@tsparticles/updater-life@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-life/-/updater-life-3.8.1.tgz"
-  integrity sha512-5rCFFKD7js1lKgTpKOLo2OfmisWp4qqMVUVR4bNPeR0Ne/dcwDbKDzWyYS2AMsvWv/gcTTtWiarRfAiVQ5HtNg==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/shape-polygon@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-polygon/-/shape-polygon-4.3.2.tgz#79b0ba9304fd809edca6e64050890236916ba9f4"
+  integrity sha512-ebpHYQlk0khRXFtG1WWQIQSIedb23OEICWuhTAmh87lVkFkNeU5synyS6UqxSOXda098BiRnO++P69Sfq12E5w==
 
-"@tsparticles/updater-opacity@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-opacity/-/updater-opacity-3.8.1.tgz"
-  integrity sha512-41dJ0T7df7AUFFkV9yU0buUfUwh+hLYcViXxkDy+6CJiiNCNZ4H404w1DTpBQLL4fbxUcDk9BXZLV7gkE2OfAw==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/shape-square@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-square/-/shape-square-4.3.2.tgz#4fe2f8e17f801e3cea9442547b8582933022cefd"
+  integrity sha512-U3q5TdvDclXSAM6ott4evZaWt00o+mEmO0RUsIGZR4W0DdaaZTa0zmeitQnM/wJnkwpXUqVWF3H88FS1MOy9ag==
 
-"@tsparticles/updater-out-modes@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-out-modes/-/updater-out-modes-3.8.1.tgz"
-  integrity sha512-BY8WqQwoDFpgPybwTzBU2GnxtRkjWnGStqBnR53x5+f1j7geTSY6WjcOvl1W+IkjtwtjiifriwBl41EbqMrjdQ==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/shape-star@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/shape-star/-/shape-star-4.3.2.tgz#a4a89429f2b397671ae3fb98349882272e2bf1c7"
+  integrity sha512-i8AquyuaJ3GH3qsWIepVbsdxCM0Tl0ZFSmJni8AC+ly2Py7+Ig/uJpxM9oC5YkNdcAU6vosMgAS3xUobVQDvsg==
 
-"@tsparticles/updater-roll@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-roll/-/updater-roll-3.8.1.tgz"
-  integrity sha512-KYFTfMr8/M5pYBJFUFVrkogJURtKO5ogNSocOCf0v2QLMsbT5+OKNO7CLtxPZD98vTGRD3CHlt53/PF0tSesDA==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/updater-life@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-life/-/updater-life-4.3.2.tgz#ac8f130364113366bb7d25a5c3fd39e617f8cd64"
+  integrity sha512-RL3803nFKsCsGQavLSZyEiFWhto9R4+QQ/tsqt8PNmHOC7nmI96ZVGVXDknaSuCM4OwuwrDawIdrZUv6OSEFSQ==
 
-"@tsparticles/updater-rotate@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-rotate/-/updater-rotate-3.8.1.tgz"
-  integrity sha512-gpI07H1+diuuUdhJsQ1RlfHSD3fzBJrjyuwGuoXgHmvKzak6EWKpYfUMOraH4Dm41m/4kJZelle4nST+NpIuoA==
+"@tsparticles/updater-opacity@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-opacity/-/updater-opacity-4.3.2.tgz#bafb105a568af2afa568b4be24506d79c9caacc6"
+  integrity sha512-Mw4WN/E+ZQQkL683/oyLkebDMpSpbqDRgx2GhMqWOQNTDby5RYG6wSrq0cGtg0aLZmkoYDYLz5Al7wjPfX0/LA==
   dependencies:
-    "@tsparticles/engine" "3.8.1"
+    "@tsparticles/animation-utils" "4.3.2"
 
-"@tsparticles/updater-size@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-size/-/updater-size-3.8.1.tgz"
-  integrity sha512-SC2ZxewtpwKadCalotK6x2YanxRO3hTMW1Rxzx9V2rcjAIgh/Nw49Vuithy2TDq8RtTc9rHDAPic2vMQ/lYQwA==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/updater-out-modes@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-out-modes/-/updater-out-modes-4.3.2.tgz#4d63cec322ad88242eb4c12ea6ae50d1478f7c03"
+  integrity sha512-lGiYbrFGaAmBakCrEf3Xq5W+LzDkvfINav0MGxCe/acf7u3yvjOUkVH0Co1zc/ju43nU5U2ZO88Anqk4xKtoPA==
 
-"@tsparticles/updater-tilt@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-tilt/-/updater-tilt-3.8.1.tgz"
-  integrity sha512-qMVd/sjrAds8m6vXFH5YKN8zrQR9SLdn5N5EvHx/JuKpOut4NhG85u8AEJL6ct1g7hY8Zj9kfi/dDSSovkaHhw==
-  dependencies:
-    "@tsparticles/engine" "3.8.1"
+"@tsparticles/updater-paint@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-paint/-/updater-paint-4.3.2.tgz#b12e7c8f74dd7073d5929df09569bf49d390a6e7"
+  integrity sha512-cp020EtLL0zjsILL1w07r8n8wmwzziuHwtQ0GqGaGq+SikrdoK6yT/sXbyAylJqDypNaloVy3NZMq4wNQtxLOg==
 
-"@tsparticles/updater-wobble@3.8.1":
-  version "3.8.1"
-  resolved "https://registry.npmjs.org/@tsparticles/updater-wobble/-/updater-wobble-3.8.1.tgz"
-  integrity sha512-PkjVgeSkW0EebJQ9PdpwSMWU2fAvKsVSuH4KGmodYlgGkH0/zvKjMOPMEI6YRAor1/vF1soFyLYp9Vax7Ae13g==
+"@tsparticles/updater-roll@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-roll/-/updater-roll-4.3.2.tgz#8d66823f3a238aa0a26f2eea92d4ca41e9d16d84"
+  integrity sha512-5PG/uZx8EcwKV2WeyZ9ww4DyE/HjUcuF4loIAJSt2qNP66pwzMnZ0LqD+YOCRWhhm+/ESry3JNHaAWmJY6yp/A==
+
+"@tsparticles/updater-rotate@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-rotate/-/updater-rotate-4.3.2.tgz#ae26a2ce4cbd9f4b2757daba1fbec834a8c92338"
+  integrity sha512-vDp7sg+FQQ9NRY6Nh2Joccd5oqmv6W1Y0L56AWrxjc6wk29IRuVeRo1QuoqRLzqq/xLJBhsbkyKXZG0wiE8Blg==
   dependencies:
-    "@tsparticles/engine" "3.8.1"
+    "@tsparticles/animation-utils" "4.3.2"
+
+"@tsparticles/updater-size@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-size/-/updater-size-4.3.2.tgz#dc499367254742c112c9a09221cd91f6b00a3cab"
+  integrity sha512-U7YtYqH0MvALOS4Nr33soOFJ63n8qS9Xujl9BcNZnbmRBf4xgOnTC1TztMvGO19GANTBwq4QKsKQiwFlwAk4qw==
+  dependencies:
+    "@tsparticles/animation-utils" "4.3.2"
+
+"@tsparticles/updater-tilt@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-tilt/-/updater-tilt-4.3.2.tgz#4a74e1a3c957b15dccb527ab80146ab82d027c3a"
+  integrity sha512-iPI0Fc86Nyuxvm0Dx+aPOZ6d7fDZ4SNk+TulCbMQz9Zf5/p6nYB9CDjAuvmTDCLqzZCMUtrwbbzJfLKR7R5Gog==
+  dependencies:
+    "@tsparticles/animation-utils" "4.3.2"
+
+"@tsparticles/updater-wobble@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@tsparticles/updater-wobble/-/updater-wobble-4.3.2.tgz#122a25f98a955b49771044f0ed97f106c700a0be"
+  integrity sha512-nRKKFkjUgFoQG+WpDASlqj4hUPwafgHb9pLjuqAN7ko0udvajspF01nuXFgDznEIVcVU9pXfq9KfQPiU+xyjiQ==
 
 "@types/d3@3.5.38":
   version "3.5.38"
