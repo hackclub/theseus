@@ -57,10 +57,12 @@ class Components::Shared::ActionBar < Components::Base
       plain "⚠ Impersonating #{current_user.username}"
     end
 
-    a(
-      href: stop_impersonating_path,
-      style: "color: var(--red); text-decoration: none; font-weight: bold;"
-    ) { "Stop" }
+    form_with(url: stop_impersonating_path, method: :delete, style: "display:inline") do
+      button(
+        type: "submit",
+        style: "background:none;border:none;color:var(--red);font:inherit;font-weight:bold;cursor:pointer;padding:0;"
+      ) { "Stop" }
+    end
   end
 
   def render_user_menu

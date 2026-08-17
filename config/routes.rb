@@ -525,9 +525,9 @@ Rails.application.routes.draw do
     constraints AdminConstraint do
       mount GoodJob::Engine => "good_job"
       mount Blazer::Engine, at: "blazer"
-      get "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
+      post "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
     end
-    get "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
+    delete "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
     get "/dev_login", to: "sessions#dev_login" if Rails.env.development?
 
     namespace :usps do
@@ -642,7 +642,7 @@ Rails.application.routes.draw do
 
   get "/impersonate", to: "public/impersonations#new", as: :public_impersonate_form
   post "/impersonate", to: "public/impersonations#create", as: :public_impersonate
-  get "/stop_impersonating", to: "public/impersonations#stop_impersonating", as: :public_stop_impersonating
+  delete "/stop_impersonating", to: "public/impersonations#stop_impersonating", as: :public_stop_impersonating
 
   get "/:public_id", to: "public/public_identifiable#show", constraints: { public_id: /(pkg|ltr)![^\/]+/ }
 

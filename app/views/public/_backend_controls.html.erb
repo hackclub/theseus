@@ -14,7 +14,7 @@
           <p class="status-bar-field">
             <% if impersonating? %>
               currently impersonating <%= current_public_user.email %>
-              . <%= link_to "stop", public_stop_impersonating_path %>?
+              . <%= button_to "stop", public_stop_impersonating_path, method: :delete, class: "btn-link" %>?
             <% else %>
               <%= link_to "impersonate", public_impersonate_form_path %> somebody else?
             <% end %>

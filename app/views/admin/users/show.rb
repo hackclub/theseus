@@ -111,8 +111,8 @@ class Views::Admin::Users::Show < Views::Base
     # Impersonate
     if @user != current_user
       section do
-        a(href: impersonate_user_path(@user), style: "text-decoration:none;") do
-          button(class: "btn-warning") { "🥸 Impersonate #{@user.username}" }
+        form_with(url: impersonate_user_path(@user), method: :post, style: "display:inline") do
+          button(type: "submit", class: "btn-warning") { "🥸 Impersonate #{@user.username}" }
         end
       end
     end

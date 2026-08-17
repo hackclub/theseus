@@ -94,3 +94,14 @@ img {
 iframe {
   border: none;
 }
+
+.btn-link {
+  display: inline;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
