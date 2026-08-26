@@ -36,7 +36,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
         a(href: warehouse_skus_path(include_non_inventory: true)) { button(class: "btn-sm") { "Show all" } }
       end
 
-      if policy(Warehouse::SKURequest).new?
+      if policy(::Warehouse::SKURequest).new?
         a(href: helpers.new_warehouse_sku_request_path) { button(class: "btn-success btn-sm") { "+ Request New SKU" } }
       end
     end
