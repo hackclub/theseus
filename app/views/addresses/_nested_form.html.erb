@@ -1,3 +1,4 @@
+<%# locals: (form:, phone: false) %>
 <%= form.fields_for :address do |a| %>
   <div class="grid md:grid-cols-2 gap-4">
     <div class="form-group">
@@ -45,4 +46,12 @@
                          { include_blank: "Select a country" }, 
                          { class: "form-control" } %>
   </div>
+
+  <% if phone %>
+    <div class="form-group">
+      <%= a.label :phone_number, "Phone Number", class: "form-label" %>
+      <%= a.telephone_field :phone_number, class: "form-control" %>
+      <div class="form-hint">Customs asks for this on anything leaving the US</div>
+    </div>
+  <% end %>
 <% end %>

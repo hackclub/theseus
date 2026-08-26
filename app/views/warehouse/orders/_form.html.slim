@@ -17,7 +17,7 @@
     = form.email_field :recipient_email, class: 'form-control'
 
   b address:
-  = render 'addresses/nested_form', form: form
+  = render 'addresses/nested_form', form: form, phone: true
   .py-3
     = form.label :internal_notes, "internal notes:"
     .display-block
