@@ -35,7 +35,8 @@ module AddressParameterParsing
       :city,
       :state,
       :postal_code,
-      :country
+      :country,
+      :phone_number
     )
   end
 end
