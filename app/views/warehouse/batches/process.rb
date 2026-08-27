@@ -2,6 +2,7 @@
 
 class Views::Warehouse::Batches::Process < Views::Base
   include Phlex::Rails::Helpers::NumberToCurrency
+  include Phlex::Rails::Helpers::FormAuthenticityToken
 
   def initialize(batch:)
     @batch = batch
