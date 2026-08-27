@@ -7,6 +7,9 @@ class Views::Warehouse::Batches::Process < Views::Base
     @batch = batch
   end
 
+  # the controller runs preflight before rendering, so errors here mean unmailable rows
+  def blocked? = @batch.errors.any?
+
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
       div(style: "display:flex;align-items:center;gap:0.5rem") do
@@ -17,8 +20,17 @@ class Views::Warehouse::Batches::Process < Views::Base
 
     div(class: "show-layout") do
       div(class: "show-main") do
-        div(class: "banner", style: "margin-bottom: 1rem;") do
-          plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
+        if blocked?
+          div(class: "banner banner-error", style: "margin-bottom: 1rem;") do
+            strong { "These rows can't be shipped yet:" }
+            ul(style: "margin: 0.5rem 0 0; padding-left: 1.25rem;") do
+              @batch.errors.each { |error| li { error.message } }
+            end
+          end
+        else
+          div(class: "banner", style: "margin-bottom: 1rem;") do
+            plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
+          end
         end
 
         section(style: "margin-bottom: 1rem;") do
@@ -57,7 +69,10 @@ class Views::Warehouse::Batches::Process < Views::Base
           div(style: "margin-top: 0.5rem;") do
             form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
               input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-              button(type: "submit", class: "btn-success", style: "width: 100%;") { "▶ Process Batch" }
+              button(type: "submit", class: "btn-success", style: "width: 100%;", disabled: blocked?) { "▶ Process Batch" }
+            end
+            if blocked?
+              div(style: "margin-top: 0.5rem; color: var(--foreground2);") { "Fix the addresses above, then come back." }
             end
             div(style: "margin-top: 0.5rem;") do
               a(href: warehouse_batch_path(@batch), style: "color: var(--foreground2);") { "Cancel" }

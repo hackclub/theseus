@@ -90,6 +90,7 @@ class Warehouse::BatchesController < BaseBatchesController
 
   def process_form
     authorize @batch, :process_form?
+    @batch.preflight # surface unmailable rows before they click, not after
     render Views::Warehouse::Batches::Process.new(batch: @batch)
   end
 
@@ -98,7 +99,7 @@ class Warehouse::BatchesController < BaseBatchesController
     if @batch.process!
       redirect_to warehouse_batch_path(@batch), notice: "Batch was successfully processed."
     else
-      render :process_form, status: :unprocessable_entity
+      render Views::Warehouse::Batches::Process.new(batch: @batch), status: :unprocessable_entity
     end
   end
 

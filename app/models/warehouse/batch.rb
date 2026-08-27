@@ -56,29 +56,51 @@ class Warehouse::Batch < Batch
 
   def self.model_name = Batch.model_name
 
+  # how many bad rows we'll name before giving up and just counting them
+  PREFLIGHT_ERROR_LIMIT = 25
+
   def process!(options = {})
     return false unless fields_mapped?
 
-    # Create orders for each address
-    addresses.each do |address|
-      Warehouse::Order.from_template(
-        warehouse_template,
-        batch: self,
-        recipient_email: address.email,
-        address: address,
-        user: user,
-        idempotency_key: "batch_#{id}_address_#{address.id}",
-        user_facing_title: warehouse_user_facing_title,
-        tags: tags,
-      ).save!
-    end
+    # Build every order first and validate the lot. Saving as we go would leave a
+    # half-created batch behind the moment one row is missing a phone number for
+    # customs, and the good half is already on its way to the warehouse by then.
+    new_orders = addresses.map { |address| build_order_for(address) }
+    return false unless preflight(new_orders)
 
-    # Dispatch all orders
-    orders.each do |order|
-      order.dispatch!
-    end
+    transaction { new_orders.each(&:save!) }
+
+    new_orders.each(&:dispatch!)
 
     mark_processed!
+  end
+
+  # Surfaces every unmailable row at once instead of blowing up on the first one.
+  def preflight(new_orders = addresses.map { |address| build_order_for(address) })
+    invalid = new_orders.reject(&:valid?)
+    return true if invalid.empty?
+
+    invalid.first(PREFLIGHT_ERROR_LIMIT).each do |order|
+      errors.add(:base, "#{order.address.name_line}: #{order.errors.full_messages.to_sentence}")
+    end
+    if invalid.size > PREFLIGHT_ERROR_LIMIT
+      errors.add(:base, "...and #{invalid.size - PREFLIGHT_ERROR_LIMIT} more rows with problems.")
+    end
+
+    false
+  end
+
+  private def build_order_for(address)
+    Warehouse::Order.from_template(
+      warehouse_template,
+      batch: self,
+      recipient_email: address.email,
+      address: address,
+      user: user,
+      idempotency_key: "batch_#{id}_address_#{address.id}",
+      user_facing_title: warehouse_user_facing_title,
+      tags: tags,
+    )
   end
 
   def build_mapping(row, address)

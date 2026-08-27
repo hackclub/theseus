@@ -1,3 +1,4 @@
+<%# locals: (form:, phone: false) %>
 <%
   countries_for_select = Address.countries_for_select.map { |code, name|
     flag = code.blank? ? "" : code.upcase.chars.map { |c| (c.ord + 127397).chr(Encoding::UTF_8) }.join
@@ -58,4 +59,12 @@
       <% end %>
     </select>
   </div>
+
+  <% if phone %>
+    <div style="margin-bottom: 0.5rem;">
+      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Phone number</label>
+      <input type="tel" name="<%= a.field_name(:phone_number) %>" value="<%= a.object&.phone_number %>" style="width: 100%;">
+      <div style="color: var(--foreground2); font-size: 0.85em; margin-top: 0.25rem;">Customs asks for this on anything leaving the US</div>
+    </div>
+  <% end %>
 <% end %>
