@@ -21,10 +21,11 @@ class TemplatePreviewsController < ApplicationController
   def create_mock_letter
     return_address = OpenStruct.new(
       name: "Hack Club",
-      line_1: "15 Falls Rd",
-      city: "Shelburne",
+      line_1: "212 Battery St",
+      line_2: "Suite 3",
+      city: "Burlington",
       state: "VT",
-      postal_code: "05482",
+      postal_code: "05401",
       country: "US",
     )
 

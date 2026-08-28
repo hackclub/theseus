@@ -124,9 +124,9 @@ module CustomsReceipt
             div style: { display: "inline-block", padding_left: "10px" } do
               b { "Hack Club" }
               br
-              plain "15 Falls Rd "
+              plain "212 Battery St, Suite 3 "
               br
-              plain "Shelburne, VT 05482 "
+              plain "Burlington, VT 05401 "
               br
               plain "United States"
             end
