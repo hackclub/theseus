@@ -126,7 +126,7 @@ module CustomsReceipt
               br
               plain "212 Battery St "
               br
-              plain "Burlington, Vermont 05401"
+              plain "Burlington, VT 05401"
               br
               plain "United States"
             end
