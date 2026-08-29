@@ -8,7 +8,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    aasm (5.5.0)
+    aasm (6.0.0)
       concurrent-ruby (~> 1.0)
     actioncable (8.0.5.1)
       actionpack (= 8.0.5.1)
@@ -745,7 +745,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  aasm (~> 5.5)
+  aasm (~> 6.0)
   acts-as-taggable-array-on (~> 0.7.0)
   administrate (~> 0.19.0)
   annotaterb (~> 4.16)
