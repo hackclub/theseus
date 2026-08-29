@@ -68,7 +68,7 @@ gem "dotenv-rails", "~> 3.1"
 
 gem "net-http", "~> 0.6.0"
 
-gem "http", "~> 5.2"
+gem "http", "~> 6.0"
 
 gem "annotaterb", "~> 4.16"
 
