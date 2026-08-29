@@ -4,4 +4,7 @@
   email: user.email,
   avatar: user.icon_url,
   admin: user.admin?,
+  can_warehouse: user.can_warehouse?,
+  can_impersonate_public: user.can_impersonate_public?,
+  can_use_indicia: user.can_use_indicia?,
 }

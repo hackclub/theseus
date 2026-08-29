@@ -683,6 +683,7 @@ Rails.application.routes.draw do
       end
       namespace :v1 do
         resource :user
+        resources :users, only: [:create]
         resources :letters do
           member do
             post :mark_printed
