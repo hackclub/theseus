@@ -152,7 +152,7 @@ gem "valid_email2", "~> 7.0"
 
 gem "sssecrets", "~> 1.0"
 
-gem "lockbox", "~> 2.0"
+gem "lockbox", "~> 2.2"
 
 gem "blind_index", "~> 2.7"
 
