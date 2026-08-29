@@ -945,10 +945,10 @@ d3@^7.9.0:
     d3-transition "3"
     d3-zoom "3"
 
-datamaps@^0.5.9:
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/datamaps/-/datamaps-0.5.9.tgz#2a775473aaab29b55025208b2245e840ecfd4fe1"
-  integrity sha512-GUXpO713URNzaExVUgBtqA5fr2UuxUG/fVitI04zEFHVL2FHSjd672alHq8E16oQqRNzF0m1bmx8WlTnDrGSqQ==
+datamaps@^0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/datamaps/-/datamaps-0.5.10.tgz#64d398c5bed96346a44739df958f0ab92e28e2ee"
+  integrity sha512-FU9J8oXQlGuwALvf3LVno/jKSLiK4uTPcbrSfIRcVBwXCZ7I2KMSmj8kqW4rvBvSbd7Sk5oBxy4PTjSVq+XrMw==
   dependencies:
     "@types/d3" "3.5.38"
     d3 "^3.5.6"
