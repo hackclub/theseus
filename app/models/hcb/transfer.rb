@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: hcb_transfers
+#
+#  id                 :bigint           not null, primary key
+#  amount_cents       :integer          not null
+#  error_message      :string
+#  state              :integer          default(0), not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  billing_profile_id :bigint           not null
+#  hcb_transaction_id :string
+#
+# Indexes
+#
+#  index_hcb_transfers_on_billing_profile_id  (billing_profile_id)
+#  index_hcb_transfers_on_hcb_transaction_id  (hcb_transaction_id)
+#  index_hcb_transfers_on_state               (state)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (billing_profile_id => hcb_payment_accounts.id)
+#
 class HCB::Transfer < ApplicationRecord
   self.table_name = "hcb_transfers"
 

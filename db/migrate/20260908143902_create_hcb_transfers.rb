@@ -12,7 +12,9 @@ class CreateHCBTransfers < ActiveRecord::Migration[8.0]
     add_index :hcb_transfers, :state
     add_index :hcb_transfers, :hcb_transaction_id
 
-    # Link ledger entries to their transfer
+    # Replace the string hcb_transfer_id column with a proper FK to hcb_transfers
+    remove_index :ledger_entries, :hcb_transfer_id, if_exists: true
+    remove_column :ledger_entries, :hcb_transfer_id, :string
     add_reference :ledger_entries, :hcb_transfer, null: true, foreign_key: true
   end
 end

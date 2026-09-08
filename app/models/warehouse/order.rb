@@ -30,7 +30,6 @@
 #  batch_id                :bigint
 #  hc_id                   :string
 #  origin_batch_id         :bigint
-#  source_tag_id           :bigint           not null
 #  template_id             :bigint
 #  user_id                 :bigint           not null
 #  zenventory_id           :integer
@@ -43,7 +42,6 @@
 #  index_warehouse_orders_on_hc_id            (hc_id)
 #  index_warehouse_orders_on_idempotency_key  (idempotency_key) UNIQUE
 #  index_warehouse_orders_on_origin_batch_id  (origin_batch_id)
-#  index_warehouse_orders_on_source_tag_id    (source_tag_id)
 #  index_warehouse_orders_on_tags             (tags) USING gin
 #  index_warehouse_orders_on_template_id      (template_id)
 #  index_warehouse_orders_on_user_id          (user_id)
@@ -53,7 +51,6 @@
 #  fk_rails_...  (address_id => addresses.id)
 #  fk_rails_...  (batch_id => batches.id)
 #  fk_rails_...  (origin_batch_id => batches.id)
-#  fk_rails_...  (source_tag_id => source_tags.id)
 #  fk_rails_...  (template_id => warehouse_templates.id)
 #  fk_rails_...  (user_id => users.id)
 #
