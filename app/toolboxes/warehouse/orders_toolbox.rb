@@ -60,6 +60,9 @@ module Warehouse
     end
     def create_from_template
       template = Warehouse::Template.find_by_public_id!(params[:template_id])
+      unless template.public? || template.user == current_user || admin?
+        halt error: "Template not found"
+      end
       billing_profile = resolve_billing_profile(params[:billing_profile_id])
 
       attrs = {

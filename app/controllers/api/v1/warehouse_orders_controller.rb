@@ -26,6 +26,7 @@ module API
 
       def from_template
         @template = Warehouse::Template.find_by_public_id!(params[:template_id])
+        raise ActiveRecord::RecordNotFound unless @template.public? || @template.user == current_user || current_user.admin?
         billing_profile = resolve_billing_profile
         return if performed?
 
