@@ -52,6 +52,19 @@
 class Letter::Batch < Batch
   def self.policy_class = Letter::BatchPolicy
 
+  include PgSearch::Model
+
+  pg_search_scope :search,
+    against: %i[tags letter_return_address_name],
+    associated_against: {
+      csv_blob: %i[filename],
+      user: %i[email username],
+      letter_queue: %i[name]
+    },
+    using: {
+      tsearch: { prefix: true }
+    }
+
   self.inheritance_column = "type"
   # default_scope { where(type: 'letters') }
   has_many :letters, dependent: :destroy

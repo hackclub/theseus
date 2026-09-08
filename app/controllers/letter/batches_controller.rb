@@ -2,8 +2,18 @@ class Letter::BatchesController < BaseBatchesController
   # GET /letter/batches
   def index
     authorize Letter::Batch, policy_class: Letter::BatchPolicy
-    @batches = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope).order(created_at: :desc)
-    render Views::Letter::Batches::Index.new(batches: @batches)
+    all_batches = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope).order(created_at: :desc)
+    batches = all_batches
+    batches = batches.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
+    batches = batches.search(params[:search]) if params[:search].present?
+    users = current_user&.is_admin? ? User.where(id: all_batches.select(:user_id).distinct).order(:email) : []
+    render Views::Letter::Batches::Index.new(
+      batches: batches,
+      search: params[:search],
+      state: params[:state],
+      user_id: params[:user_id],
+      users: users
+    )
   end
 
   # GET /letter/batches/new
@@ -143,8 +153,8 @@ class Letter::BatchesController < BaseBatchesController
         return
       end
 
-      unless current_user.hcb_payment_accounts.exists?(id: letter_batch_params[:hcb_payment_account_id])
-        redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select an HCB payment account"
+      unless current_user.billing_profiles.exists?(id: letter_batch_params[:hcb_payment_account_id])
+        redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select a billing profile"
         return
       end
     end
@@ -284,8 +294,8 @@ class Letter::BatchesController < BaseBatchesController
         return
       end
 
-      hcb_account = @batch.hcb_payment_account
-      HCB::PaymentAccount.refund_to_organization!(
+      hcb_account = @batch.billing_profile
+      BillingProfile.refund_to_organization!(
         organization_id: hcb_account.organization_id,
         amount_cents: overpaid,
         name: "Refund for #{@batch.public_id}",

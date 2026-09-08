@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class Views::Letter::Batches::Index < Views::Base
-  def initialize(batches:, search: nil, state: nil)
+  def initialize(batches:, search: nil, state: nil, user_id: nil, users: [])
     @batches = batches
     @search = search
     @state = state
+    @user_id = user_id
+    @users = users
   end
 
   def view_template
@@ -15,18 +17,28 @@ class Views::Letter::Batches::Index < Views::Base
 
   private
 
+  attr_reader :batches, :search, :state, :user_id, :users
+
   def toolbar
     render Components::Shared::PageToolbar.new(
       title: "Letter Batches",
       jumpcode_path: letter_batches_path,
       search_path: letter_batches_path,
-      search_value: @search,
+      search_value: search,
       search_placeholder: "Search batches...",
-      search_params: { state: @state },
+      search_params: { state: state, user_id: user_id },
       action_href: new_letter_batch_path,
       action_label: "+ New Batch"
     ) do
-      if @state.present? || @search.present?
+      admin_tool do
+        render Components::Shared::UserPicker.new(
+          users: users,
+          selected_user_id: user_id,
+          path_builder: ->(uid) { letter_batches_path(search: search, state: state, user_id: uid) }
+        )
+      end
+
+      if state.present? || search.present? || user_id.present?
         a(href: letter_batches_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
       end
     end
@@ -34,27 +46,27 @@ class Views::Letter::Batches::Index < Views::Base
 
   def stat_filters
     stats = [
-      { param: nil, count: @batches.count, label: "All" },
-      { param: "awaiting_field_mapping", count: @batches.where(aasm_state: "awaiting_field_mapping").count, label: "Awaiting", color: "yellow" },
-      { param: "fields_mapped", count: @batches.where(aasm_state: "fields_mapped").count, label: "Mapped", color: "blue" },
-      { param: "processed", count: @batches.where(aasm_state: "processed").count, label: "Processed", color: "green" },
-      { param: "printed", count: @batches.where(aasm_state: "printed").count, label: "Printed" },
-      { param: "mailed", count: @batches.where(aasm_state: "mailed").count, label: "Mailed" }
+      { param: nil, count: batches.count, label: "All" },
+      { param: "awaiting_field_mapping", count: batches.where(aasm_state: "awaiting_field_mapping").count, label: "Awaiting", color: "yellow" },
+      { param: "fields_mapped", count: batches.where(aasm_state: "fields_mapped").count, label: "Mapped", color: "blue" },
+      { param: "processed", count: batches.where(aasm_state: "processed").count, label: "Processed", color: "green" },
+      { param: "printed", count: batches.where(aasm_state: "printed").count, label: "Printed" },
+      { param: "mailed", count: batches.where(aasm_state: "mailed").count, label: "Mailed" }
     ]
 
     render Components::Shared::StatFilters.new(
       stats: stats,
-      active: @state,
-      base_path: ->(status: nil, **) { letter_batches_path(state: status, search: @search) },
+      active: state,
+      base_path: ->(status: nil, **) { letter_batches_path(state: status, search: search, user_id: user_id) },
       filter_key: :status
     )
   end
 
   def batches_table
-    filtered = if @state.present?
-                 @batches.where(aasm_state: @state)
+    filtered = if state.present?
+                 batches.where(aasm_state: state)
                else
-                 @batches
+                 batches
                end
 
     table do
