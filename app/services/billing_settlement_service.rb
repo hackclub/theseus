@@ -1,6 +1,8 @@
 class BillingSettlementService
   attr_reader :billing_profile, :errors
 
+  MAX_RETRY_ATTEMPTS = 5
+
   def initialize(billing_profile:, entries: nil)
     @billing_profile = billing_profile
     @explicit_entries = entries
@@ -8,7 +10,7 @@ class BillingSettlementService
   end
 
   # Settle pending entries in two phases:
-  # Phase 1 (DB tx): lock entries, create pending transfer, claim entries
+  # Phase 1 (DB tx): lock UNCLAIMED entries, create pending transfer, claim them
   # Phase 2 (no tx): call HCB API
   # Phase 3 (DB tx): mark settled or failed
   def settle!
@@ -21,12 +23,12 @@ class BillingSettlementService
       entries = if @explicit_entries
         LedgerEntry.where(id: @explicit_entries.map(&:id))
           .lock("FOR UPDATE SKIP LOCKED")
-          .pending
+          .where(state: :pending, hcb_transfer_id: nil)  # only unclaimed entries
           .to_a
       else
         billing_profile.ledger_entries
           .lock("FOR UPDATE SKIP LOCKED")
-          .pending
+          .where(state: :pending, hcb_transfer_id: nil)  # only unclaimed entries
           .to_a
       end
 
@@ -80,6 +82,7 @@ class BillingSettlementService
         hcb_transfer.fail!(error_msg)
         LedgerEntry.where(id: entry_ids).update_all(
           state: LedgerEntry.states[:failed],
+          hcb_transfer_id: nil,  # unclaim so they can be retried
         )
       end
 
@@ -101,22 +104,37 @@ class BillingSettlementService
     end
   end
 
-  # Settle all pending AND failed entries across ALL billing profiles.
+  # Settle unclaimed pending entries across ALL billing profiles.
+  # Also retries failed entries up to MAX_RETRY_ATTEMPTS.
   def self.settle_all!
-    results = { settled: 0, failed: 0 }
+    results = { settled: 0, failed: 0, errors: [] }
+
+    # Retry failed entries that haven't exceeded max attempts
+    LedgerEntry.failed
+      .where(hcb_transfer_id: nil)
+      .where("(metadata->>'retry_count')::int < ? OR metadata->>'retry_count' IS NULL", MAX_RETRY_ATTEMPTS)
+      .find_each do |entry|
+        count = (entry.metadata["retry_count"] || 0).to_i + 1
+        entry.update_columns(
+          state: LedgerEntry.states[:pending],
+          metadata: entry.metadata.merge("retry_count" => count),
+        )
+      end
 
     BillingProfile.joins(:ledger_entries)
-      .merge(LedgerEntry.where(state: [:pending, :failed]))
+      .merge(LedgerEntry.where(state: :pending, hcb_transfer_id: nil))
       .distinct
       .find_each do |profile|
-        # Reset failed entries to pending so they get picked up
-        profile.ledger_entries.failed.update_all(state: LedgerEntry.states[:pending])
-
-        service = new(billing_profile: profile)
-        if service.settle!
-          results[:settled] += 1
-        else
-          results[:failed] += 1
+        begin
+          service = new(billing_profile: profile)
+          if service.settle!
+            results[:settled] += 1
+          else
+            results[:failed] += 1
+          end
+        rescue => e
+          results[:errors] << "#{profile.id}: #{e.message}"
+          Sentry.capture_exception(e, extra: { billing_profile_id: profile.id }) if defined?(Sentry)
         end
       end
 

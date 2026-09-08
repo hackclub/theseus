@@ -1,0 +1,61 @@
+{
+  id: @order.hc_id,
+  state: @order.aasm_state,
+  humanized_state: @order.humanized_state,
+  user_facing_title: @order.user_facing_title,
+  user_facing_description: @order.user_facing_description,
+  internal_notes: @order.internal_notes,
+  recipient_email: @order.recipient_email,
+  notify_on_dispatch: @order.notify_on_dispatch,
+  created_via: @order.created_via,
+  tags: @order.tags,
+  owner: @order.user_id == current_user.id ? "you" : @order.user&.email,
+
+  address: @order.address && {
+    first_name: @order.address.first_name,
+    last_name: @order.address.last_name,
+    line_1: @order.address.line_1,
+    line_2: @order.address.line_2,
+    city: @order.address.city,
+    state: @order.address.state,
+    postal_code: @order.address.postal_code,
+    country: @order.address.country,
+    phone_number: @order.address.phone_number,
+    email: @order.address.email,
+    formatted: @order.address.us_format.strip,
+  },
+
+  line_items: @order.line_items.map { |li|
+    {
+      id: li.id,
+      sku_id: li.sku_id,
+      sku_code: li.sku&.sku,
+      sku_name: li.sku&.name,
+      quantity: li.quantity,
+    }
+  },
+
+  costs: {
+    contents_cost: @order.contents_cost&.to_f,
+    labor_cost: @order.labor_cost&.to_f,
+    postage_cost: @order.postage_cost&.to_f,
+    total_cost: @order.total_cost&.to_f,
+  },
+
+  tracking: @order.tracking_number.present? ? {
+    tracking_number: @order.tracking_number,
+    carrier: @order.carrier,
+    service: @order.service,
+    tracking_url: @order.tracking_url,
+    shipping_method: @order.pretty_via,
+  } : nil,
+
+  billing_profile_id: @order.billing_profile&.public_id,
+  template_id: @order.template&.public_id,
+
+  created_at: @order.created_at.iso8601,
+  updated_at: @order.updated_at.iso8601,
+  dispatched_at: @order.dispatched_at&.iso8601,
+  mailed_at: @order.mailed_at&.iso8601,
+  canceled_at: @order.canceled_at&.iso8601,
+}

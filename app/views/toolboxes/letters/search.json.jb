@@ -1,0 +1,20 @@
+{
+  letters: @letters.map { |letter|
+    {
+      id: letter.public_id,
+      title: letter.display_name,
+      state: letter.aasm_state,
+      recipient: letter.address&.name_line,
+      recipient_city: letter.address&.city,
+      recipient_state: letter.address&.state,
+      postage_type: letter.postage_type,
+      processing_category: letter.processing_category,
+      tags: letter.tags,
+      created_at: letter.created_at.iso8601,
+      mailed_at: letter.mailed_at&.iso8601,
+    }
+  },
+  page: @letters.current_page,
+  total_pages: @letters.total_pages,
+  total_count: @letters.total_count,
+}

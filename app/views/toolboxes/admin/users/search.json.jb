@@ -1,0 +1,17 @@
+{
+  users: @users.map { |user|
+    {
+      id: user.id,
+      public_id: user.public_id,
+      username: user.username,
+      email: user.email,
+      is_admin: user.is_admin,
+      is_warehouse_czar: user.is_warehouse_czar,
+      can_warehouse: user.can_warehouse,
+      created_at: user.created_at
+    }
+  },
+  page: @users.current_page,
+  total_pages: @users.total_pages,
+  total_count: @users.total_count
+}

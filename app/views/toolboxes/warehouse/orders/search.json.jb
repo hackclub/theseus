@@ -1,0 +1,24 @@
+{
+  orders: @orders.map { |o|
+    {
+      id: o.hc_id,
+      state: o.aasm_state,
+      user_facing_title: o.user_facing_title,
+      recipient_email: o.recipient_email,
+      recipient_name: o.address&.name_line,
+      line_items_count: o.line_items.size,
+      line_items_summary: o.line_items.map { |li|
+        "#{li.quantity}x #{li.sku&.name || 'Unknown SKU'}"
+      }.join(", "),
+      tags: o.tags,
+      created_via: o.created_via,
+      owner: o.user_id == current_user.id ? "you" : o.user&.email,
+      created_at: o.created_at.iso8601,
+      dispatched_at: o.dispatched_at&.iso8601,
+      mailed_at: o.mailed_at&.iso8601,
+    }
+  },
+  page: @orders.current_page,
+  total_pages: @orders.total_pages,
+  total_count: @orders.total_count,
+}

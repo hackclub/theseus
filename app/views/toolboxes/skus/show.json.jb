@@ -1,0 +1,51 @@
+{
+  id: @sku.id,
+  sku: @sku.sku,
+  name: @sku.name,
+  description: @sku.description,
+  category: @sku.category,
+  enabled: @sku.enabled,
+  ai_enabled: @sku.ai_enabled,
+  country_of_origin: @sku.country_of_origin,
+  hs_code: @sku.hs_code,
+  customs_description: @sku.customs_description,
+  stock: {
+    in_stock: @sku.in_stock,
+    inbound: @sku.inbound,
+    backordered: @sku.in_stock.to_i < 0
+  },
+  costs: {
+    declared_unit_cost: @sku.declared_unit_cost,
+    declared_unit_cost_override: @sku.declared_unit_cost_override,
+    average_po_cost: @sku.average_po_cost,
+    actual_cost_to_hc: @sku.actual_cost_to_hc
+  },
+  recent_orders: @recent_orders.map { |order|
+    {
+      id: order.id,
+      public_id: order.public_id,
+      state: order.aasm_state,
+      user_facing_title: order.user_facing_title,
+      recipient_email: order.recipient_email,
+      created_at: order.created_at
+    }
+  },
+  outstanding_purchase_orders: @outstanding_pos.map { |po|
+    {
+      id: po.id,
+      order_number: po.order_number,
+      status: po.status,
+      supplier_name: po.supplier_name,
+      required_by_date: po.required_by_date,
+      line_items: po.line_items.select { |li| li.sku_id == @sku.id }.map { |li|
+        {
+          quantity: li.quantity,
+          unit_cost: li.unit_cost
+        }
+      },
+      created_at: po.created_at
+    }
+  },
+  created_at: @sku.created_at,
+  updated_at: @sku.updated_at
+}

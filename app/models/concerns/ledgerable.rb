@@ -2,13 +2,15 @@ module Ledgerable
   extend ActiveSupport::Concern
 
   included do
-    has_many :ledger_entries, as: :ledgerable, dependent: :nullify
+    # Guard must be declared BEFORE has_many so its callback runs first
+    before_destroy :prevent_destroy_with_billing_entries
 
-    # Prevent destruction of records that have settled/refunded billing entries
-    before_destroy :prevent_destroy_with_settled_entries
+    has_many :ledger_entries, as: :ledgerable, dependent: :restrict_with_error
+    # dependent: :restrict_with_error means:
+    # - if any entries exist, destroy is blocked with a validation error
+    # - entries are never orphaned or cascade-deleted
+    # - to destroy a billable, its entries must be explicitly handled first
 
-    # Records that have a billing profile but no ledger entries at all.
-    # Useful for sweep jobs that catch things that fell through the cracks.
     scope :unbilled, -> {
       left_joins(:ledger_entries)
         .where(ledger_entries: { id: nil })
@@ -29,9 +31,9 @@ module Ledgerable
 
   private
 
-  def prevent_destroy_with_settled_entries
-    if ledger_entries.where(state: [:settled, :refunded]).exists?
-      errors.add(:base, "cannot delete a record with settled billing entries")
+  def prevent_destroy_with_billing_entries
+    if ledger_entries.exists?
+      errors.add(:base, "cannot delete a record that has billing entries")
       throw(:abort)
     end
   end

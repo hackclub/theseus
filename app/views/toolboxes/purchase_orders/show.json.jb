@@ -1,0 +1,43 @@
+{
+  id: @purchase_order.id,
+  order_number: @purchase_order.order_number,
+  status: @purchase_order.status,
+  humanized_status: @purchase_order.humanized_state,
+  supplier_name: @purchase_order.supplier_name,
+  supplier_id: @purchase_order.supplier_id,
+  notes: @purchase_order.notes,
+  reviewer_notes: @purchase_order.reviewer_notes,
+  required_by_date: @purchase_order.required_by_date&.iso8601,
+  total_cost: @purchase_order.total_cost.to_f,
+  all_skus_resolved: @purchase_order.all_skus_resolved?,
+  zenventory_id: @purchase_order.zenventory_id,
+  zenventory_url: @purchase_order.zenventory_url,
+  submitted_at: @purchase_order.submitted_at&.iso8601,
+  reviewed_at: @purchase_order.reviewed_at&.iso8601,
+  reviewed_by: @purchase_order.reviewed_by ? {
+    id: @purchase_order.reviewed_by.id,
+    username: @purchase_order.reviewed_by.username,
+    email: @purchase_order.reviewed_by.email
+  } : nil,
+  created_by: {
+    id: @purchase_order.user.id,
+    username: @purchase_order.user.username,
+    email: @purchase_order.user.email
+  },
+  line_items: @line_items.map { |li|
+    {
+      id: li.id,
+      display_name: li.display_name,
+      resolved: li.resolved?,
+      sku_id: li.sku_id,
+      sku_code: li.sku&.sku,
+      sku_name: li.sku&.name,
+      sku_request_id: li.sku_request_id,
+      quantity: li.quantity,
+      unit_cost: li.unit_cost&.to_f,
+      line_total: ((li.unit_cost || 0) * li.quantity).to_f
+    }
+  },
+  created_at: @purchase_order.created_at.iso8601,
+  updated_at: @purchase_order.updated_at.iso8601
+}

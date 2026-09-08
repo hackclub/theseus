@@ -1,0 +1,14 @@
+{
+  skus: @skus.map { |sku|
+    {
+      id: sku.id,
+      sku: sku.sku,
+      name: sku.name,
+      category: sku.category,
+      in_stock: sku.in_stock,
+      inbound: sku.inbound,
+      deficit: sku.in_stock.to_i.abs
+    }
+  },
+  count: @skus.size
+}

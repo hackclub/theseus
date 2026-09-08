@@ -1,0 +1,24 @@
+{
+  return_addresses: @return_addresses.map { |ra|
+    {
+      id: ra.id,
+      name: ra.name,
+      line_1: ra.line_1,
+      line_2: ra.line_2,
+      city: ra.city,
+      state: ra.state,
+      postal_code: ra.postal_code,
+      country: ra.country,
+      shared: ra.shared,
+      owner_id: ra.user_id,
+      display_name: ra.display_name,
+      location: ra.location,
+      letters_count: ra.letters.size,
+      created_at: ra.created_at,
+      updated_at: ra.updated_at
+    }
+  },
+  page: @return_addresses.current_page,
+  total_pages: @return_addresses.total_pages,
+  total_count: @return_addresses.total_count
+}

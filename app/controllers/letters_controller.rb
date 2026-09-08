@@ -340,8 +340,8 @@ class LettersController < ApplicationController
           hcb_transaction_id: refund_tx_id,
         )
         indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
-        indicium.destroy!
-        redirect_to @letter, alert: "Purchase failed: #{e.message}"
+        # Don't destroy indicium — it has refunded billing entries for audit trail
+        redirect_to @letter, alert: "Purchase failed (refunded): #{e.message}"
       end
       return
     end

@@ -1,0 +1,18 @@
+{
+  id: @return_address.id,
+  name: @return_address.name,
+  line_1: @return_address.line_1,
+  line_2: @return_address.line_2,
+  city: @return_address.city,
+  state: @return_address.state,
+  postal_code: @return_address.postal_code,
+  country: @return_address.country,
+  shared: @return_address.shared,
+  owner_id: @return_address.user_id,
+  display_name: @return_address.display_name,
+  location: @return_address.location,
+  letters_count: @return_address.letters.size,
+  is_default: @return_address.id == current_user&.home_return_address_id,
+  created_at: @return_address.created_at,
+  updated_at: @return_address.updated_at
+}

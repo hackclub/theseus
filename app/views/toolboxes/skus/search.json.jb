@@ -1,0 +1,19 @@
+{
+  skus: @skus.map { |sku|
+    {
+      id: sku.id,
+      sku: sku.sku,
+      name: sku.name,
+      description: sku.description,
+      category: sku.category,
+      enabled: sku.enabled,
+      ai_enabled: sku.ai_enabled,
+      in_stock: sku.in_stock,
+      inbound: sku.inbound,
+      declared_unit_cost: sku.declared_unit_cost
+    }
+  },
+  page: @skus.current_page,
+  total_pages: @skus.total_pages,
+  total_count: @skus.total_count
+}

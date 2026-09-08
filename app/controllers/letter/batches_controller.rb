@@ -284,13 +284,14 @@ class Letter::BatchesController < BaseBatchesController
   def refund_overpayment
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
 
-    # Phase 1: calculate inside lock
+    # Phase 1: calculate and reserve inside lock
     overpaid = nil
+    original_amount = nil
     hcb_account = nil
     @batch.with_lock do
-      charged = @batch.hcb_transfer_amount_cents.to_i
+      original_amount = @batch.hcb_transfer_amount_cents.to_i
       spent = @batch.actual_spent_cents
-      overpaid = charged - spent
+      overpaid = original_amount - spent
 
       if overpaid <= 0
         redirect_to processing_letter_batch_path(@batch), alert: "Nothing to refund."
@@ -298,19 +299,26 @@ class Letter::BatchesController < BaseBatchesController
       end
 
       hcb_account = @batch.billing_profile
-      # Mark the batch as refunding to prevent double-click
+      # Reserve: mark as refunding to prevent double-click
       @batch.update_columns(hcb_transfer_amount_cents: spent)
     end
 
     return if performed?
 
     # Phase 2: HCB call outside the lock
-    refund_result = BillingProfile.refund_to_organization!(
-      organization_id: hcb_account.organization_id,
-      amount_cents: overpaid,
-      name: "Refund for #{@batch.public_id}",
-      memo: "[theseus] overpayment refund",
-    )
+    begin
+      refund_result = BillingProfile.refund_to_organization!(
+        organization_id: hcb_account.organization_id,
+        amount_cents: overpaid,
+        name: "Refund for #{@batch.public_id}",
+        memo: "[theseus] overpayment refund",
+      )
+    rescue => e
+      # Restore original amount so retry is possible
+      @batch.update_columns(hcb_transfer_amount_cents: original_amount)
+      redirect_to processing_letter_batch_path(@batch), alert: "Refund failed: #{e.message}"
+      return
+    end
 
     # Phase 3: record in ledger
     refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
@@ -320,7 +328,6 @@ class Letter::BatchesController < BaseBatchesController
       state: :completed,
       hcb_transaction_id: refund_tx_id,
     )
-    # Mark original entry as refunded (don't try to shrink amount to 0)
     original_entry = @batch.ledger_entries.settled.indicia.first
     if original_entry
       original_entry.update_columns(
@@ -332,8 +339,6 @@ class Letter::BatchesController < BaseBatchesController
     @batch.audit!(:hcb_refunded, amount_cents: overpaid, admin: current_user.email)
 
     redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % (overpaid / 100.0)}"
-  rescue => e
-    redirect_to processing_letter_batch_path(@batch), alert: "Refund failed: #{e.message}"
   end
 
   def update_costs

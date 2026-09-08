@@ -1,0 +1,19 @@
+{
+  templates: @templates.map { |t|
+    {
+      id: t.public_id,
+      name: t.name,
+      public: t.public,
+      owner: t.user_id == current_user.id ? "you" : t.user&.email,
+      line_items_count: t.line_items.size,
+      line_items_summary: t.line_items.map { |li|
+        "#{li.quantity}x #{li.sku&.name || 'Unknown SKU'}"
+      }.join(", "),
+      updated_at: t.updated_at.iso8601,
+      created_at: t.created_at.iso8601
+    }
+  },
+  page: @templates.current_page,
+  total_pages: @templates.total_pages,
+  total_count: @templates.total_count
+}

@@ -1,0 +1,23 @@
+{
+  id: @queue.id,
+  slug: @queue.slug,
+  name: @queue.name,
+  type: @queue.type,
+  letter_processing_category: @queue.letter_processing_category,
+  letter_height: @queue.letter_height,
+  letter_width: @queue.letter_width,
+  letter_weight: @queue.letter_weight,
+  postage_type: @queue.postage_type,
+  user_facing_title: @queue.user_facing_title,
+  include_qr_code: @queue.include_qr_code,
+  tags: @queue.tags,
+  letter_mailer_id_id: @queue.letter_mailer_id_id,
+  letter_return_address_id: @queue.letter_return_address_id,
+  letter_return_address_name: @queue.letter_return_address_name,
+  letter_counts: @letter_counts,
+  total_letters: @letter_counts.values.sum,
+  pending_letters: @letter_counts.select { |state, _| state == "queued" }.values.sum,
+  batches_count: @batches_count,
+  created_at: @queue.created_at,
+  updated_at: @queue.updated_at
+}

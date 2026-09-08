@@ -1,0 +1,13 @@
+{
+  tag: @tag,
+  is_common: @is_common,
+  implies_ysws: @implies_ysws,
+  letters: {
+    total: @letter_total,
+    by_state: @letters_by_state
+  },
+  warehouse_orders: {
+    total: @warehouse_order_total,
+    by_state: @warehouse_orders_by_state
+  }
+}

@@ -1,0 +1,8 @@
+@mailer_ids.map do |mid|
+  {
+    id: mid.id,
+    name: mid.name,
+    mid: mid.mid,
+    crid: mid.crid,
+  }
+end

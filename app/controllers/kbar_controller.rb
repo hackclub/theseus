@@ -21,15 +21,15 @@ class KbarController < ApplicationController
   private
 
   def search_public_id(q)
-    prefix = q.split("!").first&.downcase
-    clazzes = ActiveRecord::Base.descendants.select { |c| c.included_modules.include?(PublicIdentifiable) }
-    clazz = clazzes.find { |c| c.public_id_prefix == prefix }
-    return [] unless clazz
+    result = PublicIdResolver.resolve(q)
+    return [] unless result
 
-    record = policy_scope(clazz).find_by_public_id(q)
+    record = result.record
+    # Re-check via policy_scope for authorization
+    record = policy_scope(record.class).find_by(id: record.id)
     return [] unless record
 
-    [{ label: record_label(record), sublabel: record.public_id, path: url_for(record) }]
+    [{ label: record_label(record), sublabel: record.respond_to?(:public_id) ? record.public_id : record.id.to_s, path: url_for(record) }]
   rescue => e
     Rails.logger.warn("kbar public_id lookup failed: #{e.message}")
     []

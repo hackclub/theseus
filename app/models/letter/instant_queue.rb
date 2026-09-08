@@ -155,8 +155,8 @@ class Letter::InstantQueue < Letter::Queue
             hcb_transaction_id: refund_tx_id,
           )
           indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
-          indicium.destroy!
-          letter.destroy!
+          # Don't destroy indicium or letter — they have refunded billing entries.
+          # The indicium stays as an audit trail; the letter stays in pending state.
           raise e
         end
       end

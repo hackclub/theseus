@@ -1,0 +1,21 @@
+{
+  purchase_orders: @purchase_orders.map { |po|
+    {
+      id: po.id,
+      order_number: po.order_number,
+      status: po.status,
+      humanized_status: po.humanized_state,
+      supplier_name: po.supplier_name,
+      supplier_id: po.supplier_id,
+      total_cost: po.total_cost.to_f,
+      line_item_count: po.line_items.size,
+      required_by_date: po.required_by_date&.iso8601,
+      created_by: po.user&.username || po.user&.email,
+      created_at: po.created_at.iso8601,
+      updated_at: po.updated_at.iso8601
+    }
+  },
+  page: @purchase_orders.current_page,
+  total_pages: @purchase_orders.total_pages,
+  total_count: @purchase_orders.total_count
+}

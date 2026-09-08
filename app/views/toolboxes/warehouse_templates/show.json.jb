@@ -1,0 +1,17 @@
+{
+  id: @template.public_id,
+  name: @template.name,
+  public: @template.public,
+  owner: @template.user_id == current_user.id ? "you" : @template.user&.email,
+  line_items: @template.line_items.map { |li|
+    {
+      id: li.id,
+      sku_code: li.sku&.sku,
+      sku_name: li.sku&.name,
+      quantity: li.quantity
+    }
+  },
+  line_items_count: @template.line_items.size,
+  created_at: @template.created_at.iso8601,
+  updated_at: @template.updated_at.iso8601
+}

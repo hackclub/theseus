@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_08_143902) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -468,6 +468,51 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_143902) do
     t.index ["user_id"], name: "index_return_addresses_on_user_id"
   end
 
+  create_table "toolchest_oauth_access_grants", force: :cascade do |t|
+    t.string "resource_owner_id", null: false
+    t.bigint "application_id", null: false
+    t.string "token_digest", null: false
+    t.text "redirect_uri", null: false
+    t.string "scopes", default: "", null: false
+    t.string "code_challenge"
+    t.string "code_challenge_method"
+    t.string "mount_key", default: "default", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "index_toolchest_oauth_access_grants_on_application_id"
+    t.index ["token_digest"], name: "index_toolchest_oauth_access_grants_on_token_digest", unique: true
+  end
+
+  create_table "toolchest_oauth_access_tokens", force: :cascade do |t|
+    t.string "resource_owner_id"
+    t.bigint "application_id", null: false
+    t.string "token", null: false
+    t.string "refresh_token"
+    t.string "scopes"
+    t.string "mount_key", default: "default", null: false
+    t.datetime "expires_at"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "index_toolchest_oauth_access_tokens_on_application_id"
+    t.index ["refresh_token"], name: "index_toolchest_oauth_access_tokens_on_refresh_token", unique: true
+    t.index ["token"], name: "index_toolchest_oauth_access_tokens_on_token", unique: true
+  end
+
+  create_table "toolchest_oauth_applications", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "uid", null: false
+    t.string "secret"
+    t.text "redirect_uri", null: false
+    t.string "scopes", default: "", null: false
+    t.boolean "confidential", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["uid"], name: "index_toolchest_oauth_applications_on_uid", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "slack_id"
     t.string "email"
@@ -759,6 +804,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_143902) do
   add_foreign_key "public_impersonations", "users"
   add_foreign_key "public_login_codes", "public_users", column: "user_id"
   add_foreign_key "return_addresses", "users"
+  add_foreign_key "toolchest_oauth_access_grants", "toolchest_oauth_applications", column: "application_id"
+  add_foreign_key "toolchest_oauth_access_tokens", "toolchest_oauth_applications", column: "application_id"
   add_foreign_key "users", "return_addresses", column: "home_return_address_id"
   add_foreign_key "users", "usps_mailer_ids", column: "home_mid_id"
   add_foreign_key "usps_indicia", "hcb_payment_accounts"

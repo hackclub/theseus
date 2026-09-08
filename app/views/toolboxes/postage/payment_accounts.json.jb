@@ -1,0 +1,10 @@
+@payment_accounts.map do |pa|
+  {
+    id: pa.id,
+    name: pa.name,
+    display_name: pa.display_name,
+    account_type: pa.account_type,
+    ach: pa.ach,
+    mailer_id: pa.usps_mailer_id.name,
+  }
+end

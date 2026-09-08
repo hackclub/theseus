@@ -7,77 +7,54 @@ class PublicIdsController < ApplicationController
   end
 
   def lookup
-
     return redirect_back fallback_location: public_ids_path, alert: "well you gotta enter *something*..." unless params[:id].present?
 
-    # The public_id contains the prefix that determines the model class
     prefix = params[:id].split("!").first&.downcase
-    id_part = params[:id].split("!").last
 
-    # Find the corresponding model based on the prefix
+    # Special cases with admin-specific routing
     case prefix
     when "mtr"
       @record = USPS::IVMTR::Event.find_by_public_id!(params[:id])
       @letter = @record.letter
       if current_user.admin?
         return redirect_to inspect_iv_mtr_event_path(@record)
+      elsif @letter.present?
+        return redirect_to public_letter_path(@letter)
       else
-        if @letter.present?
-          return redirect_to public_letter_path(@letter)
-        else
-          return redirect_back fallback_location: public_ids_path, alert: "MTR event found, but no associated letter...?"
-        end
+        return redirect_back fallback_location: public_ids_path, alert: "MTR event found, but no associated letter...?"
       end
     when "hackapost", "dev"
-      @indicium = USPS::Indicium.find(id_part[1...])
-      @letter = @indicium.letter
-      if current_user.admin?
-        return redirect_to inspect_indicium_path(@indicium)
-      else
-        if @letter.present?
+      result = PublicIdResolver.resolve(params[:id])
+      if result&.record.is_a?(USPS::Indicium)
+        @indicium = result.record
+        @letter = @indicium.letter
+        if current_user.admin?
+          return redirect_to inspect_indicium_path(@indicium)
+        elsif @letter.present?
           return redirect_to public_letter_path(@letter)
         else
           return redirect_back fallback_location: public_ids_path, alert: "indicium found, but no associated letter...?"
         end
       end
-    else
-      # bad hack:
-      clazzes = ActiveRecord::Base.descendants.select { |c| c.included_modules.include?(PublicIdentifiable) }
-      clazz = clazzes.find { |c| c.public_id_prefix == prefix }
-      unless clazz.present?
-        return search_by_tracking_number(params[:id])
-      end
-      @record = clazz.find_by_public_id(params[:id])
-      unless @record.present?
-        return redirect_back fallback_location: public_ids_path, alert: "no #{clazz.name} found with public id #{params[:id]}"
-      end
-
-      redirect_to url_for(@record)
-
+      return redirect_back fallback_location: public_ids_path, alert: "nothing found for that hackapost ID"
     end
+
+    # Generic resolution via PublicIdResolver
+    result = PublicIdResolver.resolve(params[:id])
+    if result
+      return redirect_to url_for(result.record)
+    end
+
+    # LSV fallback for tracking numbers (Airtable, not in PublicIdResolver)
+    if params[:id].match?(/\A[A-Z0-9]{10,}\z/i)
+      lsv = LSV::MarketingShipmentRequest.first_where("{Warehouse–Tracking Number} = '#{params[:id].gsub("'", "\\'")}'")
+      return redirect_to show_lsv_path(LSV.slug_for(lsv), lsv.id) if lsv
+    end
+
+    flash[:alert] = "nothing found at all."
+    redirect_back fallback_location: public_ids_path
   rescue ActiveRecord::RecordNotFound => e
     flash[:alert] = "Record not found"
-    redirect_back fallback_location: public_ids_path
-  end
-
-  private
-
-  def search_by_tracking_number(tracking_number)
-    return if tracking_number.blank?
-    # Search for warehouse orders by tracking number
-    warehouse_order = Warehouse::Order.find_by(tracking_number: tracking_number)
-    if warehouse_order
-      return redirect_to warehouse_order_path(warehouse_order)
-    end
-
-    lsv = LSV::MarketingShipmentRequest.first_where("{Warehouse–Tracking Number} = '#{tracking_number.gsub("'", "\\'")}'")
-
-    if lsv
-      return redirect_to show_lsv_path(LSV.slug_for(lsv), lsv.id)
-    end
-
-    # No package found with this tracking number
-    flash[:alert] = "nothing found at all."
     redirect_back fallback_location: public_ids_path
   end
 end

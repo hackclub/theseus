@@ -1,0 +1,25 @@
+{
+  id: @indicium.id,
+  public_id: @indicium.public_id,
+  postage: @indicium.postage&.to_f,
+  fees: @indicium.fees&.to_f,
+  cost: @indicium.cost.to_f,
+  usps_sku: @indicium.usps_sku,
+  mailing_date: @indicium.mailing_date,
+  processing_category: @indicium.processing_category,
+  nonmachinable: @indicium.nonmachinable,
+  postage_weight: @indicium.postage_weight,
+  payment_account: @indicium.payment_account.display_name,
+  letter: @indicium.letter ? {
+    id: @indicium.letter.id,
+    public_id: @indicium.letter.public_id,
+    state: @indicium.letter.aasm_state,
+  } : nil,
+  billing_profile: @indicium.billing_profile ? {
+    id: @indicium.billing_profile.id,
+    public_id: @indicium.billing_profile.public_id,
+    organization_name: @indicium.billing_profile.organization_name,
+  } : nil,
+  created_at: @indicium.created_at,
+  updated_at: @indicium.updated_at,
+}

@@ -1,0 +1,19 @@
+@queues.map do |queue|
+  counts = @letter_counts.select { |(qid, _), _| qid == queue.id }
+  {
+    id: queue.id,
+    slug: queue.slug,
+    name: queue.name,
+    type: queue.type,
+    letter_processing_category: queue.letter_processing_category,
+    letter_height: queue.letter_height,
+    letter_width: queue.letter_width,
+    letter_weight: queue.letter_weight,
+    postage_type: queue.postage_type,
+    tags: queue.tags,
+    include_qr_code: queue.include_qr_code,
+    letters: counts.transform_keys { |(_qid, state)| state },
+    created_at: queue.created_at,
+    updated_at: queue.updated_at
+  }
+end
