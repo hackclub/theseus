@@ -52,5 +52,9 @@ Rails.application.configure do
       cron: "0 14 * * 1-5",  # 14:00 UTC = 9am EST, weekdays only
       class: "Warehouse::CzarDigestJob",
     },
+    billing_settlement_sweep: {
+      cron: "*/15 * * * *",  # every 15 minutes — catches orphaned pending/failed entries
+      class: "BillingSettlementSweepJob",
+    },
   }
 end

@@ -236,6 +236,7 @@ GEM
       fugit (>= 1.11.0)
       railties (>= 6.1.0)
       thor (>= 1.0.0)
+    hana (1.3.7)
     hashid-rails (1.4.1)
       activerecord (>= 4.0)
       hashids (~> 1.0)
@@ -277,6 +278,11 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
+    json_schemer (2.5.0)
+      bigdecimal
+      hana (~> 1.3)
+      regexp_parser (~> 2.0)
+      simpleidn (~> 0.2)
     jwt (3.2.0)
       base64
     kamal (2.12.0)
@@ -333,6 +339,8 @@ GEM
       net-smtp
     marcel (1.2.1)
     matrix (0.4.3)
+    mcp (1.5.0)
+      json_schemer (>= 2.4)
     memoizer (1.0.3)
     mini_mime (1.1.5)
     minitest (6.0.6)
@@ -616,6 +624,7 @@ GEM
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
+    simpleidn (0.3.0)
     slack-notifier (2.4.0)
     slim (5.2.2)
       temple (~> 0.10.0)
@@ -669,6 +678,9 @@ GEM
     thruster (0.1.25-x86_64-linux)
     tilt (2.8.0)
     timeout (0.6.1)
+    toolchest (0.3.7)
+      mcp (>= 0.10)
+      rails (>= 7.0)
     tsort (0.2.0)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
@@ -811,6 +823,7 @@ DEPENDENCIES
   sssecrets (~> 1.0)
   stimulus-rails
   thruster
+  toolchest (~> 0.3)
   ttfunk (~> 1.8)
   turbo-rails
   tzinfo-data

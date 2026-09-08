@@ -39,6 +39,6 @@ class BaseBatchesController < ApplicationController
   private
 
   def set_batch
-    @batch = Batch.find(params[:id])
+    @batch = policy_scope(Batch).find(params[:id])
   end
 end

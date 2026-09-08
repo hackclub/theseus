@@ -426,6 +426,8 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
+  toolchest_oauth
+  mount Toolchest::Engine => "/mcp"
   get "customs_receipts/index"
   get "customs_receipts/show"
   scope path: "back_office" do
