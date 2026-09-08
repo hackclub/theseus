@@ -3,6 +3,7 @@ Toolchest.configure do |config|
   config.server_description = "Mail & fulfillment management for Hack Club"
   config.auth = :oauth
   config.mount_path = "/mcp"
+  config.access_token_expires_in = 30.days
 
   Toolchest.base_controller = "ToolchestController"
 
