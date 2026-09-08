@@ -26,9 +26,12 @@ module API
 
       def from_template
         @template = Warehouse::Template.find_by_public_id!(params[:template_id])
+        billing_profile = resolve_billing_profile
+        return if performed?
+
         address = parse_address_from_params(permit_address_params)
         @warehouse_order = Warehouse::Order.from_template(@template, warehouse_order_params.merge(
-          address:, user: current_user, billing_profile: resolve_billing_profile,
+          address:, user: current_user, billing_profile:,
         ))
         authorize @warehouse_order
 
@@ -54,9 +57,12 @@ module API
       end
 
       def create
+        billing_profile = resolve_billing_profile
+        return if performed?
+
         address = parse_address_from_params(permit_address_params)
         @warehouse_order = Warehouse::Order.new(warehouse_order_params.merge(
-          address:, user: current_user, billing_profile: resolve_billing_profile,
+          address:, user: current_user, billing_profile:,
         ))
         authorize @warehouse_order
         address.save!
@@ -101,11 +107,21 @@ module API
 
       # Per-request billing_profile_id overrides the API key's default
       def resolve_billing_profile
-        if params[:billing_profile_id].present?
+        profile = if params[:billing_profile_id].present?
           BillingProfile.find(params[:billing_profile_id])
         else
           current_token.billing_profile
         end
+
+        if profile.nil? && Flipper.enabled?(:require_billing_profile_2026_09_08)
+          render json: {
+            error: "billing_profile_required",
+            message: "A billing profile is required for warehouse orders. Set a default on your API key or pass billing_profile_id per request.",
+          }, status: :unprocessable_entity
+          return nil
+        end
+
+        profile
       end
 
       def contents_params
