@@ -160,6 +160,7 @@ class Warehouse::Order < ApplicationRecord
     end
 
     ActiveRecord::Base.transaction do
+      lock!  # row-level lock prevents concurrent dispatch
       raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
       order = Zenventory.create_customer_order(
         {

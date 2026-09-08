@@ -254,12 +254,14 @@ class LettersController < ApplicationController
       return
     end
 
-    if @letter.usps_indicium.present?
-      redirect_to @letter, alert: "Indicia already purchased for this letter."
-      return
-    end
+    # Lock the letter to prevent concurrent double-purchase
+    @letter.with_lock do
+      if @letter.usps_indicium.present?
+        redirect_to @letter, alert: "Indicia already purchased for this letter."
+        return
+      end
 
-    usps_payment_account = USPS::PaymentAccount.find_by(id: params[:usps_payment_account_id])
+      usps_payment_account = USPS::PaymentAccount.find_by(id: params[:usps_payment_account_id])
     if usps_payment_account.nil?
       redirect_to @letter, alert: "Please select a valid USPS payment account."
       return
@@ -345,7 +347,8 @@ class LettersController < ApplicationController
     end
 
     @letter.update_columns(indicia_state: "purchased")
-    redirect_to @letter, notice: "Indicia purchased successfully (charged to #{billing_profile.organization_name})."
+      redirect_to @letter, notice: "Indicia purchased successfully (charged to #{billing_profile.organization_name})."
+    end
   end
 
   # GET /letters/scanner

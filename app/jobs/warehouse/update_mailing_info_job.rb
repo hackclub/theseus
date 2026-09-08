@@ -24,26 +24,38 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
     orders.each do |order|
       zen_order = zen_orders[order.hc_id]
       next unless zen_order
-      order.update(
-        carrier: zen_order[:carrier],
-        service: zen_order[:service],
-        weight: zen_order[:weight],
-        tracking_number: zen_order[:tracking_number],
-        mailed_at: DateTime.parse(zen_order[:shipped_date]),
-        postage_cost: zen_order[:shipping_handling],
-        aasm_state: "mailed"
-      )
-      Warehouse::OrderMailer.with(order:).order_shipped.deliver_later
 
-      # Create postage ledger entry if billing profile is present and postage is known
-      if order.billing_profile.present? && zen_order[:shipping_handling].to_d.positive?
-        order.ledger_entries.create!(
-          billing_profile: order.billing_profile,
-          category: :postage,
-          amount_cents: (zen_order[:shipping_handling].to_d * 100).ceil,
+      # Lock the order to prevent concurrent job runs from double-processing
+      order.with_lock do
+        # Skip if already mailed (another job run got here first)
+        next if order.mailed?
+
+        order.update!(
+          carrier: zen_order[:carrier],
+          service: zen_order[:service],
+          weight: zen_order[:weight],
+          tracking_number: zen_order[:tracking_number],
+          mailed_at: DateTime.parse(zen_order[:shipped_date]),
+          postage_cost: zen_order[:shipping_handling],
+          aasm_state: "mailed"
         )
-        profiles_to_settle << order.billing_profile
+
+        # Create postage ledger entry if billing profile is present and postage is known
+        # Guard: only create if no postage entry exists yet for this order
+        if order.billing_profile.present? &&
+           zen_order[:shipping_handling].to_d.positive? &&
+           !order.ledger_entries.postage.exists?
+          order.ledger_entries.create!(
+            billing_profile: order.billing_profile,
+            category: :postage,
+            amount_cents: (zen_order[:shipping_handling].to_d * 100).ceil,
+          )
+          profiles_to_settle << order.billing_profile
+        end
       end
+
+      # Send email outside the lock
+      Warehouse::OrderMailer.with(order:).order_shipped.deliver_later
     end
 
     # Settle each billing profile that had new postage entries
