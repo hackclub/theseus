@@ -510,7 +510,11 @@ Rails.application.routes.draw do
     end
 
     namespace :admin do
-      resources :users
+      resources :users do
+        member do
+          post :flip
+        end
+      end
       resources :common_tags
 
       namespace :usps do

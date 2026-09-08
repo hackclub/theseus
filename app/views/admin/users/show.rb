@@ -108,6 +108,53 @@ class Views::Admin::Users::Show < Views::Base
       end
     end
 
+    # Feature Flags
+    section do
+      h3(style: "margin-top:0;") { "Feature Flags" }
+      if Flipper.features.any?
+        Flipper.features.sort_by(&:name).each do |flag|
+          global = flag.state == :on
+          user_enabled = flag.enabled?(@user)
+          desc = Rails.configuration.flipper_features[flag.name]
+
+          div(style: "display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;") do
+            case flag.state
+            when :on
+              span(class: "badge badge-success") { "on" }
+            when :off
+              span(class: "badge") { "off" }
+            when :conditional
+              span(class: "badge badge-warning") { "cond" }
+            end
+
+            a(href: "#{flipper_path}/features/#{flag.name}", target: "_blank", style: "font-family:monospace;") { flag.name }
+
+            if desc.present?
+              abbr(title: desc, style: "color:var(--foreground2);cursor:help;") { "(?)" }
+            end
+
+            span(style: "flex:1;")
+
+            if global
+              span(style: "color:var(--foreground2);font-style:italic;") { "on for everyone" }
+            elsif user_enabled
+              span(class: "badge badge-success") { "enabled" }
+              form_with(url: flip_admin_user_path(@user, flag: flag.name, state: false), method: :post, style: "display:inline;") do
+                button(type: "submit", class: "btn-sm") { "disable" }
+              end
+            else
+              span(style: "color:var(--foreground2);") { "disabled" }
+              form_with(url: flip_admin_user_path(@user, flag: flag.name, state: true), method: :post, style: "display:inline;") do
+                button(type: "submit", class: "btn-sm") { "enable" }
+              end
+            end
+          end
+        end
+      else
+        p(class: "text-muted") { "No feature flags configured." }
+      end
+    end
+
     # Impersonate
     if @user != current_user
       section do

@@ -26,6 +26,19 @@ module Admin
       end
     end
 
+    def flip
+      feature = params[:flag]
+      state = params[:state] == "true"
+
+      if state
+        Flipper.enable_actor(feature, resource)
+      else
+        Flipper.disable_actor(feature, resource)
+      end
+
+      redirect_to admin_user_path(resource), notice: "#{feature}: #{state ? 'enabled' : 'disabled'} for #{resource.username}"
+    end
+
     private
 
     def resource = @resource ||= User.find(params[:id])
