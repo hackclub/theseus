@@ -84,7 +84,13 @@ class Views::APIKeys::Show < Views::Base
         end
         span(class: "detail-label") { "Billing Profile" }
         if api_key.billing_profile.present?
-          span { api_key.billing_profile.organization_name }
+          span do
+            a(href: hcb_payment_account_path(api_key.billing_profile), style: "text-decoration:none;") do
+              plain api_key.billing_profile.organization_name
+            end
+            plain " "
+            code(style: "font-size:0.85em;color:var(--foreground2);") { api_key.billing_profile.public_id }
+          end
         else
           span(class: "text-muted") { "None" }
         end

@@ -30,6 +30,7 @@ module Shortcodes
         "ind" => { model: "USPS::Indicium", path: "/back_office/inspect/indicia" },
         "mtr" => { model: "USPS::IVMTR::Event", path: "/back_office/inspect/iv_mtr_events" },
         "wot" => { model: "Warehouse::Template", path: "/back_office/warehouse/templates" },
+        "bp" => { model: "BillingProfile", path: "/back_office/hcb/payment_accounts" },
       }
     end
 

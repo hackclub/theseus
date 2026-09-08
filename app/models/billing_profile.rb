@@ -25,6 +25,9 @@ class BillingProfile < ApplicationRecord
 
   has_paper_trail
 
+  include PublicIdentifiable
+  set_public_id_prefix "bp"
+
   has_many :ledger_entries, dependent: :restrict_with_error
   has_many :hcb_transfers, class_name: "HCB::Transfer", dependent: :restrict_with_error
 

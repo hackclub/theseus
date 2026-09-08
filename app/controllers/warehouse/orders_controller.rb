@@ -75,9 +75,13 @@ class Warehouse::OrdersController < ApplicationController
 
   # POST /warehouse/orders or /warehouse/orders.json
   def create
+    resolved_profile = resolve_billing_profile(params.dig(:warehouse_order, :billing_profile_id))
+    return if performed?
+
     @warehouse_order = Warehouse::Order.new(
-      warehouse_order_params.merge(
+      warehouse_order_params.except(:billing_profile_id).merge(
         user: current_user,
+        billing_profile: resolved_profile,
       )
     )
 
@@ -159,5 +163,18 @@ class Warehouse::OrdersController < ApplicationController
       line_items_attributes: [:id, :sku_id, :quantity, :_destroy],
       address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email],
     ).compact_blank
+  end
+
+  def resolve_billing_profile(id_or_public_id)
+    return nil if id_or_public_id.blank?
+
+    profile = current_user.billing_profiles.find_by(id: id_or_public_id) ||
+              BillingProfile.find_by_public_id(id_or_public_id)&.then { |p| p if p.user == current_user }
+
+    unless profile
+      redirect_to new_warehouse_order_path, alert: "Billing profile not found or not yours."
+    end
+
+    profile
   end
 end

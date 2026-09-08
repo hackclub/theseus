@@ -108,15 +108,17 @@ module API
       # Per-request billing_profile_id overrides the API key's default
       def resolve_billing_profile
         profile = if params[:billing_profile_id].present?
-          # Only allow billing profiles owned by the API key's user
-          current_user.billing_profiles.find_by(id: params[:billing_profile_id]).tap do |p|
-            unless p
-              render json: { error: "not_authorized", message: "Billing profile not found or not yours." }, status: :forbidden
-              return nil
-            end
-          end
+          # Accept public ID (bp!xxx) or numeric ID, scoped to current user
+          id = params[:billing_profile_id]
+          current_user.billing_profiles.find_by(id: id) ||
+            BillingProfile.find_by_public_id(id)&.then { |p| p if p.user == current_user }
         else
           current_token.billing_profile
+        end
+
+        if params[:billing_profile_id].present? && profile.nil?
+          render json: { error: "not_authorized", message: "Billing profile not found or not yours." }, status: :forbidden
+          return nil
         end
 
         if profile.nil? && Flipper.enabled?(:require_billing_profile_2026_09_08)

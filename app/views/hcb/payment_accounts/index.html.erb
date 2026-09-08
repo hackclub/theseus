@@ -1,8 +1,8 @@
-<% content_for :title, "HCB Payment Accounts" %>
+<% content_for :title, "Billing Profiles" %>
 
 <div class="toolbar">
   <div style="display:flex;align-items:center;gap:0.5rem">
-    <strong style="font-size: 1.15em;">HCB Payment Accounts</strong>
+    <strong style="font-size: 1.15em;">Billing Profiles</strong>
   </div>
   <span class="spacer"></span>
   <% if current_user.hcb_connected? %>
@@ -17,6 +17,7 @@
         <table>
           <thead>
             <tr>
+              <th>ID</th>
               <th>Organization</th>
               <th>Added</th>
             </tr>
@@ -24,6 +25,7 @@
           <tbody>
             <% @payment_accounts.each do |account| %>
               <tr>
+                <td><code style="font-size:0.85em;"><%= account.public_id %></code></td>
                 <td><a href="<%= hcb_payment_account_path(account) %>" style="text-decoration: none;"><strong><%= account.organization_name %></strong></a></td>
                 <td class="text-muted"><%= account.created_at.strftime("%b %d, %Y") %></td>
               </tr>
