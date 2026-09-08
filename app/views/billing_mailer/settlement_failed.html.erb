@@ -1,0 +1,24 @@
+<h2>Billing settlement failed</h2>
+
+<p><strong>Organization:</strong> <%= @billing_profile.organization_name %></p>
+<p><strong>Error:</strong> <%= @error %></p>
+
+<h3>Entries that failed to settle:</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr>
+    <th>Category</th>
+    <th>Amount</th>
+    <th>Billable</th>
+    <th>Created</th>
+  </tr>
+  <% @ledger_entries.each do |entry| %>
+    <tr>
+      <td><%= entry.category %></td>
+      <td>$<%= "%.2f" % entry.amount %></td>
+      <td><%= entry.ledgerable_type %> #<%= entry.ledgerable_id %></td>
+      <td><%= entry.created_at.strftime("%b %d, %Y %H:%M") %></td>
+    </tr>
+  <% end %>
+</table>
+
+<p>Total: $<%= "%.2f" % (@ledger_entries.sum(&:amount_cents) / 100.0) %></p>

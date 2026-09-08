@@ -18,6 +18,9 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
       endDate: end_date
     ).index_by { |order| order[:order_number].to_s.sub("hack.club/", "") }
 
+    # Track which billing profiles need settlement after processing
+    profiles_to_settle = Set.new
+
     orders.each do |order|
       zen_order = zen_orders[order.hc_id]
       next unless zen_order
@@ -31,6 +34,21 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
         aasm_state: "mailed"
       )
       Warehouse::OrderMailer.with(order:).order_shipped.deliver_later
+
+      # Create postage ledger entry if billing profile is present and postage is known
+      if order.billing_profile.present? && zen_order[:shipping_handling].to_d.positive?
+        order.ledger_entries.create!(
+          billing_profile: order.billing_profile,
+          category: :postage,
+          amount_cents: (zen_order[:shipping_handling].to_d * 100).ceil,
+        )
+        profiles_to_settle << order.billing_profile
+      end
+    end
+
+    # Settle each billing profile that had new postage entries
+    profiles_to_settle.each do |profile|
+      BillingSettlementService.new(billing_profile: profile).settle!
     end
   end
 end

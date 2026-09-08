@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_08_130911) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_08_133544) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -303,6 +303,26 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_130911) do
     t.datetime "updated_at", null: false
     t.index ["hcb_oauth_connection_id"], name: "index_hcb_payment_accounts_on_hcb_oauth_connection_id"
     t.index ["user_id"], name: "index_hcb_payment_accounts_on_user_id"
+  end
+
+  create_table "ledger_entries", force: :cascade do |t|
+    t.bigint "billing_profile_id", null: false
+    t.string "ledgerable_type", null: false
+    t.bigint "ledgerable_id", null: false
+    t.integer "category", null: false
+    t.integer "amount_cents", null: false
+    t.integer "state", default: 0, null: false
+    t.datetime "settled_at"
+    t.string "hcb_transfer_id"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_profile_id", "state"], name: "index_ledger_entries_on_billing_profile_id_and_state"
+    t.index ["billing_profile_id"], name: "index_ledger_entries_on_billing_profile_id"
+    t.index ["category"], name: "index_ledger_entries_on_category"
+    t.index ["hcb_transfer_id"], name: "index_ledger_entries_on_hcb_transfer_id"
+    t.index ["ledgerable_type", "ledgerable_id"], name: "index_ledger_entries_on_ledgerable"
+    t.index ["state"], name: "index_ledger_entries_on_state"
   end
 
   create_table "letter_queues", force: :cascade do |t|
@@ -708,6 +728,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_130911) do
   add_foreign_key "hcb_oauth_connections", "users"
   add_foreign_key "hcb_payment_accounts", "hcb_oauth_connections"
   add_foreign_key "hcb_payment_accounts", "users"
+  add_foreign_key "ledger_entries", "hcb_payment_accounts", column: "billing_profile_id"
   add_foreign_key "letter_queues", "hcb_payment_accounts"
   add_foreign_key "letter_queues", "return_addresses", column: "letter_return_address_id"
   add_foreign_key "letter_queues", "users"

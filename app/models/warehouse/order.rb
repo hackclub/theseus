@@ -59,6 +59,7 @@
 #
 class Warehouse::Order < ApplicationRecord
   has_paper_trail
+  include Ledgerable
 
   include AASM
   include HasAddress
@@ -81,10 +82,12 @@ class Warehouse::Order < ApplicationRecord
   belongs_to :template, class_name: "Warehouse::Template", optional: true
   belongs_to :user
   belongs_to :origin_batch, class_name: "Batch", optional: true
+  belongs_to :billing_profile, class_name: "BillingProfile", foreign_key: :billing_profile_id, optional: true
 
   validates :line_items, presence: true
   validates :recipient_email, presence: true
   validate :can_mail_parcels_to_country
+  validate :billing_profile_required, on: :create
 
   before_validation :set_created_via_defaults, on: :create
   after_create :set_hc_id
@@ -168,6 +171,20 @@ class Warehouse::Order < ApplicationRecord
         }
       )
       mark_dispatched!(order[:id])
+
+      # Create labor ledger entry inside transaction
+      if billing_profile.present? && labor_cost.present? && labor_cost.positive?
+        ledger_entries.create!(
+          billing_profile: billing_profile,
+          category: :labor,
+          amount_cents: (labor_cost * 100).ceil,
+        )
+      end
+    end
+
+    # Settle labor charges after transaction commits (don't roll back zenventory on HCB failure)
+    if billing_profile.present? && ledger_entries.pending.labor.any?
+      BillingSettlementService.new(billing_profile: billing_profile, entries: ledger_entries.pending.labor.to_a).settle!
     end
 
     if notify_on_dispatch?
@@ -383,6 +400,12 @@ class Warehouse::Order < ApplicationRecord
 
   def can_mail_parcels_to_country
     errors.add(:base, :cant_mail, message: "We can't currently ship to #{ISO3166::Country[address.country]&.common_name || address.country} from the warehouse.") if %i[IR PS CU KP RU].include? address.country&.to_sym
+  end
+
+  def billing_profile_required
+    if Flipper.enabled?(:require_billing_profile_2026_09_08) && billing_profile.blank?
+      errors.add(:billing_profile, "is required for warehouse orders")
+    end
   end
 
   def inherit_batch_tags

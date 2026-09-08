@@ -120,6 +120,18 @@ class BatchProcessJob < ApplicationJob
       xfer
     end
 
+    # Create ledger entry for the batch indicia charge
+    if transfer && estimated_cents.positive?
+      batch.ledger_entries.create!(
+        billing_profile: hcb_account,
+        category: :indicia,
+        amount_cents: estimated_cents,
+        state: :settled,
+        settled_at: Time.current,
+        hcb_transfer_id: transfer.respond_to?(:id) ? transfer.id : batch.hcb_transfer_id,
+      )
+    end
+
     actual_cents = Concurrent::AtomicFixnum.new(0)
     purchased_count = Concurrent::AtomicFixnum.new(0)
     failed_count = Concurrent::AtomicFixnum.new(0)

@@ -25,6 +25,8 @@ class BillingProfile < ApplicationRecord
 
   has_paper_trail
 
+  has_many :ledger_entries, dependent: :restrict_with_error
+
   belongs_to :user
   belongs_to :oauth_connection, class_name: "HCB::OauthConnection", foreign_key: :hcb_oauth_connection_id
 
