@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_08_130911) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -175,6 +175,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
     t.boolean "implies_ysws"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "flipper_features", force: :cascade do |t|
+    t.string "key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_flipper_features_on_key", unique: true
+  end
+
+  create_table "flipper_gates", force: :cascade do |t|
+    t.string "feature_key", null: false
+    t.string "key", null: false
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -419,14 +435,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
     t.index ["user_id"], name: "index_return_addresses_on_user_id"
   end
 
-  create_table "source_tags", force: :cascade do |t|
-    t.string "slug"
-    t.string "name"
-    t.string "owner"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "slack_id"
     t.string "email"
@@ -554,7 +562,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
     t.string "user_facing_description"
     t.text "internal_notes"
     t.integer "zenventory_id"
-    t.bigint "source_tag_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "address_id", null: false
@@ -582,7 +589,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
     t.index ["idempotency_key"], name: "index_warehouse_orders_on_idempotency_key", unique: true
     t.index ["origin_batch_id"], name: "index_warehouse_orders_on_origin_batch_id"
-    t.index ["source_tag_id"], name: "index_warehouse_orders_on_source_tag_id"
     t.index ["tags"], name: "index_warehouse_orders_on_tags", using: :gin
     t.index ["template_id"], name: "index_warehouse_orders_on_template_id"
     t.index ["user_id"], name: "index_warehouse_orders_on_user_id"
@@ -683,11 +689,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
   create_table "warehouse_templates", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name"
-    t.bigint "source_tag_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "public"
-    t.index ["source_tag_id"], name: "index_warehouse_templates_on_source_tag_id"
     t.index ["user_id"], name: "index_warehouse_templates_on_user_id"
   end
 
@@ -734,7 +738,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
   add_foreign_key "warehouse_orders", "addresses"
   add_foreign_key "warehouse_orders", "batches"
   add_foreign_key "warehouse_orders", "batches", column: "origin_batch_id"
-  add_foreign_key "warehouse_orders", "source_tags"
   add_foreign_key "warehouse_orders", "users"
   add_foreign_key "warehouse_orders", "warehouse_templates", column: "template_id"
   add_foreign_key "warehouse_purchase_order_line_items", "warehouse_purchase_orders", column: "purchase_order_id"
@@ -745,6 +748,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_214500) do
   add_foreign_key "warehouse_sku_requests", "users"
   add_foreign_key "warehouse_sku_requests", "users", column: "reviewed_by_id"
   add_foreign_key "warehouse_sku_requests", "warehouse_skus"
-  add_foreign_key "warehouse_templates", "source_tags"
   add_foreign_key "warehouse_templates", "users"
 end
