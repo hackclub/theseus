@@ -14,7 +14,7 @@ class BillingController < ApplicationController
   end
 
   def show
-    @ledger_entry = LedgerEntry.find(params[:id])
+    @ledger_entry = policy_scope(LedgerEntry).find(params[:id])
     authorize @ledger_entry
 
     render Views::Billing::Show.new(ledger_entry: @ledger_entry)

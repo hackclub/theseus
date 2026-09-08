@@ -61,8 +61,10 @@ class Letter::InstantQueue < Letter::Queue
   def process_letter_instantly!(address, params = {})
     Rails.logger.info("Starting process_letter_instantly! with postage_type: #{postage_type}")
 
-    letter = ActiveRecord::Base.transaction do
-      # Create letter directly in pending state
+    # Phase 1: create letter and indicium in a transaction
+    letter = nil
+    indicium = nil
+    ActiveRecord::Base.transaction do
       letter = letters.build(
         address: address,
         height: letter_height,
@@ -79,116 +81,93 @@ class Letter::InstantQueue < Letter::Queue
         **params,
       )
       letter.save!
-      Rails.logger.info("Created letter #{letter.id} with postage_type: #{letter.postage_type}")
 
-      # Purchase indicia if needed
       if indicia?
-        Rails.logger.info("Creating indicia for letter #{letter.id}")
-        begin
-          usps_payment_account = USPS::PaymentAccount.find(usps_payment_account_id)
-          Rails.logger.info("Found USPS payment account #{usps_payment_account.id}")
+        usps_payment_account = USPS::PaymentAccount.find(usps_payment_account_id)
+        indicium = USPS::Indicium.create!(
+          letter: letter,
+          payment_account: usps_payment_account,
+          billing_profile: billing_profile,
+          mailing_date: letter.mailing_date,
+        )
+      end
+    end
 
-          indicium = USPS::Indicium.create!(
-            letter: letter,
-            payment_account: usps_payment_account,
-            billing_profile: billing_profile,
-            mailing_date: letter.mailing_date,
-          )
-          Rails.logger.info("Created indicium #{indicium.public_id} for letter #{letter.id}")
+    # Phase 2: external calls outside transaction (HCB charge, USPS buy)
+    if indicium
+      cost_cents = (letter.postage * 100).ceil
 
-          cost_cents = (letter.postage * 100).ceil
+      # Charge HCB
+      transfer_service = HCB::TransferService.new(
+        billing_profile: billing_profile,
+        amount_cents: cost_cents,
+        name: "Postage for #{letter.public_id} #{indicium.public_id} (#{slug}) #{Rails.application.routes.url_helpers.letter_path(letter)}",
+        memo: "[theseus] postage for a #{letter.processing_category} via queue #{name}",
+      )
+      transfer = transfer_service.call
+      unless transfer
+        # HCB charge failed — destroy indicium (no money moved) and the letter
+        indicium.destroy!
+        letter.destroy!
+        raise "HCB payment failed: #{transfer_service.errors.join(', ')}"
+      end
 
-          Rails.logger.info("Using billing profile #{billing_profile.id} for letter #{letter.id}")
-          transfer_service = HCB::TransferService.new(
-            billing_profile: billing_profile,
+      # Record billing — these are committed and survive even if USPS buy fails
+      transaction_id = transfer.respond_to?(:id) ? transfer.id : transfer.to_s
+      indicium.update!(hcb_transfer_id: transfer.id)
+      hcb_xfer = HCB::Transfer.create!(
+        billing_profile: billing_profile,
+        amount_cents: cost_cents,
+        state: :completed,
+        hcb_transaction_id: transaction_id,
+      )
+      indicium.ledger_entries.create!(
+        billing_profile: billing_profile,
+        category: :indicia,
+        amount_cents: cost_cents,
+        state: :settled,
+        settled_at: Time.current,
+        hcb_transfer: hcb_xfer,
+      )
+
+      # Buy from USPS
+      begin
+        indicium.buy!
+      rescue => e
+        if indicium.raw_json_response.present?
+          # USPS already sold us postage — do NOT destroy or refund.
+          Sentry.capture_exception(e, level: :fatal, tags: { money: true, critical: true },
+            extra: { indicium_id: indicium.id, letter_id: letter.id, response: indicium.raw_json_response })
+          raise e
+        else
+          # USPS API never went through, safe to refund HCB
+          refund_result = BillingProfile.refund_to_organization!(
+            organization_id: billing_profile.organization_id,
             amount_cents: cost_cents,
-            name: "Postage for #{letter.public_id} #{indicium.public_id} (#{slug}) #{Rails.application.routes.url_helpers.letter_path(letter)}",
-            memo: "[theseus] postage for a #{letter.processing_category} via queue #{name}",
+            name: "Refund for #{letter.public_id} #{indicium.public_id} #{Rails.application.routes.url_helpers.letter_path(letter)}",
+            memo: "[theseus] postage refund for a #{letter.processing_category}",
           )
-          transfer = transfer_service.call
-          unless transfer
-            indicium.destroy!
-            raise "HCB payment failed: #{transfer_service.errors.join(', ')}"
-          end
-
-          indicium.update!(hcb_transfer_id: transfer.id)
-
-          # Create HCB::Transfer and settled ledger entry for this indicium charge
-          transaction_id = transfer.respond_to?(:id) ? transfer.id : transfer.to_s
-          hcb_xfer = HCB::Transfer.create!(
+          refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
+          refund_xfer = HCB::Transfer.create!(
             billing_profile: billing_profile,
             amount_cents: cost_cents,
             state: :completed,
-            hcb_transaction_id: transaction_id,
+            hcb_transaction_id: refund_tx_id,
           )
-          indicium.ledger_entries.create!(
-            billing_profile: billing_profile,
-            category: :indicia,
-            amount_cents: cost_cents,
-            state: :settled,
-            settled_at: Time.current,
-            hcb_transfer: hcb_xfer,
-          )
-
-          begin
-            indicium.buy!
-          rescue => e
-            if indicium.raw_json_response.present?
-              # USPS already sold us postage — do NOT destroy or refund.
-              Sentry.capture_exception(e, level: :fatal, tags: { money: true, critical: true },
-                extra: { indicium_id: indicium.id, letter_id: letter.id, response: indicium.raw_json_response })
-              raise e
-            else
-              # API call never went through, safe to clean up.
-              refund_result = BillingProfile.refund_to_organization!(
-                organization_id: billing_profile.organization_id,
-                amount_cents: cost_cents,
-                name: "Refund for #{letter.public_id} #{indicium.public_id} #{Rails.application.routes.url_helpers.letter_path(letter)}",
-                memo: "[theseus] postage refund for a #{letter.processing_category}",
-              )
-              refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
-              refund_xfer = HCB::Transfer.create!(
-                billing_profile: billing_profile,
-                amount_cents: cost_cents,
-                state: :completed,
-                hcb_transaction_id: refund_tx_id,
-              )
-              indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
-              indicium.destroy!
-              raise e
-            end
-          end
-          Rails.logger.info("Successfully bought indicium for letter #{letter.id}")
-
-          letter.reload
-          if letter.usps_indicium.present?
-            Rails.logger.info("Verified indicium #{letter.usps_indicium.id} is associated with letter #{letter.id}")
-          else
-            Rails.logger.error("Indicium was not properly associated with letter #{letter.id} after creation")
-            Rails.logger.error("Letter postage_type: #{letter.postage_type}")
-            Rails.logger.error("Letter mailing_date: #{letter.mailing_date}")
-            raise "Failed to associate indicium with letter"
-          end
-        rescue => e
-          Rails.logger.error("Failed to create indicium for letter #{letter.id}: #{e.message}")
+          indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
+          indicium.destroy!
+          letter.destroy!
           raise e
         end
       end
-      letter
+
+      letter.reload
+      unless letter.usps_indicium.present?
+        raise "Failed to associate indicium with letter"
+      end
     end
 
-    # Verify indicium exists before generating label if using indicia
-    letter.reload
-    Rails.logger.info("Before generate_label - Letter #{letter.id} postage_type: #{letter.postage_type}")
-    Rails.logger.info("Before generate_label - Letter #{letter.id} has indicium: #{letter.usps_indicium.present?}")
-
-    if indicia? && !letter.usps_indicium.present?
-      Rails.logger.error("No indicium found for letter #{letter.id} before generating label")
-      Rails.logger.error("Letter postage_type: #{letter.postage_type}")
-      Rails.logger.error("Letter mailing_date: #{letter.mailing_date}")
-      raise "No indicium found for letter before generating label"
-    end
-
+    # Phase 3: post-processing
     letter.generate_label(
       template: template,
       include_qr_code: include_qr_code,

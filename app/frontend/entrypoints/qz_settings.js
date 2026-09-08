@@ -19,28 +19,29 @@ function findPrinters() {
     });
 }
 qz_state.refresh_state = false
-root.appendChild(h(QZStatusBanner, {in_settings: true}))
-// root.appendChild(h(QZPrinterPicker))
+
 root.appendChild(html`
-    <div>
-        <div class="grid">
-            <div>
+    <div style="max-width: 32rem;">
+        <${QZStatusBanner} in_settings=${true} />
+
+        <section>
+            <div class="detail-grid" style="grid-template-columns: auto 1fr auto;">
+                <label class="detail-label" for="printer_picker">Printer</label>
                 <${QZPrinterPicker}/>
-            </div>
-            <div>
                 ${h(RefreshPrintersButton, {findPrinters: findPrinters})}
             </div>
-        </div>
-    </div>
+        </section>
 
+        <section>
+            <strong>Resolution</strong>
+            <${DPIPicker} settings=${qzSettingsStore} state=${qzState} />
+        </section>
+
+        ${h(TestPrintButton, {
+            testPrint: () => { print("/qz_tray/test_print") }
+        })}
+    </div>
 `)
 
-// root.appendChild(h(RefreshPrintersButton, {findPrinters: findPrinters}))
-root.appendChild(h(DPIPicker, {settings: qzSettingsStore, state: qzState}))
-root.appendChild(h(TestPrintButton, {
-    testPrint: () => {
-        print("/qz_tray/test_print")
-    }
-}))
 await connect_qz();
 await findPrinters();

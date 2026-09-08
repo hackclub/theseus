@@ -85,6 +85,7 @@ class Warehouse::Order < ApplicationRecord
   validates :recipient_email, presence: true
   validate :can_mail_parcels_to_country
   validate :billing_profile_required, on: :create
+  validate :billing_profile_belongs_to_user
 
   before_validation :set_created_via_defaults, on: :create
   after_create :set_hc_id
@@ -403,6 +404,12 @@ class Warehouse::Order < ApplicationRecord
   def billing_profile_required
     if Flipper.enabled?(:require_billing_profile_2026_09_08) && billing_profile.blank?
       errors.add(:billing_profile, "is required for warehouse orders")
+    end
+  end
+
+  def billing_profile_belongs_to_user
+    if billing_profile.present? && billing_profile.user != user
+      errors.add(:billing_profile, "must belong to the order's user")
     end
   end
 
