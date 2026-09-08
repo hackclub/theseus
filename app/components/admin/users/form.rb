@@ -14,7 +14,7 @@ class Components::Admin::Users::Form < Components::Base
       end
     end
 
-    form_with model: @user, url: admin_user_path(@user), local: true do |f|
+    form_with model: @user, url: form_url, method: form_method, local: true do |f|
       div(class: "form-stack") do
         # Identity
         form_field("Username", "user[username]", @user.username)
@@ -43,10 +43,18 @@ class Components::Admin::Users::Form < Components::Base
         end
 
         div(style: "padding-top:1rem;") do
-          button(type: "submit", class: "btn-success") { "Update User" }
+          button(type: "submit", class: "btn-success") { @user.persisted? ? "Update User" : "Create User" }
         end
       end
     end
+  end
+
+  def form_url
+    @user.persisted? ? admin_user_path(@user) : admin_users_path
+  end
+
+  def form_method
+    @user.persisted? ? :patch : :post
   end
 
   private

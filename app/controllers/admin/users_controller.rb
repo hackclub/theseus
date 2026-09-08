@@ -10,6 +10,19 @@ module Admin
       render Views::Admin::Users::Index.new(users: @users)
     end
 
+    def new
+      render Views::Admin::Users::New.new(user: User.new)
+    end
+
+    def create
+      @user = User.new(user_params)
+      if @user.save
+        redirect_to admin_user_path(@user), notice: "User created."
+      else
+        render Views::Admin::Users::New.new(user: @user), status: :unprocessable_entity
+      end
+    end
+
     def show
       render Views::Admin::Users::Show.new(user: resource)
     end

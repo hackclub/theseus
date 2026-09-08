@@ -10,7 +10,9 @@ class Views::Admin::Users::Index < Views::Base
       title: "Users",
       jumpcode_path: admin_users_path,
       search_path: admin_users_path,
-      search_placeholder: "Search users..."
+      search_placeholder: "Search users...",
+      action_href: new_admin_user_path,
+      action_label: "+ New User"
     )
 
     table do
