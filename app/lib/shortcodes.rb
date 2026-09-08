@@ -82,6 +82,7 @@ module Shortcodes
         Shortcode.new(code: "TASK", label: "My Tasks", icon: "◆", path: tasks_path, gate: nil),
         Shortcode.new(code: "PROB", label: "Problems", icon: "⊘", path: problems_path, gate: nil),
         Shortcode.new(code: "SETT", label: "My Settings", icon: "⚙", path: "/back_office/my/settings", gate: nil),
+        Shortcode.new(code: "BILL", label: "Billing History", icon: "⊞", path: "/back_office/billing", gate: nil),
 
         # admin
         Shortcode.new(code: "JOBS", label: "Good Job", icon: "⊕", path: "/back_office/good_job", gate: ADMIN),

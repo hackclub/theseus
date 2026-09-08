@@ -534,6 +534,7 @@ Rails.application.routes.draw do
     delete "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
     get "/dev_login", to: "sessions#dev_login" if Rails.env.development?
 
+    resources :billing, only: [:index, :show], controller: "billing"
     namespace :usps do
       resources :indicia
     end

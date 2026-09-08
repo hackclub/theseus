@@ -66,6 +66,7 @@ class Components::Shared::Sidebar < Components::Base
         nav_link("My Settings", settings_path)
         nav_link("Print", settings_qz_tray_path)
         nav_link("Billing Profiles", hcb_payment_accounts_path)
+        nav_link("Billing History", billing_index_path)
       end
 
       if current_user&.admin?
