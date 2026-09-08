@@ -92,10 +92,10 @@ class Views::Admin::Users::Show < Views::Base
       h3(style: "margin-top:0;") { "Activity" }
       div(class: "detail-grid") do
         stat_link "Letters", @user.letters.count, letters_path(user_id: @user.id)
-        stat_link "Letter Batches", Letter::Batch.where(user_id: @user.id).count, letter_batches_path(user_id: @user.id)
+        stat_link "Letter Batches", ::Letter::Batch.where(user_id: @user.id).count, letter_batches_path(user_id: @user.id)
         stat_link "Letter Queues", @user.letter_queues.count, letter_queues_path(user_id: @user.id)
         stat_link "Warehouse Orders", @user.warehouse_orders.count, warehouse_orders_path(user_id: @user.id)
-        stat_link "Warehouse Batches", Warehouse::Batch.where(user_id: @user.id).count, warehouse_batches_path(user_id: @user.id)
+        stat_link "Warehouse Batches", ::Warehouse::Batch.where(user_id: @user.id).count, warehouse_batches_path(user_id: @user.id)
 
         span(class: "detail-label") { "Warehouse Templates" }
         span { @user.warehouse_templates.count.to_s }
@@ -155,7 +155,7 @@ class Views::Admin::Users::Show < Views::Base
     # Recent Billing
     billing_profiles = @user.billing_profiles.to_a
     if billing_profiles.any?
-      recent_entries = LedgerEntry
+      recent_entries = ::LedgerEntry
         .where(billing_profile: billing_profiles)
         .includes(:billing_profile, :ledgerable)
         .order(created_at: :desc)
