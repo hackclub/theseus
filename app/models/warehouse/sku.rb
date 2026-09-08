@@ -27,6 +27,14 @@
 #
 class Warehouse::SKU < ApplicationRecord
   has_paper_trail
+  include PgSearch::Model
+
+  pg_search_scope :search,
+    against: %i[name sku description],
+    using: {
+      tsearch: { prefix: true }
+    }
+
 
   scope :in_inventory, -> { where.not(in_stock: nil, inbound: nil) }
   scope :backordered, -> { where("in_stock < 0") }

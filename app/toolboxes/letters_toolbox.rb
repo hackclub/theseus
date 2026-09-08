@@ -3,37 +3,37 @@ class LettersToolbox < ApplicationToolbox
   before_action :set_letter, except: [:search, :create]
   before_action :require_letter_owner!, only: [:update, :generate_label, :mark_printed, :mark_mailed, :mark_received]
 
-  tool "Search letters by query, status, or both. Returns paginated results.", access: :read do
+  tool "Search physical letters by query, status, or both. Returns paginated list with address, postage, and state", access: :read do
     param :query, :string, "Full-text search across title, recipient, address", optional: true
-    param :status, :string, "Filter by state", optional: true, enum: %w[pending printed mailed received]
+    param :status, :string, "Filter by letter state (pending → printed → mailed → received)", optional: true, enum: %w[pending printed mailed received]
     param :page, :integer, "Page number", optional: true
   end
   def search
-    scope = current_user.letters.includes(:address, :return_address).order(created_at: :desc)
+    scope = policy_scope(Letter).includes(:address, :return_address).where.not(aasm_state: "queued").order(created_at: :desc)
     scope = scope.search(params[:query]) if params[:query].present?
     scope = scope.where(aasm_state: params[:status]) if params[:status].present?
     @letters = paginate(scope)
   end
 
-  tool "Show full detail for a letter including address, return address, postage, and tags.", access: :read
+  tool "Show full detail for a physical letter including address, return address, postage, and tags", access: :read
   def show
     @letter = @letter # already set by before_action; load associations
     @letter.address
     @letter.return_address
   end
 
-  tool "Create a new letter with address and postage details.", access: :write do
+  tool "Create a new physical letter with recipient address and postage details", access: :write do
     param :body, :string, "Letter body text", optional: true
     param :height, :number, "Envelope height in inches", optional: true
     param :width, :number, "Envelope width in inches", optional: true
     param :weight, :number, "Weight in ounces", optional: true
-    param :non_machinable, :boolean, "Whether the letter is non-machinable", optional: true
-    param :processing_category, :string, "Processing category", enum: %w[letter flat]
-    param :postage_type, :string, "Postage type", optional: true, enum: %w[stamps indicia international_origin]
+    param :non_machinable, :boolean, "Letter requires hand-processing (can't go through USPS sorting machines)", optional: true
+    param :processing_category, :string, "Mail class: letter (standard #10 envelope) or flat (large envelope)", enum: %w[letter flat]
+    param :postage_type, :string, "Postage method: stamps (physical), indicia (USPS electronic postage), or international_origin", optional: true, enum: %w[stamps indicia international_origin]
     param :mailing_date, :string, "Mailing date (YYYY-MM-DD), required for indicia", optional: true
     param :rubber_stamps, :string, "Rubber stamp text", optional: true
     param :user_facing_title, :string, "Display title for the letter", optional: true
-    param :return_address_id, :integer, "Return address ID"
+    param :return_address_id, :integer, "ID of the sender return address (use return_addresses_list to find)"
     param :recipient_email, :string, "Recipient email for tracking notifications", optional: true
     param :tags, [:string], "Tags for categorization", optional: true
     param :address, :object, "Recipient address" do
@@ -61,18 +61,18 @@ class LettersToolbox < ApplicationToolbox
     suggests :generate_label, "Generate a PDF label for this letter"
   end
 
-  tool "Update an existing letter's details.", access: :write do
+  tool "Update a pending physical letter's details", access: :write do
     param :body, :string, "Letter body text", optional: true
     param :height, :number, "Envelope height in inches", optional: true
     param :width, :number, "Envelope width in inches", optional: true
     param :weight, :number, "Weight in ounces", optional: true
-    param :non_machinable, :boolean, "Whether the letter is non-machinable", optional: true
-    param :processing_category, :string, "Processing category", optional: true, enum: %w[letter flat]
-    param :postage_type, :string, "Postage type", optional: true, enum: %w[stamps indicia international_origin]
+    param :non_machinable, :boolean, "Letter requires hand-processing (can't go through USPS sorting machines)", optional: true
+    param :processing_category, :string, "Mail class: letter (standard #10 envelope) or flat (large envelope)", optional: true, enum: %w[letter flat]
+    param :postage_type, :string, "Postage method: stamps (physical), indicia (USPS electronic postage), or international_origin", optional: true, enum: %w[stamps indicia international_origin]
     param :mailing_date, :string, "Mailing date (YYYY-MM-DD)", optional: true
     param :rubber_stamps, :string, "Rubber stamp text", optional: true
     param :user_facing_title, :string, "Display title for the letter", optional: true
-    param :return_address_id, :integer, "Return address ID", optional: true
+    param :return_address_id, :integer, "ID of the sender return address (use return_addresses_list to find)", optional: true
     param :recipient_email, :string, "Recipient email for tracking notifications", optional: true
     param :tags, [:string], "Tags for categorization", optional: true
     param :address, :object, "Recipient address (updates existing)", optional: true do
@@ -98,7 +98,7 @@ class LettersToolbox < ApplicationToolbox
     render :show
   end
 
-  tool "Generate a PDF label for a letter.", access: :write do
+  tool "Generate a PDF mailing label for a letter. Check letter details with letters_show afterward", access: :write do
     param :template, :string, "Label template name", optional: true
     param :qr, :boolean, "Include QR code on label", optional: true
   end
@@ -116,7 +116,7 @@ class LettersToolbox < ApplicationToolbox
     end
   end
 
-  tool "Mark a letter as printed.", access: :write
+  tool "Mark a pending letter as printed (pending → printed)", access: :write
   def mark_printed
     @letter.mark_printed!
     render json: {
@@ -126,7 +126,7 @@ class LettersToolbox < ApplicationToolbox
     }
   end
 
-  tool "Mark a letter as mailed.", access: :write
+  tool "Mark a printed letter as mailed (printed → mailed)", access: :write
   def mark_mailed
     halt error: "Letter already mailed" if @letter.been_mailed?
     @letter.mark_mailed!
@@ -137,7 +137,7 @@ class LettersToolbox < ApplicationToolbox
     }
   end
 
-  tool "Mark a letter as received.", access: :write
+  tool "Mark a mailed letter as received by the recipient (mailed → received)", access: :write
   def mark_received
     @letter.mark_received!
     render json: {

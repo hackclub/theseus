@@ -1,7 +1,7 @@
 class LetterQueuesToolbox < ApplicationToolbox
   default_param :queue_id, :string, "Queue slug", except: [:list, :create]
 
-  tool "List the current user's letter queues", access: :read do
+  tool "List your letter queues — templates for bulk letter creation where external systems push addresses in and letters are held until batched", access: :read do
     param :page, :integer, "Page number", optional: true
   end
   def list
@@ -11,7 +11,7 @@ class LetterQueuesToolbox < ApplicationToolbox
                            .count
   end
 
-  tool "Show details of a letter queue including letter counts", access: :read do
+  tool "Show details of a letter queue including letter counts by state and batch count", access: :read do
   end
   def show
     @queue = current_user.letter_queues.find_by!(slug: params[:queue_id])
@@ -19,16 +19,16 @@ class LetterQueuesToolbox < ApplicationToolbox
     @batches_count = @queue.letter_batches.count
   end
 
-  tool "Create a new letter queue", access: :write do
+  tool "Create a new letter queue for bulk letter creation from external address submissions", access: :write do
     param :name, :string, "Queue name"
     param :letter_height, :number, "Letter height in inches"
     param :letter_width, :number, "Letter width in inches"
     param :letter_weight, :number, "Letter weight in ounces"
-    param :letter_processing_category, :string, "Processing category", enum: %w[letter flat]
-    param :letter_mailer_id_id, :integer, "USPS Mailer ID record ID"
-    param :letter_return_address_id, :integer, "Return address record ID"
+    param :letter_processing_category, :string, "Mail class: letter (standard envelope) or flat (large envelope)", enum: %w[letter flat]
+    param :letter_mailer_id_id, :integer, "USPS Mailer ID for letters in this queue (use postage_mailer_ids to find)"
+    param :letter_return_address_id, :integer, "Return address for letters in this queue (use return_addresses_list to find)"
     param :tags, [:string], "Tags for letters in this queue"
-    param :postage_type, :string, "Postage type", optional: true
+    param :postage_type, :string, "Postage method: stamps (physical), indicia (USPS electronic postage), or international_origin", optional: true
     param :user_facing_title, :string, "User-facing title", optional: true
     param :include_qr_code, :boolean, "Include QR code on letters", optional: true
   end
@@ -45,7 +45,7 @@ class LetterQueuesToolbox < ApplicationToolbox
     render :show
   end
 
-  tool "Create a batch from queued letters in this queue", access: :write do
+  tool "Pull queued letters from this queue into a new batch for printing and mailing", access: :write do
     param :limit, :integer, "Max letters to include in the batch", optional: true
   end
   def make_batch

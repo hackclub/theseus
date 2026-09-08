@@ -7,25 +7,21 @@ class PurchaseOrdersToolbox < ApplicationToolbox
 
   # ── Read tools ──────────────────────────────────────────────
 
-  tool "Search purchase orders by supplier name, order number, or notes", access: :read do
+  tool "Search purchase orders for warehouse inventory restocking. Returns paginated results matching supplier, order number, or notes", access: :read do
     param :query, :string, "Search term (matches supplier name, order number, notes)", optional: true
-    param :status, :string, "Filter by status", optional: true, enum: %w[draft submitted approved returned open completed]
+    param :status, :string, "Filter by PO lifecycle status (draft → submitted → approved/returned → open → completed)", optional: true, enum: %w[draft submitted approved returned open completed]
     param :page, :integer, "Page number", optional: true
   end
   def search
-    scope = scoped_purchase_orders.includes(:user, :line_items).order(created_at: :desc)
-
-    if params[:query].present?
-      q = "%#{ActiveRecord::Base.sanitize_sql_like(params[:query])}%"
-      scope = scope.where("supplier_name ILIKE ? OR order_number ILIKE ? OR notes ILIKE ?", q, q, q)
-    end
+    scope = policy_scope(Warehouse::PurchaseOrder).includes(:user, :line_items).order(created_at: :desc)
+    scope = scope.search(params[:query]) if params[:query].present?
 
     scope = scope.where(status: params[:status]) if params[:status].present?
 
     @purchase_orders = paginate(scope)
   end
 
-  tool "Show full purchase order details with line items", access: :read do; end
+  tool "Show full purchase order details including line items, approval status, and supplier info", access: :read do; end
   def show
     @purchase_order = find_purchase_order!
     @line_items = @purchase_order.line_items.includes(:sku, :sku_request)
@@ -33,9 +29,9 @@ class PurchaseOrdersToolbox < ApplicationToolbox
 
   # ── Write tools ─────────────────────────────────────────────
 
-  tool "Create a new purchase order with line items", access: :write do
-    param :supplier_name, :string, "Supplier name"
-    param :supplier_id, :integer, "Supplier ID in Zenventory", optional: true
+  tool "Create a new purchase order to request inventory from a vendor into the warehouse", access: :write do
+    param :supplier_name, :string, "Vendor/supplier name"
+    param :supplier_id, :integer, "Vendor ID in the fulfillment warehouse system", optional: true
     param :notes, :string, "Notes for the order", optional: true
     param :required_by_date, :string, "Required by date (YYYY-MM-DD)", optional: true
     param :line_items, :"[:object]", "Line items for the order" do
@@ -62,9 +58,9 @@ class PurchaseOrdersToolbox < ApplicationToolbox
     suggests :submit, "Submit this PO for approval when ready"
   end
 
-  tool "Update a draft or returned purchase order", access: :write do
-    param :supplier_name, :string, "Supplier name", optional: true
-    param :supplier_id, :integer, "Supplier ID in Zenventory", optional: true
+  tool "Update a draft or returned purchase order (only editable before approval)", access: :write do
+    param :supplier_name, :string, "Vendor/supplier name", optional: true
+    param :supplier_id, :integer, "Vendor ID in the fulfillment warehouse system", optional: true
     param :notes, :string, "Notes for the order", optional: true
     param :required_by_date, :string, "Required by date (YYYY-MM-DD)", optional: true
     param :line_items, :"[:object]", "Replacement line items (replaces all existing)", optional: true do
@@ -95,7 +91,7 @@ class PurchaseOrdersToolbox < ApplicationToolbox
     render :show
   end
 
-  tool "Submit a draft purchase order for approval", access: :write do; end
+  tool "Submit a draft purchase order for review by a warehouse manager (draft → submitted)", access: :write do; end
   def submit
     po = find_purchase_order!
     halt error: "Only the owner can submit" unless po.user_id == current_user.id
@@ -107,8 +103,8 @@ class PurchaseOrdersToolbox < ApplicationToolbox
   # PO approval is a human judgment call — the whole point of the review workflow.
   # Use the web UI to approve POs.
 
-  tool "Reject a submitted purchase order back for revision (warehouse czar only)", access: :write, scope: "warehouse_czar" do
-    param :reviewer_notes, :string, "Reason for rejection", optional: true
+  tool "Return a submitted purchase order to the submitter for revision (submitted → returned, warehouse manager only)", access: :write, scope: "warehouse_czar" do
+    param :reviewer_notes, :string, "Reason for returning to the submitter", optional: true
   end
   def reject
     po = find_purchase_order!
@@ -120,7 +116,7 @@ class PurchaseOrdersToolbox < ApplicationToolbox
     render json: { id: po.id, status: po.status, message: "Purchase order returned for revision" }
   end
 
-  tool "Return a rejected purchase order to draft for editing", access: :write do; end
+  tool "Move a returned purchase order back to draft for further editing (returned → draft)", access: :write do; end
   def revise
     po = find_purchase_order!
     halt error: "Only the owner or an admin can revise" unless po.user_id == current_user.id || admin?
@@ -128,7 +124,7 @@ class PurchaseOrdersToolbox < ApplicationToolbox
     render json: { id: po.id, status: po.status, message: "Purchase order returned to draft" }
   end
 
-  tool "Send an approved purchase order to Zenventory (requires confirmation)", access: :write, scope: "warehouse_czar" do; end
+  tool "Send an approved purchase order to the fulfillment warehouse system for receiving (approved → open, warehouse manager only)", access: :write, scope: "warehouse_czar" do; end
   def send_to_zenventory
     po = find_purchase_order!
     halt error: "Only warehouse czar can dispatch to Zenventory" unless current_user.warehouse_czar?
@@ -165,16 +161,8 @@ class PurchaseOrdersToolbox < ApplicationToolbox
 
   private
 
-  def scoped_purchase_orders
-    if current_user.warehouse_czar? || admin?
-      Warehouse::PurchaseOrder.all
-    else
-      Warehouse::PurchaseOrder.where(user: current_user)
-    end
-  end
-
   def find_purchase_order!
-    scoped_purchase_orders.find(params[:po_id])
+    policy_scope(Warehouse::PurchaseOrder).find(params[:po_id])
   end
 
   def guard_editable!(po = @purchase_order)

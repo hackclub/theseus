@@ -4,7 +4,7 @@ class WarehouseTemplatesToolbox < ApplicationToolbox
 
   default_param :template_id, :string, "Template ID (e.g. wot_...)", except: [:list]
 
-  tool "List warehouse templates (shared + your own)", access: :read do
+  tool "List saved warehouse order templates (shared + your own). Templates are pre-configured item lists for quickly creating package orders", access: :read do
     param :page, :integer, "Page number", optional: true
   end
   def list
@@ -17,7 +17,7 @@ class WarehouseTemplatesToolbox < ApplicationToolbox
     )
   end
 
-  tool "Show a warehouse template with full line item details", access: :read
+  tool "Show a warehouse order template with full line item details including SKU names and quantities", access: :read
   def show
     @template = @template.tap { |t| t.line_items.includes(:sku).load }
   end

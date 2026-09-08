@@ -1,5 +1,5 @@
 class TagsToolbox < ApplicationToolbox
-  tool "Search tags used on letters and warehouse orders. Returns distinct tag names with counts of how many letters and warehouse orders use each tag.", access: :read do
+  tool "Search tags used to organize letters and warehouse orders by campaign or project. Returns distinct tag names with usage counts", access: :read do
     param :query, :string, "Filter tags by name (case-insensitive partial match)", optional: true
   end
   def search
@@ -18,7 +18,7 @@ class TagsToolbox < ApplicationToolbox
     end
   end
 
-  tool "Show detailed stats for a specific tag including counts by state for both letters and warehouse orders", access: :read do
+  tool "Show detailed stats for a tag including counts broken down by state for both letters and warehouse orders", access: :read do
     param :tag, :string, "Tag name"
   end
   def show

@@ -32,6 +32,14 @@
 #
 class User < ApplicationRecord
   has_paper_trail
+  include PgSearch::Model
+
+  pg_search_scope :search,
+    against: %i[username email],
+    using: {
+      tsearch: { prefix: true }
+    }
+
 
   has_many :warehouse_templates, class_name: "Warehouse::Template", inverse_of: :user
   has_many :return_addresses, dependent: :destroy

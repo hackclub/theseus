@@ -8,32 +8,32 @@ module Warehouse
 
     default_param :order_id, :string, "Order ID (e.g. pkg_...)", except: [:search, :create, :create_from_template]
 
-    tool "Search warehouse orders by keyword, with optional state filter", access: :read do
+    tool "Search warehouse package orders by keyword with optional state filter. Returns paginated list with recipient, status, and tracking", access: :read do
       param :query, :string, "Search term (matches order ID, recipient email, title, tags, address name)", optional: true
       param :state, :string, "Filter by state", optional: true, enum: %w[draft dispatched mailed canceled]
       param :page, :integer, "Page number", optional: true
     end
     def search
-      scope = scoped_orders.includes(:address, :user, line_items: :sku).order(created_at: :desc)
+      scope = policy_scope(Warehouse::Order).includes(:address, :user, line_items: :sku).order(created_at: :desc)
       scope = scope.where(aasm_state: params[:state]) if params[:state].present?
       scope = scope.search(params[:query]) if params[:query].present?
       @orders = paginate(scope)
     end
 
-    tool "Show full details for a warehouse order including line items, address, costs, and tracking", access: :read
+    tool "Show full details for a warehouse package order including line items, shipping address, costs, and tracking", access: :read
     def show
       @order = @order.tap { |o| o.line_items.includes(:sku).load }
     end
 
-    tool "Create a new warehouse order", access: :write do
+    tool "Create a new warehouse package order for physical shipment via the fulfillment warehouse", access: :write do
       param :user_facing_title, :string, "Title shown to recipient"
       param :user_facing_description, :string, "Description shown to recipient", optional: true
       param :internal_notes, :string, "Internal notes (not shown to recipient)", optional: true
       param :recipient_email, :string, "Recipient email address"
       param :notify_on_dispatch, :boolean, "Email recipient when order ships", optional: true
-      param :billing_profile_id, :string, "Billing profile ID (e.g. bp_...)", optional: true
+      param :billing_profile_id, :string, "Billing profile for charging shipment costs (use postage_billing_profiles to find)", optional: true
       param :tags, [:string], "Tags for the order", optional: true
-      param :line_items, [:object], "Line items — each: {sku_id: integer, quantity: integer}"
+      param :line_items, [:object], "Items to ship, each with a sku_id (integer) and quantity (integer)"
       param :address, :object, "Shipping address — {first_name, last_name, line_1, line_2, city, state, postal_code, country, phone_number, email}"
     end
     def create
@@ -50,11 +50,11 @@ module Warehouse
       suggests :send_to_warehouse, "Send this draft to the warehouse when ready"
     end
 
-    tool "Create a warehouse order from a template", access: :write do
+    tool "Create a warehouse package order from a saved template of pre-configured items", access: :write do
       param :template_id, :string, "Template ID (e.g. wot_...)"
       param :recipient_email, :string, "Recipient email address"
       param :notify_on_dispatch, :boolean, "Email recipient when order ships", optional: true
-      param :billing_profile_id, :string, "Billing profile ID (e.g. bp_...)", optional: true
+      param :billing_profile_id, :string, "Billing profile for charging shipment costs (use postage_billing_profiles to find)", optional: true
       param :tags, [:string], "Tags for the order", optional: true
       param :address, :object, "Shipping address — {first_name, last_name, line_1, line_2, city, state, postal_code, country, phone_number, email}"
     end
@@ -79,13 +79,13 @@ module Warehouse
       suggests :send_to_warehouse, "Send this draft to the warehouse when ready"
     end
 
-    tool "Update an existing warehouse order", access: :write do
+    tool "Update a draft warehouse package order before dispatch", access: :write do
       param :user_facing_title, :string, "Title shown to recipient", optional: true
       param :user_facing_description, :string, "Description shown to recipient", optional: true
       param :internal_notes, :string, "Internal notes", optional: true
       param :recipient_email, :string, "Recipient email address", optional: true
       param :notify_on_dispatch, :boolean, "Email recipient when order ships", optional: true
-      param :billing_profile_id, :string, "Billing profile ID", optional: true
+      param :billing_profile_id, :string, "Billing profile for charging shipment costs (use postage_billing_profiles to find)", optional: true
       param :tags, [:string], "Tags for the order", optional: true
       param :line_items, [:object], "Line items — each: {id: integer (for update), sku_id: integer, quantity: integer, _destroy: boolean}", optional: true
       param :address, :object, "Shipping address fields to update", optional: true
@@ -99,7 +99,7 @@ module Warehouse
       render :show
     end
 
-    tool "Send a draft order to the warehouse for fulfillment (requires confirmation)", access: :write
+    tool "Dispatch a draft order to the fulfillment warehouse for physical shipping (draft → dispatched)", access: :write
     def send_to_warehouse
       halt error: "Order is not a draft" unless @order.draft?
 
@@ -120,7 +120,7 @@ module Warehouse
       render :show
     end
 
-    tool "Cancel a dispatched order (requires confirmation)", access: :write do
+    tool "Cancel a dispatched order at the fulfillment warehouse, not just locally (dispatched → canceled)", access: :write do
       param :reason, :string, "Reason for cancellation"
     end
     def cancel
@@ -148,13 +148,6 @@ module Warehouse
       halt error: "Forbidden — you don't own this order" unless @order.user_id == current_user.id || admin?
     end
 
-    def scoped_orders
-      if admin?
-        Warehouse::Order.all
-      else
-        Warehouse::Order.where(user: current_user)
-      end
-    end
 
     def resolve_billing_profile(id_or_public_id)
       return nil if id_or_public_id.blank?

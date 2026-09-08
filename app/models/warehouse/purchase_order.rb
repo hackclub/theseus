@@ -37,6 +37,14 @@ class Warehouse::PurchaseOrder < ApplicationRecord
 
   include AASM
   include HasZenventoryUrl
+  include PgSearch::Model
+
+  pg_search_scope :search,
+    against: %i[supplier_name order_number notes],
+    using: {
+      tsearch: { prefix: true }
+    }
+
 
   belongs_to :user
   belongs_to :reviewed_by, class_name: "User", optional: true

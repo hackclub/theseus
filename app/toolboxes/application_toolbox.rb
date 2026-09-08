@@ -1,4 +1,6 @@
 class ApplicationToolbox < Toolchest::Toolbox
+  include Pundit::Authorization
+
   helper_method :current_user, :admin?, :can_warehouse?
 
   def current_user = auth&.resource_owner

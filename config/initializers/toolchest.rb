@@ -47,6 +47,10 @@ Toolchest.configure do |config|
   # Every token gets theseus:read so the agent can at least orient itself.
   config.required_scopes = ["theseus:read"]
 
+  # Consent screen shows checkboxes — users can uncheck scopes they don't want to grant.
+  # theseus:read is required (always checked, can't uncheck — the agent needs orientation).
+  config.optional_scopes = true
+
   # Scope names match toolchest convention: last segment of controller_name.
   # Warehouse::OrdersToolbox → "orders:*", not "warehouse_orders:*"
   config.scopes = {
@@ -90,6 +94,7 @@ Toolchest.configure do |config|
     allowed
   end
 
-  # Transport security
-  config.dns_rebinding_protection = true
+  # TODO: enable once toolchest >= 0.4 is released (attr exists in local src but not 0.3.7)
+  # config.dns_rebinding_protection = true
+  # config.allowed_origins = ["https://theseus.hackclub.com"]
 end

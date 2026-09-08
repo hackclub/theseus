@@ -1,24 +1,24 @@
 class PostageToolbox < ApplicationToolbox
-  tool "List USPS payment accounts with name and account type", access: :read do
+  tool "List USPS payment accounts for purchasing electronic postage. Returns account names and types", access: :read do
   end
   def payment_accounts
     @payment_accounts = USPS::PaymentAccount.all
   end
 
-  tool "List USPS mailer IDs with MID and CRID", access: :read do
+  tool "List USPS Mailer IDs used on letter labels and intelligent mail barcodes", access: :read do
   end
   def mailer_ids
     @mailer_ids = USPS::MailerId.all
   end
 
-  tool "List billing profiles for the current user", access: :read do
+  tool "List billing profiles — organization accounts used for charging postage and shipping costs", access: :read do
   end
   def billing_profiles
     @billing_profiles = current_user.billing_profiles
   end
 
-  tool "Show indicium details including postage, fees, cost, SKU, and mailing date (admin only)", access: :read, scope: "admin" do
-    param :indicium_id, :string, "Indicium ID — accepts ind!HASH, hackapost!/HASH, or just the hashid"
+  tool "Show USPS electronic postage record details including fees, cost breakdown, SKU, and mailing date (admin only)", access: :read, scope: "admin" do
+    param :indicium_id, :string, "USPS postage record ID — accepts ind!HASH, hackapost!/HASH, or just the hashid"
   end
   def indicium_info
     require_admin!
