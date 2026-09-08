@@ -1,0 +1,2 @@
+shared:
+  require_billing_profile_2026_09_08: requires a billing profile on warehouse orders and API calls. disable to allow unbilled orders during migration.

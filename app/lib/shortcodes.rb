@@ -83,6 +83,7 @@ module Shortcodes
 
         # admin
         Shortcode.new(code: "JOBS", label: "Good Job", icon: "⊕", path: "/back_office/good_job", gate: ADMIN),
+        Shortcode.new(code: "FLIP", label: "Flipper", icon: "⚑", path: "/back_office/flipper", gate: ADMIN),
         Shortcode.new(code: "FIRE", label: "Blazer", icon: "≋", path: "/back_office/blazer", gate: ADMIN),
         Shortcode.new(code: "AUSR", label: "Admin Users", icon: "⊛", path: "/back_office/admin/users", gate: ADMIN),
         Shortcode.new(code: "ACTG", label: "Common Tags", icon: "⏿", path: "/back_office/admin/common_tags", gate: ADMIN),

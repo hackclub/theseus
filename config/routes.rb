@@ -524,6 +524,7 @@ Rails.application.routes.draw do
     constraints AdminConstraint do
       mount GoodJob::Engine => "good_job"
       mount Blazer::Engine, at: "blazer"
+      mount Flipper::UI.app(Flipper) => "flipper", as: :flipper
       post "/impersonate/:id", to: "sessions#impersonate", as: :impersonate_user
     end
     delete "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating

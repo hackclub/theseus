@@ -184,3 +184,7 @@ gem "hcbv4", "~> 0.2"
 gem "pg_search", "~> 2.3"
 
 gem "redcarpet", "~> 3.6"
+
+gem "flipper", "~> 1.4"
+gem "flipper-ui", "~> 1.4"
+gem "flipper-active_record", "~> 1.4"

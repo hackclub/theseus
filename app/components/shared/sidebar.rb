@@ -76,6 +76,7 @@ class Components::Shared::Sidebar < Components::Base
           nav_link("USPS Mailer IDs", admin_usps_mailer_ids_path)
           nav_link("USPS Payment Accts", admin_usps_payment_accounts_path)
           nav_link("Good Job", good_job_path)
+          nav_link("Flipper", flipper_path)
           nav_link("Blazer", blazer_path)
         end
       end

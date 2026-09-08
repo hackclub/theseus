@@ -50,5 +50,7 @@ module Theseus
 
     # Use dynamic error pages so we can show Sentry event IDs
     config.exceptions_app = routes
+
+    config.flipper_features = config_for(:flipper_features)
   end
 end
