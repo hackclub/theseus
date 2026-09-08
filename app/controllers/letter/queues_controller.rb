@@ -10,7 +10,7 @@ class Letter::QueuesController < ApplicationController
 
     user_id = is_admin ? params[:user_id] : nil
     filtered = filtered.where(user_id: user_id) if user_id.present?
-    users = is_admin ? User.where(id: all_queues.select(:user_id).distinct).order(:email) : []
+    users = is_admin ? User.where(id: all_queues.reorder(nil).select(:user_id).distinct).order(:email) : []
 
     filtered = filtered.includes(:user) if is_admin
 

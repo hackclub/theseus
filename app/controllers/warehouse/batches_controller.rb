@@ -8,7 +8,7 @@ class Warehouse::BatchesController < BaseBatchesController
     batches = all_batches
     batches = batches.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
     batches = batches.search(params[:search]) if params[:search].present?
-    users = current_user&.is_admin? ? User.where(id: all_batches.select(:user_id).distinct).order(:email) : []
+    users = current_user&.is_admin? ? User.where(id: all_batches.reorder(nil).select(:user_id).distinct).order(:email) : []
     render Views::Warehouse::Batches::Index.new(
       batches: batches,
       search: params[:search],

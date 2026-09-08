@@ -22,7 +22,7 @@ class LettersController < ApplicationController
       status: params[:status],
       origin: params[:origin],
       user_id: params[:user_id],
-      users: current_user&.is_admin? ? User.where(id: all_letters.select(:user_id).distinct).order(:email) : []
+      users: current_user&.is_admin? ? User.where(id: all_letters.reorder(nil).select(:user_id).distinct).order(:email) : []
     )
   end
 

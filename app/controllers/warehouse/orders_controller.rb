@@ -26,7 +26,7 @@ class Warehouse::OrdersController < ApplicationController
     @warehouse_orders = orders.order(created_at: :desc).page(params[:page]).per(25)
 
     # Get users for the picker (admin only)
-    @users = current_user&.is_admin? ? User.where(id: @all_orders.select(:user_id).distinct).order(:email) : []
+    @users = current_user&.is_admin? ? User.where(id: @all_orders.reorder(nil).select(:user_id).distinct).order(:email) : []
 
     render Views::Warehouse::Orders::Index.new(
       warehouse_orders: @warehouse_orders,

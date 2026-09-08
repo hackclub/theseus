@@ -67,19 +67,31 @@ routes.each do |route|
     skipped << "#{path} (unresolved param)"
     next
   end
+  # Test the base path, plus common query param variations for index routes
+  paths_to_test = [path]
+  if action == "index"
+    user_id = User.first&.id
+    paths_to_test << "#{path}?user_id=#{user_id}" if user_id
+    paths_to_test << "#{path}?search=test"
+    paths_to_test << "#{path}?state=draft"
+    paths_to_test << "#{path}?origin=manual"
+    paths_to_test << "#{path}?page=1"
+  end
 
-  begin
-    session.get path
-    status = session.response.status
-    if status >= 500
-      body = session.response.body.to_s
-      err = body.match(/<h1>(.*?)<\/h1>/m)&.[](1)&.strip || "HTTP #{status}"
-      errors << "#{status} #{path} — #{err}"
-    else
-      ok << path
+  paths_to_test.each do |test_path|
+    begin
+      session.get test_path
+      status = session.response.status
+      if status >= 500
+        body = session.response.body.to_s
+        err = body.match(/<h1>(.*?)<\/h1>/m)&.[](1)&.strip || "HTTP #{status}"
+        errors << "#{status} #{test_path} — #{err}"
+      else
+        ok << test_path
+      end
+    rescue => e
+      errors << "EXC #{test_path} — #{e.class}: #{e.message[0..150]}"
     end
-  rescue => e
-    errors << "EXC #{path} — #{e.class}: #{e.message[0..150]}"
   end
 end
 
