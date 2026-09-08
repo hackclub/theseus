@@ -87,24 +87,21 @@ class Views::Admin::Users::Show < Views::Base
       end
     end
 
-    # Stats
+    # Activity
     section do
-      h3(style: "margin-top:0;") { "Stats" }
+      h3(style: "margin-top:0;") { "Activity" }
       div(class: "detail-grid") do
-        span(class: "detail-label") { "Letters" }
-        span { @user.letters.size.to_s }
-
-        span(class: "detail-label") { "Batches" }
-        span { @user.batches.size.to_s }
+        stat_link "Letters", @user.letters.count, letters_path(user_id: @user.id)
+        stat_link "Letter Batches", Letter::Batch.where(user_id: @user.id).count, letter_batches_path(user_id: @user.id)
+        stat_link "Letter Queues", @user.letter_queues.count, letter_queues_path(user_id: @user.id)
+        stat_link "Warehouse Orders", @user.warehouse_orders.count, warehouse_orders_path(user_id: @user.id)
+        stat_link "Warehouse Batches", Warehouse::Batch.where(user_id: @user.id).count, warehouse_batches_path(user_id: @user.id)
 
         span(class: "detail-label") { "Warehouse Templates" }
-        span { @user.warehouse_templates.size.to_s }
+        span { @user.warehouse_templates.count.to_s }
 
         span(class: "detail-label") { "Return Addresses" }
-        span { @user.return_addresses.size.to_s }
-
-        span(class: "detail-label") { "Letter Queues" }
-        span { @user.letter_queues.size.to_s }
+        span { @user.return_addresses.count.to_s }
       end
     end
 
@@ -173,5 +170,10 @@ class Views::Admin::Users::Show < Views::Base
     else
       span(class: "badge") { "Disabled" }
     end
+  end
+
+  def stat_link(label, count, path)
+    span(class: "detail-label") { label }
+    span { a(href: path) { count.to_s } }
   end
 end

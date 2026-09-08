@@ -37,6 +37,7 @@ class User < ApplicationRecord
   has_many :return_addresses, dependent: :destroy
   has_many :letters
   has_many :batches
+  has_many :warehouse_orders, class_name: "Warehouse::Order"
   has_many :letter_queues, dependent: :destroy, class_name: "Letter::Queue"
   has_one :hcb_oauth_connection, class_name: "HCB::OauthConnection", dependent: :destroy
   has_many :billing_profiles, class_name: "BillingProfile", dependent: :destroy
