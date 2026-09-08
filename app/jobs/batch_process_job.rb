@@ -120,15 +120,23 @@ class BatchProcessJob < ApplicationJob
       xfer
     end
 
-    # Create ledger entry for the batch indicia charge
+    # Create HCB::Transfer and ledger entry for the batch indicia charge
     if transfer && estimated_cents.positive?
+      transaction_id = transfer.respond_to?(:id) ? transfer.id : batch.hcb_transfer_id
+      hcb_xfer = HCB::Transfer.create!(
+        billing_profile: hcb_account,
+        amount_cents: estimated_cents,
+        state: :completed,
+        hcb_transaction_id: transaction_id,
+      )
       batch.ledger_entries.create!(
         billing_profile: hcb_account,
         category: :indicia,
         amount_cents: estimated_cents,
         state: :settled,
         settled_at: Time.current,
-        hcb_transfer_id: transfer.respond_to?(:id) ? transfer.id : batch.hcb_transfer_id,
+        hcb_transfer: hcb_xfer,
+        hcb_transfer_id: transaction_id,
       )
     end
 

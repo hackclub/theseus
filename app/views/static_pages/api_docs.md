@@ -19,6 +19,16 @@ once you have it, just pass it in the `Authorization` header of your requests li
 Authorization: Bearer th_apk_live_alskfjsdkfjksdjhf
 ```
 
+### billing:
+
+warehouse orders are billed to an HCB organization. your API key can have a **default billing profile** — set it up in the back office when you create the key.
+
+if your key has a default billing profile, all warehouse orders created through it will be billed to that organization automatically. you can also override the default per-request by passing `billing_profile_id` in the request body.
+
+if your key doesn't have a default and you don't pass one per-request, warehouse order creation will fail with a `billing_profile_required` error.
+
+letter queues handle billing differently — they're configured with a billing profile when the queue is set up, so you don't need to worry about it per-request.
+
 ### authorization (the other kind):
 if you're planning on using the warehouse, talk to Zach/Nora first!
 
@@ -272,6 +282,7 @@ POST /api/v1/warehouse_orders
 - `warehouse_order.idempotency_key` — you know the drill. use it. please.
 - `warehouse_order.user_facing_title` — a friendly name for the shipment that might show up in recipient-facing contexts.
 - `warehouse_order.metadata` — same as with letters, a JSON object that's all yours.
+- `billing_profile_id` — override the API key's default billing profile for this order. pass the ID of any billing profile your account has access to.
 - `contents` — additional SKU items (required for freeform, optional for template orders).
 
 **the response** (201 Created):
@@ -352,6 +363,7 @@ a few things to know:
 - `missing_parameter` (400) — you forgot a required field.
 - `validation_error` (400) — something's wrong with your data (bad address, etc.).
 - `idempotency_error` (400) — you already sent something with that idempotency key. this is a feature, not a bug!
+- `billing_profile_required` (422) — you tried to create a warehouse order without a billing profile. set a default on your API key or pass `billing_profile_id`.
 - `resource_not_found` (404) — couldn't find that queue, letter, order, template, or SKU.
 
 ---

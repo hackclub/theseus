@@ -52,6 +52,27 @@ There are two API systems:
 
 Most integrations use the internal API. If you're building something that shows a user their incoming mail/packages, use the public API.
 
+
+## Billing
+
+Warehouse orders are billed to an HCB (Hack Club Bank) organization via a **billing profile**.
+
+**API key default:** Each API key can have a default billing profile. Set it in the back office when creating the key. All warehouse orders created through that key will bill to that organization unless overridden.
+
+**Per-request override:** Pass `billing_profile_id` as a top-level field in the request body to bill a different organization for a specific order.
+
+**Resolution order:** per-request `billing_profile_id` > API key default > error.
+
+If no billing profile can be resolved and billing is required, the API returns:
+```json
+{
+  "error": "billing_profile_required",
+  "message": "A billing profile is required for warehouse orders. Set a default on your API key or pass billing_profile_id per request."
+}
+```
+Status: 422 Unprocessable Entity.
+
+**Letters** don't need per-request billing — their billing profile is configured on the queue itself.
 ---
 
 ## Sending Mail
@@ -250,6 +271,7 @@ Same body structure, but `contents` is required — you need at least one item.
 | `warehouse_order.user_facing_title` | no | friendly name shown in recipient-facing contexts |
 | `warehouse_order.metadata` | no | arbitrary JSON, same as letters |
 | `contents` | template: no, freeform: yes | array of `{ "sku": "...", "quantity": N }` |
+| `billing_profile_id` | no | override your API key's default billing profile for this order |
 
 **Response (201):**
 ```json
@@ -374,6 +396,7 @@ Idempotency collisions return 400. The response does **not** include the origina
 | `validation_error` | 400 | something's wrong with the data (bad address, missing fields) |
 | `Validation failed` | 422 | same as above, from letter queue and warehouse order endpoints |
 | `idempotency_error` | 400 | you already sent a request with that idempotency key — **this is intentional protection, not a bug** |
+| `billing_profile_required` | 422 | no billing profile resolved — set a default on your API key or pass `billing_profile_id` per request |
 | `resource_not_found` | 404 | the letter, order, queue, template, or SKU doesn't exist |
 
 When writing error handling, match on the `error` field, not the status code — the same logical error can come back as 400 or 422 depending on the endpoint.

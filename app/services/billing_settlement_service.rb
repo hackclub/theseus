@@ -14,42 +14,50 @@ class BillingSettlementService
     total_cents = entries.sum(:amount_cents)
     return true if total_cents <= 0
 
+    # Create the transfer record first
+    hcb_transfer = HCB::Transfer.create!(
+      billing_profile: billing_profile,
+      amount_cents: total_cents,
+      state: :pending,
+    )
+
     memo_lines = entries.map { |e| "#{e.category}: #{e.ledgerable_type}##{e.ledgerable_id} ($#{"%.2f" % e.amount})" }
     memo = "[theseus] #{memo_lines.join(", ")}"
 
-    transfer = HCB::TransferService.new(
+    transfer_service = HCB::TransferService.new(
       billing_profile: billing_profile,
       amount_cents: total_cents,
       name: "Theseus billing: #{entries.count} entries",
       memo: memo.truncate(500),
     )
 
-    result = transfer.call
+    result = transfer_service.call
 
     if result
-      transfer_id = result.respond_to?(:id) ? result.id : result.try(:transaction_id) || result.to_s
-      entries.each { |entry| entry.settle!(transfer_id) }
+      transaction_id = result.respond_to?(:id) ? result.id : result.try(:transaction_id) || result.to_s
+      hcb_transfer.complete!(transaction_id)
+      entries.each { |entry| entry.settle!(hcb_transfer) }
       true
     else
+      error_msg = transfer_service.errors.join("; ")
+      hcb_transfer.fail!(error_msg)
       entries.each(&:fail!)
 
-      is_insufficient = transfer.errors.any? { |e| e.include?("insufficient") || e.include?("Insufficient") }
+      is_insufficient = transfer_service.errors.any? { |e| e.include?("insufficient") || e.include?("Insufficient") }
+
+      mailer_params = {
+        ledger_entries: entries,
+        billing_profile: billing_profile,
+        error: error_msg,
+      }
 
       if is_insufficient
-        BillingMailer.with(
-          ledger_entries: entries,
-          billing_profile: billing_profile,
-          error: transfer.errors.join("; "),
-        ).insufficient_funds.deliver_later
+        BillingMailer.with(mailer_params).insufficient_funds.deliver_later
       else
-        BillingMailer.with(
-          ledger_entries: entries,
-          billing_profile: billing_profile,
-          error: transfer.errors.join("; "),
-        ).settlement_failed.deliver_later
+        BillingMailer.with(mailer_params).settlement_failed.deliver_later
       end
 
-      @errors = transfer.errors
+      @errors = transfer_service.errors
       false
     end
   end

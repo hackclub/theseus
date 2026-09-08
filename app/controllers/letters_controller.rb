@@ -295,14 +295,22 @@ class LettersController < ApplicationController
 
     indicium.update!(hcb_transfer_id: transfer.id)
 
-    # Create settled ledger entry for this indicium charge
+    # Create HCB::Transfer and settled ledger entry for this indicium charge
+    transaction_id = transfer.respond_to?(:id) ? transfer.id : transfer.to_s
+    hcb_xfer = HCB::Transfer.create!(
+      billing_profile: billing_profile,
+      amount_cents: cost_cents,
+      state: :completed,
+      hcb_transaction_id: transaction_id,
+    )
     indicium.ledger_entries.create!(
       billing_profile: billing_profile,
       category: :indicia,
       amount_cents: cost_cents,
       state: :settled,
       settled_at: Time.current,
-      hcb_transfer_id: transfer.respond_to?(:id) ? transfer.id : transfer.to_s,
+      hcb_transfer: hcb_xfer,
+      hcb_transfer_id: transaction_id,
     )
 
     begin
