@@ -73,7 +73,6 @@ class Components::Shared::Sidebar < Components::Base
           span(class: "sidebar-label") { "Admin" }
           nav_link("Users", admin_users_path)
           nav_link("Common Tags", admin_common_tags_path)
-          nav_link("Source Tags", admin_source_tags_path)
           nav_link("USPS Mailer IDs", admin_usps_mailer_ids_path)
           nav_link("USPS Payment Accts", admin_usps_payment_accounts_path)
           nav_link("Good Job", good_job_path)

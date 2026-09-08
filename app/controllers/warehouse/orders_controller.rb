@@ -5,7 +5,7 @@ class Warehouse::OrdersController < ApplicationController
     authorize Warehouse::Order
 
     # Get all orders with their associations using policy scope
-    @all_orders = policy_scope(Warehouse::Order).includes(:batch, :origin_batch, :address, :source_tag, :user, line_items: :sku)
+    @all_orders = policy_scope(Warehouse::Order).includes(:batch, :origin_batch, :address, :user, line_items: :sku)
 
     # Filter by origin (how the order was created)
     orders = if params[:origin].present? && %w[manual bulk_upload api].include?(params[:origin])
@@ -78,7 +78,6 @@ class Warehouse::OrdersController < ApplicationController
     @warehouse_order = Warehouse::Order.new(
       warehouse_order_params.merge(
         user: current_user,
-        source_tag: SourceTag.web_tag,
       )
     )
 

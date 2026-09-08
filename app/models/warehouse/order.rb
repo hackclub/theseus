@@ -80,7 +80,6 @@ class Warehouse::Order < ApplicationRecord
 
   belongs_to :template, class_name: "Warehouse::Template", optional: true
   belongs_to :user
-  belongs_to :source_tag
   belongs_to :origin_batch, class_name: "Batch", optional: true
 
   validates :line_items, presence: true
@@ -221,7 +220,6 @@ class Warehouse::Order < ApplicationRecord
     new(
       attributes.merge(
         template: template,
-        source_tag: template.source_tag,
       )
     )
   end

@@ -86,7 +86,6 @@ module Shortcodes
         Shortcode.new(code: "FIRE", label: "Blazer", icon: "≋", path: "/back_office/blazer", gate: ADMIN),
         Shortcode.new(code: "AUSR", label: "Admin Users", icon: "⊛", path: "/back_office/admin/users", gate: ADMIN),
         Shortcode.new(code: "ACTG", label: "Common Tags", icon: "⏿", path: "/back_office/admin/common_tags", gate: ADMIN),
-        Shortcode.new(code: "ASTG", label: "Source Tags", icon: "⊙", path: "/back_office/admin/source_tags", gate: ADMIN),
         Shortcode.new(code: "AMID", label: "USPS Mailer IDs", icon: "⊚", path: "/back_office/admin/usps/mailer_ids", gate: ADMIN),
         Shortcode.new(code: "AEPS", label: "USPS Payment Accts", icon: "⊛", path: "/back_office/admin/usps/payment_accounts", gate: ADMIN),
       ]

@@ -25,7 +25,7 @@ class Warehouse::TemplatesController < ApplicationController
 
   # POST /warehouse/templates or /warehouse/templates.json
   def create
-    @warehouse_template = Warehouse::Template.new(warehouse_template_params.merge(user: current_user, source_tag: SourceTag.web_tag))
+    @warehouse_template = Warehouse::Template.new(warehouse_template_params.merge(user: current_user))
     authorize @warehouse_template
 
     respond_to do |format|

@@ -29,5 +29,4 @@ class Warehouse::Template < ApplicationRecord
   scope :shared, -> { where(public: true) }
 
   belongs_to :user
-  belongs_to :source_tag
 end

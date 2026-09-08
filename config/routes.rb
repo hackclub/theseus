@@ -512,7 +512,6 @@ Rails.application.routes.draw do
     namespace :admin do
       resources :users
       resources :common_tags
-      resources :source_tags
 
       namespace :usps do
         resources :mailer_ids

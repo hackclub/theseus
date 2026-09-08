@@ -53,7 +53,7 @@ module API
 
       def create
         address = parse_address_from_params(permit_address_params)
-        @warehouse_order = Warehouse::Order.new(warehouse_order_params.merge(address:, user: current_user, source_tag: SourceTag.first))
+        @warehouse_order = Warehouse::Order.new(warehouse_order_params.merge(address:, user: current_user))
         authorize @warehouse_order
         address.save!
 

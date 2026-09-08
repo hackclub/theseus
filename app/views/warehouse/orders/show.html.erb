@@ -46,8 +46,6 @@
           <span class="detail-label">Created via</span>
           <span><%= @warehouse_order.created_via.humanize %></span>
         <% end %>
-        <span class="detail-label">Source</span>
-        <span><%= @warehouse_order.source_tag&.name || "—" %></span>
         <span class="detail-label">Notify</span>
         <span><%= @warehouse_order.notify_on_dispatch? ? "Yes" : "No" %></span>
         <span class="detail-label">Zenventory</span>
