@@ -324,12 +324,21 @@ class LettersController < ApplicationController
         redirect_to @letter, alert: "Postage was purchased but failed to save (#{e.message}). Do not retry — contact Nora."
       else
         # API call never went through, safe to clean up.
-        BillingProfile.refund_to_organization!(
+        refund_result = BillingProfile.refund_to_organization!(
           organization_id: billing_profile.organization_id,
           amount_cents: cost_cents,
           name: "Refund for #{@letter.public_id} #{indicium.public_id} #{letter_path(@letter)}",
           memo: "[theseus] postage refund for a #{@letter.processing_category}",
         )
+        # Mark the charge entry as refunded instead of destroying it
+        refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
+        refund_xfer = HCB::Transfer.create!(
+          billing_profile: billing_profile,
+          amount_cents: cost_cents,
+          state: :completed,
+          hcb_transaction_id: refund_tx_id,
+        )
+        indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
         indicium.destroy!
         redirect_to @letter, alert: "Purchase failed: #{e.message}"
       end

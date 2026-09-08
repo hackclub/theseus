@@ -295,12 +295,28 @@ class Letter::BatchesController < BaseBatchesController
       end
 
       hcb_account = @batch.billing_profile
-      BillingProfile.refund_to_organization!(
+      refund_result = BillingProfile.refund_to_organization!(
         organization_id: hcb_account.organization_id,
         amount_cents: overpaid,
         name: "Refund for #{@batch.public_id}",
         memo: "[theseus] overpayment refund",
       )
+      # Record the refund in the ledger
+      refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
+      refund_xfer = HCB::Transfer.create!(
+        billing_profile: hcb_account,
+        amount_cents: overpaid,
+        state: :completed,
+        hcb_transaction_id: refund_tx_id,
+      )
+      # Update the original settled entry to reflect the partial refund
+      original_entry = @batch.ledger_entries.settled.indicia.first
+      if original_entry
+        original_entry.update!(
+          amount_cents: original_entry.amount_cents - overpaid,
+          metadata: original_entry.metadata.merge("overpayment_refunded_cents" => overpaid),
+        )
+      end
       @batch.update_columns(hcb_transfer_amount_cents: spent)
       @batch.audit!(:hcb_refunded, amount_cents: overpaid, admin: current_user.email)
 

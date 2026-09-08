@@ -210,12 +210,21 @@ class BatchProcessJob < ApplicationJob
     hcb_account = BillingProfile.find_by(id: options[:hcb_payment_account_id])
     return unless hcb_account
 
-    BillingProfile.refund_to_organization!(
+    refund_result = BillingProfile.refund_to_organization!(
       organization_id: hcb_account.organization_id,
       amount_cents: amount,
       name: "Auto-refund for #{batch.public_id} (failed before purchasing)",
       memo: "[theseus] auto-refund, zero postage purchased",
     )
+    # Mark the original charge ledger entry as refunded
+    refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
+    refund_xfer = HCB::Transfer.create!(
+      billing_profile: hcb_account,
+      amount_cents: amount,
+      state: :completed,
+      hcb_transaction_id: refund_tx_id,
+    )
+    batch.ledger_entries.settled.each { |le| le.refund!(refund_xfer) }
     batch.update_columns(hcb_transfer_id: nil, hcb_transfer_amount_cents: nil)
     batch.audit!(:hcb_auto_refunded, amount_cents: amount, reason: "failed before any postage purchased")
   rescue => e

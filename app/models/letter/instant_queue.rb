@@ -141,12 +141,20 @@ class Letter::InstantQueue < Letter::Queue
               raise e
             else
               # API call never went through, safe to clean up.
-              BillingProfile.refund_to_organization!(
+              refund_result = BillingProfile.refund_to_organization!(
                 organization_id: billing_profile.organization_id,
                 amount_cents: cost_cents,
                 name: "Refund for #{letter.public_id} #{indicium.public_id} #{Rails.application.routes.url_helpers.letter_path(letter)}",
                 memo: "[theseus] postage refund for a #{letter.processing_category}",
               )
+              refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
+              refund_xfer = HCB::Transfer.create!(
+                billing_profile: billing_profile,
+                amount_cents: cost_cents,
+                state: :completed,
+                hcb_transaction_id: refund_tx_id,
+              )
+              indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
               indicium.destroy!
               raise e
             end
