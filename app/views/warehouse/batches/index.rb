@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class Views::Warehouse::Batches::Index < Views::Base
-  def initialize(batches:)
+  def initialize(batches:, search: nil, user_id: nil, users: [])
     @batches = batches
+    @search = search
+    @user_id = user_id
+    @users = users
   end
 
   def view_template
@@ -13,20 +16,38 @@ class Views::Warehouse::Batches::Index < Views::Base
 
   private
 
+  attr_reader :batches, :search, :user_id, :users
+
   def toolbar
     render Components::Shared::PageToolbar.new(
       title: "Warehouse Batches",
       jumpcode_path: warehouse_batches_path,
+      search_path: warehouse_batches_path,
+      search_value: search,
+      search_placeholder: "Search batches...",
+      search_params: { user_id: user_id },
       action_href: new_warehouse_batch_path,
       action_label: "+ New Batch"
-    )
+    ) do
+      admin_tool do
+        render Components::Shared::UserPicker.new(
+          users: users,
+          selected_user_id: user_id,
+          path_builder: ->(uid) { warehouse_batches_path(search: search, user_id: uid) }
+        )
+      end
+
+      if search.present? || user_id.present?
+        a(href: warehouse_batches_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
+      end
+    end
   end
 
   def stat_filters
     counts = {
-      awaiting_field_mapping: @batches.where(aasm_state: :awaiting_field_mapping).count,
-      fields_mapped: @batches.where(aasm_state: :fields_mapped).count,
-      processed: @batches.where(aasm_state: :processed).count
+      awaiting_field_mapping: batches.where(aasm_state: :awaiting_field_mapping).count,
+      fields_mapped: batches.where(aasm_state: :fields_mapped).count,
+      processed: batches.where(aasm_state: :processed).count
     }
 
     render Components::Shared::StatFilters.new(
@@ -36,13 +57,13 @@ class Views::Warehouse::Batches::Index < Views::Base
         { label: "Processed", count: counts[:processed], color: "green", param: "processed" },
       ],
       active: nil,
-      base_path: ->(**_params) { warehouse_batches_path },
-      total: @batches.count
+      base_path: ->(**_params) { warehouse_batches_path(search: search, user_id: user_id) },
+      total: batches.count
     )
   end
 
   def batches_table
-    if @batches.any?
+    if batches.any?
       table do
         thead do
           tr do
@@ -55,7 +76,7 @@ class Views::Warehouse::Batches::Index < Views::Base
           end
         end
         tbody do
-          @batches.each { |batch| render_batch_row(batch) }
+          batches.each { |batch| render_batch_row(batch) }
         end
       end
     else

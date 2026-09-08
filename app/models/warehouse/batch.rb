@@ -52,6 +52,19 @@
 class Warehouse::Batch < Batch
   belongs_to :warehouse_template, class_name: "Warehouse::Template"
 
+  include PgSearch::Model
+
+  pg_search_scope :search,
+    against: %i[tags warehouse_user_facing_title],
+    associated_against: {
+      csv_blob: %i[filename],
+      user: %i[email username],
+      warehouse_template: %i[name]
+    },
+    using: {
+      tsearch: { prefix: true }
+    }
+
   has_many :orders, class_name: "Warehouse::Order"
 
   def self.model_name = Batch.model_name

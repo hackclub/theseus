@@ -4,8 +4,17 @@ class Warehouse::BatchesController < BaseBatchesController
   # GET /warehouse/batches
   def index
     authorize Warehouse::Batch
-    @batches = policy_scope(Warehouse::Batch).order(created_at: :desc)
-    render Views::Warehouse::Batches::Index.new(batches: @batches)
+    all_batches = policy_scope(Warehouse::Batch).order(created_at: :desc)
+    batches = all_batches
+    batches = batches.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
+    batches = batches.search(params[:search]) if params[:search].present?
+    users = current_user&.is_admin? ? User.where(id: all_batches.select(:user_id).distinct).order(:email) : []
+    render Views::Warehouse::Batches::Index.new(
+      batches: batches,
+      search: params[:search],
+      user_id: params[:user_id],
+      users: users
+    )
   end
 
   # GET /warehouse/batches/1
