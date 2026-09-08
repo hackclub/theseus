@@ -55,7 +55,7 @@ Most integrations use the internal API. If you're building something that shows 
 
 ## Billing
 
-Warehouse orders are billed to an HCB (Hack Club Bank) organization via a **billing profile**.
+Warehouse orders are billed to an HCB organization via a **billing profile**.
 
 **API key default:** Each API key can have a default billing profile. Set it in the back office when creating the key. All warehouse orders created through that key will bill to that organization unless overridden.
 

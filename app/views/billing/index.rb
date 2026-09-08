@@ -71,8 +71,8 @@ class Views::Billing::Index < Views::Base
               td { entry.billing_profile.organization_name }
               td { state_badge(entry.state) }
               td do
-                if entry.hcb_transfer_id.present?
-                  code(class: "text-muted") { entry.hcb_transfer_id.truncate(16) }
+                if entry.hcb_transfer&.hcb_transaction_id.present?
+                  code(class: "text-muted") { entry.hcb_transfer.hcb_transaction_id.truncate(16) }
                 else
                   span(class: "text-muted") { "—" }
                 end

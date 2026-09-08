@@ -35,10 +35,10 @@ class Views::Billing::Show < Views::Base
         span(class: "detail-label") { "For" }
         span { ledgerable_detail(@entry) }
 
-        if @entry.hcb_transfer_id.present?
+        if @entry.hcb_transfer.present?
           span(class: "detail-label") { "HCB Transfer" }
           span do
-            code { @entry.hcb_transfer_id }
+            code { @entry.hcb_transfer.hcb_transaction_id || "pending" }
           end
         end
 

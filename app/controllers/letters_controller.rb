@@ -310,7 +310,6 @@ class LettersController < ApplicationController
       state: :settled,
       settled_at: Time.current,
       hcb_transfer: hcb_xfer,
-      hcb_transfer_id: transaction_id,
     )
 
     begin

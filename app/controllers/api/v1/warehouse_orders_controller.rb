@@ -108,7 +108,13 @@ module API
       # Per-request billing_profile_id overrides the API key's default
       def resolve_billing_profile
         profile = if params[:billing_profile_id].present?
-          BillingProfile.find(params[:billing_profile_id])
+          # Only allow billing profiles owned by the API key's user
+          current_user.billing_profiles.find_by(id: params[:billing_profile_id]).tap do |p|
+            unless p
+              render json: { error: "not_authorized", message: "Billing profile not found or not yours." }, status: :forbidden
+              return nil
+            end
+          end
         else
           current_token.billing_profile
         end

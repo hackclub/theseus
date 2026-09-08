@@ -136,7 +136,6 @@ class BatchProcessJob < ApplicationJob
         state: :settled,
         settled_at: Time.current,
         hcb_transfer: hcb_xfer,
-        hcb_transfer_id: transaction_id,
       )
     end
 

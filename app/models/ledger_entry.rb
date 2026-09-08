@@ -23,7 +23,7 @@ class LedgerEntry < ApplicationRecord
   scope :for_profile, ->(profile) { where(billing_profile: profile) }
 
   def settle!(transfer)
-    update!(state: :settled, settled_at: Time.current, hcb_transfer: transfer, hcb_transfer_id: transfer.hcb_transaction_id)
+    update!(state: :settled, settled_at: Time.current, hcb_transfer: transfer)
   end
 
   def fail!
@@ -31,7 +31,7 @@ class LedgerEntry < ApplicationRecord
   end
 
   def refund!(transfer)
-    update!(state: :refunded, hcb_transfer: transfer, hcb_transfer_id: transfer.hcb_transaction_id)
+    update!(state: :refunded, hcb_transfer: transfer)
   end
 
   def amount

@@ -7,14 +7,12 @@ class CreateLedgerEntries < ActiveRecord::Migration[8.0]
       t.integer :amount_cents, null: false
       t.integer :state, null: false, default: 0
       t.datetime :settled_at
-      t.string :hcb_transfer_id
       t.jsonb :metadata, default: {}
       t.timestamps
     end
 
     add_index :ledger_entries, :state
     add_index :ledger_entries, :category
-    add_index :ledger_entries, :hcb_transfer_id
     add_index :ledger_entries, [:billing_profile_id, :state]
   end
 end

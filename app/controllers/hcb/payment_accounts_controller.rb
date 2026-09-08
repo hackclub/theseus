@@ -1,6 +1,4 @@
 class HCB::PaymentAccountsController < ApplicationController
-  skip_after_action :verify_authorized
-
   before_action :require_hcb_connection, except: [:index]
   before_action :set_payment_account, only: [:show]
 
@@ -20,29 +18,35 @@ class HCB::PaymentAccountsController < ApplicationController
   end
 
   def index
-    @payment_accounts = current_user.billing_profiles
+    authorize BillingProfile
+    @payment_accounts = policy_scope(BillingProfile)
   end
 
   def new
-    @organizations = available_organizations
     @payment_account = current_user.billing_profiles.build
+    authorize @payment_account
+    @organizations = available_organizations
   end
 
   def create
+    @payment_account = current_user.billing_profiles.build(
+      oauth_connection: current_user.hcb_oauth_connection,
+    )
+    authorize @payment_account
+
     org = find_organization(params[:organization_id])
     if org.nil?
       redirect_to new_hcb_payment_account_path, alert: "Organization not found"
       return
     end
 
-    @payment_account = current_user.billing_profiles.build(
-      oauth_connection: current_user.hcb_oauth_connection,
+    @payment_account.assign_attributes(
       organization_id: org.id,
       organization_name: org.name,
     )
 
     if @payment_account.save
-      redirect_to hcb_payment_accounts_path, notice: "Payment account created for #{org.name}"
+      redirect_to hcb_payment_accounts_path, notice: "Billing profile created for #{org.name}"
     else
       @organizations = available_organizations
       render :new, status: :unprocessable_entity
@@ -50,6 +54,7 @@ class HCB::PaymentAccountsController < ApplicationController
   end
 
   def show
+    authorize @payment_account
   end
 
   private
@@ -61,7 +66,7 @@ class HCB::PaymentAccountsController < ApplicationController
   end
 
   def set_payment_account
-    @payment_account = current_user.billing_profiles.find(params[:id])
+    @payment_account = policy_scope(BillingProfile).find(params[:id])
   end
 
   def available_organizations
