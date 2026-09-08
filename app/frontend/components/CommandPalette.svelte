@@ -19,6 +19,7 @@
   let publicIdTimeout;
 
   const scopeShortcuts = { '?l': 'letters', '?w': 'orders' };
+  const prefixScopes = { '@': 'users' };
 
   let visibleItems = $derived(computeVisibleItems());
 
@@ -112,7 +113,8 @@
         ? searchScopes.filter(s => s.label.toLowerCase().includes(q) || 'search'.includes(q))
         : searchScopes;
       filteredScopes.forEach(s => {
-        const hint = Object.entries(scopeShortcuts).find(([, v]) => v === s.key)?.[0];
+        const hint = Object.entries(scopeShortcuts).find(([, v]) => v === s.key)?.[0]
+                   || Object.entries(prefixScopes).find(([, v]) => v === s.key)?.[0];
         items.push({ label: `Search ${s.label}`, hint, icon: '⌕', scope: s });
       });
     }
@@ -140,6 +142,30 @@
   function handleInput() {
     const q = query;
 
+    // Prefix scopes: @ stays visible in input, search happens after prefix
+    const prefixEntry = Object.entries(prefixScopes).find(([p]) => q.startsWith(p));
+    if (prefixEntry) {
+      const [prefix, scopeKey] = prefixEntry;
+      const scope = searchScopes.find(s => s.key === scopeKey);
+      if (scope) {
+        activeScope = scope;
+        const searchQ = q.slice(prefix.length);
+        if (searchQ.length >= 2) {
+          doScopedSearch(searchQ, scopeKey);
+        } else {
+          scopedResults = [];
+        }
+        return;
+      }
+    }
+
+    // If we were in a prefix scope but prefix is gone, exit it
+    if (activeScope && Object.values(prefixScopes).includes(activeScope.key)) {
+      activeScope = null;
+      scopedResults = [];
+    }
+
+    // Regular scope shortcuts (?l, ?w) — enter scope and clear input
     const scopeKey = scopeShortcuts[q.toLowerCase()];
     if (scopeKey) {
       const scope = searchScopes.find(s => s.key === scopeKey);

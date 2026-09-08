@@ -41,6 +41,7 @@ class KbarController < ApplicationController
     case scope
     when "letters" then search_letters(q)
     when "orders" then search_orders(q)
+    when "users" then search_users(q)
     else []
     end
   end
@@ -82,6 +83,20 @@ class KbarController < ApplicationController
       sublabel = [name, tracking, o.aasm_state&.humanize].compact_blank.join(" · ")
 
       { label: "Order ##{o.hc_id || o.id}", sublabel:, path: warehouse_order_path(o) }
+    end
+  end
+
+  def search_users(q)
+    return [] unless current_user&.admin?
+
+    users = User.where("username ILIKE :q OR email ILIKE :q", q: "%#{q}%").order(:username).limit(8)
+
+    users.map do |u|
+      {
+        label: u.username.presence || u.email,
+        sublabel: [u.email, u.is_admin? ? "Admin" : nil].compact_blank.join(" · "),
+        path: admin_user_path(u)
+      }
     end
   end
 

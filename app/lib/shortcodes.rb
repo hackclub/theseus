@@ -33,11 +33,13 @@ module Shortcodes
       }
     end
 
-    def search_scopes
-      [
+    def search_scopes(user = nil)
+      scopes = [
         { key: "letters", label: "Letters", icon: "◇" },
         { key: "orders", label: "Warehouse Orders", icon: "⊡" },
       ]
+      scopes << { key: "users", label: "Users", icon: "⊛" } if user&.admin?
+      scopes
     end
 
     def code_for(path)
@@ -102,7 +104,7 @@ module Shortcodes
       {
         shortcuts: all(user).map(&:to_h),
         prefixes: public_id_prefixes,
-        searchScopes: search_scopes,
+        searchScopes: search_scopes(user),
       }.to_json
     end
   end
