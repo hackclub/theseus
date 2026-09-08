@@ -152,6 +152,52 @@ class Views::Admin::Users::Show < Views::Base
       end
     end
 
+    # Recent Billing
+    billing_profiles = @user.billing_profiles.to_a
+    if billing_profiles.any?
+      recent_entries = LedgerEntry
+        .where(billing_profile: billing_profiles)
+        .includes(:billing_profile, :ledgerable)
+        .order(created_at: :desc)
+        .limit(20)
+
+      section do
+        h3(style: "margin-top:0;") do
+          plain "Recent Billing"
+          span(class: "text-muted", style: "font-weight:normal;font-size:0.85em;margin-left:0.5rem;") do
+            plain "(#{billing_profiles.map(&:organization_name).join(", ")})"
+          end
+        end
+
+        if recent_entries.any?
+          table do
+            thead do
+              tr do
+                th { "Date" }
+                th { "Category" }
+                th { "Amount" }
+                th { "For" }
+                th { "State" }
+              end
+            end
+            tbody do
+              recent_entries.each do |entry|
+                tr do
+                  td(class: "text-muted") { entry.created_at.strftime("%b %d %H:%M") }
+                  td { span(class: "badge badge-info") { entry.category } }
+                  td(style: "font-weight:600;") { "$#{"%.2f" % entry.amount}" }
+                  td { ledgerable_link(entry) }
+                  td { state_badge(entry.state) }
+                end
+              end
+            end
+          end
+        else
+          p(class: "text-muted") { "No billing activity yet." }
+        end
+      end
+    end
+
     # Impersonate
     if @user != current_user
       section do
@@ -175,5 +221,35 @@ class Views::Admin::Users::Show < Views::Base
   def stat_link(label, count, path)
     span(class: "detail-label") { label }
     span { a(href: path) { count.to_s } }
+  end
+
+  def state_badge(state)
+    variant = case state
+              when "settled" then "badge-success"
+              when "pending" then "badge-warning"
+              when "failed" then "badge-danger"
+              when "refunded" then "badge"
+              end
+    span(class: "badge #{variant}") { state }
+  end
+
+  def ledgerable_link(entry)
+    case entry.ledgerable_type
+    when "Warehouse::Order"
+      order = entry.ledgerable
+      a(href: warehouse_order_path(order)) { order.hc_id || "Order ##{order.id}" }
+    when "Batch"
+      batch = entry.ledgerable
+      a(href: letter_batch_path(batch)) { batch.public_id }
+    when "USPS::Indicium"
+      indicium = entry.ledgerable
+      if indicium.letter.present?
+        a(href: letter_path(indicium.letter)) { "Indicium #{indicium.public_id}" }
+      else
+        plain "Indicium #{indicium.public_id}"
+      end
+    else
+      plain "#{entry.ledgerable_type} ##{entry.ledgerable_id}"
+    end
   end
 end
