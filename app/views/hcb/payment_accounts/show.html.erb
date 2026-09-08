@@ -18,10 +18,7 @@
       <hr>
       <div class="detail-grid" style="margin-top: 0.5rem;">
         <span class="detail-label">Billing Profile ID</span>
-        <span style="display:flex;align-items:center;gap:0.5rem;">
-          <code><%= @payment_account.public_id %></code>
-          <button onclick="navigator.clipboard.writeText('<%= @payment_account.public_id %>'); this.textContent='✓ copied'" style="background:none;border:1px solid var(--foreground2);border-radius:4px;padding:0.1rem 0.4rem;cursor:pointer;font-size:0.8em;color:var(--foreground2);">copy</button>
-        </span>
+        <span><%= copy_to_clipboard(@payment_account.public_id) { content_tag(:code, @payment_account.public_id) } %></span>
         <span class="detail-label">Organization</span>
         <span><%= @payment_account.organization_name %></span>
         <span class="detail-label">HCB Org ID</span>
