@@ -50,7 +50,7 @@ class Letter::InstantQueue < Letter::Queue
 
   # Associations
   belongs_to :usps_payment_account, class_name: "USPS::PaymentAccount", optional: true
-  belongs_to :hcb_payment_account, class_name: "HCB::PaymentAccount", optional: true
+  belongs_to :billing_profile, class_name: "BillingProfile", foreign_key: :hcb_payment_account_id, optional: true
 
   # Scopes
   default_scope { where(type: "Letter::InstantQueue") }
@@ -91,16 +91,16 @@ class Letter::InstantQueue < Letter::Queue
           indicium = USPS::Indicium.create!(
             letter: letter,
             payment_account: usps_payment_account,
-            hcb_payment_account: hcb_payment_account,
+            billing_profile: billing_profile,
             mailing_date: letter.mailing_date,
           )
           Rails.logger.info("Created indicium #{indicium.public_id} for letter #{letter.id}")
 
           cost_cents = (letter.postage * 100).ceil
 
-          Rails.logger.info("Using HCB payment account #{hcb_payment_account.id} for letter #{letter.id}")
+          Rails.logger.info("Using billing profile #{billing_profile.id} for letter #{letter.id}")
           transfer_service = HCB::TransferService.new(
-            hcb_payment_account: hcb_payment_account,
+            billing_profile: billing_profile,
             amount_cents: cost_cents,
             name: "Postage for #{letter.public_id} #{indicium.public_id} (#{slug}) #{Rails.application.routes.url_helpers.letter_path(letter)}",
             memo: "[theseus] postage for a #{letter.processing_category} via queue #{name}",
@@ -123,8 +123,8 @@ class Letter::InstantQueue < Letter::Queue
               raise e
             else
               # API call never went through, safe to clean up.
-              HCB::PaymentAccount.refund_to_organization!(
-                organization_id: hcb_payment_account.organization_id,
+              BillingProfile.refund_to_organization!(
+                organization_id: billing_profile.organization_id,
                 amount_cents: cost_cents,
                 name: "Refund for #{letter.public_id} #{indicium.public_id} #{Rails.application.routes.url_helpers.letter_path(letter)}",
                 memo: "[theseus] postage refund for a #{letter.processing_category}",

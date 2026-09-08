@@ -42,7 +42,7 @@ class USPS::Indicium < ApplicationRecord
 
   belongs_to :payment_account, foreign_key: :usps_payment_account_id
   belongs_to :letter, optional: true
-  belongs_to :hcb_payment_account, class_name: "HCB::PaymentAccount", optional: true
+  belongs_to :billing_profile, class_name: "BillingProfile", foreign_key: :hcb_payment_account_id, optional: true
 
   def buy!(payment_token = nil)
     raise ArgumentError, "for what?" unless letter

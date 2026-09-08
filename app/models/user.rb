@@ -39,7 +39,7 @@ class User < ApplicationRecord
   has_many :batches
   has_many :letter_queues, dependent: :destroy, class_name: "Letter::Queue"
   has_one :hcb_oauth_connection, class_name: "HCB::OauthConnection", dependent: :destroy
-  has_many :hcb_payment_accounts, class_name: "HCB::PaymentAccount", dependent: :destroy
+  has_many :billing_profiles, class_name: "BillingProfile", dependent: :destroy
   belongs_to :home_mid, class_name: "USPS::MailerId", optional: true
   belongs_to :home_return_address, class_name: "ReturnAddress", optional: true
 

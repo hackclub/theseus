@@ -20,7 +20,9 @@
 #  fk_rails_...  (hcb_oauth_connection_id => hcb_oauth_connections.id)
 #  fk_rails_...  (user_id => users.id)
 #
-class HCB::PaymentAccount < ApplicationRecord
+class BillingProfile < ApplicationRecord
+  self.table_name = "hcb_payment_accounts"
+
   has_paper_trail
 
   belongs_to :user

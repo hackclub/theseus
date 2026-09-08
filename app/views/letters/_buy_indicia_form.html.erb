@@ -1,10 +1,10 @@
 <%= form_with(url: buy_indicia_letter_path(letter), method: :post) do |form| %>
-  <% if current_user.hcb_payment_accounts.any? %>
+  <% if current_user.billing_profiles.any? %>
     <div style="margin-bottom: 0.5rem;">
       <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">HCB Organization</label>
       <select name="hcb_payment_account_id" required style="width: 100%;">
         <option value="">Select organization…</option>
-        <% current_user.hcb_payment_accounts.each do |account| %>
+        <% current_user.billing_profiles.each do |account| %>
           <option value="<%= account.id %>"><%= account.organization_name %></option>
         <% end %>
       </select>

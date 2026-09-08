@@ -43,12 +43,12 @@
             </select>
           </div>
 
-          <% if current_user.hcb_payment_accounts.any? %>
+          <% if current_user.billing_profiles.any? %>
             <div style="margin-bottom: 0.5rem;">
               <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">HCB Organization</label>
               <select name="hcb_payment_account_id" required style="width: 100%;">
                 <option value="">Select organization…</option>
-                <% current_user.hcb_payment_accounts.each do |account| %>
+                <% current_user.billing_profiles.each do |account| %>
                   <option value="<%= account.id %>"><%= account.organization_name %></option>
                 <% end %>
               </select>
@@ -62,7 +62,7 @@
           <div style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;">
             <span class="spacer"></span>
             <a href="<%= letter_path(@letter) %>" style="color: var(--foreground2);">Cancel</a>
-            <button type="submit" class="btn-success" <%= "disabled" if current_user.hcb_payment_accounts.empty? %>>✓ Buy Indicia</button>
+            <button type="submit" class="btn-success" <%= "disabled" if current_user.billing_profiles.empty? %>>✓ Buy Indicia</button>
           </div>
         <% end %>
       </div>

@@ -1,8 +1,8 @@
 class HCB::TransferService
-  attr_reader :hcb_payment_account, :amount_cents, :name, :memo, :errors
+  attr_reader :billing_profile, :amount_cents, :name, :memo, :errors
 
-  def initialize(hcb_payment_account:, amount_cents:, name:, memo: nil)
-    @hcb_payment_account = hcb_payment_account
+  def initialize(billing_profile:, amount_cents:, name:, memo: nil)
+    @billing_profile = billing_profile
     @amount_cents = amount_cents
     @name = name
     @memo = memo
@@ -10,10 +10,10 @@ class HCB::TransferService
   end
 
   def call
-    return failure("No HCB payment account provided") unless hcb_payment_account
+    return failure("No billing profile provided") unless billing_profile
     return failure("Amount must be positive") unless amount_cents.positive?
 
-    transfer = hcb_payment_account.create_disbursement!(
+    transfer = billing_profile.create_disbursement!(
       amount_cents: amount_cents,
       name: name,
       memo: memo,
@@ -21,7 +21,7 @@ class HCB::TransferService
 
     transfer
   rescue OAuth2::Error => e
-    hcb_payment_account.oauth_connection&.invalidate!
+    billing_profile.oauth_connection&.invalidate!
     failure("HCB connection expired — please relink your account")
   rescue HCB::OauthConnectionInvalidatedError
     failure("HCB connection has been invalidated — please relink your account")

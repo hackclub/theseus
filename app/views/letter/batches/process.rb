@@ -202,11 +202,11 @@ class Views::Letter::Batches::Process < Views::Base
       end
 
       # HCB account
-      if current_user.hcb_payment_accounts.any?
+      if current_user.billing_profiles.any?
         div(style: "margin-top:0.75rem;") do
           label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "HCB Payment Account" }
           select(name: "batch[hcb_payment_account_id]", style: "width:100%;") do
-            current_user.hcb_payment_accounts.each do |hcb|
+            current_user.billing_profiles.each do |hcb|
               option(value: hcb.id) { hcb.display_name }
             end
           end

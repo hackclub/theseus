@@ -20,12 +20,12 @@ class HCB::PaymentAccountsController < ApplicationController
   end
 
   def index
-    @payment_accounts = current_user.hcb_payment_accounts
+    @payment_accounts = current_user.billing_profiles
   end
 
   def new
     @organizations = available_organizations
-    @payment_account = current_user.hcb_payment_accounts.build
+    @payment_account = current_user.billing_profiles.build
   end
 
   def create
@@ -35,7 +35,7 @@ class HCB::PaymentAccountsController < ApplicationController
       return
     end
 
-    @payment_account = current_user.hcb_payment_accounts.build(
+    @payment_account = current_user.billing_profiles.build(
       oauth_connection: current_user.hcb_oauth_connection,
       organization_id: org.id,
       organization_name: org.name,
@@ -61,12 +61,12 @@ class HCB::PaymentAccountsController < ApplicationController
   end
 
   def set_payment_account
-    @payment_account = current_user.hcb_payment_accounts.find(params[:id])
+    @payment_account = current_user.billing_profiles.find(params[:id])
   end
 
   def available_organizations
     current_user.hcb_oauth_connection.organizations.reject do |org|
-      HCB::PaymentAccount::BLOCKED_ORGANIZATION_IDS.include?(org.id)
+      BillingProfile::BLOCKED_ORGANIZATION_IDS.include?(org.id)
     end
   end
 

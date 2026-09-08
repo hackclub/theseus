@@ -31,9 +31,9 @@ class Views::Letter::InstantQueues::Show < Views::Letter::Queues::ShowBase
       span { queue.usps_payment_account.display_name }
     end
 
-    if queue.hcb_payment_account.present?
+    if queue.billing_profile.present?
       span(class: "detail-label") { "HCB Payment" }
-      span { queue.hcb_payment_account.organization_name }
+      span { queue.billing_profile.organization_name }
     end
 
     span(class: "detail-label") { "QR Code" }

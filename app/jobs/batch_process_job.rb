@@ -71,7 +71,7 @@ class BatchProcessJob < ApplicationJob
 
   def purchase_indicia(batch, options)
     usps_account = USPS::PaymentAccount.find(options[:usps_payment_account_id])
-    hcb_account = HCB::PaymentAccount.find(options[:hcb_payment_account_id])
+    hcb_account = BillingProfile.find(options[:hcb_payment_account_id])
 
     letters_to_buy = batch.letters.includes(:address, :usps_indicium)
                           .where(postage_type: "indicia")
@@ -102,7 +102,7 @@ class BatchProcessJob < ApplicationJob
       end
 
       xfer = HCB::TransferService.new(
-        hcb_payment_account: hcb_account,
+        billing_profile: hcb_account,
         amount_cents: estimated_cents,
         name: "Postage for #{batch.public_id}",
         memo: "[theseus] batch postage",
@@ -187,10 +187,10 @@ class BatchProcessJob < ApplicationJob
     amount = batch.hcb_transfer_amount_cents.to_i
     return if amount <= 0
 
-    hcb_account = HCB::PaymentAccount.find_by(id: options[:hcb_payment_account_id])
+    hcb_account = BillingProfile.find_by(id: options[:hcb_payment_account_id])
     return unless hcb_account
 
-    HCB::PaymentAccount.refund_to_organization!(
+    BillingProfile.refund_to_organization!(
       organization_id: hcb_account.organization_id,
       amount_cents: amount,
       name: "Auto-refund for #{batch.public_id} (failed before purchasing)",
@@ -208,7 +208,7 @@ class BatchProcessJob < ApplicationJob
     indicium = letter.usps_indicium || USPS::Indicium.create!(
       letter: letter,
       payment_account: usps_account,
-      hcb_payment_account: hcb_account,
+      billing_profile: hcb_account,
       mailing_date: batch.letter_mailing_date,
     )
     indicium.buy!(token) unless indicium.postage.present?

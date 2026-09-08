@@ -93,7 +93,7 @@ class Batch < ApplicationRecord
   self.inheritance_column = "type"
   belongs_to :user
   belongs_to :letter_queue, optional: true, class_name: "Letter::Queue"
-  belongs_to :hcb_payment_account, class_name: "HCB::PaymentAccount", optional: true
+  belongs_to :billing_profile, class_name: "BillingProfile", foreign_key: :hcb_payment_account_id, optional: true
   has_one_attached :csv
   has_one_attached :labels_pdf
   has_one_attached :pdf_document

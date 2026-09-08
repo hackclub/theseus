@@ -98,11 +98,11 @@ class Components::Letter::InstantQueues::Form < Components::Base
       )
 
       # HCB Payment Account
-      if current_user.hcb_payment_accounts.any?
+      if current_user.billing_profiles.any?
         select_field(
           name: "letter_instant_queue[hcb_payment_account_id]",
           label: "Pay with HCB Organization",
-          options: current_user.hcb_payment_accounts.map { |a| [a.organization_name, a.id] },
+          options: current_user.billing_profiles.map { |a| [a.organization_name, a.id] },
           selected: queue.hcb_payment_account_id
         )
       else

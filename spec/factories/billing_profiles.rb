@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: hcb_payment_accounts
@@ -21,7 +23,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 FactoryBot.define do
-  factory :hcb_payment_account, class: "HCB::PaymentAccount" do
+  factory :billing_profile, class: "BillingProfile" do
     association :user
     association :oauth_connection, factory: :hcb_oauth_connection
     organization_id { "org_test123" }

@@ -17,7 +17,7 @@ RSpec.describe BatchProcessJob, type: :job do
   end
   let(:usps_account) { create(:usps_payment_account, usps_mailer_id: mailer_id) }
   let(:hcb_oauth) { create(:hcb_oauth_connection, user: user) }
-  let(:hcb_account) { create(:hcb_payment_account, user: user, oauth_connection: hcb_oauth) }
+  let(:hcb_account) { create(:billing_profile, user: user, oauth_connection: hcb_oauth) }
 
   let(:process_options) do
     {
@@ -60,8 +60,8 @@ RSpec.describe BatchProcessJob, type: :job do
     allow_any_instance_of(HCB::TransferService).to receive(:call).and_return(fake_transfer)
     allow(USPS::PaymentAccount).to receive(:find).with(usps_account.id).and_return(usps_account)
     allow(usps_account).to receive(:create_payment_token).and_return(fake_payment_token)
-    allow(HCB::PaymentAccount).to receive(:find).with(hcb_account.id).and_return(hcb_account)
-    allow(HCB::PaymentAccount).to receive(:refund_to_organization!).and_return(true)
+    allow(BillingProfile).to receive(:find).with(hcb_account.id).and_return(hcb_account)
+    allow(BillingProfile).to receive(:refund_to_organization!).and_return(true)
     allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to)
     allow(batch).to receive(:generate_labels)
     # Stub Letter::Batch.find to return our batch instance (so generate_labels stub works)
@@ -145,7 +145,7 @@ RSpec.describe BatchProcessJob, type: :job do
         perform_job
 
         expect(HCB::TransferService).to have_received(:new).with(
-          hcb_payment_account: hcb_account,
+          billing_profile: hcb_account,
           amount_cents: anything,
           name: "Postage for #{batch.public_id}",
           memo: "[theseus] batch postage",
@@ -365,7 +365,7 @@ RSpec.describe BatchProcessJob, type: :job do
   end
 
   describe "batch records HCB transfer metadata" do
-    it "stores hcb_payment_account and hcb_transfer_id after indicia purchase" do
+    it "stores billing_profile and hcb_transfer_id after indicia purchase" do
       create_letters(1)
       stub_buy_success
 

@@ -265,22 +265,22 @@ class LettersController < ApplicationController
       return
     end
 
-    hcb_payment_account = current_user.hcb_payment_accounts.find_by(id: params[:hcb_payment_account_id])
+    billing_profile = current_user.billing_profiles.find_by(id: params[:hcb_payment_account_id])
 
-    if hcb_payment_account.blank?
-      redirect_to @letter, alert: "You must select an HCB payment account to purchase indicia."
+    if billing_profile.blank?
+      redirect_to @letter, alert: "You must select a billing profile to purchase indicia."
       return
     end
 
     indicium = USPS::Indicium.create!(
       letter: @letter,
       payment_account: usps_payment_account,
-      hcb_payment_account: hcb_payment_account,
+      billing_profile: billing_profile,
     )
     cost_cents = (@letter.postage * 100).ceil
 
     transfer_service = HCB::TransferService.new(
-      hcb_payment_account: hcb_payment_account,
+      billing_profile: billing_profile,
       amount_cents: cost_cents,
       name: "Postage for #{@letter.public_id} #{indicium.public_id} #{letter_path(@letter)}",
       memo: "[theseus] postage for a #{@letter.processing_category}",
@@ -306,8 +306,8 @@ class LettersController < ApplicationController
         redirect_to @letter, alert: "Postage was purchased but failed to save (#{e.message}). Do not retry — contact Nora."
       else
         # API call never went through, safe to clean up.
-        HCB::PaymentAccount.refund_to_organization!(
-          organization_id: hcb_payment_account.organization_id,
+        BillingProfile.refund_to_organization!(
+          organization_id: billing_profile.organization_id,
           amount_cents: cost_cents,
           name: "Refund for #{@letter.public_id} #{indicium.public_id} #{letter_path(@letter)}",
           memo: "[theseus] postage refund for a #{@letter.processing_category}",
@@ -319,7 +319,7 @@ class LettersController < ApplicationController
     end
 
     @letter.update_columns(indicia_state: "purchased")
-    redirect_to @letter, notice: "Indicia purchased successfully (charged to #{hcb_payment_account.organization_name})."
+    redirect_to @letter, notice: "Indicia purchased successfully (charged to #{billing_profile.organization_name})."
   end
 
   # GET /letters/scanner

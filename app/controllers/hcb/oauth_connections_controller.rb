@@ -35,7 +35,7 @@ class HCB::OauthConnectionsController < ApplicationController
       )
     end
 
-    redirect_to hcb_payment_accounts_path, notice: "HCB account linked! Now create a payment account."
+    redirect_to hcb_payment_accounts_path, notice: "HCB account linked! Now create a billing profile."
   end
 
   private
