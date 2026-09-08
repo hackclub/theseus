@@ -50,6 +50,8 @@
         <span><%= @warehouse_order.notify_on_dispatch? ? "Yes" : "No" %></span>
         <span class="detail-label">Zenventory</span>
         <span><code><%= @warehouse_order.zenventory_id || "—" %></code></span>
+        <span class="detail-label">Billing</span>
+        <span><%= @warehouse_order.billing_profile&.organization_name || "—" %></span>
       </div>
     </section>
 

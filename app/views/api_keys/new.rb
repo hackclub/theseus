@@ -46,6 +46,19 @@ class Views::APIKeys::New < Views::Base
                 end
               end
 
+              if current_user.billing_profiles.any?
+                div(style: "margin-bottom: 1rem; margin-top: 1rem;") do
+                  label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Default Billing Profile" }
+                  select(name: "api_key[billing_profile_id]", style: "width: 100%;") do
+                    option(value: "") { "None (no billing)" }
+                    current_user.billing_profiles.each do |profile|
+                      option(value: profile.id) { profile.organization_name }
+                    end
+                  end
+                  p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0;") { "Warehouse orders created through this key will bill this organization." }
+                end
+              end
+
               button(type: "submit", class: "btn-success", style: "width: 100%;") { "🔑 Create API Key" }
             end
           end

@@ -14,7 +14,7 @@ class APIKeysController < ApplicationController
   end
 
   def create
-    permitted_params = [:name, :pii, :qz_only]
+    permitted_params = [:name, :pii, :qz_only, :billing_profile_id]
     permitted_params << :may_impersonate if current_user.admin?
 
     @api_key = APIKey.new(params.require(:api_key).permit(*permitted_params).merge(user: current_user))

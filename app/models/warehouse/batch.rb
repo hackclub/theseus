@@ -80,6 +80,7 @@ class Warehouse::Batch < Batch
         recipient_email: address.email,
         address: address,
         user: user,
+        billing_profile: billing_profile,
         idempotency_key: "batch_#{id}_address_#{address.id}",
         user_facing_title: warehouse_user_facing_title,
         tags: tags,

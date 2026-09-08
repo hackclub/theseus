@@ -27,7 +27,9 @@ module API
       def from_template
         @template = Warehouse::Template.find_by_public_id!(params[:template_id])
         address = parse_address_from_params(permit_address_params)
-        @warehouse_order = Warehouse::Order.from_template(@template, warehouse_order_params.merge(address:, user: current_user))
+        @warehouse_order = Warehouse::Order.from_template(@template, warehouse_order_params.merge(
+          address:, user: current_user, billing_profile: resolve_billing_profile,
+        ))
         authorize @warehouse_order
 
         # Build additional line items from contents if provided
@@ -53,7 +55,9 @@ module API
 
       def create
         address = parse_address_from_params(permit_address_params)
-        @warehouse_order = Warehouse::Order.new(warehouse_order_params.merge(address:, user: current_user))
+        @warehouse_order = Warehouse::Order.new(warehouse_order_params.merge(
+          address:, user: current_user, billing_profile: resolve_billing_profile,
+        ))
         authorize @warehouse_order
         address.save!
 
@@ -92,6 +96,15 @@ module API
           wp.require(:recipient_email)
           wp.require(:tags)
           raise ActionController::ParameterMissing.new(:tags) if wp[:tags].blank? || wp[:tags].empty?
+        end
+      end
+
+      # Per-request billing_profile_id overrides the API key's default
+      def resolve_billing_profile
+        if params[:billing_profile_id].present?
+          BillingProfile.find(params[:billing_profile_id])
+        else
+          current_token.billing_profile
         end
       end
 

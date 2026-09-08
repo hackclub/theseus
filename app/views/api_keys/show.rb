@@ -82,6 +82,12 @@ class Views::APIKeys::Show < Views::Base
           span(class: "detail-label") { "Revoked" }
           span(style: "color: var(--red);") { api_key.revoked_at.strftime("%b %d, %Y %H:%M") }
         end
+        span(class: "detail-label") { "Billing Profile" }
+        if api_key.billing_profile.present?
+          span { api_key.billing_profile.organization_name }
+        else
+          span(class: "text-muted") { "None" }
+        end
       end
     end
   end

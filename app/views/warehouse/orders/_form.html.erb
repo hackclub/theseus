@@ -64,6 +64,23 @@
     </div>
   </section>
 
+  <% if current_user.billing_profiles.any? %>
+    <section style="margin-bottom: 1rem;">
+      <strong>Billing</strong>
+      <hr>
+      <div style="margin-top: 0.5rem;">
+        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Billing Profile</label>
+        <select name="warehouse_order[billing_profile_id]" style="width: 100%;">
+          <option value="">None</option>
+          <% current_user.billing_profiles.each do |profile| %>
+            <option value="<%= profile.id %>" <%= "selected" if warehouse_order.billing_profile_id == profile.id %>><%= profile.organization_name %></option>
+          <% end %>
+        </select>
+        <span style="display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25rem;">Which HCB organization pays for this order?</span>
+      </div>
+    </section>
+  <% end %>
+
   <%= render 'shared/primer_tag_picker', form: form, taggable: warehouse_order %>
 
   <div style="display:flex;align-items:center;gap:0.5rem">

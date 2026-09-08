@@ -154,6 +154,7 @@ class Warehouse::OrdersController < ApplicationController
       :internal_notes,
       :recipient_email,
       :notify_on_dispatch,
+      :billing_profile_id,
       tags: [],
       line_items_attributes: [:id, :sku_id, :quantity, :_destroy],
       address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email],
