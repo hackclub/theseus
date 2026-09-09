@@ -137,6 +137,23 @@
 // Trailing "Actions" table cell that holds the icon links above.
 .actions-cell { text-align: right; white-space: nowrap; }
 
+// Roomier empty-state block for admin index pages (USPS, common tags).
+.empty-state-lg { text-align: center; padding: 3rem 1rem; }
+
+// ── Admin::Users::Show ───────────────────────────────────
+
+.object-cover { object-fit: cover; }
+.flag-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; }
+.help-hint { color: var(--foreground2); cursor: help; }
+.text-muted-italic { color: var(--foreground2); font-style: italic; }
+.billing-orgs-label { font-weight: normal; font-size: 0.85em; margin-left: 0.5rem; }
+
+// ── Admin::Users::Index ──────────────────────────────────
+
+.col-avatar { width: 2.5rem; }
+.align-middle { vertical-align: middle; }
+.mr-quarter { margin-right: 0.25rem; }
+
 // ── Batches::Show (generic Batch, not Letter::Batch) ─────
 
 // Danger-zone section outlined in red instead of the default border.

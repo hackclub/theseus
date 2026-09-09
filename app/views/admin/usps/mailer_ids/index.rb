@@ -17,20 +17,20 @@ class Views::Admin::USPS::MailerIds::Index < Views::Base
           th { "Name" }
           th { "CRID" }
           th { "MID" }
-          th(style: "text-align: right;") { "" }
+          th(class: "text-right") { "" }
         end
       end
       tbody do
         @mailer_ids.each do |mailer_id|
           tr do
             td do
-              a(href: admin_usps_mailer_id_path(mailer_id), style: "text-decoration:none;font-weight:600;") { mailer_id.name }
+              a(href: admin_usps_mailer_id_path(mailer_id), class: "link-strong") { mailer_id.name }
             end
             td(class: "text-muted") { mailer_id.crid }
             td(class: "text-muted") { mailer_id.mid }
-            td(style: "text-align:right;white-space:nowrap;") do
-              a(href: edit_admin_usps_mailer_id_path(mailer_id), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
-              button_to "✕", admin_usps_mailer_id_path(mailer_id), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this mailer ID?')"
+            td(class: "actions-cell") do
+              a(href: edit_admin_usps_mailer_id_path(mailer_id), class: "icon-link") { "✎" }
+              button_to "✕", admin_usps_mailer_id_path(mailer_id), method: :delete, form: { class: "form-inline" }, class: "btn-link-danger", onclick: "return confirm('Delete this mailer ID?')"
             end
           end
         end
