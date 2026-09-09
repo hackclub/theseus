@@ -150,24 +150,42 @@ RSpec.describe Billing::Reconciler do
     expect(t.reload.remote_id).to eq("xfr_ours")
   end
 
-  it "will not declare a transfer absent when the listing hit the page ceiling" do
+  it "keeps paginating well past the old five-page budget" do
+    t = unknown_transfer(500)
+    pages = Array.new(5) { |i| [ remote(id: "xfr_noise#{i}", cents: 999) ] }
+    pages << [ remote(id: "xfr_ours", cents: 500) ]
+    stub_hq_transactions(pages: pages)
+
+    expect(described_class.new(t).call.outcome).to eq(:completed)
+    expect(t.reload.remote_id).to eq("xfr_ours")
+  end
+
+  it "will not declare a transfer absent when even the safety valve is hit, and says so once" do
+    allow(Billing::Alert).to receive(:reconcile_truncated).and_call_original
     t = unknown_transfer(500, created_at: 3.hours.ago)
-    pages = Array.new(described_class::MAX_PAGES) { |i| [ remote(id: "xfr_noise#{i}", cents: 999) ] }
-    stub_hq_transactions(pages: pages, more: true)
+    pages = Array.new(described_class::MAX_PAGES + 2) { |i| [ remote(id: "xfr_noise#{i}", cents: 999) ] }
+    stub_hq_transactions(pages: pages)
 
     result = described_class.new(t).call
     expect(result.outcome).to eq(:waiting)
     expect(t.reload).to be_unknown
     expect(t.metadata["reconciled_by"]).to eq("ceiling")
+    expect(Billing::Alert).to have_received(:reconcile_truncated).with(t, described_class::MAX_PAGES).once
+
+    # the reconcile cron runs again: still stuck, but we don't re-alert
+    expect(described_class.new(t.reload).call.outcome).to eq(:waiting)
+    expect(Billing::Alert).to have_received(:reconcile_truncated).once
   end
 
-  it "does declare it absent when the listing was exhausted inside the ceiling" do
+  it "does declare it absent when the listing was exhausted inside the safety valve" do
+    allow(Billing::Alert).to receive(:reconcile_truncated)
     t = unknown_transfer(500, created_at: 3.hours.ago)
     pages = Array.new(described_class::MAX_PAGES) { |i| [ remote(id: "xfr_noise#{i}", cents: 999) ] }
     stub_hq_transactions(pages: pages, more: false)
 
     expect(described_class.new(t).call.outcome).to eq(:failed)
     expect(t.reload.metadata["reconciled_by"]).to eq("absent")
+    expect(Billing::Alert).not_to have_received(:reconcile_truncated)
   end
 
   it "flags ambiguous matches for a human instead of guessing" do

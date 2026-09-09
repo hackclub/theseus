@@ -40,6 +40,20 @@ module Billing::Alert
     Billing::SlackNotifyJob.notify(transfer, "ambiguous")
   end
 
+  # The reconciler read MAX_PAGES of HCB history and there was still more
+  # behind it, so it cannot prove the transfer is absent and won't hand it
+  # back to the sweep. Nothing is double-charged and nothing is lost, but the
+  # transfer sits `unknown` until a human looks — so this is an ops problem
+  # (the window needs widening), not a billing problem for the org. No mail.
+  def self.reconcile_truncated(transfer, pages)
+    Rails.logger.warn("[billing] reconcile: listing truncated at #{pages} pages for #{transfer.idempotency_key}")
+    Sentry.capture_message(
+      "reconcile: listing truncated at #{pages} pages for #{transfer.idempotency_key}; cannot prove the transfer is absent",
+      level: :error, tags: { money: true, billing_reconcile_truncated: true },
+      extra: { transfer_id: transfer.id, hq_organization_id: transfer.hq_organization_id, pages: pages },
+    ) if defined?(Sentry)
+  end
+
   def self.ledger_mismatch(transfer, pending_cents)
     Sentry.capture_message(
       "billing ledger mismatch: transfer #{transfer.idempotency_key} is #{transfer.amount_cents}c but its pending entries sum to #{pending_cents}c; refused to send",
