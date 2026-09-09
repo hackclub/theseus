@@ -27,9 +27,29 @@ RSpec.describe Billing::Reconciler do
       transfer: FakeHCB::RemoteTransfer.new(id: id, transaction_id: "txn_#{id}", amount_cents: cents, memo: memo, from: from, to: to))
   end
 
-  def stub_hq_transactions(*txs)
-    list = double("list")
-    allow(list).to receive(:auto_paginate) { |max_pages:| txs.each }
+  # Stands in for HCBV4::TransactionList: pages of transactions, each knowing
+  # whether anything follows it. `more:` says there are further pages beyond
+  # the ones handed in — i.e. the ceiling is real.
+  FakePage = Struct.new(:txs, :more, keyword_init: true) do
+    def each(&block) = txs.each(&block)
+    def has_more? = !!more
+  end
+
+  FakeList = Struct.new(:pages, :more, keyword_init: true) do
+    def each_page
+      return enum_for(:each_page) unless block_given?
+      pages.each_with_index do |txs, i|
+        last = i == pages.size - 1
+        page = FakePage.new(txs: txs, more: last ? more : true)
+        yield page
+        break unless page.has_more?
+        raise "fake list ran off the end: reconciler asked for page #{i + 2}" if last
+      end
+    end
+  end
+
+  def stub_hq_transactions(*txs, pages: nil, more: false)
+    list = FakeList.new(pages: pages || [ txs ], more: more)
     client = double("theseus client")
     allow(client).to receive(:transactions).with(hq_id, hash_including(:filters)).and_return(list)
     allow(BillingProfile).to receive(:theseus_client).and_return(client)
@@ -63,6 +83,27 @@ RSpec.describe Billing::Reconciler do
     expect(t.reload).to be_unknown
   end
 
+  it "treats a memo carrying our own key as a definite match, outranking everything else" do
+    t = unknown_transfer(500)
+    stub_hq_transactions(
+      remote(id: "xfr_decoy", cents: 500),                                              # would match on amount alone
+      remote(id: "xfr_ours", cents: 999, memo: "Postage [#{t.idempotency_key}]"),       # HCB reflected our tagged_name
+    )
+
+    expect(described_class.new(t).call.outcome).to eq(:completed)
+    expect(t.reload).to be_completed
+    expect(t.remote_id).to eq("xfr_ours")
+    expect(t.metadata["reconciled_by"]).to eq("match")
+  end
+
+  it "still excludes a remote transfer carrying somebody else's key" do
+    t = unknown_transfer(500)
+    stub_hq_transactions(remote(id: "xfr_theirs", cents: 500, memo: "Postage [th_someotherkey]"))
+
+    expect(described_class.new(t).call.outcome).to eq(:waiting)
+    expect(t.reload).to be_unknown
+  end
+
   it "matches credits on the destination org" do
     t = unknown_transfer(300, direction: :credit)
     stub_hq_transactions(
@@ -84,6 +125,49 @@ RSpec.describe Billing::Reconciler do
     expect(old.reload).to be_failed
     expect(old).to be_retryable
     expect(old.metadata["reconciled_by"]).to eq("absent")
+  end
+
+  it "measures the grace period from the last attempt, not from creation" do
+    # NSF backoff can keep a transfer alive for hours; the attempt that went
+    # unknown is what HCB is still catching up on.
+    t = unknown_transfer(500, created_at: 3.hours.ago)
+    t.update!(attempts: 4, last_attempted_at: 10.minutes.ago)
+    stub_hq_transactions
+
+    expect(described_class.new(t).call.outcome).to eq(:waiting)
+    expect(t.reload).to be_unknown
+    expect(t.metadata["reconciled_by"]).to be_nil
+  end
+
+  it "reads across pages" do
+    t = unknown_transfer(500)
+    stub_hq_transactions(pages: [
+      [ remote(id: "xfr_noise", cents: 999) ],
+      [ remote(id: "xfr_ours", cents: 500) ]
+    ])
+
+    expect(described_class.new(t).call.outcome).to eq(:completed)
+    expect(t.reload.remote_id).to eq("xfr_ours")
+  end
+
+  it "will not declare a transfer absent when the listing hit the page ceiling" do
+    t = unknown_transfer(500, created_at: 3.hours.ago)
+    pages = Array.new(described_class::MAX_PAGES) { |i| [ remote(id: "xfr_noise#{i}", cents: 999) ] }
+    stub_hq_transactions(pages: pages, more: true)
+
+    result = described_class.new(t).call
+    expect(result.outcome).to eq(:waiting)
+    expect(t.reload).to be_unknown
+    expect(t.metadata["reconciled_by"]).to eq("ceiling")
+  end
+
+  it "does declare it absent when the listing was exhausted inside the ceiling" do
+    t = unknown_transfer(500, created_at: 3.hours.ago)
+    pages = Array.new(described_class::MAX_PAGES) { |i| [ remote(id: "xfr_noise#{i}", cents: 999) ] }
+    stub_hq_transactions(pages: pages, more: false)
+
+    expect(described_class.new(t).call.outcome).to eq(:failed)
+    expect(t.reload.metadata["reconciled_by"]).to eq("absent")
   end
 
   it "flags ambiguous matches for a human instead of guessing" do
