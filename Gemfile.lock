@@ -1,3 +1,10 @@
+GIT
+  remote: https://github.com/24c02/ttfunk.git
+  revision: c38d7521fa2679c1370f8ff07b932b0a79c36034
+  specs:
+    ttfunk (1.8.0)
+      bigdecimal (~> 3.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -669,8 +676,6 @@ GEM
       mcp (>= 1.0)
       rails (>= 7.0)
     tsort (0.2.0)
-    ttfunk (1.8.0)
-      bigdecimal (~> 3.1)
     turbo-rails (2.0.23)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
@@ -807,7 +812,7 @@ DEPENDENCIES
   stimulus-rails
   thruster
   toolchest (~> 0.4)
-  ttfunk (~> 1.8)
+  ttfunk!
   turbo-rails
   tzinfo-data
   usps_intelligent_barcode (~> 1.0)

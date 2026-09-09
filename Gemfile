@@ -173,7 +173,8 @@ gem "phlex-pdf", "~> 0.1.2"
 gem "paper_trail", "~> 17.0"
 gem "sssecrets"
 
-gem "ttfunk", "~> 1.8"
+# fork = upstream PR #106 (maxp glyph mapping fix), unreleased as of 1.8.0; drop when ttfunk > 1.8.0 ships
+gem "ttfunk", github: "24c02/ttfunk"
 
 gem "hcbv4", "~> 0.2"
 
