@@ -19,8 +19,8 @@ class Views::Settings::Show < Views::Base
         hr
 
         if @user.warehouse_czar?
-          div(style: "margin-top:0.5rem;") do
-            div(style: "display:flex;align-items:center;gap:0.5rem;") do
+          div(class: "mt-half") do
+            div(class: "flex-row") do
               input(type: "hidden", name: "settings[czar_notifications]", value: "0")
               input(
                 type: "checkbox",
@@ -39,7 +39,7 @@ class Views::Settings::Show < Views::Base
         end
       end
 
-      div(style: "margin-top:1rem;") do
+      div(class: "mt-1") do
         button(type: "submit", class: "btn-success") { "Save Settings" }
       end
     end

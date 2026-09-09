@@ -1,9 +1,9 @@
 <% if record.batch.present? %>
   <% batch_path = record.batch.is_a?(Letter::Batch) ? letter_batch_path(record.batch) : warehouse_batch_path(record.batch) %>
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Batch</strong>
     <hr>
-    <div class="detail-grid" style="margin-top: 0.5rem;">
+    <div class="detail-grid mt-half">
       <span class="detail-label">Batch</span>
       <span><a href="<%= batch_path %>"><%= record.batch.type.split('::').first.titleize %> Batch #<%= record.batch.id %></a></span>
       <span class="detail-label">Status</span>

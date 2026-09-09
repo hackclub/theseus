@@ -1,7 +1,7 @@
 <% content_for :title, "Billing Profiles" %>
 
 <div class="toolbar">
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <strong style="font-size: 1.15em;">Billing Profiles</strong>
   </div>
   <span class="spacer"></span>
@@ -41,15 +41,15 @@
     </div>
 
     <div class="show-sidebar">
-      <section style="margin-bottom: 1rem;">
+      <section class="mb-1">
         <strong>Account Status</strong>
         <hr>
-        <div style="margin-top: 0.5rem;">
-          <div style="display:flex;align-items:center;gap:0.5rem">
+        <div class="mt-half">
+          <div class="flex-row">
             <span style="color: var(--green);">✓</span>
             <span style="font-weight: 500; color: var(--green);">HCB Connected</span>
           </div>
-          <div class="text-muted" style="margin-top: 0.5rem;">
+          <div class="text-muted mt-half">
             Your account is linked to HCB. You can pay for postage using any of your organizations' funds.
           </div>
         </div>
@@ -59,7 +59,7 @@
 <% else %>
   <section style="text-align: center; padding: 2rem; max-width: 30rem; margin: 2rem auto;">
     <strong style="font-size: 1.15em;">🔗 Connect to HCB</strong>
-    <div class="text-muted" style="margin-top: 0.5rem; margin-bottom: 1rem;">Link your HCB account to pay for postage directly from your organization's funds.</div>
+    <div class="text-muted mt-half mb-1">Link your HCB account to pay for postage directly from your organization's funds.</div>
     <a href="<%= new_hcb_oauth_connection_path %>"><button class="btn-success">Connect HCB Account</button></a>
   </section>
 <% end %>

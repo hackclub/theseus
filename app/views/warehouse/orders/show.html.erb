@@ -1,22 +1,22 @@
 <% content_for :title, "Order #{@warehouse_order.hc_id}" %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_orders_path %>" style="text-decoration: none; color: var(--foreground2);">← Orders</a>
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
+    <a href="<%= warehouse_orders_path %>" class="text-muted" style="text-decoration: none">← Orders</a>
     <strong style="font-size: 1.15em;">Order <%= @warehouse_order.hc_id %></strong>
     <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
   </div>
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <%= render Components::Shared::PublicId.new(value: @warehouse_order.hc_id) %>
     <% if @warehouse_order.user_facing_title.present? %>
-      <span style="color: var(--foreground2);"><%= @warehouse_order.user_facing_title %></span>
+      <span class="text-muted"><%= @warehouse_order.user_facing_title %></span>
     <% end %>
     <% @warehouse_order.tags.compact_blank.each do |tag| %>
       <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span class="badge"><%= tag %></span></a>
     <% end %>
   </div>
   <span class="spacer"></span>
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <a href="<%= edit_warehouse_order_path(@warehouse_order) %>">✎ Edit</a>
     <a href="<%= public_package_path(@warehouse_order) %>" target="_blank">↗ Public</a>
     <% if @warehouse_order.zenventory_url.present? %>
@@ -34,10 +34,10 @@
   <div class="show-main">
 
     <!-- Details -->
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Details</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">Created</span>
         <span><%= @warehouse_order.created_at.strftime("%b %d, %Y %H:%M") %></span>
         <span class="detail-label">Created by</span>
@@ -56,10 +56,10 @@
     </section>
 
     <!-- Contents -->
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Contents</strong>
       <hr>
-      <table style="margin-top: 0.5rem; width: 100%;">
+      <table class="mt-half w-100">
         <thead>
           <tr>
             <th style="text-align: left;">SKU</th>
@@ -73,11 +73,11 @@
             <tr>
               <td>
                 <%= link_to li.sku.name, warehouse_sku_path(li.sku) %>
-                <span style="color: var(--foreground2);"><code><%= li.sku.sku %></code></span>
+                <span class="text-muted"><code><%= li.sku.sku %></code></span>
               </td>
               <td style="text-align: right; font-variant-numeric: tabular-nums;"><strong><%= li.quantity %></strong></td>
-              <td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--foreground2);"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
-              <td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--foreground2);"><%= number_to_currency(li.sku.declared_unit_cost) %></td>
+              <td class="text-muted" style="text-align: right; font-variant-numeric: tabular-nums"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
+              <td class="text-muted" style="text-align: right; font-variant-numeric: tabular-nums"><%= number_to_currency(li.sku.declared_unit_cost) %></td>
             </tr>
           <% end %>
         </tbody>
@@ -93,12 +93,12 @@
     </section>
 
     <!-- Recipient -->
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Recipient</strong>
       <hr>
-      <div style="margin-top: 0.5rem;">
+      <div class="mt-half">
         <strong><%= @warehouse_order.address.first_name %> <%= @warehouse_order.address.last_name %></strong><br>
-        <span style="color: var(--foreground2);">
+        <span class="text-muted">
           <%= @warehouse_order.address.line_1 %><br>
           <% if @warehouse_order.address.line_2.present? %><%= @warehouse_order.address.line_2 %><br><% end %>
           <%= @warehouse_order.address.city %>, <%= @warehouse_order.address.state %> <%= @warehouse_order.address.postal_code %><br>
@@ -106,17 +106,17 @@
         </span>
         <% if @warehouse_order.recipient_email.present? %>
           <hr style="margin:0.5rem 0">
-          <span style="color: var(--foreground2);">✉</span> <%= link_to @warehouse_order.recipient_email, "mailto:#{@warehouse_order.recipient_email}" %>
+          <span class="text-muted">✉</span> <%= link_to @warehouse_order.recipient_email, "mailto:#{@warehouse_order.recipient_email}" %>
         <% end %>
       </div>
     </section>
 
     <% if @warehouse_order.mailed? %>
       <!-- Shipping -->
-      <section style="margin-bottom: 1rem;">
+      <section class="mb-1">
         <strong>Shipping</strong>
         <hr>
-        <div class="detail-grid" style="margin-top: 0.5rem;">
+        <div class="detail-grid mt-half">
           <span class="detail-label">Carrier</span>
           <span><%= @warehouse_order.pretty_via %></span>
           <% if @warehouse_order.tracking_number.present? %>
@@ -135,7 +135,7 @@
           <% end %>
         </div>
         <% if @warehouse_order.might_be_slow? %>
-          <div style="margin-top: 0.5rem;">
+          <div class="mt-half">
             <div class="banner banner-warning">⚠ International shipping may take 2–4 weeks</div>
           </div>
         <% end %>
@@ -143,14 +143,14 @@
     <% end %>
 
     <% if @warehouse_order.batch.present? %>
-      <section style="margin-bottom: 1rem;">
+      <section class="mb-1">
         <strong>Batch</strong>
         <hr>
-        <div style="margin-top: 0.5rem;">
+        <div class="mt-half">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <span>
               <strong>Batch #<%= @warehouse_order.batch.id %></strong>
-              <span style="color: var(--foreground2);"><%= @warehouse_order.batch.aasm.current_state.to_s.titleize %></span>
+              <span class="text-muted"><%= @warehouse_order.batch.aasm.current_state.to_s.titleize %></span>
             </span>
             <a href="<%= letter_batch_path(@warehouse_order.batch) %>">View Batch →</a>
           </div>
@@ -159,7 +159,7 @@
     <% end %>
 
     <% if @warehouse_order.internal_notes.present? %>
-      <section style="margin-bottom: 1rem;">
+      <section class="mb-1">
         <strong>Internal Notes</strong>
         <hr>
         <pre style="margin: 0.5rem 0 0; white-space: pre-wrap;"><%= @warehouse_order.internal_notes %></pre>
@@ -172,23 +172,23 @@
 
   <div class="show-sidebar">
     <!-- Actions -->
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Actions</strong>
       <hr>
-      <div style="margin-top: 0.5rem;">
+      <div class="mt-half">
         <% has_action = false %>
 
         <% if policy(@warehouse_order).send_to_warehouse? && @warehouse_order.may_mark_dispatched? %>
           <% has_action = true %>
           <%= form_with url: send_to_warehouse_warehouse_order_path(@warehouse_order), method: :post do %>
-            <button type="submit" class="btn-success" style="width: 100%;">✓ Send to Warehouse</button>
+            <button type="submit" class="btn-success w-100">✓ Send to Warehouse</button>
           <% end %>
         <% end %>
 
         <% if @warehouse_order.may_mark_canceled? && policy(@warehouse_order).cancel? %>
           <% has_action = true %>
-          <a href="<%= cancel_warehouse_order_path(@warehouse_order) %>" style="display: block; margin-top: 0.5rem;">
-            <button class="btn-danger btn-sm" style="width: 100%;">× Cancel Order</button>
+          <a href="<%= cancel_warehouse_order_path(@warehouse_order) %>" class="mt-half" style="display: block">
+            <button class="btn-danger btn-sm w-100">× Cancel Order</button>
           </a>
         <% end %>
 
@@ -196,25 +196,25 @@
           <% if @warehouse_order.mailed? %>
             <div style="text-align: center; padding: 1rem 0; color: var(--green);">
               <span style="font-size: 2em;">✓</span>
-              <div style="margin-top: 0.5rem;"><strong>Shipped</strong></div>
+              <div class="mt-half"><strong>Shipped</strong></div>
             </div>
           <% elsif @warehouse_order.canceled_at.present? %>
-            <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">
+            <div class="text-muted" style="text-align: center; padding: 1rem 0">
               <span style="font-size: 2em;">×</span>
-              <div style="margin-top: 0.5rem;"><strong>Canceled</strong></div>
+              <div class="mt-half"><strong>Canceled</strong></div>
             </div>
           <% else %>
-            <span style="color: var(--foreground2);">No actions available</span>
+            <span class="text-muted">No actions available</span>
           <% end %>
         <% end %>
       </div>
     </section>
 
     <!-- Cost Summary -->
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Cost Summary</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">Contents</span>
         <span><%= number_to_currency(@warehouse_order.contents_actual_cost_to_hc) %></span>
         <span class="detail-label">Labor</span>
@@ -233,7 +233,7 @@
     <section>
       <strong>Timeline</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">Created</span>
         <span><%= @warehouse_order.created_at.strftime("%b %d, %Y") %></span>
         <% if @warehouse_order.dispatched_at.present? %>

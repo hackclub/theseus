@@ -21,7 +21,7 @@ class Components::Shared::PageHeader < Components::Base
           end
         end
         if @subtitle
-          span(style: "color:var(--foreground2)") { @subtitle }
+          span(class: "text-muted") { @subtitle }
         end
       end
       if @actions_block

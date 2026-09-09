@@ -40,17 +40,17 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   def header_section
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: letter_queues_path, style: "text-decoration: none; color: var(--foreground2);") { "← Queues" }
         strong(style: "font-size: 1.15em;") { queue.name }
         type_badge
         queue_status_badge
       end
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         span(class: "text-muted") { queue.slug }
       end
       span(class: "spacer")
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: edit_queue_path) { "✎ Edit" }
         admin_tool do
           form_with(url: queue_show_path, method: :delete, data: { turbo_confirm: "Delete this queue?" }, class: "form-inline") do
@@ -80,10 +80,10 @@ class Views::Letter::Queues::ShowBase < Views::Base
   # --- Queue Details ---
 
   def queue_details_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Details" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         admin_tool do
           span(class: "detail-label") { "Owner" }
           span { render_user_mention(queue.user) }
@@ -113,10 +113,10 @@ class Views::Letter::Queues::ShowBase < Views::Base
   end
 
   def return_address_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Return Address" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         render_address(queue)
       end
     end
@@ -128,7 +128,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
   # --- Letters Section ---
 
   def letters_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       div(style: "display:flex;align-items:center") do
         strong { "Letters" }
         span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{letters.count})" } if letters.any?
@@ -177,7 +177,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
             name: "search",
             placeholder: "Search by name or email...",
             value: search,
-            style: "width: 100%;"
+            class: "w-100"
           )
         end
       end
@@ -214,13 +214,13 @@ class Views::Letter::Queues::ShowBase < Views::Base
   # --- Sidebar ---
 
   def actions_sidebar
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Actions" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         make_batch_section
         a(href: edit_queue_path, style: "display: block; margin-top: 0.5rem;") do
-          button(class: "btn-sm", style: "width: 100%;") { "✎ Edit Queue" }
+          button(class: "btn-sm w-100") { "✎ Edit Queue" }
         end
       end
     end
@@ -230,10 +230,10 @@ class Views::Letter::Queues::ShowBase < Views::Base
     active_states = LETTER_STATES.select { |s| letter_counts.fetch(s, 0) > 0 }
     return if active_states.empty?
 
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Stats" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         active_states.each do |state|
           div(style: "display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;") do
             span(class: "text-muted") { state.capitalize }
@@ -300,7 +300,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
   end
 
   def render_user_mention(user)
-    div(style: "display:flex;align-items:center;gap:0.5rem") do
+    div(class: "flex-row") do
       if user.icon_url.present?
         img(src: user.icon_url, width: 20, height: 20, style: "border-radius: 50%;", alt: "")
       end
@@ -310,9 +310,9 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   def admin_inspector(record)
     admin_tool do
-      details(style: "margin-top: 1rem;") do
-        summary(style: "color: var(--foreground2); cursor: pointer;") { "Inspect #{record.class.name.underscore}" }
-        section(style: "margin-top: 0.5rem;") do
+      details(class: "mt-1") do
+        summary(class: "text-muted pointer") { "Inspect #{record.class.name.underscore}" }
+        section(class: "mt-half") do
           pre(style: "margin: 0; overflow-x: auto; font-size: 0.85em;") { JSON.pretty_generate(record.as_json) }
         end
       end

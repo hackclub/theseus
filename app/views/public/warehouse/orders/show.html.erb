@@ -13,7 +13,7 @@
   <%= @package.humanized_state %>
 </div>
 <% if @package.tracking_number %>
-  <div style="margin-top: 1rem;">
+  <div class="mt-1">
     <b>Tracking:</b>
     <div>
       <%= @package.pretty_via %>
@@ -29,7 +29,7 @@
     <% end %>
   </div>
 <% end %>
-<div style="margin-top: 1rem; margin-bottom: 1rem;">
+<div class="mt-1 mb-1">
   <b>Contents:</b>
   <div class="field-row">
     <div class="sunken-panel w-100">
@@ -75,7 +75,7 @@
   </div>
 <% end %>
 <% if @package.tags.any? %>
-  <div style="margin-top: 1rem;">
+  <div class="mt-1">
     <b>Tags:</b>
     <div class="field-row">
       <%= @package.tags.join(", ") %>
@@ -83,7 +83,7 @@
   </div>
 <% end %>
 <% if current_public_user&.email == @package.recipient_email && !@package.address.us? && @package.mailed?  %>
-  <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+  <div class="mt-1" style="display: flex; justify-content: flex-end">
     <%= button_to "generate customs receipt", package_customs_receipt_path(@package), method: :get %>
   </div>
 <% end %>

@@ -1,6 +1,6 @@
 <%= form_with(model: purchase_order, url: purchase_order.persisted? ? warehouse_purchase_order_path(purchase_order) : warehouse_purchase_orders_path) do |form| %>
   <% if purchase_order.errors.any? %>
-    <div style="margin-bottom: 1rem; color: var(--red);">
+    <div class="mb-1" style="color: var(--red)">
       <strong>[!] <%= pluralize(purchase_order.errors.count, "error") %>:</strong>
       <ul style="margin: 0.25rem 0 0; padding-left: 1rem;">
         <% purchase_order.errors.each do |error| %>
@@ -10,33 +10,33 @@
     </div>
   <% end %>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Supplier Information</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
-      <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Supplier name <span style="color: var(--red);">*</span></label>
-        <input type="text" name="warehouse_purchase_order[supplier_name]" value="<%= purchase_order.supplier_name %>" required style="width: 100%;">
+    <div class="mt-half">
+      <div class="mb-half">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Supplier name <span style="color: var(--red);">*</span></label>
+        <input type="text" name="warehouse_purchase_order[supplier_name]" value="<%= purchase_order.supplier_name %>" required class="w-100">
       </div>
-      <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Supplier ID</label>
-        <input type="text" name="warehouse_purchase_order[supplier_id]" value="<%= purchase_order.supplier_id %>" style="width: 100%;">
+      <div class="mb-half">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Supplier ID</label>
+        <input type="text" name="warehouse_purchase_order[supplier_id]" value="<%= purchase_order.supplier_id %>" class="w-100">
       </div>
-      <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Required by date</label>
+      <div class="mb-half">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Required by date</label>
         <%= form.date_field :required_by_date, style: "width: 100%;" %>
       </div>
-      <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Notes</label>
-        <textarea name="warehouse_purchase_order[notes]" rows="3" style="width: 100%;"><%= purchase_order.notes %></textarea>
+      <div class="mb-half">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Notes</label>
+        <textarea name="warehouse_purchase_order[notes]" rows="3" class="w-100"><%= purchase_order.notes %></textarea>
       </div>
     </div>
   </section>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Line Items</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
+    <div class="mt-half">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: :enabled,
@@ -46,9 +46,9 @@
     </div>
   </section>
 
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <span class="spacer"></span>
-    <a href="<%= warehouse_purchase_orders_path %>" style="color: var(--foreground2);">Cancel</a>
+    <a href="<%= warehouse_purchase_orders_path %>" class="text-muted">Cancel</a>
     <button type="submit" class="btn-success">✓ <%= purchase_order.persisted? ? "Update Purchase Order" : "Create Purchase Order" %></button>
   </div>
 <% end %>

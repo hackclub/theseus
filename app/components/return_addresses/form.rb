@@ -25,39 +25,39 @@ class Components::ReturnAddresses::Form < Components::Base
     form_with model: return_address, local: true do |f|
       div(class: "form-stack") do
         div(class: "form-grid-auto") do
-          div(style: "margin-bottom: 1rem;") do
+          div(class: "mb-1") do
             label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Name *" }
-            input(type: "text", name: "return_address[name]", value: return_address.name, required: true, style: "width: 100%;")
+            input(type: "text", name: "return_address[name]", value: return_address.name, required: true, class: "w-100")
             small(class: "text-muted") { "Organization or personal name" }
           end
 
-          div(style: "margin-bottom: 1rem;") do
+          div(class: "mb-1") do
             label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Address Line 1 *" }
-            input(type: "text", name: "return_address[line_1]", value: return_address.line_1, required: true, style: "width: 100%;")
+            input(type: "text", name: "return_address[line_1]", value: return_address.line_1, required: true, class: "w-100")
             small(class: "text-muted") { "Street address, P.O. box, etc." }
           end
         end
 
-        div(style: "margin-bottom: 1rem;") do
+        div(class: "mb-1") do
           label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Address Line 2" }
-          input(type: "text", name: "return_address[line_2]", value: return_address.line_2, style: "width: 100%;")
+          input(type: "text", name: "return_address[line_2]", value: return_address.line_2, class: "w-100")
           small(class: "text-muted") { "Apartment, suite, unit, etc. (optional)" }
         end
 
         div(class: "form-grid-auto--sm") do
-          div(style: "margin-bottom: 1rem;") do
+          div(class: "mb-1") do
             label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "City *" }
-            input(type: "text", name: "return_address[city]", value: return_address.city, required: true, style: "width: 100%;")
+            input(type: "text", name: "return_address[city]", value: return_address.city, required: true, class: "w-100")
           end
 
-          div(style: "margin-bottom: 1rem;") do
+          div(class: "mb-1") do
             label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "State *" }
-            input(type: "text", name: "return_address[state]", value: return_address.state, required: true, style: "width: 100%;")
+            input(type: "text", name: "return_address[state]", value: return_address.state, required: true, class: "w-100")
           end
 
-          div(style: "margin-bottom: 1rem;") do
+          div(class: "mb-1") do
             label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Postal Code *" }
-            input(type: "text", name: "return_address[postal_code]", value: return_address.postal_code, required: true, style: "width: 100%;")
+            input(type: "text", name: "return_address[postal_code]", value: return_address.postal_code, required: true, class: "w-100")
           end
         end
 

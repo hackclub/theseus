@@ -14,7 +14,7 @@ class Components::Shared::Jumpcode < Components::Base
         title: "Press ⌘K and type #{@code}",
         onclick: safe("window.openKbar?.()")
       ) do
-        span(style: "color:var(--foreground2)") { "⌘K" }
+        span(class: "text-muted") { "⌘K" }
         plain " #{@code}"
       end
 

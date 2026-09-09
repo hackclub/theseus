@@ -1,7 +1,7 @@
 <% content_for :title, "#{@payment_account.organization_name} — Billing Profile" %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
     <a href="<%= hcb_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">← Billing Profiles</a>
     <strong style="font-size: 1.15em;"><%= @payment_account.organization_name %></strong>
   </div>
@@ -13,10 +13,10 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Organization Details</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">Billing Profile ID</span>
         <span><%= copy_to_clipboard(@payment_account.public_id) { content_tag(:code, @payment_account.public_id) } %></span>
         <span class="detail-label">Organization</span>

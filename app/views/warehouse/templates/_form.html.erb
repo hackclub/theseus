@@ -1,6 +1,6 @@
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
-    <div style="margin-bottom: 1rem; color: var(--red);">
+    <div class="mb-1" style="color: var(--red)">
       <strong>[!] <%= pluralize(warehouse_template.errors.count, "error") %>:</strong>
       <ul style="margin: 0.25rem 0 0; padding-left: 1rem;">
         <% warehouse_template.errors.each do |error| %>
@@ -10,13 +10,13 @@
     </div>
   <% end %>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Template Details</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
-      <div style="margin-bottom: 0.5rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Template name <span style="color: var(--red);">*</span></label>
-        <input type="text" name="warehouse_template[name]" value="<%= warehouse_template.name %>" required style="width: 100%;">
+    <div class="mt-half">
+      <div class="mb-half">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Template name <span style="color: var(--red);">*</span></label>
+        <input type="text" name="warehouse_template[name]" value="<%= warehouse_template.name %>" required class="w-100">
       </div>
       <label>
         <input type="hidden" name="warehouse_template[public]" value="0">
@@ -26,10 +26,10 @@
     </div>
   </section>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Contents</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
+    <div class="mt-half">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: :in_inventory,
@@ -39,9 +39,9 @@
     </div>
   </section>
 
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <span class="spacer"></span>
-    <a href="<%= warehouse_templates_path %>" style="color: var(--foreground2);">Cancel</a>
+    <a href="<%= warehouse_templates_path %>" class="text-muted">Cancel</a>
     <button type="submit" class="btn-success">✓ <%= warehouse_template.persisted? ? "Update Template" : "Create Template" %></button>
   </div>
 <% end %>

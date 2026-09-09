@@ -9,7 +9,7 @@ class Views::APIKeys::Show < Views::Base
 
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
         strong(style: "font-size: 1.15em;") { api_key.pretty_name }
         span(class: api_key.active? ? "badge badge-success" : "badge badge-danger") do
@@ -31,7 +31,7 @@ class Views::APIKeys::Show < Views::Base
           section do
             strong { "Actions" }
             hr
-            div(style: "margin-top: 0.5rem;") do
+            div(class: "mt-half") do
               render_revoke_dialog
             end
           end
@@ -39,7 +39,7 @@ class Views::APIKeys::Show < Views::Base
           section do
             div(style: "text-align: center; padding: 1rem 0; color: var(--red);") do
               span(style: "font-size: 2em;") { "✗" }
-              div(style: "margin-top: 0.5rem;") { strong { "Revoked" } }
+              div(class: "mt-half") { strong { "Revoked" } }
             end
           end
         end
@@ -52,11 +52,11 @@ class Views::APIKeys::Show < Views::Base
   attr_reader :api_key
 
   def secret_key_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Secret Key" }
       hr
-      div(style: "margin-top: 0.5rem;") do
-        div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "mt-half") do
+        div(class: "flex-row") do
           code(data_copy_to_clipboard: api_key.token) { api_key.token }
           button(
             class: "btn-sm",
@@ -70,10 +70,10 @@ class Views::APIKeys::Show < Views::Base
   end
 
   def details_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Details" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Name" }
         span { api_key.pretty_name }
         span(class: "detail-label") { "Created" }
@@ -99,10 +99,10 @@ class Views::APIKeys::Show < Views::Base
   end
 
   def permissions_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Permissions" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "PII Access" }
         if api_key.pii
           span(style: "color: var(--green);") { "✓ Enabled" }
@@ -144,6 +144,6 @@ class Views::APIKeys::Show < Views::Base
       end
     end
 
-    button(class: "btn-danger", style: "width: 100%;", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
+    button(class: "btn-danger w-100", onclick: safe("document.getElementById('revoke-dialog').showModal()")) { "× Revoke Key" }
   end
 end

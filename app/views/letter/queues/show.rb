@@ -25,17 +25,17 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
 
     details(id: "make-batch-dialog") do
       summary(style: "list-style: none;") do
-        button(class: "btn-success", style: "width: 100%;") { "⊞ Make Batch" }
+        button(class: "btn-success w-100") { "⊞ Make Batch" }
       end
 
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
-          div(style: "margin-bottom: 0.5rem;") do
+          div(class: "mb-half") do
             label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "How many letters?" }
-            input(type: "text", name: "limit", style: "width: 100%;")
+            input(type: "text", name: "limit", class: "w-100")
             small(class: "text-muted") { "Blank = all #{queued_count}" }
           end
-          button(type: "submit", class: "btn-success", style: "width: 100%;") { "✓ Create Batch" }
+          button(type: "submit", class: "btn-success w-100") { "✓ Create Batch" }
         end
       end
     end
@@ -46,7 +46,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
   def batches_section
     return unless batches.any?
 
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Batches" }
       span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{batches.count})" }
       hr

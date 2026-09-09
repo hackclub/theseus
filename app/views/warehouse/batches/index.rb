@@ -98,10 +98,10 @@ class Views::Warehouse::Batches::Index < Views::Base
           end
         end
       end
-      td(style: "color: var(--foreground2);") { plain batch.created_at.strftime("%b %d") }
+      td(class: "text-muted") { plain batch.created_at.strftime("%b %d") }
       td { plain batch.warehouse_template&.name || "—" }
-      td(style: "color: var(--foreground2);") { plain batch.address_count&.to_s || "0" }
-      td(style: "color: var(--foreground2);") { plain batch.orders.size.to_s }
+      td(class: "text-muted") { plain batch.address_count&.to_s || "0" }
+      td(class: "text-muted") { plain batch.orders.size.to_s }
       td { render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch) }
     end
   end
@@ -109,7 +109,7 @@ class Views::Warehouse::Batches::Index < Views::Base
   def blankslate
     section(style: "text-align: center; padding: 2rem;") do
       h2(style: "margin: 0;") { "📦 No warehouse batches yet" }
-      p(style: "color: var(--foreground2);") { "Create a batch to ship items to multiple addresses at once." }
+      p(class: "text-muted") { "Create a batch to ship items to multiple addresses at once." }
       a(href: new_warehouse_batch_path, class: "btn-success") { "+ New Batch" }
     end
   end

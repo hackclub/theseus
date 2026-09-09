@@ -36,17 +36,17 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def progress_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Progress" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         if @batch.purchasing? || @batch.generating_labels?
           raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
           raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
         elsif @batch.processed?
           failed_letters = @batch.letters.where(indicia_state: "failed")
           if failed_letters.any?
-            div(style: "margin-bottom: 0.5rem;") do
+            div(class: "mb-half") do
               span(class: "text-danger") { "#{failed_letters.count} letter(s) failed indicia purchase" }
             end
             raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
@@ -79,20 +79,20 @@ class Views::Letter::Batches::Show < Views::Base
 
   def header_toolbar
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
       if @batch.tags.any?
-        div(style: "display:flex;align-items:center;gap:0.5rem") do
+        div(class: "flex-row") do
           @batch.tags.compact_blank.each do |tag|
             span(class: "badge") { tag }
           end
         end
       end
       span(class: "spacer")
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: edit_letter_batch_path(@batch)) { "✎ Edit" }
         if @batch.fields_mapped?
           a(href: process_confirm_letter_batch_path(@batch)) do
@@ -107,10 +107,10 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def details_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Details" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Origin" }
         span { @batch.origin || "—" }
 
@@ -133,7 +133,7 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def actions_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       if @batch.processed?
         printed = @batch.letters.where.not(printed_at: nil).count
         total = @batch.letters.count
@@ -198,7 +198,7 @@ class Views::Letter::Batches::Show < Views::Base
 
           hr
           form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
-            button(type: "submit", class: "btn-sm", style: "width:100%;") { "✉ Mark all mailed" }
+            button(type: "submit", class: "btn-sm w-100") { "✉ Mark all mailed" }
           end
         end
 
@@ -242,10 +242,10 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def stats_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Stats" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Letters" }
         span { helpers.number_with_delimiter(@batch.letters.count) }
 
@@ -263,7 +263,7 @@ class Views::Letter::Batches::Show < Views::Base
       picklist_section
     end
 
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Letters" }
       span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{@batch.letters.count})" }
       hr
@@ -313,7 +313,7 @@ class Views::Letter::Batches::Show < Views::Base
       { id: "pick-#{id}", letter_id: id, state: state_class, title: "#{name} — #{loc} (#{pub_id})" }
     end
 
-    div("data-picklist-container": true, style: "margin-bottom:1.5rem;") do
+    div("data-picklist-container": true, class: "mb-1h") do
       strong { "Select Letters" }
       span(class: "text-muted", style: "margin-left:0.5rem;font-size:0.85em;") { "click to select, shift-click for range" }
 
@@ -351,7 +351,7 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def addresses_table
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Addresses" }
       span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{@batch.addresses.count})" }
       hr

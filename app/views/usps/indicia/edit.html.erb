@@ -1,7 +1,7 @@
 <% content_for :title, "Edit Indicium" %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
     <a href="<%= usps_indicium_path(@usps_indicium) %>" class="text-muted" style="text-decoration: none;">← <%= @usps_indicium.public_id %></a>
     <strong style="font-size: 1.15em;">Edit Indicium</strong>
   </div>

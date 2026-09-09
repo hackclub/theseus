@@ -11,11 +11,11 @@ class Components::Shared::TemplatePicker < Components::Base
   end
 
   def view_template
-    div(style: "margin-bottom:1rem") do
+    div(class: "mb-1") do
       select(
         name: "#{form.object_name}[#{name}]",
         id: "template-picker-select",
-        style: "width: 100%;"
+        class: "w-100"
       ) do
         option(value: "", disabled: true, selected: selected.blank?) { "Choose template..." }
         templates.each do |tmpl|

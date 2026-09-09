@@ -1,22 +1,22 @@
-<section style="margin-bottom: 1rem;">
+<section class="mb-1">
   <strong>Letter Batch</strong>
   <hr>
 
-  <div style="display:flex;gap:1rem;margin-top:0.5rem;margin-bottom:1rem">
+  <div class="mt-half mb-1" style="display:flex; gap:1rem">
     <section style="flex: 1;">
       <strong>From</strong>
       <hr>
-      <div style="margin-top: 0.5rem;">
+      <div class="mt-half">
         <% if batch.letter_return_address.present? %>
           <strong><%= batch.letter_return_address.name %></strong><br>
-          <span style="color: var(--foreground2);">
+          <span class="text-muted">
             <%= batch.letter_return_address.line_1 %><br>
             <% if batch.letter_return_address.line_2.present? %><%= batch.letter_return_address.line_2 %><br><% end %>
             <%= batch.letter_return_address.city %>, <%= batch.letter_return_address.state %> <%= batch.letter_return_address.postal_code %><br>
             <%= batch.letter_return_address.country %>
           </span>
         <% else %>
-          <span style="color: var(--foreground2);">No return address</span>
+          <span class="text-muted">No return address</span>
         <% end %>
       </div>
     </section>
@@ -24,7 +24,7 @@
     <section style="flex: 1;">
       <strong>Info</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">Dimensions</span>
         <span><%= batch.letter_width %> × <%= batch.letter_height %> in</span>
         <span class="detail-label">Weight</span>
@@ -38,11 +38,11 @@
   </div>
 
   <% if batch.pdf_label.attached? %>
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Generated Labels</strong>
       <hr>
-      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem">
-        <span style="color: var(--foreground2);">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
+      <div class="mt-half" style="display:flex; align-items:center; gap:0.5rem">
+        <span class="text-muted">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
         <span class="spacer"></span>
         <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>"><button class="btn-success btn-sm">↓ Download PDF</button></a>
         <% if batch.letters.any? && batch.letters.all?(&:pending?) %>
@@ -58,7 +58,7 @@
       </div>
     </section>
   <% else %>
-    <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">
+    <div class="text-muted" style="text-align: center; padding: 1rem 0">
       No labels generated yet.
     </div>
   <% end %>

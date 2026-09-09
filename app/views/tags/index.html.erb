@@ -9,14 +9,14 @@
   <% end %>
 </div>
 
-<div class="banner" style="margin-bottom: 1rem;">
+<div class="banner mb-1">
   This page is cached for performance. Hit refresh if you need fresh data.
 </div>
 
-<section style="margin-bottom: 1rem;">
+<section class="mb-1">
   <strong>Common Tags</strong>
   <hr>
-  <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem;">
+  <div class="mt-half" style="display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem">
     <% @common_tags.each do |tag| %>
       <a href="<%= tag_stats_path(tag.tag) %>" style="text-decoration: none;"><span class="badge badge-info"><%= tag.tag %></span></a>
     <% end %>
@@ -26,7 +26,7 @@
 <section>
   <strong>All Tags</strong>
   <hr>
-  <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem;">
+  <div class="mt-half" style="display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem">
     <% @tags.each do |tag| %>
       <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span class="badge"><%= tag %></span></a>
     <% end %>

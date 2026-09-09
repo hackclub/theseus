@@ -30,13 +30,13 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
   def toolbar
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: warehouse_sku_requests_path, style: "text-decoration: none; color: var(--foreground2);") { "← SKU Requests" }
         strong(style: "font-size: 1.15em;") { @sku_request.name }
         status_badge(@sku_request.aasm_state)
       end
       span(class: "spacer")
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         if @sku_request.draft?
           draft_actions
         elsif @sku_request.returned?
@@ -97,7 +97,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def summary_banner
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       div(style: "display:flex;gap:2rem;flex-wrap:wrap;") do
         div do
           span(class: "detail-label") { "Requested by " }
@@ -142,7 +142,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def czar_review_form
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Review & Approve" }
       hr
 
@@ -174,23 +174,23 @@ class Views::Warehouse::SKURequests::Show < Views::Base
             label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Unit Cost" }
             div(style: "display:flex;align-items:center;gap:0.25rem;") do
               span { "$" }
-              input(type: "number", name: "unit_cost_override", step: "0.01", value: (@sku_request.unit_cost ? "%.2f" % @sku_request.unit_cost : nil), style: "width:100%;")
+              input(type: "number", name: "unit_cost_override", step: "0.01", value: (@sku_request.unit_cost ? "%.2f" % @sku_request.unit_cost : nil), class: "w-100")
             end
           end
 
           div do
             label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Country of Origin" }
-            input(type: "text", name: "country_of_origin_override", value: @sku_request.country_of_origin, style: "width:100%;")
+            input(type: "text", name: "country_of_origin_override", value: @sku_request.country_of_origin, class: "w-100")
           end
 
           div do
             label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "HS Code" }
-            input(type: "text", name: "hs_code_override", value: @sku_request.hs_code, style: "width:100%;")
+            input(type: "text", name: "hs_code_override", value: @sku_request.hs_code, class: "w-100")
           end
 
           div do
             label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Customs Description" }
-            input(type: "text", name: "customs_description_override", value: @sku_request.customs_description, style: "width:100%;")
+            input(type: "text", name: "customs_description_override", value: @sku_request.customs_description, class: "w-100")
           end
         end
 
@@ -201,13 +201,13 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
       # Return for revision — separate form, visually secondary
       hr
-      div(style: "margin-top:0.5rem;") do
+      div(class: "mt-half") do
         form(method: "post", action: reject_warehouse_sku_request_path(@sku_request)) do
           input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
           div(style: "display:flex;align-items:flex-end;gap:0.5rem;") do
             div(style: "flex:1;") do
               label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Reviewer Notes (optional)" }
-              input(type: "text", name: "reviewer_notes", placeholder: "Notes for the requester...", style: "width:100%;")
+              input(type: "text", name: "reviewer_notes", placeholder: "Notes for the requester...", class: "w-100")
             end
             button(type: "submit", class: "btn-warning btn-sm", onclick: safe("return confirm('Return this SKU request for revision?')")) { "↩ Return for Revision" }
           end
@@ -217,10 +217,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def approved_info
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "✓ Approved" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "SKU Code" }
         if @sku_request.warehouse_sku
           a(href: warehouse_sku_path(@sku_request.warehouse_sku), style: "font-weight:600;font-family:monospace;") { @sku_request.assigned_sku_code }
@@ -259,10 +259,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def returned_info
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Review History" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Reviewed By" }
         span { @sku_request.reviewed_by&.username || "—" }
         span(class: "detail-label") { "Reviewed At" }
@@ -272,10 +272,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def details_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Request Details" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         detail_row("Name", @sku_request.name)
         detail_row("Description", @sku_request.description)
         detail_row("Category", @sku_request.category&.humanize)
@@ -297,10 +297,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def image_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Image" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         img(
           src: helpers.url_for(@sku_request.image),
           style: "max-width: 100%; max-height: 300px; border-radius: 4px;",
@@ -312,11 +312,11 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
   def blocking_pos_section
     pos = @sku_request.blocking_purchase_orders
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Blocking Purchase Orders" }
       hr
-      div(style: "margin-top: 0.5rem;") do
-        p(class: "text-muted", style: "margin-bottom: 0.5rem;") do
+      div(class: "mt-half") do
+        p(class: "text-muted mb-half") do
           plain "This SKU request is blocking #{pos.size} purchase order#{pos.size == 1 ? '' : 's'}."
         end
         ul do
@@ -334,10 +334,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def timestamps_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Timestamps" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Created" }
         span(class: "text-muted") { @sku_request.created_at.strftime("%b %d, %Y %H:%M") }
         span(class: "detail-label") { "Updated" }

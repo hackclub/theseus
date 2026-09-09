@@ -1,8 +1,8 @@
 <% content_for :title, "Edit SKU #{@warehouse_sku.sku}" %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @warehouse_sku.sku %></a>
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
+    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" class="text-muted" style="text-decoration: none">← <%= @warehouse_sku.sku %></a>
     <strong style="font-size: 1.15em;">Edit SKU</strong>
   </div>
 </div>
@@ -15,7 +15,7 @@
     <section>
       <strong>SKU Info</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">SKU</span>
         <span><code><%= @warehouse_sku.sku %></code></span>
         <span class="detail-label">In Stock</span>

@@ -21,7 +21,7 @@ class Components::Shared::Pagination < Components::Base
 
       window(current, total).each do |page_num|
         if page_num == :gap
-          span(style: "color:var(--foreground2)") { "…" }
+          span(class: "text-muted") { "…" }
         elsif page_num == current
           strong { page_num.to_s }
         else

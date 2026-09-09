@@ -14,7 +14,7 @@ class Views::Letter::Batches::New < Views::Base
     vite_javascript_tag("taggable")
 
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "New Letter Batch" }
       end
@@ -23,10 +23,10 @@ class Views::Letter::Batches::New < Views::Base
 render Components::Shared::ErrorMessages.new(record: @batch)
 
     form_with(model: @batch, url: letter_batches_path, scope: :letter_batch, multipart: true) do |f|
-      section(style: "margin-bottom: 1rem;") do
+      section(class: "mb-1") do
         strong { "Letter Specs" }
         hr
-        div(style: "margin-top: 0.5rem;") do
+        div(class: "mt-half") do
           div(
             data_svelte_component: "letter-attributes-picker",
             data_form_scope: "letter_batch",
@@ -37,16 +37,16 @@ render Components::Shared::ErrorMessages.new(record: @batch)
         end
       end
 
-      section(style: "margin-bottom: 1rem;") do
+      section(class: "mb-1") do
         strong { "Sender & Postage" }
         hr
-        div(style: "margin-top: 0.5rem;") { sender_fields(f) }
+        div(class: "mt-half") { sender_fields(f) }
       end
 
-      section(style: "margin-bottom: 1rem;") do
+      section(class: "mb-1") do
         strong { "CSV File" }
         hr
-        div(style: "margin-top: 0.5rem;") do
+        div(class: "mt-half") do
           input(type: "file", name: "letter_batch[csv]", accept: ".csv", required: true)
           p(class: "text-muted", style: "margin:0.5rem 0 0;font-size:0.85em;") do
             plain "Upload a CSV with address columns. You'll map them on the next page."
@@ -102,9 +102,9 @@ render Components::Shared::ErrorMessages.new(record: @batch)
       end
     end
 
-    div(style: "margin-bottom: 1rem;") do
+    div(class: "mb-1") do
       label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Custom Return Address Name" }
-      input(type: "text", name: "letter_batch[letter_return_address_name]", style: "width: 100%;")
+      input(type: "text", name: "letter_batch[letter_return_address_name]", class: "w-100")
       p(class: "form-hint") { "Leave blank to use the return address name" }
     end
   end

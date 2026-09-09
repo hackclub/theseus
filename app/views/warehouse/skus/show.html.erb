@@ -1,8 +1,8 @@
 <% content_for :title, @warehouse_sku.sku %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_skus_path %>" style="text-decoration: none; color: var(--foreground2);">← SKUs</a>
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
+    <a href="<%= warehouse_skus_path %>" class="text-muted" style="text-decoration: none">← SKUs</a>
     <strong style="font-size: 1.15em;"><%= @warehouse_sku.sku %></strong>
     <% if @warehouse_sku.in_stock.to_i > 10 %>
       <span class="badge badge-success">In stock</span>
@@ -20,11 +20,11 @@
     <% if @warehouse_sku.ai_enabled %><span class="badge badge-info">AI</span><% end %>
     <% unless @warehouse_sku.enabled %><span class="badge">Disabled</span><% end %>
   </div>
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <span style="color: var(--foreground2);"><%= @warehouse_sku.name %></span>
+  <div class="flex-row">
+    <span class="text-muted"><%= @warehouse_sku.name %></span>
   </div>
   <span class="spacer"></span>
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <% admin_tool do %>
       <a href="<%= edit_warehouse_sku_path(@warehouse_sku) %>">✎ Edit</a>
     <% end %>
@@ -38,10 +38,10 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Details</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">In Stock</span>
         <span><%= @warehouse_sku.in_stock || "—" %></span>
         <span class="detail-label">Inbound</span>
@@ -79,11 +79,11 @@
       </div>
     </section>
 
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Recent Orders</strong>
       <hr>
       <% if @recent_orders.any? %>
-        <table style="width: 100%; margin-top: 0.5rem;">
+        <table class="w-100 mt-half">
           <thead>
             <tr>
               <th style="text-align: left;">Order</th>
@@ -104,9 +104,9 @@
                 <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
                 <td style="padding: 0.25rem 0.5rem;">
                   <% if order.tracking_number.present? %>
-                    <a href="<%= order.tracking_url %>" target="_blank" style="color: var(--foreground2);"><%= order.pretty_via %> ↗</a>
+                    <a href="<%= order.tracking_url %>" target="_blank" class="text-muted"><%= order.pretty_via %> ↗</a>
                   <% else %>
-                    <span style="color: var(--foreground2);">—</span>
+                    <span class="text-muted">—</span>
                   <% end %>
                 </td>
                 <td style="padding: 0.25rem 0.5rem;">
@@ -118,15 +118,15 @@
           </tbody>
         </table>
       <% else %>
-        <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">No orders yet.</div>
+        <div class="text-muted" style="text-align: center; padding: 1rem 0">No orders yet.</div>
       <% end %>
     </section>
 
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Purchase Orders</strong>
       <hr>
       <% if @recent_purchase_orders.any? %>
-        <table style="width: 100%; margin-top: 0.5rem;">
+        <table class="w-100 mt-half">
           <thead>
             <tr>
               <th style="text-align: left;">PO</th>
@@ -143,7 +143,7 @@
                 <td style="padding: 0.25rem 0.5rem;">
                   <a href="<%= warehouse_purchase_order_path(po) %>" style="font-weight: bold; text-decoration: none;"><%= po.order_number.presence || "##{po.id}" %></a>
                 </td>
-                <td style="padding: 0.25rem 0.5rem; color: var(--foreground2);"><%= po.supplier_name %></td>
+                <td class="text-muted" style="padding: 0.25rem 0.5rem"><%= po.supplier_name %></td>
                 <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
                 <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(line_item&.unit_cost) %></td>
                 <td style="padding: 0.25rem 0.5rem;">
@@ -155,7 +155,7 @@
           </tbody>
         </table>
       <% else %>
-        <div style="text-align: center; padding: 1rem 0; color: var(--foreground2);">No purchase orders yet.</div>
+        <div class="text-muted" style="text-align: center; padding: 1rem 0">No purchase orders yet.</div>
       <% end %>
     </section>
 
@@ -166,7 +166,7 @@
     <section>
       <strong>Inventory</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">In Stock</span>
         <span style="font-weight: bold;"><%= @warehouse_sku.in_stock || "—" %></span>
         <span class="detail-label">Inbound</span>

@@ -1,6 +1,6 @@
 <%= form_with(model: usps_indicium) do |form| %>
   <% if usps_indicium.errors.any? %>
-    <div style="margin-bottom: 1rem; color: var(--red);">
+    <div class="mb-1" style="color: var(--red)">
       [!] <strong><%= pluralize(usps_indicium.errors.count, "error") %>:</strong>
       <ul style="margin: 0; padding-left: 1rem;">
         <% usps_indicium.errors.each do |error| %>
@@ -10,55 +10,55 @@
     </div>
   <% end %>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Postage</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
+    <div class="mt-half">
       <div style="display:flex;gap:1rem">
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Postage</label>
-          <input type="text" name="usps_indicium[postage]" value="<%= usps_indicium.postage %>" style="width: 100%;">
+          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Postage</label>
+          <input type="text" name="usps_indicium[postage]" value="<%= usps_indicium.postage %>" class="w-100">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Mailing Date</label>
+          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Mailing Date</label>
           <%= form.date_field :mailing_date, style: "width: 100%;" %>
         </div>
       </div>
-      <div style="display:flex;gap:1rem;margin-top: 1rem;">
+      <div class="mt-1" style="display:flex; gap:1rem">
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">USPS SKU</label>
-          <input type="text" name="usps_indicium[usps_sku]" value="<%= usps_indicium.usps_sku %>" style="width: 100%;">
+          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">USPS SKU</label>
+          <input type="text" name="usps_indicium[usps_sku]" value="<%= usps_indicium.usps_sku %>" class="w-100">
         </div>
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Processing Category</label>
-          <input type="text" name="usps_indicium[processing_category]" value="<%= usps_indicium.processing_category %>" style="width: 100%;">
+          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Processing Category</label>
+          <input type="text" name="usps_indicium[processing_category]" value="<%= usps_indicium.processing_category %>" class="w-100">
         </div>
       </div>
     </div>
   </section>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Dimensions</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
+    <div class="mt-half">
       <div style="display:flex;gap:1rem">
         <div style="flex: 1;">
-          <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Weight (oz)</label>
-          <input type="text" name="usps_indicium[postage_weight]" value="<%= usps_indicium.postage_weight %>" style="width: 100%;">
+          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Weight (oz)</label>
+          <input type="text" name="usps_indicium[postage_weight]" value="<%= usps_indicium.postage_weight %>" class="w-100">
         </div>
       </div>
-      <div style="margin-top: 1rem;">
+      <div class="mt-1">
         <label><input type="checkbox" name="usps_indicium[nonmachinable]" value="1" <%= "checked" if usps_indicium.nonmachinable %>> Non-machinable</label>
       </div>
     </div>
   </section>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Raw Response</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
-      <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Raw USPS response</label>
-      <textarea name="usps_indicium[raw_json_response]" rows="4" style="width: 100%;"><%= usps_indicium.raw_json_response %></textarea>
+    <div class="mt-half">
+      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Raw USPS response</label>
+      <textarea name="usps_indicium[raw_json_response]" rows="4" class="w-100"><%= usps_indicium.raw_json_response %></textarea>
     </div>
   </section>
 

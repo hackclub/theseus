@@ -9,19 +9,19 @@ class Views::Warehouse::Batches::Show < Views::Base
 
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: warehouse_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
         strong(style: "font-size: 1.15em;") { "Warehouse Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
-        span(style: "color: var(--foreground2);") { "#{helpers.pluralize(@batch.addresses.count, 'address')}" }
+      div(class: "flex-row") do
+        span(class: "text-muted") { "#{helpers.pluralize(@batch.addresses.count, 'address')}" }
         if @batch.tags.any?
           render Components::Shared::Tags.new(tags: @batch.tags)
         end
       end
       span(class: "spacer")
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: edit_warehouse_batch_path(@batch)) { "✎ Edit" }
         if @batch.fields_mapped?
           a(href: process_confirm_warehouse_batch_path(@batch)) do
@@ -53,10 +53,10 @@ class Views::Warehouse::Batches::Show < Views::Base
   private
 
   def batch_details
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Details" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Template" }
         span { @batch.warehouse_template&.name || "—" }
         span(class: "detail-label") { "Title" }
@@ -72,10 +72,10 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def orders_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Orders (#{@batch.orders.count})" }
       hr
-      table(style: "margin-top: 0.5rem; width: 100%;") do
+      table(class: "mt-half w-100") do
         thead do
           tr do
             th(style: "text-align: left;") { "ID" }
@@ -97,10 +97,10 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def addresses_section
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Addresses (#{@batch.addresses.count})" }
       hr
-      table(style: "margin-top: 0.5rem; width: 100%;") do
+      table(class: "mt-half w-100") do
         thead do
           tr do
             th(style: "text-align: left;") { "Name" }
@@ -124,21 +124,21 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def actions_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Actions" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         if @batch.fields_mapped?
           a(href: process_confirm_warehouse_batch_path(@batch)) do
-            button(class: "btn-success", style: "width: 100%;") { "▶ Process Batch" }
+            button(class: "btn-success w-100") { "▶ Process Batch" }
           end
         elsif @batch.processed?
           div(style: "text-align: center; padding: 1rem 0; color: var(--green);") do
             span(style: "font-size: 2em;") { "✓" }
-            div(style: "margin-top: 0.5rem;") { strong { "Processed" } }
+            div(class: "mt-half") { strong { "Processed" } }
           end
         else
-          span(style: "color: var(--foreground2);") { "Map fields before processing" }
+          span(class: "text-muted") { "Map fields before processing" }
         end
       end
     end
@@ -148,7 +148,7 @@ class Views::Warehouse::Batches::Show < Views::Base
     section do
       strong { "Cost Summary" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Contents" }
         span { number_to_currency(@batch.contents_cost) }
         span(class: "detail-label") { "Labor" }

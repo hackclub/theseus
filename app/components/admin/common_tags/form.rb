@@ -18,7 +18,7 @@ class Components::Admin::CommonTags::Form < Components::Base
       div(class: "form-stack") do
         render Components::Shared::FormField.new(label: "Tag", name: "common_tag[tag]", value: @common_tag.tag, required: true)
 
-        div(style: "margin-bottom:1rem;") do
+        div(class: "mb-1") do
           label(style: "display:flex;align-items:center;gap:0.5rem;cursor:pointer;") do
             input(type: "hidden", name: "common_tag[implies_ysws]", value: "0")
             input(type: "checkbox", name: "common_tag[implies_ysws]", value: "1", checked: @common_tag.implies_ysws)

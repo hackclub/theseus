@@ -124,8 +124,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
           input(
             type: "text",
             placeholder: "Filter SKUs...",
-            class: "toolbar-search",
-            style: "width:100%;",
+            class: "toolbar-search w-100",
             "x-ref": "skuFilter",
             "x-on:input.debounce.150ms": "filterSkus($event.target.value)"
           )

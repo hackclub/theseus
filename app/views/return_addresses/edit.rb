@@ -7,7 +7,7 @@ class Views::ReturnAddresses::Edit < Views::Base
 
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: return_addresses_path, style: "text-decoration: none; color: var(--foreground2);") { "← Return Addresses" }
         strong(style: "font-size: 1.15em;") { "Edit Return Address" }
       end
@@ -26,7 +26,7 @@ class Views::ReturnAddresses::Edit < Views::Base
         section do
           strong { "Current Address" }
           hr
-          div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+          div(class: "detail-grid mt-half") do
             span(class: "detail-label") { "Name" }
             span { return_address.name.presence || "—" }
             span(class: "detail-label") { "Line 1" }

@@ -9,7 +9,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
   def view_template
     if @sku_request.errors.any?
-      div(class: "banner banner-alert", style: "margin-bottom: 1rem;") do
+      div(class: "banner banner-alert mb-1") do
         plain @sku_request.errors.full_messages.to_sentence
       end
     end
@@ -76,12 +76,12 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
 
   def category_select
-    div(style: "margin-bottom:1rem;") do
+    div(class: "mb-1") do
       label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
         plain "Category"
         plain " *"
       end
-      select(name: "warehouse_sku_request[category]", required: true, style: "width:100%;") do
+      select(name: "warehouse_sku_request[category]", required: true, class: "w-100") do
         option(value: "") { "Select a category..." }
         ::Warehouse::SKU.categories.keys.each do |cat|
           if @sku_request.category == cat
@@ -95,7 +95,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
   end
 
   def image_field
-    div(style: "margin-bottom:1rem;") do
+    div(class: "mb-1") do
       label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
         plain "Photo of the item"
         plain " *"

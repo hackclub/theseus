@@ -1,26 +1,26 @@
 <% content_for :title, "Order Templates" %>
 
 <div class="toolbar">
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <strong style="font-size: 1.15em;">Order Templates</strong>
     <%= render Components::Shared::Jumpcode.new(path: warehouse_templates_path) %>
   </div>
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <span style="color: var(--foreground2);">Reusable order configurations</span>
+  <div class="flex-row">
+    <span class="text-muted">Reusable order configurations</span>
   </div>
   <span class="spacer"></span>
   <a href="<%= new_warehouse_template_path %>" class="btn-success btn-sm">+ New Template</a>
 </div>
 
 <% if current_user&.warehouse_templates&.any? %>
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Your Templates</strong>
     <hr>
     <% current_user.warehouse_templates.each_with_index do |template, i| %>
       <% if i > 0 %><hr><% end %>
       <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
         <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
-        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
+        <span class="text-muted"><%= template.line_items.count %> items</span>
         <% if template.public %>
           <span class="badge badge-info">Shared</span>
         <% end %>
@@ -38,12 +38,12 @@
       <% if i > 0 %><hr><% end %>
       <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
         <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
-        <span style="color: var(--foreground2);"><%= template.line_items.count %> items</span>
-        <span style="color: var(--foreground2);">by <%= template.user&.username || "unknown" %></span>
+        <span class="text-muted"><%= template.line_items.count %> items</span>
+        <span class="text-muted">by <%= template.user&.username || "unknown" %></span>
       </a>
     <% end %>
   <% else %>
-    <div style="text-align: center; padding: 2rem; color: var(--foreground2);">
+    <div class="text-muted" style="text-align: center; padding: 2rem">
       No public templates yet. Shared templates from other users will appear here.
     </div>
   <% end %>

@@ -9,7 +9,7 @@ class Views::Warehouse::Batches::Process < Views::Base
 
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Process Warehouse Batch" }
       end
@@ -17,30 +17,30 @@ class Views::Warehouse::Batches::Process < Views::Base
 
     div(class: "show-layout") do
       div(class: "show-main") do
-        div(class: "banner", style: "margin-bottom: 1rem;") do
+        div(class: "banner mb-1") do
           plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
         end
 
-        section(style: "margin-bottom: 1rem;") do
+        section(class: "mb-1") do
           strong { "Template: #{@batch.warehouse_template.name}" }
           hr
-          div(style: "margin-top: 0.5rem;") do
+          div(class: "mt-half") do
             @batch.warehouse_template.line_items.each do |line_item|
               div { "#{line_item.quantity}× #{line_item.sku.name}" }
             end
           end
         end
 
-        section(style: "margin-bottom: 1rem;") do
+        section(class: "mb-1") do
           strong { "Cost Breakdown" }
           hr
-          div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+          div(class: "detail-grid mt-half") do
             span(class: "detail-label") { "Contents" }
             span { number_to_currency(@batch.contents_cost) }
             span(class: "detail-label") { "Labor" }
             span { number_to_currency(@batch.labor_cost) }
             span(class: "detail-label") { "Postage" }
-            span(style: "color: var(--foreground2);") { "TBD" }
+            span(class: "text-muted") { "TBD" }
           end
           hr(style: "margin:0.5rem 0")
           div(class: "detail-grid") do
@@ -54,13 +54,13 @@ class Views::Warehouse::Batches::Process < Views::Base
         section do
           strong { "Confirm" }
           hr
-          div(style: "margin-top: 0.5rem;") do
+          div(class: "mt-half") do
             form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
               input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-              button(type: "submit", class: "btn-success", style: "width: 100%;") { "▶ Process Batch" }
+              button(type: "submit", class: "btn-success w-100") { "▶ Process Batch" }
             end
-            div(style: "margin-top: 0.5rem;") do
-              a(href: warehouse_batch_path(@batch), style: "color: var(--foreground2);") { "Cancel" }
+            div(class: "mt-half") do
+              a(href: warehouse_batch_path(@batch), class: "text-muted") { "Cancel" }
             end
           end
         end

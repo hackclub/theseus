@@ -15,7 +15,7 @@ class Views::Warehouse::SKURequests::Index < Views::Base
     )
 
     if current_user.warehouse_czar? && pending_count > 0
-      div(class: "banner banner-info", style: "margin-bottom: 1rem;") do
+      div(class: "banner banner-info mb-1") do
         strong { "#{pending_count} request#{pending_count == 1 ? '' : 's'} pending review" }
       end
     end

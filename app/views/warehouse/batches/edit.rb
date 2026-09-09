@@ -15,7 +15,7 @@ class Views::Warehouse::Batches::Edit < Views::Base
     vite_javascript_tag("taggable")
 
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Edit Warehouse Batch" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
@@ -27,17 +27,17 @@ render Components::Shared::ErrorMessages.new(record: @batch)
     div(class: "show-layout") do
       div(class: "show-main") do
         form_with(model: @batch, url: warehouse_batch_path(@batch), scope: :batch, method: :patch) do |f|
-          section(style: "margin-bottom: 1rem;") do
+          section(class: "mb-1") do
             strong { "Batch Details" }
             hr
-            div(style: "margin-top: 0.5rem;") do
+            div(class: "mt-half") do
               if @allowed_templates.any?
-                div(style: "margin-bottom: 1rem;") do
+                div(class: "mb-1") do
                   label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;", for: "batch_warehouse_template_id") { "Template" }
                   select(
                     name: "batch[warehouse_template_id]",
                     id: "batch_warehouse_template_id",
-                    style: "width: 100%;"
+                    class: "w-100"
                   ) do
                     @allowed_templates.each do |template|
                       option(value: template.id, selected: template.id == @batch.warehouse_template_id) { template.name }
@@ -46,9 +46,9 @@ render Components::Shared::ErrorMessages.new(record: @batch)
                 end
               end
 
-              div(style: "margin-bottom: 1rem;") do
+              div(class: "mb-1") do
                 label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Title" }
-                input(type: "text", name: "batch[warehouse_user_facing_title]", value: @batch.warehouse_user_facing_title, style: "width: 100%;")
+                input(type: "text", name: "batch[warehouse_user_facing_title]", value: @batch.warehouse_user_facing_title, class: "w-100")
               end
             end
           end
@@ -66,7 +66,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
         section do
           strong { "Batch Info" }
           hr
-          div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+          div(class: "detail-grid mt-half") do
             span(class: "detail-label") { "ID" }
             span { "##{@batch.id}" }
             span(class: "detail-label") { "Created" }
@@ -85,10 +85,10 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
 
   def tag_picker(f)
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Tags" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         select(
           name: "batch[tags][]",
           multiple: true,

@@ -15,14 +15,14 @@
 <% end %>
 
 <% if @blocking.any? %>
-  <section style="margin-bottom: 1rem;">
-    <div style="display:flex;align-items:center;gap:0.5rem">
+  <section class="mb-1">
+    <div class="flex-row">
       <strong>Dispatch Blockers</strong>
       <span class="badge badge-danger">blocking</span>
     </div>
     <p class="text-muted" style="margin: 0.25rem 0 0;">No cost data at all — orders with these SKUs will refuse to dispatch.</p>
     <hr>
-    <table style="margin-top: 0.5rem;">
+    <table class="mt-half">
       <thead>
         <tr>
           <th>SKU</th>
@@ -50,14 +50,14 @@
 <% end %>
 
 <% if @no_po_cost.any? %>
-  <section style="margin-bottom: 1rem;">
-    <div style="display:flex;align-items:center;gap:0.5rem">
+  <section class="mb-1">
+    <div class="flex-row">
       <strong>Missing PO Cost Data</strong>
       <span class="badge badge-warning">degraded</span>
     </div>
     <p class="text-muted" style="margin: 0.25rem 0 0;">No <code>average_po_cost</code> from Zenventory — covered by fallback but should be fixed.</p>
     <hr>
-    <table style="margin-top: 0.5rem;">
+    <table class="mt-half">
       <thead>
         <tr>
           <th>SKU</th>
@@ -87,14 +87,14 @@
 <% end %>
 
 <% if @backordered.any? %>
-  <section style="margin-bottom: 1rem;">
-    <div style="display:flex;align-items:center;gap:0.5rem">
+  <section class="mb-1">
+    <div class="flex-row">
       <strong>Backordered Without Enough Inbound</strong>
       <span class="badge badge-warning">warning</span>
     </div>
     <p class="text-muted" style="margin: 0.25rem 0 0;">Oversold and not enough inbound stock to cover the deficit.</p>
     <hr>
-    <table style="margin-top: 0.5rem;">
+    <table class="mt-half">
       <thead>
         <tr>
           <th>SKU</th>
@@ -109,9 +109,9 @@
           <tr>
             <td><a href="<%= warehouse_sku_path(sku) %>" style="text-decoration: none;"><code><%= sku.sku %></code></a></td>
             <td><%= sku.name %></td>
-            <td style="color: var(--red); font-weight: 600;"><%= sku.in_stock %></td>
+            <td class="fw-600" style="color: var(--red)"><%= sku.in_stock %></td>
             <td><%= sku.inbound || 0 %></td>
-            <td style="color: var(--red); font-weight: 600;"><%= sku.in_stock.abs - (sku.inbound || 0) %></td>
+            <td class="fw-600" style="color: var(--red)"><%= sku.in_stock.abs - (sku.inbound || 0) %></td>
           </tr>
         <% end %>
       </tbody>
@@ -120,14 +120,14 @@
 <% end %>
 
 <% if @stuck_orders.any? %>
-  <section style="margin-bottom: 1rem;">
-    <div style="display:flex;align-items:center;gap:0.5rem">
+  <section class="mb-1">
+    <div class="flex-row">
       <strong>Stuck Orders</strong>
       <span class="badge badge-danger">blocking</span>
     </div>
     <p class="text-muted" style="margin: 0.25rem 0 0;">Dispatched 2+ weeks ago, never marked mailed. Possible Zenventory sync issue.</p>
     <hr>
-    <table style="margin-top: 0.5rem;">
+    <table class="mt-half">
       <thead>
         <tr>
           <th>Order</th>

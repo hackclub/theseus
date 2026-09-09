@@ -1,6 +1,6 @@
 <%= form_with(model: warehouse_order) do |form| %>
   <% if warehouse_order.errors.any? %>
-    <div class="banner banner-error" style="margin-bottom: 1rem;">
+    <div class="banner banner-error mb-1">
       [!] <strong>Hey, slight issue:</strong>
       <ul class="error-list">
         <% warehouse_order.errors.each do |error| %>
@@ -10,34 +10,34 @@
     </div>
   <% end %>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Order Details</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Short title (shown to recipient)</label>
-        <input type="text" name="warehouse_order[user_facing_title]" value="<%= warehouse_order.user_facing_title %>" style="width: 100%;" autofocus>
+    <div class="mt-half">
+      <div class="mb-1">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Short title (shown to recipient)</label>
+        <input type="text" name="warehouse_order[user_facing_title]" value="<%= warehouse_order.user_facing_title %>" class="w-100" autofocus>
       </div>
 
       <div>
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Recipient email</label>
-        <input type="email" name="warehouse_order[recipient_email]" value="<%= warehouse_order.recipient_email %>" style="width: 100%;">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Recipient email</label>
+        <input type="email" name="warehouse_order[recipient_email]" value="<%= warehouse_order.recipient_email %>" class="w-100">
       </div>
     </div>
   </section>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Shipping Address</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
+    <div class="mt-half">
       <%= render 'addresses/primer_nested_form', form: form %>
     </div>
   </section>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Contents</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
+    <div class="mt-half">
       <%= render Components::Warehouse::LineItemsEditor.new(
         form: form,
         scope: current_user&.is_admin? ? :all : :in_inventory,
@@ -47,43 +47,43 @@
     </div>
   </section>
 
-  <section style="margin-bottom: 1rem;">
+  <section class="mb-1">
     <strong>Options</strong>
     <hr>
-    <div style="margin-top: 0.5rem;">
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Internal notes</label>
-        <textarea name="warehouse_order[internal_notes]" rows="3" style="width: 100%;"><%= warehouse_order.internal_notes %></textarea>
+    <div class="mt-half">
+      <div class="mb-1">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Internal notes</label>
+        <textarea name="warehouse_order[internal_notes]" rows="3" class="w-100"><%= warehouse_order.internal_notes %></textarea>
       </div>
 
       <label>
         <input type="checkbox" name="warehouse_order[notify_on_dispatch]" value="1" <%= "checked" if warehouse_order.notify_on_dispatch %>>
         Send the recipient a "sent to warehouse" email
-        <span style="display: block; color: var(--foreground2); font-size: 0.85em;">They'll get an email when it ships regardless</span>
+        <span class="text-muted" style="display: block; font-size: 0.85em">They'll get an email when it ships regardless</span>
       </label>
     </div>
   </section>
 
   <% if current_user.billing_profiles.any? %>
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Billing</strong>
       <hr>
-      <div style="margin-top: 0.5rem;">
-        <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">Billing Profile</label>
-        <select name="warehouse_order[billing_profile_id]" style="width: 100%;">
+      <div class="mt-half">
+        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Billing Profile</label>
+        <select name="warehouse_order[billing_profile_id]" class="w-100">
           <option value="">None</option>
           <% current_user.billing_profiles.each do |profile| %>
             <option value="<%= profile.id %>" <%= "selected" if warehouse_order.billing_profile_id == profile.id %>><%= profile.organization_name %></option>
           <% end %>
         </select>
-        <span style="display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25rem;">Which HCB organization pays for this order?</span>
+        <span class="text-muted" style="display: block; font-size: 0.85em; margin-top: 0.25rem">Which HCB organization pays for this order?</span>
       </div>
     </section>
   <% end %>
 
   <%= render 'shared/primer_tag_picker', form: form, taggable: warehouse_order %>
 
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <a href="<%= warehouse_order.persisted? ? warehouse_order_path(warehouse_order) : warehouse_orders_path %>">Cancel</a>
     <button type="submit" class="btn-success">✓ <%= warehouse_order.persisted? ? "Update Order" : "Create Order" %></button>
   </div>

@@ -59,7 +59,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
             type: "text",
             name: "letter[user_facing_title]",
             value: letter.user_facing_title,
-            style: "width: 100%;"
+            class: "w-100"
           )
         end
 
@@ -68,7 +68,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
             type: "email",
             name: "letter[recipient_email]",
             value: letter.recipient_email,
-            style: "width: 100%;"
+            class: "w-100"
           )
         end
 
@@ -76,7 +76,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
           textarea(
             name: "letter[rubber_stamps]",
             rows: 3,
-            style: "width: 100%;"
+            class: "w-100"
           ) { letter.rubber_stamps }
         end
       end
@@ -99,7 +99,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
   attr_reader :letter
 
   def field_group(label:, caption: nil, &block)
-    div(style: "margin-bottom:1rem;") do
+    div(class: "mb-1") do
       tag(:label, style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { label }
       yield
       if caption
@@ -114,7 +114,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
 
   def mailing_date_field(f)
-    div(style: "margin-bottom:1rem;") do
+    div(class: "mb-1") do
       label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Mailing date" }
       input(
         type: "date",
@@ -160,45 +160,45 @@ render Components::Shared::ErrorMessages.new(record: letter)
         div(style: "display:flex;gap:1rem;") do
           div(style: "flex:1;") do
             field_group(label: "First name") do
-              input(type: "text", name: a.field_name(:first_name), value: a.object&.first_name, required: true, style: "width: 100%;")
+              input(type: "text", name: a.field_name(:first_name), value: a.object&.first_name, required: true, class: "w-100")
             end
           end
           div(style: "flex:1;") do
             field_group(label: "Last name") do
-              input(type: "text", name: a.field_name(:last_name), value: a.object&.last_name, style: "width: 100%;")
+              input(type: "text", name: a.field_name(:last_name), value: a.object&.last_name, class: "w-100")
             end
           end
         end
 
         field_group(label: "Street address") do
-          input(type: "text", name: a.field_name(:line_1), value: a.object&.line_1, required: true, style: "width: 100%;")
+          input(type: "text", name: a.field_name(:line_1), value: a.object&.line_1, required: true, class: "w-100")
         end
 
         field_group(label: "Apt, suite, unit", caption: "Optional") do
-          input(type: "text", name: a.field_name(:line_2), value: a.object&.line_2, style: "width: 100%;")
+          input(type: "text", name: a.field_name(:line_2), value: a.object&.line_2, class: "w-100")
         end
 
         # City / State / Postal row
         div(style: "display:flex;gap:1rem;") do
           div(style: "flex:2;") do
             field_group(label: "City") do
-              input(type: "text", name: a.field_name(:city), value: a.object&.city, required: true, style: "width: 100%;")
+              input(type: "text", name: a.field_name(:city), value: a.object&.city, required: true, class: "w-100")
             end
           end
           div(style: "flex:1;") do
             field_group(label: "State") do
-              input(type: "text", name: a.field_name(:state), value: a.object&.state, required: true, style: "width: 100%;")
+              input(type: "text", name: a.field_name(:state), value: a.object&.state, required: true, class: "w-100")
             end
           end
           div(style: "flex:1;") do
             field_group(label: "Postal code") do
-              input(type: "text", name: a.field_name(:postal_code), value: a.object&.postal_code, required: true, style: "width: 100%;")
+              input(type: "text", name: a.field_name(:postal_code), value: a.object&.postal_code, required: true, class: "w-100")
             end
           end
         end
 
         field_group(label: "Country") do
-          select(name: a.field_name(:country), id: "#{form_id}_country", style: "width: 100%;") do
+          select(name: a.field_name(:country), id: "#{form_id}_country", class: "w-100") do
             option(value: "") { "Select a country..." }
             all_ordered.each do |country|
               option(value: country[:code], selected: country[:code] == current_country) { country[:display] }
@@ -244,7 +244,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
     # Return address
     field_group(label: "Return address") do
-      select(name: "letter[return_address_id]", id: "letter_return_address_id", style: "width: 100%;") do
+      select(name: "letter[return_address_id]", id: "letter_return_address_id", class: "w-100") do
         option(value: "") { "Select a return address..." }
         addresses.each do |addr|
           option(value: addr.id, selected: addr.id == letter.return_address_id) { addr.display_name }
@@ -256,7 +256,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
     end
 
     field_group(label: "Custom return name", caption: "Leave blank to use the return address name") do
-      input(type: "text", name: "letter[return_address_name]", value: letter.return_address_name, style: "width: 100%;")
+      input(type: "text", name: "letter[return_address_name]", value: letter.return_address_name, class: "w-100")
     end
 
     # Postage type (hidden by default, shown by JS for US addresses)
@@ -277,7 +277,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
     # Mailer ID
     field_group(label: "USPS Mailer ID") do
-      select(name: "letter[usps_mailer_id_id]", id: "letter_usps_mailer_id_id", style: "width: 100%;") do
+      select(name: "letter[usps_mailer_id_id]", id: "letter_usps_mailer_id_id", class: "w-100") do
         option(value: "") { "Select a mailer ID..." }
         USPS::MailerId.all.each do |m|
           option(value: m.id, selected: m.id == (letter.usps_mailer_id_id || USPS::MailerId.first&.id)) { m.name }
@@ -285,7 +285,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
       end
     end
 
-    div(class: "banner banner-warning", style: "margin-top:0.5rem;") do
+    div(class: "banner banner-warning mt-half") do
       plain "[!] Leave the mailer ID at the default if mailing from HQ."
     end
   end
@@ -341,7 +341,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
   def tag_picker(f)
     field_group(label: "Tags") do
-      select(name: "letter[tags][]", multiple: true, class: "selectize-tags", style: "width: 100%;") do
+      select(name: "letter[tags][]", multiple: true, class: "selectize-tags w-100") do
         available_tags.each do |tag|
           option(value: tag, selected: letter.tags&.include?(tag)) { tag }
         end

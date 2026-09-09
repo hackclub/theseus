@@ -10,7 +10,7 @@ class Views::Letter::Batches::Process < Views::Base
 
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
         strong(style: "font-size: 1.15em;") { "Process Batch" }
       end
@@ -43,7 +43,7 @@ class Views::Letter::Batches::Process < Views::Base
   private
 
   def letter_details_box(f)
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Details" }
       hr
 
@@ -53,7 +53,7 @@ class Views::Letter::Batches::Process < Views::Base
           type: "text",
           name: "batch[user_facing_title]",
           placeholder: "e.g. Monthly Newsletter, YSWS Stickers Round 3",
-          style: "width:100%;",
+          class: "w-100",
           autofocus: true
         )
         p(class: "text-muted", style: "margin:0.25rem 0 0;font-size:0.85em;") { "Visible to recipients. Shows in the batch list." }
@@ -76,10 +76,10 @@ class Views::Letter::Batches::Process < Views::Base
     standard_templates = SnailMail::PhlexService.templates_for_size(:standard)
     envelope_templates = SnailMail::PhlexService.templates_for_size(:envelope)
 
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Label Templates" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         p(class: "form-hint mb-2") { "Select multiple templates to cycle through them, or just one for all labels." }
         select(
           name: "batch[template_cycle]",
@@ -108,10 +108,10 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def options_box
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Options" }
       hr
-      div(style: "margin-top: 0.5rem;") do
+      div(class: "mt-half") do
         label(class: "form-check-label form-field") do
           input(type: "checkbox", name: "batch[include_qr_code]", value: "1", checked: true)
           span { "Include QR code on labels" }
@@ -133,7 +133,7 @@ class Views::Letter::Batches::Process < Views::Base
     us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count
     intl_count = @batch.letters.count - us_count
 
-    section(style: "margin-bottom: 1rem;") do
+    section(class: "mb-1") do
       strong { "Postage" }
       hr
 
@@ -181,7 +181,7 @@ class Views::Letter::Batches::Process < Views::Base
   def payment_box
     default_usps_id = ENV["DEFAULT_USPS_PACC_ID"] || USPS::PaymentAccount.first&.id
 
-    section(id: "payment-section", style: "margin-bottom: 1rem;") do
+    section(id: "payment-section", class: "mb-1") do
       strong { "Payment" }
       hr
 
@@ -190,7 +190,7 @@ class Views::Letter::Batches::Process < Views::Base
         admin_tool(element: "div") do
           div(style: "margin-top:0.75rem;") do
             label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "USPS Payment Account" }
-            select(name: "batch[usps_payment_account_id]", style: "width:100%;") do
+            select(name: "batch[usps_payment_account_id]", class: "w-100") do
               USPS::PaymentAccount.all.each do |pa|
                 option(value: pa.id, selected: pa.id == default_usps_id.to_i) { pa.display_name }
               end
@@ -205,7 +205,7 @@ class Views::Letter::Batches::Process < Views::Base
       if current_user.billing_profiles.any?
         div(style: "margin-top:0.75rem;") do
           label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "HCB Payment Account" }
-          select(name: "batch[hcb_payment_account_id]", style: "width:100%;") do
+          select(name: "batch[hcb_payment_account_id]", class: "w-100") do
             current_user.billing_profiles.each do |hcb|
               option(value: hcb.id) { hcb.display_name }
             end
@@ -219,7 +219,7 @@ class Views::Letter::Batches::Process < Views::Base
     section do
       strong { "Batch Summary" }
       hr
-      div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+      div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "Addresses" }
         span { @batch.addresses.count.to_s }
 

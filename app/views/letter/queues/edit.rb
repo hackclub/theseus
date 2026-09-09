@@ -7,7 +7,7 @@ class Views::Letter::Queues::Edit < Views::Base
 
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: letter_queue_path(@queue), style: "text-decoration: none; color: var(--foreground2);") { "← #{@queue.name}" }
         strong(style: "font-size: 1.15em;") { "Edit Queue" }
       end
@@ -23,7 +23,7 @@ class Views::Letter::Queues::Edit < Views::Base
         section do
           strong { "Queue Info" }
           hr
-          div(class: "detail-grid", style: "margin-top: 0.5rem;") do
+          div(class: "detail-grid mt-half") do
             span(class: "detail-label") { "Slug" }
             span { @queue.slug }
             span(class: "detail-label") { "Type" }

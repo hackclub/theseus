@@ -1,8 +1,8 @@
 <% content_for :title, "Edit Order #{@warehouse_order.hc_id}" %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_order_path(@warehouse_order) %>" style="text-decoration: none; color: var(--foreground2);">← Order <%= @warehouse_order.hc_id %></a>
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
+    <a href="<%= warehouse_order_path(@warehouse_order) %>" class="text-muted" style="text-decoration: none">← Order <%= @warehouse_order.hc_id %></a>
     <strong style="font-size: 1.15em;">Edit Order</strong>
     <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
   </div>
@@ -17,7 +17,7 @@
     <section>
       <strong>Order Info</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">ID</span>
         <span><%= @warehouse_order.hc_id %></span>
         <span class="detail-label">Created</span>

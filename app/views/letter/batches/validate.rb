@@ -71,7 +71,7 @@ class Views::Letter::Batches::Validate < Views::Base
           class: "btn-success"
       end
 
-      a(href: new_letter_batch_path, style: "color:var(--foreground2);") { "Fix CSV & re-upload" }
+      a(href: new_letter_batch_path, class: "text-muted") { "Fix CSV & re-upload" }
     end
   end
 end

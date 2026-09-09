@@ -47,7 +47,7 @@ class Components::Shared::ActionBar < Components::Base
 
   def render_user_context
     return unless current_user
-    span(style: "color:var(--foreground2)") do
+    span(class: "text-muted") do
       plain current_user.username
     end
   end

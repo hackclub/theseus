@@ -16,25 +16,25 @@
     <%= msr.type_text %>: <%= msr.title_text %>
   <% end %>
   <div class="window-body">
-    <div class="field-row" style="margin-bottom: 1rem;">
+    <div class="field-row mb-1">
       <b style="margin: 0;"><%= msr.title_text %></b>
     </div>
-    <div class="field-row" style="margin-bottom: 0.5rem;">
+    <div class="field-row mb-half">
       <label style="width: 80px;">Type:</label>
       <span><%= msr.type_text %></span>
     </div>
-    <div class="field-row" style="margin-bottom: 0.5rem;">
+    <div class="field-row mb-half">
       <label style="width: 80px;">Status:</label>
       <span><%= msr.status_text %></span>
     </div>
     <% if msr["Warehouse-Service"] %>
-      <div class="field-row" style="margin-bottom: 0.5rem;">
+      <div class="field-row mb-half">
         <label style="width: 80px;">Service:</label>
         <span><%= msr["Warehouse–Service"] %></span>
       </div>
     <% end %>
     <% if msr.tracking_number %>
-      <div class="field-row" style="margin-bottom: 0.5rem;">
+      <div class="field-row mb-half">
         <label style="width: 80px;">Tracking:</label>
         <% if msr.tracking_link %>
           <%= link_to(msr.tracking_number, msr.tracking_link, target: "_blank", class: "link") %>
@@ -44,7 +44,7 @@
       </div>
     <% end %>
     <% if msr.description %>
-      <div class="field-row" style="margin-bottom: 0.5rem;">
+      <div class="field-row mb-half">
         <label style="width: 80px;"><%= msr.description.is_a?(Array) ? "Contents:" : "Description:" %></label>
         <% if msr.description.is_a? Array %>
           <ul class="tree-view" style="margin: 0;">
@@ -57,12 +57,12 @@
         <% end %>
       </div>
     <% end %>
-    <div class="field-row" style="margin-bottom: 0.5rem;">
+    <div class="field-row mb-half">
       <label style="width: 80px;">Created:</label>
       <span><%= msr.created_at %></span>
     </div>
     <% back_office_tool do %>
-      <div class="field-row" style="margin-bottom: 0.5rem;">
+      <div class="field-row mb-half">
         <label style="width: 80px;">Airtable:</label>
         <span class="internal"><%= link_to(msr.source_id, msr.source_url, target: "_blank") %></span>
       </div>

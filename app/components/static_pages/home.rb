@@ -20,7 +20,7 @@ class Components::StaticPages::Home < Components::Base
 
   def toolbar
     div(class: "toolbar") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         span(class: "text-muted") do
           plain "Welcome back, "
           strong { current_user&.username || "friend" }
@@ -40,7 +40,7 @@ class Components::StaticPages::Home < Components::Base
   end
 
   def needs_attention_section
-    div(style: "margin-bottom: 1rem;") do
+    div(class: "mb-1") do
       section_header("Needs Attention")
       div(class: "stat-filters", style: "margin-top: 0.25rem;") do
         if stats[:orders_to_dispatch].to_i > 0
@@ -54,7 +54,7 @@ class Components::StaticPages::Home < Components::Base
   end
 
   def this_week_section
-    div(style: "margin-bottom: 1rem;") do
+    div(class: "mb-1") do
       section_header("This Week")
       div(class: "stat-filters", style: "margin-top: 0.25rem;") do
         kpi_chip("In Transit", stats[:orders_in_transit], warehouse_orders_path(state: "dispatched"))

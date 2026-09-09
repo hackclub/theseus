@@ -66,7 +66,7 @@ class Views::Letter::Batches::Map < Views::Base
                 plain @sample_row[header].to_s
               end
               td do
-                select(name: "field_mapping[#{header}]", style: "width:100%;") do
+                select(name: "field_mapping[#{header}]", class: "w-100") do
                   ADDRESS_FIELDS.each do |value, label|
                     if value == guess
                       option(value: value, selected: true) { label }
@@ -83,7 +83,7 @@ class Views::Letter::Batches::Map < Views::Base
 
       hr
 
-      div(style: "display:flex;align-items:center;gap:0.5rem;") do
+      div(class: "flex-row") do
         button(type: "submit", class: "btn-success") { "✓ Map & Create Letters" }
         a(href: letter_batch_path(@batch)) { "Cancel" }
       end

@@ -17,7 +17,7 @@ class Views::Admin::Users::Show < Views::Base
     # Avatar + identity
     section do
       if @user.icon_url.present?
-        div(style: "margin-bottom:1rem;") do
+        div(class: "mb-1") do
           img(
             src: @user.icon_url,
             alt: @user.username,
@@ -49,7 +49,7 @@ class Views::Admin::Users::Show < Views::Base
 
     # Permissions
     section do
-      h3(style: "margin-top:0;") { "Permissions" }
+      h3(class: "mt-0") { "Permissions" }
       div(class: "detail-grid") do
         span(class: "detail-label") { "Admin" }
         span { permission_badge(@user.is_admin) }
@@ -67,7 +67,7 @@ class Views::Admin::Users::Show < Views::Base
 
     # Defaults
     section do
-      h3(style: "margin-top:0;") { "Defaults" }
+      h3(class: "mt-0") { "Defaults" }
       div(class: "detail-grid") do
         span(class: "detail-label") { "Home Mailer ID" }
         span(class: "text-muted") do
@@ -91,7 +91,7 @@ class Views::Admin::Users::Show < Views::Base
 
     # Activity
     section do
-      h3(style: "margin-top:0;") { "Activity" }
+      h3(class: "mt-0") { "Activity" }
       div(class: "detail-grid") do
         stat_link "Letters", @user.letters.count, letters_path(user_id: @user.id)
         stat_link "Letter Batches", ::Letter::Batch.where(user_id: @user.id).count, letter_batches_path(user_id: @user.id)
@@ -109,7 +109,7 @@ class Views::Admin::Users::Show < Views::Base
 
     # Feature Flags
     section do
-      h3(style: "margin-top:0;") { "Feature Flags" }
+      h3(class: "mt-0") { "Feature Flags" }
       if Flipper.features.any?
         Flipper.features.sort_by(&:name).each do |flag|
           global = flag.state == :on
@@ -142,7 +142,7 @@ class Views::Admin::Users::Show < Views::Base
                 button(type: "submit", class: "btn-sm") { "disable" }
               end
             else
-              span(style: "color:var(--foreground2);") { "disabled" }
+              span(class: "text-muted") { "disabled" }
               form_with(url: flip_admin_user_path(@user, flag: flag.name, state: true), method: :post, style: "display:inline;") do
                 button(type: "submit", class: "btn-sm") { "enable" }
               end
@@ -164,7 +164,7 @@ class Views::Admin::Users::Show < Views::Base
         .limit(20)
 
       section do
-        h3(style: "margin-top:0;") do
+        h3(class: "mt-0") do
           plain "Recent Billing"
           span(class: "text-muted", style: "font-weight:normal;font-size:0.85em;margin-left:0.5rem;") do
             plain "(#{billing_profiles.map(&:organization_name).join(", ")})"
@@ -187,7 +187,7 @@ class Views::Admin::Users::Show < Views::Base
                 tr do
                   td(class: "text-muted") { entry.created_at.strftime("%b %d %H:%M") }
                   td { span(class: "badge badge-info") { entry.category } }
-                  td(style: "font-weight:600;") { "#{entry.credit? ? "-" : ""}$#{"%.2f" % entry.amount.abs}" }
+                  td(class: "fw-600") { "#{entry.credit? ? "-" : ""}$#{"%.2f" % entry.amount.abs}" }
                   td { ledgerable_link(entry) }
                   td { state_badge(entry.state) }
                 end

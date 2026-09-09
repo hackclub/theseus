@@ -19,13 +19,13 @@ render Components::Shared::ErrorMessages.new(record: queue)
       section_heading("The important part")
 
       div(class: "form-grid mb-3") do
-        div(style: "margin-bottom: 1rem;") do
+        div(class: "mb-1") do
           label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Name *" }
-          input(type: :text, name: "letter_instant_queue[name]", value: queue.name, required: true, style: "width: 100%;")
+          input(type: :text, name: "letter_instant_queue[name]", value: queue.name, required: true, class: "w-100")
         end
-        div(style: "margin-bottom: 1rem;") do
+        div(class: "mb-1") do
           label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Display Title" }
-          input(type: :text, name: "letter_instant_queue[user_facing_title]", value: queue.user_facing_title, style: "width: 100%;")
+          input(type: :text, name: "letter_instant_queue[user_facing_title]", value: queue.user_facing_title, class: "w-100")
           span(class: "text-muted", style: "font-size: 0.9em;") { "Optional title shown to users" }
         end
       end
@@ -75,7 +75,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
 
       div(class: "form-field-lg") do
         label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Custom return address name" }
-        input(type: :text, name: "letter_instant_queue[letter_return_address_name]", value: queue.letter_return_address_name, style: "width: 100%;")
+        input(type: :text, name: "letter_instant_queue[letter_return_address_name]", value: queue.letter_return_address_name, class: "w-100")
         span(class: "text-muted", style: "font-size: 0.9em;") { "Leave blank to use the address' default name" }
       end
 
@@ -132,7 +132,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       admin_tool do
         div(class: "form-field-lg") do
           label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Slug" }
-          input(type: :text, name: "letter_instant_queue[slug]", value: queue.slug, style: "width: 100%;")
+          input(type: :text, name: "letter_instant_queue[slug]", value: queue.slug, class: "w-100")
         end
       end
 

@@ -1,18 +1,18 @@
 <% content_for :title, "Buy Indicia — #{@letter.public_id}" %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= letter_path(@letter) %>" style="text-decoration: none; color: var(--foreground2);">← <%= @letter.public_id %></a>
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
+    <a href="<%= letter_path(@letter) %>" class="text-muted" style="text-decoration: none">← <%= @letter.public_id %></a>
     <strong style="font-size: 1.15em;">Buy Indicia</strong>
   </div>
 </div>
 
 <div class="show-layout">
   <div class="show-main">
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Letter Details</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">Recipient</span>
         <span><%= @letter.address.name_line %></span>
         <span class="detail-label">Destination</span>
@@ -21,21 +21,21 @@
         <span><%= @letter.height %> × <%= @letter.width %> in, <%= @letter.weight %> oz</span>
       </div>
       <% if @letter.non_machinable? %>
-        <hr style="margin-top:0.5rem">
-        <div style="margin-top: 0.5rem;">
+        <hr class="mt-half">
+        <div class="mt-half">
           <span class="badge badge-warning">⚠ Non-machinable surcharge applies</span>
         </div>
       <% end %>
     </section>
 
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Purchase Postage</strong>
       <hr>
-      <div style="margin-top: 0.5rem;">
+      <div class="mt-half">
         <%= form_with(url: buy_indicia_letter_path(@letter), method: :post) do |form| %>
-          <div style="margin-bottom: 0.5rem;">
-            <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">USPS Payment Account</label>
-            <select name="usps_payment_account_id" required style="width: 100%;">
+          <div class="mb-half">
+            <label class="text-muted" style="display: block; margin-bottom: 0.25rem">USPS Payment Account</label>
+            <select name="usps_payment_account_id" required class="w-100">
               <option value="">Select account…</option>
               <% USPS::PaymentAccount.all.each do |account| %>
                 <option value="<%= account.id %>" <%= "selected" if account.id == USPS::PaymentAccount.first&.id %>><%= account.name %></option>
@@ -44,9 +44,9 @@
           </div>
 
           <% if current_user.billing_profiles.any? %>
-            <div style="margin-bottom: 0.5rem;">
-              <label style="display: block; color: var(--foreground2); margin-bottom: 0.25rem;">HCB Organization</label>
-              <select name="hcb_payment_account_id" required style="width: 100%;">
+            <div class="mb-half">
+              <label class="text-muted" style="display: block; margin-bottom: 0.25rem">HCB Organization</label>
+              <select name="hcb_payment_account_id" required class="w-100">
                 <option value="">Select organization…</option>
                 <% current_user.billing_profiles.each do |account| %>
                   <option value="<%= account.id %>"><%= account.organization_name %></option>
@@ -54,14 +54,14 @@
               </select>
             </div>
           <% else %>
-            <div style="margin-bottom: 0.5rem; color: var(--foreground2);">
+            <div class="mb-half text-muted">
               <%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to pay for postage.
             </div>
           <% end %>
 
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;">
+          <div class="mt-1" style="display:flex; align-items:center; gap:0.5rem">
             <span class="spacer"></span>
-            <a href="<%= letter_path(@letter) %>" style="color: var(--foreground2);">Cancel</a>
+            <a href="<%= letter_path(@letter) %>" class="text-muted">Cancel</a>
             <button type="submit" class="btn-success" <%= "disabled" if current_user.billing_profiles.empty? %>>✓ Buy Indicia</button>
           </div>
         <% end %>
@@ -73,7 +73,7 @@
     <section>
       <strong>Info</strong>
       <hr>
-      <div style="margin-top: 0.5rem; color: var(--foreground2);">
+      <div class="mt-half text-muted">
         Purchasing indicia buys USPS postage for this letter. The cost is charged to the selected HCB organization.
       </div>
     </section>

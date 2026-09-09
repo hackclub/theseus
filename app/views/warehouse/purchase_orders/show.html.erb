@@ -12,17 +12,17 @@
   }[@purchase_order.status] || "badge"
 %>
 
-<div class="toolbar" style="border-bottom: none; margin-bottom: 0;">
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <a href="<%= warehouse_purchase_orders_path %>" style="text-decoration: none; color: var(--foreground2);">&larr; Purchase Orders</a>
+<div class="toolbar mb-0" style="border-bottom: none">
+  <div class="flex-row">
+    <a href="<%= warehouse_purchase_orders_path %>" class="text-muted" style="text-decoration: none">&larr; Purchase Orders</a>
     <strong style="font-size: 1.15em;"><%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></strong>
     <span class="<%= badge_class %>"><%= @purchase_order.humanized_state %></span>
   </div>
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <span style="color: var(--foreground2);"><%= @purchase_order.supplier_name %></span>
+  <div class="flex-row">
+    <span class="text-muted"><%= @purchase_order.supplier_name %></span>
   </div>
   <span class="spacer"></span>
-  <div style="display:flex;align-items:center;gap:0.5rem">
+  <div class="flex-row">
     <%# Draft + owner: Submit for Approval %>
     <% if policy(@purchase_order).submit? && @purchase_order.draft? %>
       <%= button_to "Submit for Approval", submit_for_approval_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-success", data: { confirm: "Submit this purchase order for approval?" } %>
@@ -39,13 +39,13 @@
     <% end %>
     <% if policy(@purchase_order).return_for_revision? %>
       <details class="popover">
-        <summary tabindex="0" class="btn-warning" style="cursor:pointer;">↩ Return</summary>
+        <summary tabindex="0" class="btn-warning pointer">↩ Return</summary>
         <div style="padding: 0.75rem; min-width: 20rem;">
           <form action="<%= reject_warehouse_purchase_order_path(@purchase_order) %>" method="post">
             <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-            <div style="margin-bottom: 0.5rem;">
-              <label style="display:block;color:var(--foreground2);margin-bottom:0.25rem;">Notes for drafter</label>
-              <textarea name="reviewer_notes" rows="3" style="width:100%;" placeholder="What needs to be revised?"></textarea>
+            <div class="mb-half">
+              <label class="text-muted" style="display:block; margin-bottom:0.25rem">Notes for drafter</label>
+              <textarea name="reviewer_notes" rows="3" class="w-100" placeholder="What needs to be revised?"></textarea>
             </div>
             <button type="submit" class="btn-warning" onclick="return confirm('Return this purchase order for revision?')">↩ Return for Revision</button>
           </form>
@@ -74,7 +74,7 @@
 
 <%# Returned banner %>
 <% if @purchase_order.returned? %>
-  <div class="banner banner-warning" style="margin-bottom: 1rem;">
+  <div class="banner banner-warning mb-1">
     <strong>Returned for revision<%= @purchase_order.reviewed_by ? " by #{@purchase_order.reviewed_by.username || @purchase_order.reviewed_by.email}" : "" %>.</strong>
     <% if @purchase_order.reviewer_notes.present? %>
       <div style="margin-top: 0.25rem;"><strong>Notes:</strong> <%= @purchase_order.reviewer_notes %></div>
@@ -84,10 +84,10 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Details</strong>
       <hr>
-      <div class="detail-grid" style="margin-top: 0.5rem;">
+      <div class="detail-grid mt-half">
         <span class="detail-label">Supplier</span>
         <span><%= @purchase_order.supplier_name %></span>
         <% if @purchase_order.supplier_id.present? %>
@@ -118,8 +118,8 @@
         <span><code><%= @purchase_order.zenventory_id || "—" %></code></span>
       </div>
       <% if @purchase_order.notes.present? %>
-        <hr style="margin-top: 0.5rem;">
-        <div style="margin-top: 0.5rem;">
+        <hr class="mt-half">
+        <div class="mt-half">
           <span class="detail-label">Notes</span>
           <div style="margin-top: 0.25rem;"><%= simple_format(@purchase_order.notes) %></div>
         </div>
@@ -128,25 +128,25 @@
 
     <%# Blocking SKU requests section %>
     <% if @purchase_order.blocked_on_skus? || @purchase_order.has_returned_sku_requests? %>
-      <section style="margin-bottom: 1rem; border: 1px solid var(--yellow); padding: 0.75rem;">
+      <section class="mb-1" style="border: 1px solid var(--yellow); padding: 0.75rem">
         <strong style="color: var(--yellow);">&#x26A0; SKU Requests Requiring Attention</strong>
         <% if @purchase_order.has_returned_sku_requests? %>
           <div style="color: var(--red); margin-top: 0.25rem;">Some SKU requests have been returned and need to be revised before this purchase order can proceed.</div>
         <% elsif @purchase_order.blocked_on_skus? %>
-          <div style="color: var(--foreground2); margin-top: 0.25rem;">This purchase order is approved but waiting on the following SKU requests before it can be sent to Zenventory.</div>
+          <div class="text-muted" style="margin-top: 0.25rem">This purchase order is approved but waiting on the following SKU requests before it can be sent to Zenventory.</div>
         <% end %>
         <hr>
         <% @purchase_order.unresolved_sku_requests.each do |req| %>
           <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color, #333);">
             <div style="flex: 1;">
-              <a href="<%= warehouse_sku_request_path(req) %>" style="text-decoration: none; font-weight: 600;"><%= req.name %></a>
+              <a href="<%= warehouse_sku_request_path(req) %>" class="fw-600" style="text-decoration: none"><%= req.name %></a>
               <% if req.returned? %>
                 <span class="badge badge-danger" style="margin-left: 0.25rem;">Returned</span>
               <% else %>
                 <span class="badge badge-info" style="margin-left: 0.25rem;"><%= req.aasm_state.humanize %></span>
               <% end %>
               <% if req.suggested_sku_code.present? %>
-                <span style="color: var(--foreground2); margin-left: 0.25rem;">suggested: <code><%= req.suggested_sku_code %></code></span>
+                <span class="text-muted" style="margin-left: 0.25rem">suggested: <code><%= req.suggested_sku_code %></code></span>
               <% end %>
             </div>
             <% if current_user.warehouse_czar? && req.aasm_state == "submitted" %>
@@ -162,10 +162,10 @@
       </section>
     <% end %>
 
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Line Items</strong>
       <hr>
-      <table style="width: 100%; margin-top: 0.5rem;">
+      <table class="w-100 mt-half">
         <thead>
           <tr>
             <th style="text-align: left;">SKU</th>
@@ -180,7 +180,7 @@
               <td style="padding: 0.25rem 0.5rem;">
                 <% if li.sku.present? %>
                   <a href="<%= warehouse_sku_path(li.sku) %>" style="text-decoration: none;"><%= li.sku.name %></a>
-                  <span style="color: var(--foreground2);"> (<code><%= li.sku.sku %></code>)</span>
+                  <span class="text-muted"> (<code><%= li.sku.sku %></code>)</span>
                 <% elsif li.sku_request.present? %>
                   <a href="<%= warehouse_sku_request_path(li.sku_request) %>" style="text-decoration: none;"><%= li.sku_request.name %></a>
                   <% if li.sku_request.returned? %>
@@ -191,7 +191,7 @@
                     <span class="badge" style="margin-left: 0.25rem;"><%= li.sku_request.aasm_state %></span>
                   <% end %>
                 <% else %>
-                  <span style="color: var(--foreground2);">Unknown</span>
+                  <span class="text-muted">Unknown</span>
                 <% end %>
               </td>
               <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= li.quantity %></td>
@@ -215,17 +215,17 @@
   </div>
 
   <div class="show-sidebar">
-    <section style="margin-bottom: 1rem;">
+    <section class="mb-1">
       <strong>Actions</strong>
       <hr>
-      <div style="margin-top: 0.5rem;">
+      <div class="mt-half">
         <% if policy(@purchase_order).sync? %>
           <%= form_with url: sync_warehouse_purchase_order_path(@purchase_order), method: :post, local: true, class: "form-inline" do %>
-            <button type="submit" class="btn-sm" style="width: 100%; margin-bottom: 0.5rem;">⟳ Sync from Zenventory</button>
+            <button type="submit" class="btn-sm w-100 mb-half">⟳ Sync from Zenventory</button>
           <% end %>
         <% end %>
         <% if @purchase_order.zenventory_id.present? %>
-          <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= @purchase_order.zenventory_id %>" target="_blank" style="display: block; margin-bottom: 0.5rem;"><button class="btn-sm" style="width: 100%;">⎘ Download PDF</button></a>
+          <a href="https://app.zenventory.com/printing/printpurchaseorder.php?poid=<%= @purchase_order.zenventory_id %>" target="_blank" class="mb-half" style="display: block"><button class="btn-sm w-100">⎘ Download PDF</button></a>
         <% end %>
         <% if policy(@purchase_order).destroy? %>
           <%= button_to "✕ Delete", warehouse_purchase_order_path(@purchase_order), method: :delete, class: "btn-danger btn-sm", form_class: "form-inline", data: { confirm: "Delete this purchase order?" } %>

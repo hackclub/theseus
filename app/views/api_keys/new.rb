@@ -9,7 +9,7 @@ class Views::APIKeys::New < Views::Base
 
   def view_template
     div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
-      div(style: "display:flex;align-items:center;gap:0.5rem") do
+      div(class: "flex-row") do
         a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
         strong(style: "font-size: 1.15em;") { "New API Key" }
       end
@@ -20,11 +20,11 @@ class Views::APIKeys::New < Views::Base
         section do
           strong { "Details" }
           hr
-          div(style: "margin-top: 0.5rem;") do
+          div(class: "mt-half") do
             form_with model: api_key, url: api_keys_path, local: true do |f|
-              div(style: "margin-bottom: 1rem;") do
+              div(class: "mb-1") do
                 label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Name" }
-                input(type: "text", name: "api_key[name]", autofocus: true, style: "width: 100%;")
+                input(type: "text", name: "api_key[name]", autofocus: true, class: "w-100")
                 p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0;") { "Short description (think \"high-seas\")" }
               end
 
@@ -47,9 +47,9 @@ class Views::APIKeys::New < Views::Base
               end
 
               if current_user.billing_profiles.any?
-                div(style: "margin-bottom: 1rem; margin-top: 1rem;") do
+                div(class: "mb-1 mt-1") do
                   label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Default Billing Profile" }
-                  select(name: "api_key[billing_profile_id]", style: "width: 100%;") do
+                  select(name: "api_key[billing_profile_id]", class: "w-100") do
                     option(value: "") { "None (no billing)" }
                     current_user.billing_profiles.each do |profile|
                       option(value: profile.id) { profile.organization_name }
@@ -59,7 +59,7 @@ class Views::APIKeys::New < Views::Base
                 end
               end
 
-              button(type: "submit", class: "btn-success", style: "width: 100%;") { "🔑 Create API Key" }
+              button(type: "submit", class: "btn-success w-100") { "🔑 Create API Key" }
             end
           end
         end
@@ -69,7 +69,7 @@ class Views::APIKeys::New < Views::Base
         section do
           strong { "About API Keys" }
           hr
-          div(style: "margin-top: 0.5rem; color: var(--foreground2);") do
+          div(class: "mt-half text-muted") do
             p(style: "margin: 0 0 0.5rem;") { "API keys grant programmatic access to the system." }
             p(style: "margin: 0;") { "PII access should only be enabled when the integration specifically needs address data." }
           end
