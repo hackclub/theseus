@@ -60,3 +60,9 @@
 
 .approval-section { margin-bottom: 2rem; }
 .approval-empty { padding: 1.5rem; text-align: center; }
+
+// ── Tasks ──────────────────────────────────────────────
+
+.task-empty-check { font-size: 2em; color: var(--green); }
+.task-empty-note { margin: 0.25rem 0 0; }
+.task-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }

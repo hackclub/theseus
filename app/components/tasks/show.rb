@@ -30,10 +30,10 @@ class Components::Tasks::Show < Components::Base
   private
 
   def empty_state
-    section(style: "text-align: center; padding: 2rem;") do
-      div(style: "font-size: 2em; color: var(--green);") { "✓" }
+    section(class: "empty-state") do
+      div(class: "task-empty-check") { "✓" }
       strong { "All clear!" }
-      p(class: "text-muted", style: "margin: 0.25rem 0 0;") { "No tasks right now." }
+      p(class: "text-muted task-empty-note") { "No tasks right now." }
     end
   end
 
@@ -49,9 +49,9 @@ class Components::Tasks::Show < Components::Base
   end
 
   def task_row(task)
-    div(style: "display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;") do
-      div(style: "flex:1;") do
-        span(style: "font-weight:500;") { task[:name] }
+    div(class: "task-row") do
+      div(class: "flex-1") do
+        span(class: "fw-medium") { task[:name] }
         if task[:subtitle]
           whitespace
           span(class: "text-muted") { "(#{task[:subtitle]})" }
