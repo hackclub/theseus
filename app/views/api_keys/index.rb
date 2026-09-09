@@ -29,11 +29,11 @@ class Views::APIKeys::Index < Views::Base
             api_keys.each do |key|
               tr do
                 td do
-                  a(href: api_key_path(key), style: "text-decoration: none;") do
+                  a(href: api_key_path(key), class: "no-underline") do
                     plain key.pretty_name
                   end
                 end
-                td(class: "text-muted", style: "font-size: 0.85em;") do
+                td(class: "text-muted text-sm") do
                   plain (key.abbreviated rescue "••••••••")
                 end
                 td(class: "text-muted") { plain key.created_at.strftime("%b %d, %Y") }
@@ -45,9 +45,9 @@ class Views::APIKeys::Index < Views::Base
           end
         end
       else
-        div(style: "text-align: center; padding: 2rem;") do
-          h2(style: "margin: 0;") { "🔑" }
-          h3(style: "margin: 0;") { "No API keys yet" }
+        div(class: "empty-state") do
+          h2(class: "m-0") { "🔑" }
+          h3(class: "m-0") { "No API keys yet" }
         end
       end
     end

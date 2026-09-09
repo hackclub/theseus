@@ -154,6 +154,17 @@
 .align-middle { vertical-align: middle; }
 .mr-quarter { margin-right: 0.25rem; }
 
+// ── API Keys ─────────────────────────────────────────────
+
+// Hint text indented under a checkbox label.
+.checkbox-hint { color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 1rem 1rem; }
+
+.revoked-panel { text-align: center; padding: 1rem 0; color: var(--red); }
+.revoked-icon { font-size: 2em; }
+.dialog-body { padding: 1rem; }
+.dialog-subtitle { margin: 0 0 1rem; }
+.dialog-footer { display: flex; gap: 0.5rem; justify-content: flex-end; padding: 1rem 0; }
+
 // ── Batches::Show (generic Batch, not Letter::Batch) ─────
 
 // Danger-zone section outlined in red instead of the default border.

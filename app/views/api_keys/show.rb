@@ -8,10 +8,10 @@ class Views::APIKeys::Show < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
-        strong(style: "font-size: 1.15em;") { api_key.pretty_name }
+        a(href: api_keys_path, class: "link-muted") { "← API Keys" }
+        strong(class: "text-title") { api_key.pretty_name }
         span(class: api_key.active? ? "badge badge-success" : "badge badge-danger") do
           api_key.active? ? "Active" : "Revoked"
         end
@@ -37,8 +37,8 @@ class Views::APIKeys::Show < Views::Base
           end
         else
           section do
-            div(style: "text-align: center; padding: 1rem 0; color: var(--red);") do
-              span(style: "font-size: 2em;") { "✗" }
+            div(class: "revoked-panel") do
+              span(class: "revoked-icon") { "✗" }
               div(class: "mt-half") { strong { "Revoked" } }
             end
           end
@@ -64,7 +64,7 @@ class Views::APIKeys::Show < Views::Base
             aria: { label: "Copy to clipboard" }
           ) { "⎘" }
         end
-        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0;") { "Keep this secret. Don't share it with anyone." }
+        p(class: "field-hint") { "Keep this secret. Don't share it with anyone." }
       end
     end
   end
@@ -80,16 +80,16 @@ class Views::APIKeys::Show < Views::Base
         span { api_key.created_at.strftime("%b %d, %Y %H:%M") }
         if api_key.revoked?
           span(class: "detail-label") { "Revoked" }
-          span(style: "color: var(--red);") { api_key.revoked_at.strftime("%b %d, %Y %H:%M") }
+          span(class: "text-danger") { api_key.revoked_at.strftime("%b %d, %Y %H:%M") }
         end
         span(class: "detail-label") { "Billing Profile" }
         if api_key.billing_profile.present?
           span do
-            a(href: hcb_payment_account_path(api_key.billing_profile), style: "text-decoration:none;") do
+            a(href: hcb_payment_account_path(api_key.billing_profile), class: "no-underline") do
               plain api_key.billing_profile.organization_name
             end
             plain " "
-            code(style: "font-size:0.85em;color:var(--foreground2);") { api_key.billing_profile.public_id }
+            code(class: "text-sm text-muted") { api_key.billing_profile.public_id }
           end
         else
           span(class: "text-muted") { "None" }
@@ -105,14 +105,14 @@ class Views::APIKeys::Show < Views::Base
       div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "PII Access" }
         if api_key.pii
-          span(style: "color: var(--green);") { "✓ Enabled" }
+          span(class: "text-success") { "✓ Enabled" }
         else
           span(class: "text-muted") { "✗ Disabled" }
         end
 
         span(class: "detail-label") { "Impersonation" }
         if api_key.may_impersonate?
-          span(style: "color: var(--red);") { "✓ Enabled" }
+          span(class: "text-danger") { "✓ Enabled" }
         else
           span(class: "text-muted") { "✗ Disabled" }
         end
@@ -122,21 +122,21 @@ class Views::APIKeys::Show < Views::Base
 
   def render_revoke_dialog
     dialog(id: "revoke-dialog") do
-      div(style: "padding: 1rem;") do
-        div(style: "display:flex;align-items:center;justify-content:space-between") do
+      div(class: "dialog-body") do
+        div(class: "stat-total-row") do
           span(class: "badge") { "Revoking #{api_key.pretty_name}..." }
           button(onclick: safe("this.closest('dialog').close()")) { "×" }
         end
-        p(class: "text-muted", style: "margin: 0 0 1rem;") { "That which thou canst not undo." }
+        p(class: "text-muted dialog-subtitle") { "That which thou canst not undo." }
         hr
 
         form_with url: revoke_api_key_path(api_key), method: :post, local: true do |f|
-          div(class: "banner banner-error", style: "margin: 1rem 0;") do
+          div(class: "banner banner-error mt-1 mb-1") do
             plain "⚠ This is irreversible and painful! Are you sure you want to revoke this key? Everything that relies on it will unceremoniously break."
           end
 
           hr
-          div(style: "display:flex;gap:0.5rem;justify-content: flex-end; padding: 1rem 0;") do
+          div(class: "dialog-footer") do
             button(onclick: safe("document.getElementById('revoke-dialog').close()")) { "Cancel" }
             button(class: "btn-danger", type: "submit") { "Do it. Pull the trigger. I can't even stand to look at it anymore." }
           end
