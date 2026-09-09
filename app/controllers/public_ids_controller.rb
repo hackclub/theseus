@@ -47,7 +47,7 @@ class PublicIdsController < ApplicationController
 
     # LSV fallback for tracking numbers (Airtable, not in PublicIdResolver)
     if params[:id].match?(/\A[A-Z0-9]{10,}\z/i)
-      lsv = LSV::MarketingShipmentRequest.first_where("{Warehouse–Tracking Number} = '#{params[:id].gsub("'", "\\'")}'")
+      lsv = LSV::MarketingShipmentRequest.first_where("{Warehouse–Tracking Number} = '#{params[:id].gsub("'") { "\\'" }}'")
       return redirect_to show_lsv_path(LSV.slug_for(lsv), lsv.id) if lsv
     end
 

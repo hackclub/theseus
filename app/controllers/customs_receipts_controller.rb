@@ -24,7 +24,7 @@ class CustomsReceiptsController < ApplicationController
     order = Warehouse::Order.where("hc_id = :search or tracking_number = :search", search:).first
     return CustomsReceipt::TheseusSpecific.receiptable_from_warehouse_order(order) if order
 
-    sanitized_airtable_search = search.gsub("'", "\\'")
+    sanitized_airtable_search = search.gsub("'") { "\\'"}
 
     msr = LSV::MarketingShipmentRequest.first_where(
       "OR({Airtable ID (Automation)} = '#{sanitized_airtable_search}', {Warehouse–Tracking Number} = '#{sanitized_airtable_search}')"
