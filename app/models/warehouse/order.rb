@@ -430,11 +430,6 @@ class Warehouse::Order < ApplicationRecord
     end
   end
 
-  def inherit_batch_tags
-    return unless batch.present?
-    self.tags = (tags + batch.tags).uniq
-  end
-
   def set_created_via_defaults
     if batch_id.present?
       self.created_via = :bulk_upload

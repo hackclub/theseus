@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.1"
+gem "rails", "~> 8.1"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -13,8 +13,6 @@ gem "puma", ">= 5.0"
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
-# Build JSON APIs with ease [https://github.com/rails/jbuilder]
-gem "jbuilder", "~> 2.13"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
@@ -76,7 +74,6 @@ gem "aasm", "~> 5.5"
 
 gem "norairrecord", "~> 0.4.0"
 
-gem "filterrific", "~> 5.2"
 
 gem "hashid-rails", "~> 1.4"
 
@@ -98,12 +95,10 @@ gem "pundit", "~> 2.5"
 
 
 
-gem "select2-rails", "~> 4.0"
 
 gem "jquery-rails", "~> 4.6"
 
 
-gem "country-select", "~> 1.2"
 
 gem "countries", "~> 8.0"
 
@@ -113,7 +108,6 @@ gem "awesome_print", "~> 1.9"
 
 gem "cocoon", "~> 1.2"
 
-gem "slim-rails", "~> 3.7"
 
 group :development do
   gem "letter_opener_web", "~> 3.0"
@@ -133,7 +127,6 @@ gem "acts-as-taggable-array-on", "~> 0.7.0"
 
 gem "selectize-rails", "~> 0.12.6"
 
-gem "ivymeter", "~> 0.1.0"
 
 gem "slack-notifier", "~> 2.4"
 
@@ -148,7 +141,6 @@ gem "redis", "~> 5.4"
 
 gem "valid_email2", "~> 7.0"
 
-gem "sssecrets", "~> 1.0"
 
 gem "lockbox", "~> 2.0"
 
@@ -175,7 +167,8 @@ gem "xsv", "~> 1.3"
 
 gem "phlex-pdf", "~> 0.1.2"
 
-gem "paper_trail", "~> 16.0"
+gem "paper_trail", "~> 17.0"
+gem "sssecrets"
 
 gem "ttfunk", "~> 1.8"
 

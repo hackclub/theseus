@@ -30,14 +30,6 @@ module Ledgerable
     -scoped_entries(category).live.credits.sum(:amount_cents)
   end
 
-  def total_settled_cents(category = nil)
-    scoped_entries(category).settled.sum(:amount_cents)
-  end
-
-  def billing_settled?
-    ledger_entries.pending.none?
-  end
-
   private
 
   def scoped_entries(category)

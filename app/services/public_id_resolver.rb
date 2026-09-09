@@ -25,11 +25,6 @@ class PublicIdResolver
   end
 
   # Just the public_id → record part (no search fallback).
-  def resolve_exact
-    return nil if @query.blank?
-
-    by_public_id || by_hackapost || by_tracking_number
-  end
 
   def search
     return [] if @query.blank?

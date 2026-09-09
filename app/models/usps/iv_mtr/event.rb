@@ -63,15 +63,6 @@ class USPS::IVMTR::Event < ApplicationRecord
   def handling_event_type_description = hydrated.handling_event_type_description
   def imb_serial_number = hydrated.imb_serial_number
   def imb_mid = hydrated.imb_mid
-  def imb_stid = hydrated.imb_stid
-  def imb = hydrated.imb
-
-  def machine_info
-    {
-      name: hydrated.machine_name,
-      id: hydrated.machine_id,
-    }
-  end
 
   def self.find_or_create_from_payload(payload, batch_id, mailer_id_id)
     event = IvyMeter::Event::PieceEvent.from_json(payload)

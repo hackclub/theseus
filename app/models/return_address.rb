@@ -45,16 +45,6 @@ class ReturnAddress < ApplicationRecord
 
   def display_name = "#{name} / #{line_1}"
 
-  def format_for_country(other_country)
-    <<~EOA
-      #{name}
-      #{[line_1, line_2].compact_blank.join("\n")}
-      #{city}, #{state} #{postal_code}
-      #{country if country != other_country}
-    EOA
-      .strip
-  end
-
   def location = "#{city}, #{state} #{postal_code} #{country}"
 
   def us? = country == "US"

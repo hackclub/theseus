@@ -104,11 +104,6 @@ class Warehouse::Batch < Batch
     mark_processed!
   end
 
-  def build_mapping(row, address)
-    # For warehouse batches, we just return the address
-    # Orders will be created during processing
-    address
-  end
 
   def contents_cost = warehouse_template.contents_actual_cost_to_hc * addresses.count
 
@@ -120,25 +115,4 @@ class Warehouse::Batch < Batch
 
   def update_associated_tags = orders.update_all(tags:)
 
-  def process_with_zenventory!(options = {})
-    return false unless fields_mapped?
-
-    # Create orders for each address
-    addresses.each do |address|
-      begin
-        Zenventory.create_customer_order(update_hash)
-      rescue Zenventory::ZenventoryError => e
-        event_id = Sentry.capture_exception(e)&.event_id
-        errors.add(:base, "couldn't create order, Zenventory said: #{e.message} (error: #{event_id})")
-        throw(:abort)
-      end
-    end
-
-    # Dispatch all orders
-    orders.each do |order|
-      order.dispatch!
-    end
-
-    mark_processed!
-  end
 end

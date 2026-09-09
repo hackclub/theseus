@@ -50,18 +50,6 @@ class Zenventory
       paginated_get("inventory", :inventory, params)
     end
 
-    def get_kit_inventory(params = {})
-      paginated_get("inventory/kits", :inventory, params)
-    end
-
-    def get_items(params = {})
-      paginated_get("items", :items, params)
-    end
-
-    def get_item(id, include_units: false, include_bom: false)
-      conn.get("items/#{id}", includeUnits: include_units, includeBom: include_bom).body
-    end
-
     def create_item(params = {})
       conn.post("items", **params).body
     end
@@ -82,24 +70,8 @@ class Zenventory
       conn.post("purchase-orders", **params).body
     end
 
-    def draft_purchase_order(params = {})
-      create_purchase_order(draft: true, **params)
-    end
-
     def update_purchase_order(id, params = {})
       conn.put("purchase-orders/#{id}", **params).body
-    end
-
-    def finalize_purchase_order(id, params = {})
-      update_purchase_order(id, draft: false, **params)
-    end
-
-    def close_purchase_order(id)
-      conn.put("purchase-orders/#{id}/close").body
-    end
-
-    def get_suppliers
-      get_purchase_orders.map { |po| po[:supplier] }.compact.uniq { |s| s[:id] }
     end
 
     def run_report(category, report_key, params = {})
