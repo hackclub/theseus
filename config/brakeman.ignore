@@ -1,0 +1,18 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "af6191d29f386d3e08102f7d3799088cec319a52ec4050937412a6e8d808e2ea",
+      "note": "admin-only inspector; awesome_print output passed through sanitize with an explicit tag/attribute allowlist"
+    },
+    {
+      "fingerprint": "5d6cd82e52b1e3f8ddcbc687db19c623853e7a725a0e8d8b5e85bf354ca8f7f8",
+      "note": "admin-only inspector; awesome_print output passed through sanitize with an explicit tag/attribute allowlist"
+    },
+    {
+      "fingerprint": "c3445cfef0c4723db5eabf5877e65e4c64a37158e3413a5fe96bad689c3c61b7",
+      "note": "tracking_url is built by Tracking.tracking_url_for from a fixed carrier template, not from user input"
+    }
+  ],
+  "updated": "2026-09-09",
+  "brakeman_version": "8.0.5"
+}
