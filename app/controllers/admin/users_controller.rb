@@ -5,7 +5,7 @@ module Admin
     skip_after_action :verify_authorized
 
     def index
-      @users = User.all.order(:username)
+      @users = User.includes(:letters, :warehouse_templates).order(:username)
       @users = @users.where("username ILIKE :q OR email ILIKE :q", q: "%#{params[:search]}%") if params[:search].present?
       render Views::Admin::Users::Index.new(users: @users)
     end

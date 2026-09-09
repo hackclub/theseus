@@ -23,6 +23,7 @@
 # Indexes
 #
 #  index_hcb_transfers_on_billing_profile_id         (billing_profile_id)
+#  index_hcb_transfers_on_hq_organization_id         (hq_organization_id)
 #  index_hcb_transfers_on_idempotency_key            (idempotency_key) UNIQUE
 #  index_hcb_transfers_on_remote_id                  (remote_id)
 #  index_hcb_transfers_on_state                      (state)

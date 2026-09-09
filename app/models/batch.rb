@@ -30,6 +30,7 @@
 #
 # Indexes
 #
+#  index_batches_on_aasm_state                (aasm_state)
 #  index_batches_on_hcb_payment_account_id    (hcb_payment_account_id)
 #  index_batches_on_letter_mailer_id_id       (letter_mailer_id_id)
 #  index_batches_on_letter_queue_id           (letter_queue_id)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -105,6 +105,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
     t.jsonb "process_options"
     t.string "process_error"
     t.jsonb "audit_log"
+    t.index ["aasm_state"], name: "index_batches_on_aasm_state"
     t.index ["hcb_payment_account_id"], name: "index_batches_on_hcb_payment_account_id"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
     t.index ["letter_queue_id"], name: "index_batches_on_letter_queue_id"
@@ -303,6 +304,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hcb_oauth_connection_id"], name: "index_hcb_payment_accounts_on_hcb_oauth_connection_id"
+    t.index ["organization_id"], name: "index_hcb_payment_accounts_on_organization_id"
     t.index ["user_id"], name: "index_hcb_payment_accounts_on_user_id"
   end
 
@@ -324,6 +326,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
     t.datetime "next_attempt_at"
     t.jsonb "metadata", default: {}
     t.index ["billing_profile_id"], name: "index_hcb_transfers_on_billing_profile_id"
+    t.index ["hq_organization_id"], name: "index_hcb_transfers_on_hq_organization_id"
     t.index ["idempotency_key"], name: "index_hcb_transfers_on_idempotency_key", unique: true
     t.index ["remote_id"], name: "index_hcb_transfers_on_remote_id"
     t.index ["state", "next_attempt_at"], name: "index_hcb_transfers_on_state_and_next_attempt_at"
@@ -417,6 +420,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
     t.integer "created_via", default: 0, null: false
     t.string "indicia_state"
     t.string "indicia_error"
+    t.index ["aasm_state"], name: "index_letters_on_aasm_state"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
     t.index ["created_via"], name: "index_letters_on_created_via"
@@ -678,6 +682,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
     t.integer "created_via", default: 0, null: false
     t.bigint "origin_batch_id"
     t.bigint "billing_profile_id"
+    t.index ["aasm_state"], name: "index_warehouse_orders_on_aasm_state"
     t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
     t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
     t.index ["billing_profile_id"], name: "index_warehouse_orders_on_billing_profile_id"
@@ -688,6 +693,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
     t.index ["tags"], name: "index_warehouse_orders_on_tags", using: :gin
     t.index ["template_id"], name: "index_warehouse_orders_on_template_id"
     t.index ["user_id"], name: "index_warehouse_orders_on_user_id"
+    t.index ["zenventory_id"], name: "index_warehouse_orders_on_zenventory_id"
   end
 
   create_table "warehouse_purchase_order_line_items", force: :cascade do |t|

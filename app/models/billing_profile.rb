@@ -13,6 +13,7 @@
 # Indexes
 #
 #  index_hcb_payment_accounts_on_hcb_oauth_connection_id  (hcb_oauth_connection_id)
+#  index_hcb_payment_accounts_on_organization_id          (organization_id)
 #  index_hcb_payment_accounts_on_user_id                  (user_id)
 #
 # Foreign Keys
