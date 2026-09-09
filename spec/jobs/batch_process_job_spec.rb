@@ -49,19 +49,16 @@ RSpec.describe BatchProcessJob, type: :job do
     end
   end
 
-  # Fake transfer object returned by HCB::TransferService#call
-  let(:fake_transfer) { OpenStruct.new(id: "txn_fake_123") }
   let(:fake_payment_token) { "tok_fake_abc" }
 
   before do
     batch.update!(process_options: process_options)
 
     # Stub external services
-    allow_any_instance_of(HCB::TransferService).to receive(:call).and_return(fake_transfer)
+    fake_hcb!
     allow(USPS::PaymentAccount).to receive(:find).with(usps_account.id).and_return(usps_account)
     allow(usps_account).to receive(:create_payment_token).and_return(fake_payment_token)
     allow(BillingProfile).to receive(:find).with(hcb_account.id).and_return(hcb_account)
-    allow(BillingProfile).to receive(:refund_to_organization!).and_return(true)
     allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to)
     allow(batch).to receive(:generate_labels)
     # Stub Letter::Batch.find to return our batch instance (so generate_labels stub works)
@@ -87,8 +84,8 @@ RSpec.describe BatchProcessJob, type: :job do
       batch.mark_generating_labels!
       batch.mark_processed!
 
-      expect_any_instance_of(HCB::TransferService).not_to receive(:call)
       perform_job
+      expect(hcb_disbursements).to be_empty
     end
   end
 
@@ -107,13 +104,15 @@ RSpec.describe BatchProcessJob, type: :job do
     end
 
     it "sets international letters to intl_postage_type" do
+      allow(USPS::PricingEngine).to receive(:fcmi_price).and_return(1.65) # no network
       intl_letter = create_letters(1, address_attrs: { country: "GB", state: "London", postal_code: "SW1A 1AA" }).first
+      batch.update!(process_options: process_options.merge(intl_postage_type: "stamps"))
       stub_buy_success
 
       perform_job
 
       intl_letter.reload
-      expect(intl_letter.postage_type).to eq("international_origin")
+      expect(intl_letter.postage_type).to eq("stamps")
     end
   end
 
@@ -124,9 +123,9 @@ RSpec.describe BatchProcessJob, type: :job do
         stub_buy_success
 
         states = []
-        allow(batch).to receive(:mark_purchasing!) { states << :purchasing; batch.aasm.fire!(:mark_purchasing) }
-        allow(batch).to receive(:mark_generating_labels!) { states << :generating_labels; batch.aasm.fire!(:mark_generating_labels) }
-        allow(batch).to receive(:mark_processed!) { states << :processed; batch.aasm.fire!(:mark_processed) }
+        allow(batch).to receive(:mark_purchasing!).and_wrap_original { |m| states << :purchasing; m.call }
+        allow(batch).to receive(:mark_generating_labels!).and_wrap_original { |m| states << :generating_labels; m.call }
+        allow(batch).to receive(:mark_processed!).and_wrap_original { |m| states << :processed; m.call }
 
         perform_job
 
@@ -134,32 +133,77 @@ RSpec.describe BatchProcessJob, type: :job do
       end
     end
 
-    context "HCB transfer" do
-      it "calls HCB::TransferService with estimated cost" do
+    context "HCB charge" do
+      it "charges the estimated postage once for the whole batch and settles a ledger entry" do
         letters = create_letters(2)
         stub_buy_success
 
-        transfer_service = instance_double(HCB::TransferService, call: fake_transfer)
-        allow(HCB::TransferService).to receive(:new).and_return(transfer_service)
+        perform_job
+
+        sent = hcb_disbursements.sole
+        expect(sent[:profile]).to eq(hcb_account)
+        expect(sent[:amount_cents]).to eq((letters.sum(&:postage) * 100).ceil)
+        expect(sent[:name]).to start_with("Postage for #{batch.public_id}")
+
+        entry = batch.ledger_entries.sole
+        expect(entry).to be_settled
+        expect(entry.category).to eq("indicia")
+        expect(entry.hcb_transfer).to be_completed
+        expect(batch.reload.hcb_payment_account_id).to eq(hcb_account.id)
+      end
+
+      it "marks the batch failed, voids the entry, and buys nothing when HCB rejects the charge" do
+        letters = create_letters(1)
+        hcb_raises(api_error(HCBV4::UnprocessableEntityError, "You don't have enough money", status: 422))
+        allow(Sentry).to receive(:capture_exception)
+        expect_any_instance_of(USPS::Indicium).not_to receive(:buy!)
 
         perform_job
 
-        expect(HCB::TransferService).to have_received(:new).with(
-          billing_profile: hcb_account,
-          amount_cents: anything,
-          name: "Postage for #{batch.public_id}",
-          memo: "[theseus] batch postage",
-        )
-        expect(transfer_service).to have_received(:call)
+        expect(batch.reload).to be_failed
+        expect(batch.process_error).to include("enough money")
+        expect(batch.ledger_entries.sole).to be_voided
+        expect(letters.first.reload.usps_indicium).to be_nil
       end
 
-      it "raises when HCB transfer fails" do
-        create_letters(1)
+      it "does not charge again when retrying a batch that was already charged" do
+        create_letters(2)
         stub_buy_success
+        perform_job
+        expect(hcb_disbursements.size).to eq(1)
 
-        allow_any_instance_of(HCB::TransferService).to receive(:call).and_return(false)
+        batch.letters.first.update_columns(indicia_state: "failed")
+        batch.update_columns(aasm_state: "fields_mapped")
+        perform_job
+        expect(hcb_disbursements.size).to eq(1)
+        expect(batch.ledger_entries.count).to eq(1)
+      end
 
-        expect { perform_job }.to raise_error("HCB transfer failed")
+      it "auto-refunds the whole charge when the batch fails before buying anything" do
+        create_letters(1)
+        allow(usps_account).to receive(:create_payment_token).and_raise("USPS token service down")
+        allow(Sentry).to receive(:capture_exception)
+
+        perform_job
+
+        expect(batch.reload).to be_failed
+        expect(hcb_disbursements.map { |d| d[:direction] }).to eq(%i[debit credit])
+        charge = batch.ledger_entries.charges.sole
+        expect(charge.net_cents).to eq(0)
+        expect(batch.total_billed_cents).to eq(0)
+      end
+
+      it "refuses to run while a previous charge is unconfirmed" do
+        create_letters(1)
+        hcb_raises(Faraday::TimeoutError.new("boom"))
+        allow(Sentry).to receive(:capture_exception)
+        expect_any_instance_of(USPS::Indicium).not_to receive(:buy!)
+
+        perform_job
+        expect(batch.reload).to be_failed
+        expect(batch.process_error).to include("awaiting confirmation")
+        expect(HCB::Transfer.sole).to be_unknown
+        expect(hcb_disbursements).to be_empty # the timeout stub recorded nothing; nothing refunded either
       end
     end
 
@@ -318,7 +362,7 @@ RSpec.describe BatchProcessJob, type: :job do
 
       letters.each do |l|
         expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
-          batch, :progress,
+          [batch, :progress],
           hash_including(target: "cell-#{l.id}"),
         ).at_least(:once)
       end
@@ -332,9 +376,9 @@ RSpec.describe BatchProcessJob, type: :job do
 
       # purchasing phase summary
       expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
-        batch, :progress,
-        hash_including(target: "batch-summary", partial: "letter/batches/grid_summary"),
-      ).at_least(3).times # purchasing start, per-letter update(s), generating_labels, done
+        [batch, :progress],
+        hash_including(target: "batch-summary", partial: "letter/batches/progress_summary"),
+      ).at_least(2).times # purchasing start + per-letter update
     end
   end
 
@@ -356,24 +400,10 @@ RSpec.describe BatchProcessJob, type: :job do
       create_letters(1)
       batch.update!(process_options: { us_postage_type: "stamps", intl_postage_type: "international_origin" })
 
-      expect_any_instance_of(HCB::TransferService).not_to receive(:call)
-
       perform_job
 
+      expect(hcb_disbursements).to be_empty
       expect(batch.reload.aasm_state).to eq("processed")
-    end
-  end
-
-  describe "batch records HCB transfer metadata" do
-    it "stores billing_profile and hcb_transfer_id after indicia purchase" do
-      create_letters(1)
-      stub_buy_success
-
-      perform_job
-
-      batch.reload
-      expect(batch.hcb_payment_account_id).to eq(hcb_account.id)
-      expect(batch.hcb_transfer_id).to eq("txn_fake_123")
     end
   end
 end

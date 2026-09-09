@@ -16,7 +16,23 @@ class Views::Billing::Show < Views::Base
         span { span(class: "badge badge-info") { @entry.category } }
 
         span(class: "detail-label") { "Amount" }
-        span(style: "font-weight:600;font-size:1.25em;") { "$#{"%.2f" % @entry.amount}" }
+        span(style: "font-weight:600;font-size:1.25em;") { money(@entry.amount_cents) }
+
+        if @entry.reverses.present?
+          span(class: "detail-label") { "Credit against" }
+          span { a(href: billing_path(@entry.reverses)) { "entry ##{@entry.reverses.id} ($#{"%.2f" % @entry.reverses.amount})" } }
+        end
+
+        if @entry.reversals.any?
+          span(class: "detail-label") { "Credits" }
+          span do
+            @entry.reversals.each do |credit|
+              a(href: billing_path(credit)) { money(credit.amount_cents) }
+              plain " "
+            end
+            plain "(net #{money(@entry.net_cents)})"
+          end
+        end
 
         span(class: "detail-label") { "State" }
         span { state_badge(@entry.state) }
@@ -35,10 +51,18 @@ class Views::Billing::Show < Views::Base
         span(class: "detail-label") { "For" }
         span { ledgerable_detail(@entry) }
 
-        if @entry.hcb_transfer.present?
+        if (t = @entry.hcb_transfer).present?
           span(class: "detail-label") { "HCB Transfer" }
           span do
-            code { @entry.hcb_transfer.hcb_transaction_id || "pending" }
+            span(class: "badge") { "#{t.direction} · #{t.state}" }
+            plain " "
+            code { t.remote_id || t.idempotency_key }
+            if t.last_error.present?
+              div(class: "text-muted") { t.last_error }
+            end
+            if t.attempts > 0
+              div(class: "text-muted") { "#{t.attempts} attempt(s)#{t.next_attempt_at ? ", next #{t.next_attempt_at.strftime("%b %d %H:%M")}" : ""}" }
+            end
           end
         end
 
@@ -54,12 +78,16 @@ class Views::Billing::Show < Views::Base
 
   private
 
+  def money(cents)
+    sign = cents.negative? ? "-" : ""
+    "#{sign}$#{"%.2f" % (cents.abs / 100.0)}"
+  end
+
   def state_badge(state)
     variant = case state
               when "settled" then "badge-success"
               when "pending" then "badge-warning"
-              when "failed" then "badge-danger"
-              when "refunded" then "badge"
+              when "voided" then "badge"
               end
     span(class: "badge #{variant}") { state }
   end

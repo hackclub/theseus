@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_09_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -74,6 +74,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
     t.datetime "updated_at", null: false
     t.boolean "may_impersonate"
     t.boolean "qz_only"
+    t.bigint "billing_profile_id"
+    t.index ["billing_profile_id"], name: "index_api_keys_on_billing_profile_id"
     t.index ["token_bidx"], name: "index_api_keys_on_token_bidx", unique: true
     t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
@@ -102,7 +104,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
     t.string "hcb_transfer_id"
     t.jsonb "process_options"
     t.string "process_error"
-    t.integer "hcb_transfer_amount_cents"
     t.jsonb "audit_log"
     t.index ["hcb_payment_account_id"], name: "index_batches_on_hcb_payment_account_id"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
@@ -308,13 +309,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
   create_table "hcb_transfers", force: :cascade do |t|
     t.bigint "billing_profile_id", null: false
     t.integer "amount_cents", null: false
-    t.string "hcb_transaction_id"
+    t.string "remote_id"
     t.integer "state", default: 0, null: false
-    t.string "error_message"
+    t.string "last_error"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "direction", default: 0, null: false
+    t.string "hq_organization_id", null: false
+    t.string "idempotency_key", null: false
+    t.string "name"
+    t.text "memo"
+    t.integer "attempts", default: 0, null: false
+    t.datetime "last_attempted_at"
+    t.datetime "next_attempt_at"
+    t.jsonb "metadata", default: {}
     t.index ["billing_profile_id"], name: "index_hcb_transfers_on_billing_profile_id"
-    t.index ["hcb_transaction_id"], name: "index_hcb_transfers_on_hcb_transaction_id"
+    t.index ["idempotency_key"], name: "index_hcb_transfers_on_idempotency_key", unique: true
+    t.index ["remote_id"], name: "index_hcb_transfers_on_remote_id"
+    t.index ["state", "next_attempt_at"], name: "index_hcb_transfers_on_state_and_next_attempt_at"
     t.index ["state"], name: "index_hcb_transfers_on_state"
   end
 
@@ -330,12 +342,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "hcb_transfer_id"
+    t.bigint "reverses_id"
     t.index ["billing_profile_id", "state"], name: "index_ledger_entries_on_billing_profile_id_and_state"
     t.index ["billing_profile_id"], name: "index_ledger_entries_on_billing_profile_id"
     t.index ["category"], name: "index_ledger_entries_on_category"
     t.index ["hcb_transfer_id"], name: "index_ledger_entries_on_hcb_transfer_id"
     t.index ["ledgerable_type", "ledgerable_id"], name: "index_ledger_entries_on_ledgerable"
+    t.index ["reverses_id"], name: "index_ledger_entries_on_reverses_id"
+    t.index ["state", "hcb_transfer_id"], name: "index_ledger_entries_unclaimed"
     t.index ["state"], name: "index_ledger_entries_on_state"
+    t.check_constraint "amount_cents <> 0", name: "ledger_entries_amount_nonzero"
   end
 
   create_table "letter_queues", force: :cascade do |t|
@@ -661,8 +677,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
     t.decimal "contents_cost", precision: 10, scale: 2
     t.integer "created_via", default: 0, null: false
     t.bigint "origin_batch_id"
+    t.bigint "billing_profile_id"
     t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
     t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
+    t.index ["billing_profile_id"], name: "index_warehouse_orders_on_billing_profile_id"
     t.index ["created_via"], name: "index_warehouse_orders_on_created_via"
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
     t.index ["idempotency_key"], name: "index_warehouse_orders_on_idempotency_key", unique: true
@@ -776,6 +794,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "batches"
+  add_foreign_key "api_keys", "hcb_payment_accounts", column: "billing_profile_id"
   add_foreign_key "api_keys", "users"
   add_foreign_key "batches", "hcb_payment_accounts"
   add_foreign_key "batches", "letter_queues"
@@ -789,6 +808,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
   add_foreign_key "hcb_transfers", "hcb_payment_accounts", column: "billing_profile_id"
   add_foreign_key "ledger_entries", "hcb_payment_accounts", column: "billing_profile_id"
   add_foreign_key "ledger_entries", "hcb_transfers"
+  add_foreign_key "ledger_entries", "ledger_entries", column: "reverses_id"
   add_foreign_key "letter_queues", "hcb_payment_accounts"
   add_foreign_key "letter_queues", "return_addresses", column: "letter_return_address_id"
   add_foreign_key "letter_queues", "users"
@@ -821,6 +841,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_08_151518) do
   add_foreign_key "warehouse_orders", "addresses"
   add_foreign_key "warehouse_orders", "batches"
   add_foreign_key "warehouse_orders", "batches", column: "origin_batch_id"
+  add_foreign_key "warehouse_orders", "hcb_payment_accounts", column: "billing_profile_id"
   add_foreign_key "warehouse_orders", "users"
   add_foreign_key "warehouse_orders", "warehouse_templates", column: "template_id"
   add_foreign_key "warehouse_purchase_order_line_items", "warehouse_purchase_orders", column: "purchase_order_id"

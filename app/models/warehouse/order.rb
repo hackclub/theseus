@@ -28,6 +28,7 @@
 #  updated_at              :datetime         not null
 #  address_id              :bigint           not null
 #  batch_id                :bigint
+#  billing_profile_id      :bigint
 #  hc_id                   :string
 #  origin_batch_id         :bigint
 #  template_id             :bigint
@@ -36,20 +37,22 @@
 #
 # Indexes
 #
-#  index_warehouse_orders_on_address_id       (address_id)
-#  index_warehouse_orders_on_batch_id         (batch_id)
-#  index_warehouse_orders_on_created_via      (created_via)
-#  index_warehouse_orders_on_hc_id            (hc_id)
-#  index_warehouse_orders_on_idempotency_key  (idempotency_key) UNIQUE
-#  index_warehouse_orders_on_origin_batch_id  (origin_batch_id)
-#  index_warehouse_orders_on_tags             (tags) USING gin
-#  index_warehouse_orders_on_template_id      (template_id)
-#  index_warehouse_orders_on_user_id          (user_id)
+#  index_warehouse_orders_on_address_id          (address_id)
+#  index_warehouse_orders_on_batch_id            (batch_id)
+#  index_warehouse_orders_on_billing_profile_id  (billing_profile_id)
+#  index_warehouse_orders_on_created_via         (created_via)
+#  index_warehouse_orders_on_hc_id               (hc_id)
+#  index_warehouse_orders_on_idempotency_key     (idempotency_key) UNIQUE
+#  index_warehouse_orders_on_origin_batch_id     (origin_batch_id)
+#  index_warehouse_orders_on_tags                (tags) USING gin
+#  index_warehouse_orders_on_template_id         (template_id)
+#  index_warehouse_orders_on_user_id             (user_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (address_id => addresses.id)
 #  fk_rails_...  (batch_id => batches.id)
+#  fk_rails_...  (billing_profile_id => hcb_payment_accounts.id)
 #  fk_rails_...  (origin_batch_id => batches.id)
 #  fk_rails_...  (template_id => warehouse_templates.id)
 #  fk_rails_...  (user_id => users.id)
@@ -181,14 +184,26 @@ class Warehouse::Order < ApplicationRecord
       end
     end
 
-    # Settle labor charges after transaction commits (don't roll back zenventory on HCB failure)
-    if billing_profile.present? && ledger_entries.pending.labor.any?
-      BillingSettlementService.new(billing_profile: billing_profile, entries: ledger_entries.pending.labor.to_a).settle!
-    end
+    # Charge after the transaction commits (don't roll back zenventory on HCB failure).
+    # Individual orders are charged immediately; bulk-upload orders are charged
+    # once per batch by Warehouse::Batch#process!.
+    charge_labor! unless bulk_upload?
 
     if notify_on_dispatch?
       Warehouse::OrderMailer.with(order: self).order_created.deliver_later
     end
+  end
+
+  # Non-strict: if a transfer is already in flight for this profile the entry
+  # stays unclaimed and the sweep picks it up.
+  def charge_labor!
+    return unless billing_profile.present?
+    Billing.charge!(ledger_entries.unclaimed.charges.labor, name: "Labor for #{hc_id}")
+  end
+
+  def charge_postage!
+    return unless billing_profile.present?
+    Billing.charge!(ledger_entries.unclaimed.charges.postage, name: "Postage for #{hc_id}")
   end
 
   def zenv_attributes_changed?

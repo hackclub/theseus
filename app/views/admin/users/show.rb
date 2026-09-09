@@ -185,7 +185,7 @@ class Views::Admin::Users::Show < Views::Base
                 tr do
                   td(class: "text-muted") { entry.created_at.strftime("%b %d %H:%M") }
                   td { span(class: "badge badge-info") { entry.category } }
-                  td(style: "font-weight:600;") { "$#{"%.2f" % entry.amount}" }
+                  td(style: "font-weight:600;") { "#{entry.credit? ? "-" : ""}$#{"%.2f" % entry.amount.abs}" }
                   td { ledgerable_link(entry) }
                   td { state_badge(entry.state) }
                 end
@@ -227,8 +227,7 @@ class Views::Admin::Users::Show < Views::Base
     variant = case state
               when "settled" then "badge-success"
               when "pending" then "badge-warning"
-              when "failed" then "badge-danger"
-              when "refunded" then "badge"
+              when "voided" then "badge"
               end
     span(class: "badge #{variant}") { state }
   end

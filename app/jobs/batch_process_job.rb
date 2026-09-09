@@ -80,64 +80,8 @@ class BatchProcessJob < ApplicationJob
     return if total == 0
 
     estimated_cents = (letters_to_buy.sum(:postage) * 100).ceil
-    transfer = if batch.hcb_transfer_id.present?
-      batch.audit!(:hcb_charge_skipped, reason: "already charged", transfer_id: batch.hcb_transfer_id)
-      nil
-    elsif ENV["MOCK_HCB"].present?
-      batch.update_columns(hcb_transfer_id: "mock_#{SecureRandom.hex(4)}", hcb_transfer_amount_cents: estimated_cents)
-      batch.audit!(:hcb_charge_mocked, amount_cents: estimated_cents)
-      nil
-    else
-      begin
-        org = hcb_account.organization
-        if org.balance_cents < estimated_cents
-          raise "Insufficient HCB balance: #{org.name} has $#{'%.2f' % (org.balance_cents / 100.0)} " \
-                "but postage costs $#{'%.2f' % (estimated_cents / 100.0)}"
-        end
-        batch.audit!(:hcb_balance_checked, balance_cents: org.balance_cents, estimated_cents: estimated_cents)
-      rescue => e
-        raise if e.message.include?("Insufficient HCB balance")
-        batch.audit!(:hcb_balance_check_failed, error: e.message)
-        Sentry.capture_exception(e, level: :warning, extra: { batch_id: batch.id })
-      end
-
-      xfer = HCB::TransferService.new(
-        billing_profile: hcb_account,
-        amount_cents: estimated_cents,
-        name: "Postage for #{batch.public_id}",
-        memo: "[theseus] batch postage",
-      ).call
-      raise "HCB transfer failed" unless xfer
-
-      begin
-        batch.update_columns(hcb_payment_account_id: hcb_account.id, hcb_transfer_id: xfer.id, hcb_transfer_amount_cents: estimated_cents)
-      rescue => db_err
-        Sentry.capture_exception(db_err, level: :fatal, tags: { money: true, orphaned_charge: true },
-          extra: { batch_id: batch.id, transfer_id: xfer.id, amount_cents: estimated_cents })
-        raise "HCB charge succeeded (transfer #{xfer.id}) but DB update failed: #{db_err.message}"
-      end
-      batch.audit!(:hcb_charged, amount_cents: estimated_cents, transfer_id: xfer.id)
-      xfer
-    end
-
-    # Create HCB::Transfer and ledger entry for the batch indicia charge
-    if transfer && estimated_cents.positive?
-      transaction_id = transfer.respond_to?(:id) ? transfer.id : batch.hcb_transfer_id
-      hcb_xfer = HCB::Transfer.create!(
-        billing_profile: hcb_account,
-        amount_cents: estimated_cents,
-        state: :completed,
-        hcb_transaction_id: transaction_id,
-      )
-      batch.ledger_entries.create!(
-        billing_profile: hcb_account,
-        category: :indicia,
-        amount_cents: estimated_cents,
-        state: :settled,
-        settled_at: Time.current,
-        hcb_transfer: hcb_xfer,
-      )
-    end
+    batch.update_columns(hcb_payment_account_id: hcb_account.id) if batch.hcb_payment_account_id != hcb_account.id
+    charge_batch!(batch, hcb_account, estimated_cents)
 
     actual_cents = Concurrent::AtomicFixnum.new(0)
     purchased_count = Concurrent::AtomicFixnum.new(0)
@@ -198,39 +142,64 @@ class BatchProcessJob < ApplicationJob
     # overpayment refunds are manual via the refund_overpayment controller action.
   end
 
+  # One indicia charge per batch, for the estimated postage. Re-runs (retry
+  # failed letters) find the settled charge and skip straight to buying.
+  def charge_batch!(batch, hcb_account, estimated_cents)
+    existing = batch.ledger_entries.indicia.charges.live.order(:id).last
+    if existing&.settled?
+      Rails.logger.info("[BatchProcessJob] batch #{batch.id} already charged (entry #{existing.id}); skipping")
+      return existing
+    end
+    if existing&.pending?
+      raise "A previous HCB charge for this batch is still awaiting confirmation (#{existing.hcb_transfer&.idempotency_key}). Wait for it to resolve before retrying."
+    end
+    return nil unless estimated_cents.positive?
+
+    unless Billing.mock?
+      begin
+        org = hcb_account.organization
+        if org.balance_cents < estimated_cents
+          raise "Insufficient HCB balance: #{org.name} has $#{'%.2f' % (org.balance_cents / 100.0)} " \
+                "but postage costs $#{'%.2f' % (estimated_cents / 100.0)}"
+        end
+      rescue => e
+        raise if e.message.include?("Insufficient HCB balance")
+        Sentry.capture_exception(e, level: :warning, extra: { batch_id: batch.id })
+      end
+    end
+
+    entry = batch.ledger_entries.create!(
+      billing_profile: hcb_account,
+      category: :indicia,
+      amount_cents: estimated_cents,
+    )
+    begin
+      Billing.charge!([entry], name: "Postage for #{batch.public_id}", memo: "[theseus] batch postage", strict: true)
+    rescue Billing::Rejected, Billing::InFlight => e
+      entry.reload.void!(reason: e.message.truncate(200)) if entry.pending?
+      raise "HCB transfer failed: #{e.message}"
+    rescue Billing::Unconfirmed => e
+      raise "HCB charge is awaiting confirmation (#{e.transfer.idempotency_key}); do not retry until it resolves"
+    end
+    entry.reload
+  end
+
+  # If the batch failed before a single indicium was bought, hand the whole
+  # charge back. Anything else is a manual overpayment refund.
   def auto_refund_if_nothing_spent(batch, options)
-    return unless batch.hcb_transfer_id.present?
-    return if batch.hcb_transfer_id.start_with?("mock")
     return if batch.letters.where(indicia_state: "purchased").exists?
+    charge = batch.ledger_entries.indicia.charges.settled.order(:id).last
+    return unless charge && charge.net_cents.positive?
 
-    amount = batch.hcb_transfer_amount_cents.to_i
-    return if amount <= 0
-
-    hcb_account = BillingProfile.find_by(id: options[:hcb_payment_account_id])
-    return unless hcb_account
-
-    refund_result = BillingProfile.refund_to_organization!(
-      organization_id: hcb_account.organization_id,
-      amount_cents: amount,
+    Billing.credit!(
+      reverses: charge,
+      amount_cents: charge.net_cents,
       name: "Auto-refund for #{batch.public_id} (failed before purchasing)",
       memo: "[theseus] auto-refund, zero postage purchased",
     )
-    # Mark the original charge ledger entry as refunded
-    refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
-    refund_xfer = HCB::Transfer.create!(
-      billing_profile: hcb_account,
-      amount_cents: amount,
-      state: :completed,
-      hcb_transaction_id: refund_tx_id,
-    )
-    batch.ledger_entries.settled.each { |le| le.refund!(refund_xfer) }
-    batch.update_columns(hcb_transfer_id: nil, hcb_transfer_amount_cents: nil)
-    batch.audit!(:hcb_auto_refunded, amount_cents: amount, reason: "failed before any postage purchased")
   rescue => e
-    batch.audit!(:hcb_auto_refund_failed, error: e.message)
-    Sentry.capture_exception(e, extra: { batch_id: batch.id })
+    Sentry.capture_exception(e, tags: { money: true }, extra: { batch_id: batch.id })
   end
-
 
   def buy_indicium(letter, usps_account, hcb_account, batch, token)
     indicium = letter.usps_indicium || USPS::Indicium.create!(

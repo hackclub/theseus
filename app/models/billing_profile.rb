@@ -34,7 +34,7 @@ class BillingProfile < ApplicationRecord
   belongs_to :user
   belongs_to :oauth_connection, class_name: "HCB::OauthConnection", foreign_key: :hcb_oauth_connection_id
 
-  BLOCKED_ORGANIZATION_IDS = %w[hq-usps-ops].freeze
+  BLOCKED_ORGANIZATION_IDS = %w[hq-usps-ops hq-warehouse-ops].freeze
 
   validates :organization_id, presence: true, uniqueness: { scope: :user_id }
   validates :organization_name, presence: true
@@ -61,21 +61,18 @@ class BillingProfile < ApplicationRecord
     )
   end
 
-  def self.refund_to_organization!(organization_id:, amount_cents:, name:, memo: nil)
-    result = theseus_client.create_disbursement(
-      event_id: ENV.fetch("HCB_RECIPIENT_ORG_ID"),
+  # Credit: an HQ org → this organization. Uses the Theseus service account.
+  def self.refund_to_organization!(from_organization_id:, organization_id:, amount_cents:, name:)
+    theseus_client.create_disbursement(
+      event_id: from_organization_id,
       to_organization_id: organization_id,
       amount_cents: amount_cents,
       name: name,
     )
-    if memo && result.transaction_id
-      theseus_client.update_transaction(
-        result.transaction_id,
-        event_id: ENV.fetch("HCB_RECIPIENT_ORG_ID"),
-        memo: memo
-      )
-    end
-    result
+  end
+
+  def self.set_hq_transaction_memo!(hq_organization_id, transaction_id, memo)
+    theseus_client.update_transaction(transaction_id, event_id: hq_organization_id, memo: memo)
   end
 
   def client
@@ -86,16 +83,17 @@ class BillingProfile < ApplicationRecord
     client.organization!(organization_id)
   end
 
-  def create_disbursement!(amount_cents:, name:, memo: nil)
-    result = client.create_disbursement(
+  # Debit: this organization → an HQ org. Uses the linking user's OAuth token.
+  def create_disbursement!(to_organization_id:, amount_cents:, name:)
+    client.create_disbursement(
       event_id: organization_id,
-      to_organization_id: ENV.fetch("HCB_RECIPIENT_ORG_ID"),
+      to_organization_id: to_organization_id,
       amount_cents: amount_cents,
       name: name,
     )
-    if memo && result.transaction_id
-      client.update_transaction(result.transaction_id, event_id: organization_id, memo: memo)
-    end
-    result
+  end
+
+  def set_transaction_memo!(transaction_id, memo)
+    client.update_transaction(transaction_id, event_id: organization_id, memo: memo)
   end
 end

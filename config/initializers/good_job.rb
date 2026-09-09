@@ -53,8 +53,12 @@ Rails.application.configure do
       class: "Warehouse::CzarDigestJob",
     },
     billing_settlement_sweep: {
-      cron: "*/15 * * * *",  # every 15 minutes — catches orphaned pending/failed entries
+      cron: "*/15 * * * *",  # charge unclaimed entries, retry failed transfers
       class: "BillingSettlementSweepJob",
+    },
+    billing_reconcile: {
+      cron: "*/10 * * * *",  # resolve unknown / stale-pending transfers against HCB
+      class: "BillingReconcileJob",
     },
   }
 end

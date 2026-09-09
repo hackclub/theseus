@@ -20,24 +20,57 @@ class Views::Billing::Index < Views::Base
           section(style: "flex:1;min-width:200px;") do
             strong { profile.organization_name }
             div(class: "detail-grid", style: "margin-top:0.5rem;") do
-              span(class: "detail-label") { "Total billed" }
-              span { "$#{"%.2f" % (entries.where.not(state: :refunded).sum(:amount_cents) / 100.0)}" }
+              span(class: "detail-label") { "Net billed" }
+              span { money(entries.live.sum(:amount_cents)) }
 
               span(class: "detail-label") { "Settled" }
-              span { "$#{"%.2f" % (entries.settled.sum(:amount_cents) / 100.0)}" }
+              span { money(entries.settled.sum(:amount_cents)) }
 
               span(class: "detail-label") { "Pending" }
               pending = entries.pending.sum(:amount_cents)
-              if pending > 0
-                span(class: "badge badge-warning") { "$#{"%.2f" % (pending / 100.0)}" }
+              if pending != 0
+                span(class: "badge badge-warning") { money(pending) }
               else
                 span(class: "text-muted") { "$0.00" }
               end
 
-              failed = entries.failed.sum(:amount_cents)
-              if failed > 0
-                span(class: "detail-label") { "Failed" }
-                span(class: "badge badge-danger") { "$#{"%.2f" % (failed / 100.0)}" }
+              stuck = profile.hcb_transfers.where(state: [:unknown, :failed]).count
+              if stuck > 0
+                span(class: "detail-label") { "Transfers needing attention" }
+                span(class: "badge badge-danger") { stuck.to_s }
+              end
+            end
+          end
+        end
+      end
+    end
+
+    if helpers.current_user&.admin?
+      attention = HCB::Transfer.where(state: [:failed, :unknown]).includes(:billing_profile).order(:created_at)
+      if attention.any?
+        section(style: "margin-bottom:1.5rem;") do
+          h3(style: "margin-top:0;") { "Transfers needing attention" }
+          table do
+            thead { tr { th { "Created" }; th { "Org" }; th { "Direction" }; th { "HQ org" }; th { "Amount" }; th { "State" }; th { "Attempts" }; th { "Error" }; th { "" } } }
+            tbody do
+              attention.each do |t|
+                tr do
+                  td(class: "text-muted") { t.created_at.strftime("%b %d %H:%M") }
+                  td { t.billing_profile.organization_name }
+                  td { t.direction }
+                  td { code { t.hq_organization_id } }
+                  td { money(t.amount_cents) }
+                  td { transfer_cell(t) }
+                  td { "#{t.attempts}#{t.next_attempt_at ? " (next #{t.next_attempt_at.strftime("%H:%M")})" : ""}" }
+                  td(class: "text-muted") { t.last_error }
+                  td do
+                    form(action: retry_transfer_billing_index_path(transfer_id: t.id), method: "post", class: "form-inline",
+                         onsubmit: (t.unknown? ? "return confirm('This transfer is UNKNOWN. Only retry if you have checked HCB and it is NOT there. Continue?')" : nil)) do
+                      input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
+                      button(type: "submit", class: "btn-sm #{t.unknown? ? "btn-danger" : "btn-warning"}") { t.unknown? ? "Force retry" : "Retry now" }
+                    end
+                  end
+                end
               end
             end
           end
@@ -56,7 +89,7 @@ class Views::Billing::Index < Views::Base
             th { "For" }
             th { "Organization" }
             th { "State" }
-            th { "HCB Transfer" }
+            th { "Transfer" }
           end
         end
         tbody do
@@ -66,17 +99,11 @@ class Views::Billing::Index < Views::Base
               td do
                 span(class: "badge badge-info") { entry.category }
               end
-              td(style: "font-weight:600;") { "$#{"%.2f" % entry.amount}" }
+              td(style: "font-weight:600;", class: (entry.credit? ? "text-success" : nil)) { money(entry.amount_cents) }
               td { ledgerable_link(entry) }
               td { entry.billing_profile.organization_name }
               td { state_badge(entry.state) }
-              td do
-                if entry.hcb_transfer&.hcb_transaction_id.present?
-                  code(class: "text-muted") { entry.hcb_transfer.hcb_transaction_id.truncate(16) }
-                else
-                  span(class: "text-muted") { "—" }
-                end
-              end
+              td { transfer_cell(entry.hcb_transfer) }
             end
           end
         end
@@ -93,14 +120,31 @@ class Views::Billing::Index < Views::Base
 
   private
 
+  def money(cents)
+    sign = cents.negative? ? "-" : ""
+    "#{sign}$#{"%.2f" % (cents.abs / 100.0)}"
+  end
+
   def state_badge(state)
     variant = case state
               when "settled" then "badge-success"
               when "pending" then "badge-warning"
-              when "failed" then "badge-danger"
-              when "refunded" then "badge"
+              when "voided" then "badge"
               end
     span(class: "badge #{variant}") { state }
+  end
+
+  def transfer_cell(transfer)
+    return span(class: "text-muted") { "—" } unless transfer
+    variant = case transfer.state
+              when "completed" then "badge-success"
+              when "pending" then "badge-warning"
+              when "unknown" then "badge-warning"
+              when "failed" then "badge-danger"
+              end
+    span(class: "badge #{variant}", title: transfer.last_error) { transfer.state }
+    plain " "
+    code(class: "text-muted", title: transfer.idempotency_key) { transfer.remote_id&.truncate(16) || transfer.idempotency_key }
   end
 
   def ledgerable_link(entry)

@@ -255,6 +255,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
 
   # Alpine.js data
 
+  def alpine_data_json
     initial_items = @line_items.map.with_index do |li, i|
       {
         id: li.id,

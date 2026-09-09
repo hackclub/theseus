@@ -56,16 +56,25 @@
 </div>
 
 <%# ── Money summary ── %>
-<% if @batch.hcb_transfer_id.present? && !@batch.hcb_transfer_id.start_with?("mock") %>
-  <% charged = @batch.hcb_transfer_amount_cents.to_i %>
+<% indicia_charge = @batch.ledger_entries.indicia.charges.live.order(:id).last %>
+<% if indicia_charge %>
+  <% charged = indicia_charge.amount_cents %>
+  <% credited = -indicia_charge.reversals.live.sum(:amount_cents) %>
   <% spent_cents = @batch.actual_spent_cents %>
-  <% overpaid = charged - spent_cents %>
+  <% overpaid = indicia_charge.net_cents - spent_cents %>
   <div class="detail-grid batch-money">
     <span class="detail-label">Charged HCB</span>
-    <span>$<%= '%.2f' % (charged / 100.0) %></span>
+    <span>
+      $<%= '%.2f' % (charged / 100.0) %>
+      <% if indicia_charge.pending? %><span class="badge badge-warning"><%= indicia_charge.hcb_transfer&.state || "pending" %></span><% end %>
+    </span>
+    <% if credited > 0 %>
+      <span class="detail-label">Refunded</span>
+      <span>$<%= '%.2f' % (credited / 100.0) %></span>
+    <% end %>
     <span class="detail-label">USPS spent</span>
     <span>$<%= '%.2f' % (spent_cents / 100.0) %></span>
-    <% if overpaid > 0 && @batch.processed? %>
+    <% if overpaid > 0 && @batch.processed? && indicia_charge.settled? %>
       <strong class="detail-label text-warning">⚠ Overpaid</strong>
       <span>
         <strong class="text-warning">$<%= '%.2f' % (overpaid / 100.0) %></strong>
@@ -104,20 +113,27 @@
   <% end %>
 </div>
 
-<%# ── Audit trail ── %>
-<% if @batch.audit_log.present? && current_user&.admin? %>
+<%# ── Billing trail ── %>
+<% transfers = HCB::Transfer.where(id: @batch.ledger_entries.select(:hcb_transfer_id)).order(:id) %>
+<% if transfers.any? && current_user&.admin? %>
   <details class="batch-audit">
-    <summary>Audit trail (<%= @batch.audit_log.size %> events)</summary>
+    <summary>HCB transfers (<%= transfers.size %>)</summary>
     <table>
       <thead>
-        <tr><th>Time</th><th>Event</th><th>Details</th></tr>
+        <tr><th>Time</th><th>Direction</th><th>HQ org</th><th>Amount</th><th>State</th><th>Key</th><th>HCB id</th><th>Attempts</th><th>Error</th></tr>
       </thead>
       <tbody>
-        <% @batch.audit_log.reverse.each do |entry| %>
+        <% transfers.each do |t| %>
           <tr>
-            <td class="text-muted"><%= Time.parse(entry["at"]).strftime("%H:%M:%S") %></td>
-            <td><code><%= entry["event"] %></code></td>
-            <td class="text-muted"><%= entry.except("at", "event").map { |k, v| "#{k}: #{v}" }.join(", ") %></td>
+            <td class="text-muted"><%= t.created_at.strftime("%b %d %H:%M:%S") %></td>
+            <td><%= t.direction %></td>
+            <td><code><%= t.hq_organization_id %></code></td>
+            <td>$<%= '%.2f' % t.amount %></td>
+            <td><code><%= t.state %></code></td>
+            <td><code><%= t.idempotency_key %></code></td>
+            <td><code><%= t.remote_id || "—" %></code></td>
+            <td><%= t.attempts %></td>
+            <td class="text-muted"><%= t.last_error %></td>
           </tr>
         <% end %>
       </tbody>

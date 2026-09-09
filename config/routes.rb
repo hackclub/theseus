@@ -536,7 +536,11 @@ Rails.application.routes.draw do
     delete "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
     get "/dev_login", to: "sessions#dev_login" if Rails.env.development?
 
-    resources :billing, only: [:index, :show], controller: "billing"
+    resources :billing, only: [:index, :show], controller: "billing" do
+      collection do
+        post "transfers/:transfer_id/retry", action: :retry_transfer, as: :retry_transfer
+      end
+    end
     namespace :usps do
       resources :indicia
     end

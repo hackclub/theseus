@@ -284,61 +284,35 @@ class Letter::BatchesController < BaseBatchesController
   def refund_overpayment
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
 
-    # Phase 1: calculate and reserve inside lock
-    overpaid = nil
-    original_amount = nil
-    hcb_account = nil
+    # Phase 1: compute and reserve under the batch lock. The credit entry is
+    # created here (pending), so a second click sees a smaller net and bails.
+    transfer = nil
     @batch.with_lock do
-      original_amount = @batch.hcb_transfer_amount_cents.to_i
-      spent = @batch.actual_spent_cents
-      overpaid = original_amount - spent
-
+      charge = @batch.ledger_entries.indicia.charges.settled.order(:id).last
+      overpaid = charge ? charge.net_cents - @batch.actual_spent_cents : 0
       if overpaid <= 0
         redirect_to processing_letter_batch_path(@batch), alert: "Nothing to refund."
         return
       end
 
-      hcb_account = @batch.billing_profile
-      # Reserve: mark as refunding to prevent double-click
-      @batch.update_columns(hcb_transfer_amount_cents: spent)
-    end
-
-    return if performed?
-
-    # Phase 2: HCB call outside the lock
-    begin
-      refund_result = BillingProfile.refund_to_organization!(
-        organization_id: hcb_account.organization_id,
+      transfer = Billing.credit!(
+        reverses: charge,
         amount_cents: overpaid,
         name: "Refund for #{@batch.public_id}",
-        memo: "[theseus] overpayment refund",
-      )
-    rescue => e
-      # Restore original amount so retry is possible
-      @batch.update_columns(hcb_transfer_amount_cents: original_amount)
-      redirect_to processing_letter_batch_path(@batch), alert: "Refund failed: #{e.message}"
-      return
-    end
-
-    # Phase 3: record in ledger
-    refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
-    refund_xfer = HCB::Transfer.create!(
-      billing_profile: hcb_account,
-      amount_cents: overpaid,
-      state: :completed,
-      hcb_transaction_id: refund_tx_id,
-    )
-    original_entry = @batch.ledger_entries.settled.indicia.first
-    if original_entry
-      original_entry.update_columns(
-        state: LedgerEntry.states[:refunded],
-        hcb_transfer_id: refund_xfer.id,
-        metadata: original_entry.metadata.merge("overpayment_refunded_cents" => overpaid),
+        memo: "[theseus] overpayment refund by #{current_user.email}",
+        execute: false,
       )
     end
-    @batch.audit!(:hcb_refunded, amount_cents: overpaid, admin: current_user.email)
 
-    redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % (overpaid / 100.0)}"
+    # Phase 2: HCB call outside the lock
+    Billing.execute!(transfer, strict: true)
+    redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % transfer.amount}"
+  rescue Billing::InFlight => e
+    redirect_to processing_letter_batch_path(@batch), alert: "#{e.message}. Try again once it resolves."
+  rescue Billing::Unconfirmed => e
+    redirect_to processing_letter_batch_path(@batch), alert: "Refund sent but unconfirmed (#{e.transfer.idempotency_key}); the reconciler will resolve it. Do not retry."
+  rescue Billing::Rejected => e
+    redirect_to processing_letter_batch_path(@batch), alert: "Refund failed: #{e.message}"
   end
 
   def update_costs

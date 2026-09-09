@@ -1,0 +1,4 @@
+<h2 style="color: red;">🔴 Ambiguous reconciliation</h2>
+<p>More than one transfer on HCB matches this unconfirmed transfer. A human needs to look at the HQ ledger and either complete this transfer with the right <code>xfr_</code> id or mark it failed.</p>
+<p><strong>Candidates:</strong> <%= Array(@transfer.metadata["reconcile_ambiguous"]).join(", ") %></p>
+<%= render "transfer", transfer: @transfer %>

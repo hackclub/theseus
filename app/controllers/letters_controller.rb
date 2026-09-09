@@ -254,101 +254,32 @@ class LettersController < ApplicationController
       return
     end
 
-    # Lock the letter to prevent concurrent double-purchase
-    @letter.with_lock do
-      if @letter.usps_indicium.present?
-        redirect_to @letter, alert: "Indicia already purchased for this letter."
-        return
-      end
-
-      usps_payment_account = USPS::PaymentAccount.find_by(id: params[:usps_payment_account_id])
+    usps_payment_account = USPS::PaymentAccount.find_by(id: params[:usps_payment_account_id])
     if usps_payment_account.nil?
       redirect_to @letter, alert: "Please select a valid USPS payment account."
       return
     end
 
     billing_profile = current_user.billing_profiles.find_by(id: params[:hcb_payment_account_id])
-
     if billing_profile.blank?
       redirect_to @letter, alert: "You must select a billing profile to purchase indicia."
       return
     end
 
-    indicium = USPS::Indicium.create!(
-      letter: @letter,
-      payment_account: usps_payment_account,
-      billing_profile: billing_profile,
-    )
-    cost_cents = (@letter.postage * 100).ceil
-
-    transfer_service = HCB::TransferService.new(
-      billing_profile: billing_profile,
-      amount_cents: cost_cents,
-      name: "Postage for #{@letter.public_id} #{indicium.public_id} #{letter_path(@letter)}",
-      memo: "[theseus] postage for a #{@letter.processing_category}",
-    )
-    transfer = transfer_service.call
-
-    unless transfer
-      indicium.destroy!
-      redirect_to @letter, alert: transfer_service.errors.join(", ")
-      return
-    end
-
-    indicium.update!(hcb_transfer_id: transfer.id)
-
-    # Create HCB::Transfer and settled ledger entry for this indicium charge
-    transaction_id = transfer.respond_to?(:id) ? transfer.id : transfer.to_s
-    hcb_xfer = HCB::Transfer.create!(
-      billing_profile: billing_profile,
-      amount_cents: cost_cents,
-      state: :completed,
-      hcb_transaction_id: transaction_id,
-    )
-    indicium.ledger_entries.create!(
-      billing_profile: billing_profile,
-      category: :indicia,
-      amount_cents: cost_cents,
-      state: :settled,
-      settled_at: Time.current,
-      hcb_transfer: hcb_xfer,
-    )
-
-    begin
-      indicium.buy!
-    rescue => e
-      if indicium.raw_json_response.present?
-        # USPS already sold us postage — do NOT destroy or refund.
-        # The indicium is partially saved; leave it for manual resolution.
-        Sentry.capture_exception(e, level: :fatal, tags: { money: true, critical: true },
-          extra: { indicium_id: indicium.id, letter_id: @letter.id, response: indicium.raw_json_response })
-        redirect_to @letter, alert: "Postage was purchased but failed to save (#{e.message}). Do not retry — contact Nora."
-      else
-        # API call never went through, safe to clean up.
-        refund_result = BillingProfile.refund_to_organization!(
-          organization_id: billing_profile.organization_id,
-          amount_cents: cost_cents,
-          name: "Refund for #{@letter.public_id} #{indicium.public_id} #{letter_path(@letter)}",
-          memo: "[theseus] postage refund for a #{@letter.processing_category}",
-        )
-        # Mark the charge entry as refunded instead of destroying it
-        refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
-        refund_xfer = HCB::Transfer.create!(
-          billing_profile: billing_profile,
-          amount_cents: cost_cents,
-          state: :completed,
-          hcb_transaction_id: refund_tx_id,
-        )
-        indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
-        # Don't destroy indicium — it has refunded billing entries for audit trail
-        redirect_to @letter, alert: "Purchase failed (refunded): #{e.message}"
-      end
-      return
-    end
-
+    USPS::IndiciumPurchase.new(letter: @letter, usps_account: usps_payment_account, billing_profile: billing_profile).call
     @letter.update_columns(indicia_state: "purchased")
-      redirect_to @letter, notice: "Indicia purchased successfully (charged to #{billing_profile.organization_name})."
-    end
+    redirect_to @letter, notice: "Indicia purchased successfully (charged to #{billing_profile.organization_name})."
+  rescue USPS::IndiciumPurchase::AlreadyPurchased => e
+    redirect_to @letter, alert: e.message
+  rescue Billing::InFlight, Billing::Unconfirmed => e
+    redirect_to @letter, alert: "#{e.message}. Please wait for it to be confirmed before trying again."
+  rescue Billing::Rejected => e
+    redirect_to @letter, alert: "HCB declined the charge: #{e.message}"
+  rescue USPS::IndiciumPurchase::Unrecorded => e
+    redirect_to @letter, alert: "Postage was purchased but failed to save (#{e.cause_error.message}). Do not retry — contact Nora."
+  rescue USPS::IndiciumPurchase::PurchaseFailed => e
+    status = e.refunded? ? "refunded" : "refund #{e.credit&.state || 'failed'} — check billing"
+    redirect_to @letter, alert: "Purchase failed (#{status}): #{e.cause_error.message}"
   end
 
   # GET /letters/scanner

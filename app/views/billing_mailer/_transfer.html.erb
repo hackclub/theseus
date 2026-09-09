@@ -1,0 +1,21 @@
+<p>
+  <strong>Organization:</strong> <%= transfer.billing_profile.organization_name %><br>
+  <strong>Direction:</strong> <%= transfer.direction %> (<%= transfer.hq_organization_id %>)<br>
+  <strong>Amount:</strong> $<%= "%.2f" % transfer.amount %><br>
+  <strong>Key:</strong> <code><%= transfer.idempotency_key %></code><br>
+  <strong>Attempts:</strong> <%= transfer.attempts %><br>
+  <% if transfer.last_error.present? %><strong>Error:</strong> <%= transfer.last_error %><br><% end %>
+  <% if transfer.next_attempt_at.present? %><strong>Next attempt:</strong> <%= transfer.next_attempt_at.strftime("%b %d %H:%M %Z") %><br><% end %>
+</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><th>Category</th><th>Amount</th><th>For</th><th>Created</th></tr>
+  <% transfer.ledger_entries.each do |entry| %>
+    <tr>
+      <td><%= entry.category %></td>
+      <td>$<%= "%.2f" % entry.amount %></td>
+      <td><%= entry.ledgerable_type %> #<%= entry.ledgerable_id %></td>
+      <td><%= entry.created_at.strftime("%b %d, %Y %H:%M") %></td>
+    </tr>
+  <% end %>
+</table>

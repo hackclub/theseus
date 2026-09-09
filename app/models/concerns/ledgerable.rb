@@ -17,19 +17,32 @@ module Ledgerable
     }
   end
 
-  def total_billed_cents
-    ledger_entries.where.not(state: :refunded).sum(:amount_cents)
+  # Net of charges and credits, excluding voided entries.
+  def total_billed_cents(category = nil)
+    scoped_entries(category).live.sum(:amount_cents)
   end
 
-  def total_settled_cents
-    ledger_entries.settled.sum(:amount_cents)
+  def total_charged_cents(category = nil)
+    scoped_entries(category).live.charges.sum(:amount_cents)
+  end
+
+  def total_credited_cents(category = nil)
+    -scoped_entries(category).live.credits.sum(:amount_cents)
+  end
+
+  def total_settled_cents(category = nil)
+    scoped_entries(category).settled.sum(:amount_cents)
   end
 
   def billing_settled?
-    ledger_entries.unsettled.none?
+    ledger_entries.pending.none?
   end
 
   private
+
+  def scoped_entries(category)
+    category ? ledger_entries.where(category: category) : ledger_entries
+  end
 
   def prevent_destroy_with_billing_entries
     if ledger_entries.exists?

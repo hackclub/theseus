@@ -18,8 +18,9 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
       endDate: end_date
     ).index_by { |order| order[:order_number].to_s.sub("hack.club/", "") }
 
-    # Track which billing profiles need settlement after processing
-    profiles_to_settle = Set.new
+    # Individual orders are charged as soon as postage is known; bulk-upload
+    # orders are left unclaimed for the sweep to batch per profile.
+    orders_to_charge = []
 
     orders.each do |order|
       zen_order = zen_orders[order.hc_id]
@@ -50,7 +51,7 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
             category: :postage,
             amount_cents: (zen_order[:shipping_handling].to_d * 100).ceil,
           )
-          profiles_to_settle << order.billing_profile
+          orders_to_charge << order unless order.bulk_upload?
         end
       end
 
@@ -58,9 +59,10 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
       Warehouse::OrderMailer.with(order:).order_shipped.deliver_later
     end
 
-    # Settle each billing profile that had new postage entries
-    profiles_to_settle.each do |profile|
-      BillingSettlementService.new(billing_profile: profile).settle!
+    orders_to_charge.each do |order|
+      order.charge_postage!
+    rescue => e
+      Sentry.capture_exception(e, extra: { order_id: order.id }) if defined?(Sentry)
     end
   end
 end

@@ -7,7 +7,6 @@
 #  address_count               :integer
 #  audit_log                   :jsonb
 #  field_mapping               :jsonb
-#  hcb_transfer_amount_cents   :integer
 #  letter_height               :decimal(, )
 #  letter_mailing_date         :date
 #  letter_processing_category  :integer
@@ -90,6 +89,15 @@ class Warehouse::Batch < Batch
     # Dispatch all orders
     orders.each do |order|
       order.dispatch!
+    end
+
+    # One charge for the whole batch's labor. If a transfer is in flight the
+    # entries stay unclaimed and the sweep batches them.
+    if billing_profile.present?
+      Billing.charge!(
+        LedgerEntry.unclaimed.charges.labor.where(ledgerable: orders),
+        name: "Labor for batch #{public_id}",
+      )
     end
 
     mark_processed!

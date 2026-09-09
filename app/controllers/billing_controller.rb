@@ -19,4 +19,16 @@ class BillingController < ApplicationController
 
     render Views::Billing::Show.new(ledger_entry: @ledger_entry)
   end
+
+  # Admin: re-execute a failed transfer, or force a stuck unknown one back
+  # through (only do that after checking HCB by hand).
+  def retry_transfer
+    authorize LedgerEntry, :retry_transfer?
+    transfer = HCB::Transfer.find(params[:transfer_id])
+    transfer.retry!
+    Billing.execute!(transfer)
+    redirect_back fallback_location: billing_index_path, notice: "Transfer #{transfer.idempotency_key} is now #{transfer.state}#{transfer.last_error ? ": #{transfer.last_error}" : ""}"
+  rescue => e
+    redirect_back fallback_location: billing_index_path, alert: e.message
+  end
 end

@@ -61,110 +61,37 @@ class Letter::InstantQueue < Letter::Queue
   def process_letter_instantly!(address, params = {})
     Rails.logger.info("Starting process_letter_instantly! with postage_type: #{postage_type}")
 
-    # Phase 1: create letter and indicium in a transaction
-    letter = nil
-    indicium = nil
-    ActiveRecord::Base.transaction do
-      letter = letters.build(
-        address: address,
-        height: letter_height,
-        width: letter_width,
-        weight: letter_weight,
-        return_address: letter_return_address,
-        return_address_name: letter_return_address_name,
-        usps_mailer_id: letter_mailer_id,
-        processing_category: letter_processing_category,
-        tags: tags,
-        aasm_state: "pending",
-        postage_type: postage_type,
-        mailing_date: Date.current + 1.day,
-        **params,
-      )
-      letter.save!
+    letter = letters.create!(
+      address: address,
+      height: letter_height,
+      width: letter_width,
+      weight: letter_weight,
+      return_address: letter_return_address,
+      return_address_name: letter_return_address_name,
+      usps_mailer_id: letter_mailer_id,
+      processing_category: letter_processing_category,
+      tags: tags,
+      aasm_state: "pending",
+      postage_type: postage_type,
+      mailing_date: Date.current + 1.day,
+      **params,
+    )
 
-      if indicia?
-        usps_payment_account = USPS::PaymentAccount.find(usps_payment_account_id)
-        indicium = USPS::Indicium.create!(
-          letter: letter,
-          payment_account: usps_payment_account,
-          billing_profile: billing_profile,
-          mailing_date: letter.mailing_date,
-        )
-      end
-    end
-
-    # Phase 2: external calls outside transaction (HCB charge, USPS buy)
-    if indicium
-      cost_cents = (letter.postage * 100).ceil
-
-      # Charge HCB
-      transfer_service = HCB::TransferService.new(
-        billing_profile: billing_profile,
-        amount_cents: cost_cents,
-        name: "Postage for #{letter.public_id} #{indicium.public_id} (#{slug}) #{Rails.application.routes.url_helpers.letter_path(letter)}",
-        memo: "[theseus] postage for a #{letter.processing_category} via queue #{name}",
-      )
-      transfer = transfer_service.call
-      unless transfer
-        # HCB charge failed — destroy indicium (no money moved) and the letter
-        indicium.destroy!
-        letter.destroy!
-        raise "HCB payment failed: #{transfer_service.errors.join(', ')}"
-      end
-
-      # Record billing — these are committed and survive even if USPS buy fails
-      transaction_id = transfer.respond_to?(:id) ? transfer.id : transfer.to_s
-      indicium.update!(hcb_transfer_id: transfer.id)
-      hcb_xfer = HCB::Transfer.create!(
-        billing_profile: billing_profile,
-        amount_cents: cost_cents,
-        state: :completed,
-        hcb_transaction_id: transaction_id,
-      )
-      indicium.ledger_entries.create!(
-        billing_profile: billing_profile,
-        category: :indicia,
-        amount_cents: cost_cents,
-        state: :settled,
-        settled_at: Time.current,
-        hcb_transfer: hcb_xfer,
-      )
-
-      # Buy from USPS
+    if indicia?
       begin
-        indicium.buy!
-      rescue => e
-        if indicium.raw_json_response.present?
-          # USPS already sold us postage — do NOT destroy or refund.
-          Sentry.capture_exception(e, level: :fatal, tags: { money: true, critical: true },
-            extra: { indicium_id: indicium.id, letter_id: letter.id, response: indicium.raw_json_response })
-          raise e
-        else
-          # USPS API never went through, safe to refund HCB
-          refund_result = BillingProfile.refund_to_organization!(
-            organization_id: billing_profile.organization_id,
-            amount_cents: cost_cents,
-            name: "Refund for #{letter.public_id} #{indicium.public_id} #{Rails.application.routes.url_helpers.letter_path(letter)}",
-            memo: "[theseus] postage refund for a #{letter.processing_category}",
-          )
-          refund_tx_id = refund_result.respond_to?(:id) ? refund_result.id : refund_result.try(:transaction_id)
-          refund_xfer = HCB::Transfer.create!(
-            billing_profile: billing_profile,
-            amount_cents: cost_cents,
-            state: :completed,
-            hcb_transaction_id: refund_tx_id,
-          )
-          indicium.ledger_entries.each { |le| le.refund!(refund_xfer) }
-          # Don't destroy indicium or letter — they have refunded billing entries.
-          # The indicium stays as an audit trail; the letter stays in pending state.
-          raise e
-        end
+        USPS::IndiciumPurchase.new(
+          letter: letter,
+          usps_account: USPS::PaymentAccount.find(usps_payment_account_id),
+          billing_profile: billing_profile,
+          name_suffix: " via queue #{name} (#{slug})",
+        ).call
+      rescue Billing::Rejected, Billing::InFlight => e
+        # No money moved and the indicium was cleaned up; the letter is the only trace.
+        letter.destroy!
+        raise "HCB payment failed: #{e.message}"
       end
-
-      letter.reload
-      unless letter.usps_indicium.present?
-        raise "Failed to associate indicium with letter"
-      end
+      # Any other failure (Unconfirmed, Unrecorded, PurchaseFailed) leaves the
+      # letter and indicium in place as the audit trail and propagates.
     end
 
     # Phase 3: post-processing
