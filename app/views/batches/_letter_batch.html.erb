@@ -2,8 +2,8 @@
   <strong>Letter Batch</strong>
   <hr>
 
-  <div class="mt-half mb-1" style="display:flex; gap:1rem">
-    <section style="flex: 1;">
+  <div class="mt-half mb-1 flex-gap-1">
+    <section class="flex-1">
       <strong>From</strong>
       <hr>
       <div class="mt-half">
@@ -21,7 +21,7 @@
       </div>
     </section>
 
-    <section style="flex: 1;">
+    <section class="flex-1">
       <strong>Info</strong>
       <hr>
       <div class="detail-grid mt-half">
@@ -41,7 +41,7 @@
     <section class="mb-1">
       <strong>Generated Labels</strong>
       <hr>
-      <div class="mt-half" style="display:flex; align-items:center; gap:0.5rem">
+      <div class="mt-half flex-row">
         <span class="text-muted">Generated <%= batch.pdf_label.created_at.strftime("%b %d, %Y %H:%M") %></span>
         <span class="spacer"></span>
         <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>"><button class="btn-success btn-sm">↓ Download PDF</button></a>
@@ -58,7 +58,7 @@
       </div>
     </section>
   <% else %>
-    <div class="text-muted" style="text-align: center; padding: 1rem 0">
+    <div class="text-muted panel-centered">
       No labels generated yet.
     </div>
   <% end %>

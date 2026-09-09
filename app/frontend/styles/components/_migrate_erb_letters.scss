@@ -27,3 +27,8 @@
 .progress-summary-row { display: flex; gap: 1.5rem; align-items: center; }
 .progress-count { font-size: 1.5em; font-variant-numeric: tabular-nums; }
 .progress-count-sm { font-size: 1.5em; }
+
+// batches
+.panel-centered { text-align: center; padding: 1rem 0; }
+.batch-processed-icon { font-size: 2em; }
+.flex-gap-1 { display: flex; gap: 1rem; }
