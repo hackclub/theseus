@@ -21,7 +21,7 @@ class Views::Warehouse::SKURequests::Index < Views::Base
     end
 
     if @sku_requests.empty?
-      div(style: "text-align: center; padding: 3rem 0; color: var(--foreground2);") do
+      div(class: "sku-requests-empty") do
         p { "No SKU requests yet." }
         a(href: new_warehouse_sku_request_path) do
           button(class: "btn-success") { "+ New Request" }
@@ -36,22 +36,22 @@ class Views::Warehouse::SKURequests::Index < Views::Base
             th { "Status" }
             th { "Requested By" }
             th { "Date" }
-            th(style: "text-align: right;") { "" }
+            th(class: "text-right") { "" }
           end
         end
         tbody do
           @sku_requests.each do |req|
             tr do
               td do
-                a(href: warehouse_sku_request_path(req), style: "text-decoration:none;font-weight:600;") { req.name }
+                a(href: warehouse_sku_request_path(req), class: "link-strong") { req.name }
               end
               td { span(class: "badge") { req.category&.humanize || "—" } }
               td { status_badge(req.aasm_state) }
               td(class: "text-muted") { req.user&.username || "—" }
               td(class: "text-muted") { req.created_at.strftime("%b %d, %Y") }
-              td(style: "text-align:right;") do
+              td(class: "text-right") do
                 if policy(req).edit?
-                  a(href: edit_warehouse_sku_request_path(req), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
+                  a(href: edit_warehouse_sku_request_path(req), class: "sku-request-edit-link") { "✎" }
                 end
               end
             end

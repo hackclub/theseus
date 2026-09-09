@@ -1,2 +1,26 @@
 // inline-style migration shard: phlex_warehouse
 // area-specific classes only; shared utilities live in utils.scss
+
+// generic monospace text (repeated across sku codes)
+.mono { font-family: monospace; }
+
+// ── SKU requests ───────────────────────────────────────
+
+.sku-requests-empty { text-align: center; padding: 3rem 0; color: var(--foreground2); }
+.sku-request-edit-link { color: var(--foreground2); margin-right: 0.5rem; }
+.sku-request-returned-banner { margin-bottom: 1rem; border-color: var(--warning-border); background: var(--warning-bg); }
+.sku-request-returned-content { display: flex; align-items: flex-start; gap: 0.5rem; }
+.sku-request-returned-icon { font-size: 1.2em; }
+.sku-request-returned-notes { margin-top: 0.25rem; }
+.sku-request-summary-row { display: flex; gap: 2rem; flex-wrap: wrap; }
+.sku-request-review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+.sku-request-review-grid__full { grid-column: 1 / -1; }
+.sku-code-input { font-size: 1.1em; }
+.sku-request-review-hint { display: block; margin-top: 0.25rem; }
+.sku-request-unit-cost-row { display: flex; align-items: center; gap: 0.25rem; }
+.sku-request-approve-actions { margin-top: 1rem; display: flex; gap: 0.5rem; }
+.sku-request-return-row { display: flex; align-items: flex-end; gap: 0.5rem; }
+.sku-request-zenventory-box { margin-top: 0.75rem; padding: 0.75rem; background: var(--info-bg); border: 1px solid var(--info-border); border-radius: 4px; }
+.sku-request-zenventory-title { color: var(--info-fg); }
+.sku-request-zenventory-desc { margin: 0.25rem 0 0.75rem; color: var(--info-fg); font-size: 0.9em; }
+.sku-request-image { max-width: 100%; max-height: 300px; border-radius: 4px; }

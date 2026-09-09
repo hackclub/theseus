@@ -29,10 +29,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   private
 
   def toolbar
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: warehouse_sku_requests_path, style: "text-decoration: none; color: var(--foreground2);") { "← SKU Requests" }
-        strong(style: "font-size: 1.15em;") { @sku_request.name }
+        a(href: warehouse_sku_requests_path, class: "link-muted") { "← SKU Requests" }
+        strong(class: "text-title") { @sku_request.name }
         status_badge(@sku_request.aasm_state)
       end
       span(class: "spacer")
@@ -77,16 +77,16 @@ class Views::Warehouse::SKURequests::Show < Views::Base
   end
 
   def returned_banner
-    section(style: "margin-bottom: 1rem; border-color: var(--warning-border); background: var(--warning-bg);") do
-      div(style: "display:flex;align-items:flex-start;gap:0.5rem;") do
-        span(style: "font-size:1.2em;") { "⚠" }
+    section(class: "sku-request-returned-banner") do
+      div(class: "sku-request-returned-content") do
+        span(class: "sku-request-returned-icon") { "⚠" }
         div do
           strong { "Returned for revision" }
           if @sku_request.reviewed_by
             plain " by #{@sku_request.reviewed_by.username}"
           end
           if @sku_request.reviewer_notes.present?
-            div(style: "margin-top:0.25rem;") do
+            div(class: "sku-request-returned-notes") do
               span(class: "detail-label") { "Notes: " }
               span { @sku_request.reviewer_notes }
             end
@@ -98,7 +98,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
   def summary_banner
     section(class: "mb-1") do
-      div(style: "display:flex;gap:2rem;flex-wrap:wrap;") do
+      div(class: "sku-request-summary-row") do
         div do
           span(class: "detail-label") { "Requested by " }
           strong { @sku_request.user&.username || "—" }
@@ -149,10 +149,10 @@ class Views::Warehouse::SKURequests::Show < Views::Base
       form(method: "post", action: approve_warehouse_sku_request_path(@sku_request)) do
         input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
 
-        div(style: "display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.5rem;") do
+        div(class: "sku-request-review-grid") do
           # SKU code — the big one
-          div(style: "grid-column:1/-1;") do
-            label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
+          div(class: "sku-request-review-grid__full") do
+            label(class: "label-block text-muted") do
               plain "Assigned SKU Code "
               span(class: "text-danger") { "*" }
             end
@@ -162,39 +162,39 @@ class Views::Warehouse::SKURequests::Show < Views::Base
               required: true,
               value: @sku_request.suggested_code,
               placeholder: "e.g. Sti/Ath/Tes",
-              style: "width:100%;font-family:monospace;font-size:1.1em;"
+              class: "w-100 mono sku-code-input"
             )
-            small(class: "text-muted", style: "display:block;margin-top:0.25rem;") do
+            small(class: "text-muted sku-request-review-hint") do
               plain "Format: Category/Program/Name (3 letters each, but longer is ok)"
             end
           end
 
           # Editable fields the czar can adjust
           div do
-            label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Unit Cost" }
-            div(style: "display:flex;align-items:center;gap:0.25rem;") do
+            label(class: "label-block text-muted") { "Unit Cost" }
+            div(class: "sku-request-unit-cost-row") do
               span { "$" }
               input(type: "number", name: "unit_cost_override", step: "0.01", value: (@sku_request.unit_cost ? "%.2f" % @sku_request.unit_cost : nil), class: "w-100")
             end
           end
 
           div do
-            label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Country of Origin" }
+            label(class: "label-block text-muted") { "Country of Origin" }
             input(type: "text", name: "country_of_origin_override", value: @sku_request.country_of_origin, class: "w-100")
           end
 
           div do
-            label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "HS Code" }
+            label(class: "label-block text-muted") { "HS Code" }
             input(type: "text", name: "hs_code_override", value: @sku_request.hs_code, class: "w-100")
           end
 
           div do
-            label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Customs Description" }
+            label(class: "label-block text-muted") { "Customs Description" }
             input(type: "text", name: "customs_description_override", value: @sku_request.customs_description, class: "w-100")
           end
         end
 
-        div(style: "margin-top:1rem;display:flex;gap:0.5rem;") do
+        div(class: "sku-request-approve-actions") do
           button(type: "submit", class: "btn-success", onclick: safe("return confirm('Approve this SKU request and create the SKU in Zenventory?')")) { "✓ Approve & Create SKU" }
         end
       end
@@ -204,9 +204,9 @@ class Views::Warehouse::SKURequests::Show < Views::Base
       div(class: "mt-half") do
         form(method: "post", action: reject_warehouse_sku_request_path(@sku_request)) do
           input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
-          div(style: "display:flex;align-items:flex-end;gap:0.5rem;") do
-            div(style: "flex:1;") do
-              label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Reviewer Notes (optional)" }
+          div(class: "sku-request-return-row") do
+            div(class: "flex-1") do
+              label(class: "label-block text-muted") { "Reviewer Notes (optional)" }
               input(type: "text", name: "reviewer_notes", placeholder: "Notes for the requester...", class: "w-100")
             end
             button(type: "submit", class: "btn-warning btn-sm", onclick: safe("return confirm('Return this SKU request for revision?')")) { "↩ Return for Revision" }
@@ -223,9 +223,9 @@ class Views::Warehouse::SKURequests::Show < Views::Base
       div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "SKU Code" }
         if @sku_request.warehouse_sku
-          a(href: warehouse_sku_path(@sku_request.warehouse_sku), style: "font-weight:600;font-family:monospace;") { @sku_request.assigned_sku_code }
+          a(href: warehouse_sku_path(@sku_request.warehouse_sku), class: "fw-600 mono") { @sku_request.assigned_sku_code }
         else
-          span(style: "font-weight:600;font-family:monospace;") { @sku_request.assigned_sku_code }
+          span(class: "fw-600 mono") { @sku_request.assigned_sku_code }
         end
         span(class: "detail-label") { "Reviewed By" }
         span { @sku_request.reviewed_by&.username || "—" }
@@ -235,22 +235,20 @@ class Views::Warehouse::SKURequests::Show < Views::Base
 
       if @sku_request.image.attached? && @sku_request.warehouse_sku&.zenventory_url.present?
         hr
-        div(style: "margin-top:0.75rem;padding:0.75rem;background:var(--info-bg);border:1px solid var(--info-border);border-radius:4px;") do
-          strong(style: "color:var(--info-fg);") { "📷 Upload this image to Zenventory" }
-          p(style: "margin:0.25rem 0 0.75rem;color:var(--info-fg);font-size:0.9em;") do
+        div(class: "sku-request-zenventory-box") do
+          strong(class: "sku-request-zenventory-title") { "📷 Upload this image to Zenventory" }
+          p(class: "sku-request-zenventory-desc") do
             plain "Zenventory doesn't support image upload via API — download it here and upload it in their UI."
           end
-          div(style: "display:flex;gap:0.5rem;align-items:center;") do
+          div(class: "flex-row") do
             a(
               href: helpers.rails_blob_path(@sku_request.image, disposition: "attachment"),
-              class: "btn-sm btn-success",
-              style: "text-decoration:none;"
+              class: "btn-sm btn-success no-underline"
             ) { "⬇ Download Image" }
             a(
               href: @sku_request.warehouse_sku.zenventory_url,
               target: "_blank",
-              class: "btn-sm btn-info",
-              style: "text-decoration:none;"
+              class: "btn-sm btn-info no-underline"
             ) { "↗ Edit in Zenventory" }
           end
         end
@@ -285,7 +283,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
         detail_row("Customs Description", @sku_request.customs_description)
         if @sku_request.suggested_code.present?
           span(class: "detail-label") { "Suggested SKU Code" }
-          span(style: "font-family:monospace;") { @sku_request.suggested_code }
+          span(class: "mono") { @sku_request.suggested_code }
         end
       end
     end
@@ -303,7 +301,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
       div(class: "mt-half") do
         img(
           src: helpers.url_for(@sku_request.image),
-          style: "max-width: 100%; max-height: 300px; border-radius: 4px;",
+          class: "sku-request-image",
           alt: @sku_request.name
         )
       end
@@ -322,7 +320,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
         ul do
           pos.each do |po|
             li do
-              a(href: warehouse_purchase_order_path(po), style: "text-decoration:none;font-weight:600;") do
+              a(href: warehouse_purchase_order_path(po), class: "link-strong") do
                 plain "PO ##{po.id}"
               end
               span(class: "text-muted") { " — #{po.humanized_state}" }
