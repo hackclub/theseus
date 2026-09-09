@@ -27,3 +27,26 @@
 .text-lg { font-size: 1.25em; }
 .text-sm { font-size: 0.85em; }
 .code-block { margin: 0; font-size: 0.85em; }
+
+// Shared utilities for the inline-style migration. Names are the top repeated
+// inline values across app/views; reuse these before inventing a class.
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-title { font-size: 1.15em; }
+.fw-bold { font-weight: bold; }
+.m-0 { margin: 0; }
+.mb-quarter { margin-bottom: 0.25rem; }
+.flex-1 { flex: 1; }
+.w-80 { width: 80px; }
+.no-underline { text-decoration: none; }
+.link-muted { text-decoration: none; color: var(--foreground2); }
+.link-strong { text-decoration: none; font-weight: 600; }
+.link-bold { text-decoration: none; font-weight: bold; }
+.label-block { display: block; margin-bottom: 0.25rem; }
+.cell-pad { padding: 0.25rem 0.5rem; }
+.num-cell { padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+.tabular { font-variant-numeric: tabular-nums; }
+.empty-state { text-align: center; padding: 2rem; }
+.no-border-bottom { border-bottom: none; }
+.toolbar--flush { border-bottom: none; margin-bottom: 0; }
