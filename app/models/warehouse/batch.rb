@@ -83,8 +83,6 @@ class Warehouse::Batch < Batch
 
     transaction { new_orders.each(&:save!) }
 
-    transaction { new_orders.each(&:save!) }
-
     new_orders.each(&:dispatch!)
 
     # One charge for the whole batch's labor. If a transfer is in flight the
