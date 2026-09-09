@@ -263,6 +263,12 @@ class Letter < ApplicationRecord
     (iv + timestamps).sort_by { |event| event[:happened_at] }
   end
 
+  def undo_mailed!
+    raise AASM::InvalidTransition, "letter is not mailed or received" unless mailed? || received?
+    previous_state = printed_at.present? ? "printed" : "pending"
+    update!(aasm_state: previous_state, mailed_at: nil, received_at: nil)
+  end
+
   private
 
   def should_reprice?

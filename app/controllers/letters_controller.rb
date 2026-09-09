@@ -195,20 +195,15 @@ class LettersController < ApplicationController
   # POST /letters/1/undo_mark_mailed
   def undo_mark_mailed
     authorize @letter, :mark_mailed?
-
-    if @letter.mailed? || @letter.received?
-      previous_state = @letter.printed_at.present? ? 'printed' : 'pending'
-      @letter.update!(aasm_state: previous_state, mailed_at: nil, received_at: nil)
-
-      respond_to do |format|
-        format.html { redirect_to @letter, notice: "Letter unmarked as mailed." }
-        format.json { render json: { success: true, letter: letter_json(@letter) } }
-      end
-    else
-      respond_to do |format|
-        format.html { redirect_to @letter, alert: "Letter not marked as mailed." }
-        format.json { render json: { success: false, error: 'not_mailed' }, status: :unprocessable_entity }
-      end
+    @letter.undo_mailed!
+    respond_to do |format|
+      format.html { redirect_to @letter, notice: "Letter unmarked as mailed." }
+      format.json { render json: { success: true, letter: letter_json(@letter) } }
+    end
+  rescue AASM::InvalidTransition => e
+    respond_to do |format|
+      format.html { redirect_to @letter, alert: "Letter not marked as mailed." }
+      format.json { render json: { success: false, error: 'not_mailed' }, status: :unprocessable_entity }
     end
   end
 

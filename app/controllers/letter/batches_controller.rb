@@ -99,25 +99,7 @@ class Letter::BatchesController < BaseBatchesController
   def update
     authorize @batch, policy_class: Letter::BatchPolicy
     if @batch.update(batch_params)
-      # Update associated letters if the batch hasn't been processed
-      if @batch.may_mark_processed?
-        @batch.letters.update_all(
-          height: @batch.letter_height,
-          width: @batch.letter_width,
-          weight: @batch.letter_weight,
-          mailing_date: @batch.letter_mailing_date,
-          usps_mailer_id_id: @batch.letter_mailer_id_id,
-          return_address_id: @batch.letter_return_address_id,
-          return_address_name: @batch.letter_return_address_name,
-        )
-      end
-
-      # Always update tags and user facing title on letters
-      @batch.letters.update_all(
-        tags: @batch.tags,
-        user_facing_title: @batch.user_facing_title,
-      )
-
+      @batch.propagate_to_letters!
       redirect_to letter_batch_path(@batch), notice: "Batch was successfully updated."
     else
       render :edit, status: :unprocessable_entity
@@ -208,36 +190,14 @@ class Letter::BatchesController < BaseBatchesController
 
   def print_subset
     authorize @batch, :show?, policy_class: Letter::BatchPolicy
-
-    letters = if params[:letter_ids].present?
-      # Reprint specific letters
-      @batch.letters.where(id: params[:letter_ids])
-    else
-      # Next N unprinted
-      count = (params[:count] || 100).to_i.clamp(1, 5000)
-      @batch.letters.where(printed_at: nil).order(:id).limit(count)
-    end
-
-    if letters.none?
-      redirect_to letter_batch_path(@batch), alert: "No letters to print."
-      return
-    end
-
-    letters = letters.includes(:address, :usps_indicium, :usps_mailer_id, :return_address)
-
-    template_cycle = (@batch.process_options || {})["template_cycle"]
-    template_cycle = [SnailMail::PhlexService.templates_for_size(:standard).first].compact if template_cycle.blank?
-
-    pdf = SnailMail::PhlexService.generate_batch_labels(letters, template_cycle: template_cycle)
-
-    # Store the letter IDs in session so confirm_printed knows what was printed
-    session[:last_print_letter_ids] = letters.pluck(:id)
-    @batch.audit!(:print_subset, count: letters.size, reprint: params[:letter_ids].present?)
-
-    send_data pdf.render,
-      filename: "batch_#{@batch.public_id}_#{letters.size}letters.pdf",
+    result = Letter::PrintLabels.new(batch: @batch, letter_ids: params[:letter_ids], count: params[:count] || 100).call
+    session[:last_print_letter_ids] = result[:letter_ids]
+    send_data result[:pdf_data],
+      filename: "batch_#{@batch.public_id}_#{result[:count]}letters.pdf",
       type: "application/pdf",
       disposition: params[:download] ? "attachment" : "inline"
+  rescue ArgumentError => e
+    redirect_to letter_batch_path(@batch), alert: e.message
   end
 
   def confirm_printed
@@ -260,25 +220,10 @@ class Letter::BatchesController < BaseBatchesController
 
   def retry_failed
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
-
-    unless @batch.failed?
-      redirect_to processing_letter_batch_path(@batch), alert: "Batch is not in a failed state."
-      return
-    end
-
-    @batch.with_lock do
-      @batch.letters.where(indicia_state: "failed").update_all(indicia_state: nil, indicia_error: nil)
-      @batch.update!(process_error: nil)
-
-      opts = @batch.process_options || {}
-      if opts["template_cycle"].blank?
-        opts["template_cycle"] = [SnailMail::PhlexService.templates_for_size(:standard).first].compact
-        @batch.update!(process_options: opts)
-      end
-    end
-
-    BatchProcessJob.perform_later(@batch.id)
+    Letter::RetryBatch.new(batch: @batch).call
     redirect_to processing_letter_batch_path(@batch)
+  rescue RuntimeError => e
+    redirect_to processing_letter_batch_path(@batch), alert: e.message
   end
 
   def refund_overpayment

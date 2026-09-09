@@ -259,6 +259,23 @@ class Letter::Batch < Batch
     generate_labels(options)
   end
 
+  # Propagate batch attributes to letters after update.
+  # Only propagates sizing/mailing attrs if the batch hasn't been processed yet.
+  def propagate_to_letters!
+    if may_mark_processed?
+      letters.update_all(
+        height: letter_height,
+        width: letter_width,
+        weight: letter_weight,
+        mailing_date: letter_mailing_date,
+        usps_mailer_id_id: letter_mailer_id_id,
+        return_address_id: letter_return_address_id,
+        return_address_name: letter_return_address_name,
+      )
+    end
+    letters.update_all(tags: tags, user_facing_title: user_facing_title)
+  end
+
   private
 
   def update_letter_tags
