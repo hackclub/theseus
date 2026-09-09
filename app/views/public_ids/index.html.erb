@@ -1,7 +1,7 @@
 <% content_for :title, "ID Lookup" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
-  <strong style="font-size: 1.15em;">ID Lookup</strong>
+<div class="toolbar mb-0 no-border-bottom">
+  <strong class="text-title">ID Lookup</strong>
   <span class="spacer"></span>
 </div>
 
@@ -9,10 +9,10 @@
   <strong>Search</strong>
   <hr>
   <div class="mt-half">
-    <p class="text-muted" style="margin: 0 0 0.5rem;">Enter a Theseus ID or tracking number to look it up.</p>
+    <p class="text-muted hint-bottom">Enter a Theseus ID or tracking number to look it up.</p>
     <%= form_with url: lookup_public_ids_path, method: :post do |f| %>
       <div class="mb-1">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">ID</label>
+        <label class="text-muted label-block">ID</label>
         <input type="text" name="id" autofocus placeholder="e.g. ltr!abc123, 9400111..." class="w-100">
       </div>
       <button type="submit" class="btn-success">⌕ Look up</button>
