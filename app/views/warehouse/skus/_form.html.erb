@@ -2,7 +2,7 @@
   <% if warehouse_sku.errors.any? %>
     <div class="mb-1 text-danger">
       <strong>[!] <%= pluralize(warehouse_sku.errors.count, "error") %>:</strong>
-      <ul class="sku-error-list">
+      <ul class="form-error-list">
         <% warehouse_sku.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
