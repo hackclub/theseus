@@ -16,7 +16,10 @@
 # https://github.com/hackclub/theseus/issues/295
 class Billing::Reconciler
   GRACE = 2.hours       # how long to keep looking before declaring "never happened"
-  MAX_PAGES = 5
+  # Read until HCB says there's nothing left. MAX_PAGES is a safety valve
+  # against a runaway loop, not a budget: 50 × 100 is 5000 transactions in
+  # the window, and hitting it is an alert, not a verdict.
+  MAX_PAGES = 50
   PAGE_SIZE = 100
   KEY_PATTERN = /\[th_[A-Za-z0-9]+\]/
 
@@ -47,9 +50,12 @@ class Billing::Reconciler
       Result.new(transfer, :completed, remote.id)
     when 0
       if scan.truncated
-        # We never saw the whole window, so "not there" means nothing.
+        # We never saw the whole window, so "not there" means nothing. Alert
+        # once, not on every pass of the reconcile cron.
+        first = transfer.metadata["reconciled_by"] != "ceiling"
         transfer.update!(metadata: transfer.metadata.merge("reconciled_at" => Time.current.iso8601, "reconciled_by" => "ceiling"))
-        Result.new(transfer, :waiting, "listing truncated at #{MAX_PAGES} pages")
+        Billing::Alert.reconcile_truncated(transfer, scan.pages) if first
+        Result.new(transfer, :waiting, "listing truncated at #{scan.pages} pages")
       elsif last_activity_at < GRACE.ago
         transfer.fail!("not found on HCB after #{GRACE.inspect}; safe to retry", retryable: true)
         transfer.update!(metadata: transfer.metadata.merge("reconciled_at" => Time.current.iso8601, "reconciled_by" => "absent"))
@@ -76,11 +82,11 @@ class Billing::Reconciler
   # "absent" and hand it back to the sweep to send again.
   def last_activity_at = [ transfer.last_attempted_at, transfer.created_at ].compact.max
 
-  # `truncated` means we stopped at MAX_PAGES with pages still unread, so an
-  # empty candidate list proves nothing. HCBV4::TransactionList#auto_paginate
+  # `truncated` means we ran out of safety valve with pages still unread, so
+  # an empty candidate list proves nothing. HCBV4::TransactionList#auto_paginate
   # swallows that fact (it just stops), so we drive #each_page ourselves and
   # ask the last page we read whether there was more behind it.
-  Scan = Struct.new(:candidates, :truncated, keyword_init: true)
+  Scan = Struct.new(:candidates, :truncated, :pages, keyword_init: true)
 
   def scan_remote_transfers
     known = HCB::Transfer.where.not(remote_id: nil).where.not(id: transfer.id).pluck(:remote_id).to_set
@@ -130,6 +136,6 @@ class Billing::Reconciler
       end
     end
 
-    Scan.new(candidates: candidates.uniq(&:id), truncated: truncated)
+    Scan.new(candidates: candidates.uniq(&:id), truncated: truncated, pages: pages)
   end
 end
