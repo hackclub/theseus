@@ -429,7 +429,6 @@ Rails.application.routes.draw do
   toolchest_oauth
   mount Toolchest.app => "/mcp"
   get "customs_receipts/index"
-  get "customs_receipts/show"
   scope path: "back_office" do
     get "kbar/search", to: "kbar#search"
 
