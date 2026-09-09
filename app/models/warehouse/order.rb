@@ -218,6 +218,28 @@ class Warehouse::Order < ApplicationRecord
     Billing.charge!(ledger_entries.unclaimed.charges.postage, name: "Postage for #{hc_id}")
   end
 
+  # A canceled order never gets picked or packed, so the labor obligation goes
+  # away with it — otherwise the entry sits there pending and
+  # BillingSettlementSweepJob charges for work nobody did.
+  #
+  # Unless a transfer already claimed the entry: then the money is moving (or
+  # has moved) and the ledger is append-only, so we leave it alone and note why
+  # the org was billed for a package that never shipped. Refunding that is a
+  # human decision — Billing.credit! — not something a cancellation webhook
+  # gets to make.
+  #
+  # Lives on the model, and hangs off the mark_canceled transition, so the web
+  # cancel path and Warehouse::UpdateCancellationsJob both get it.
+  def release_unearned_labor!
+    ledger_entries.labor.live.each do |entry|
+      if entry.pending? && !entry.hcb_transfer&.holds_entries?
+        entry.void!(reason: "order #{hc_id} canceled before it shipped")
+      else
+        entry.update!(metadata: entry.metadata.merge("canceled_after_charge" => true))
+      end
+    end
+  end
+
   def zenv_attributes_changed?
     return true if recipient_email_changed?
     return true if address&.changed?
@@ -311,6 +333,7 @@ class Warehouse::Order < ApplicationRecord
 
     event :mark_canceled do
       transitions from: :dispatched, to: :canceled
+      after { release_unearned_labor! }
     end
   end
 
