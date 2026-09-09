@@ -81,6 +81,17 @@ class Warehouse::Order < ApplicationRecord
 
   enum :created_via, { manual: 0, bulk_upload: 1, api: 2 }
 
+  # The ledger went live on 2026-09-09. Orders created before it were never
+  # quoted a price and nobody consented to one, so they never get ledger
+  # entries — no matter what else is true about them.
+  #
+  # This is a floor, not a nicety: billing_profile_id is the only thing keeping
+  # the postage sweep off the historical backlog right now, and it's nullable on
+  # every legacy row. The day someone backfills it (to fix reporting, say),
+  # Warehouse::UpdateMailingInfoJob runs within five minutes and bills years of
+  # already-shipped packages to whoever it just attached.
+  BILLING_EPOCH = Time.utc(2026, 9, 9).freeze
+
   belongs_to :template, class_name: "Warehouse::Template", optional: true
   belongs_to :user
   belongs_to :origin_batch, class_name: "Batch", optional: true
@@ -212,6 +223,9 @@ class Warehouse::Order < ApplicationRecord
     return unless billing_profile.present?
     Billing.charge!(ledger_entries.unclaimed.charges.labor, name: "Labor for #{hc_id}")
   end
+
+  # Whether this order is allowed to accrue ledger entries at all.
+  def billable? = billing_profile.present? && created_at.present? && created_at > BILLING_EPOCH
 
   def charge_postage!
     return unless billing_profile.present?
