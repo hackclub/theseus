@@ -5,11 +5,12 @@
 # hq-warehouse-ops) with the Theseus service token, so it doesn't depend on
 # the user's OAuth being alive.
 #
-# Matching is by direction + counterparty org + amount, restricted to
-# transactions dated on or after the transfer was created, excluding any
-# HCB transfer id we already hold and any memo carrying a theseus key. With
-# at most one in-flight transfer per profile (Billing::Charge enforces this)
-# a single match is ours.
+# A memo carrying *this* transfer's key is a definite match and wins
+# outright. Otherwise matching is by direction + counterparty org + amount,
+# restricted to transactions dated on or after the transfer was created,
+# excluding any HCB transfer id we already hold and any memo carrying a
+# *different* theseus key. With at most one in-flight transfer per profile
+# (Billing::Charge enforces this) a single match is ours.
 #
 # This becomes belt-and-braces once HCB honours Idempotency-Key. See
 # https://github.com/hackclub/theseus/issues/295
@@ -80,16 +81,27 @@ class Billing::Reconciler
       limit: 100,
     )
 
-    list.auto_paginate(max_pages: MAX_PAGES).filter_map do |tx|
-      remote = tx.transfer
-      next unless remote
-      next if known.include?(remote.id)
-      next if tx.memo.to_s.match?(KEY_PATTERN) || remote.memo.to_s.match?(KEY_PATTERN)
-      next unless remote.amount_cents.to_i.abs == transfer.amount_cents
+    ours = "[#{transfer.idempotency_key}]"
 
-      counterparty = transfer.debit? ? remote.from : remote.to
-      next unless counterparty && [counterparty.id, counterparty.slug].include?(org)
-      remote
-    end.uniq(&:id)
+    catch(:definite) do
+      list.auto_paginate(max_pages: MAX_PAGES).filter_map do |tx|
+        remote = tx.transfer
+        next unless remote
+        next if known.include?(remote.id)
+
+        memo = "#{tx.memo} #{remote.memo}"
+        # Our own key in the memo is proof, not noise: Executor sends
+        # `tagged_name` and HCB may reflect it into the memo. Nothing else can
+        # outrank that, so stop looking.
+        throw(:definite, [ remote ]) if memo.include?(ours)
+        # Somebody else's key: that transfer is already accounted for.
+        next if memo.match?(KEY_PATTERN)
+        next unless remote.amount_cents.to_i.abs == transfer.amount_cents
+
+        counterparty = transfer.debit? ? remote.from : remote.to
+        next unless counterparty && [ counterparty.id, counterparty.slug ].include?(org)
+        remote
+      end.uniq(&:id)
+    end
   end
 end

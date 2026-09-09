@@ -63,6 +63,27 @@ RSpec.describe Billing::Reconciler do
     expect(t.reload).to be_unknown
   end
 
+  it "treats a memo carrying our own key as a definite match, outranking everything else" do
+    t = unknown_transfer(500)
+    stub_hq_transactions(
+      remote(id: "xfr_decoy", cents: 500),                                              # would match on amount alone
+      remote(id: "xfr_ours", cents: 999, memo: "Postage [#{t.idempotency_key}]"),       # HCB reflected our tagged_name
+    )
+
+    expect(described_class.new(t).call.outcome).to eq(:completed)
+    expect(t.reload).to be_completed
+    expect(t.remote_id).to eq("xfr_ours")
+    expect(t.metadata["reconciled_by"]).to eq("match")
+  end
+
+  it "still excludes a remote transfer carrying somebody else's key" do
+    t = unknown_transfer(500)
+    stub_hq_transactions(remote(id: "xfr_theirs", cents: 500, memo: "Postage [th_someotherkey]"))
+
+    expect(described_class.new(t).call.outcome).to eq(:waiting)
+    expect(t.reload).to be_unknown
+  end
+
   it "matches credits on the destination org" do
     t = unknown_transfer(300, direction: :credit)
     stub_hq_transactions(
