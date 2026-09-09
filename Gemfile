@@ -2,6 +2,8 @@ source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1"
+# pin until rails/rails#58601 lands in a release (json 3.0 breaks ActiveSupport::JSON.decode)
+gem "json", "< 3"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -182,4 +184,4 @@ gem "flipper", "~> 1.4"
 gem "flipper-ui", "~> 1.4"
 gem "flipper-active_record", "~> 1.4"
 
-gem "toolchest", "~> 0.3"
+gem "toolchest", "~> 0.4"

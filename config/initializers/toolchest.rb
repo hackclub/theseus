@@ -95,7 +95,6 @@ Toolchest.configure do |config|
     allowed
   end
 
-  # TODO: enable once toolchest >= 0.4 is released (attr exists in local src but not 0.3.7)
-  # config.dns_rebinding_protection = true
-  # config.allowed_origins = ["https://theseus.hackclub.com"]
+  config.dns_rebinding_protection = true
+  config.allowed_origins = ["https://theseus.hackclub.com"]
 end
