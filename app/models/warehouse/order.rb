@@ -81,6 +81,17 @@ class Warehouse::Order < ApplicationRecord
 
   enum :created_via, { manual: 0, bulk_upload: 1, api: 2 }
 
+  # The ledger went live on 2026-09-09. Orders created before it were never
+  # quoted a price and nobody consented to one, so they never get ledger
+  # entries — no matter what else is true about them.
+  #
+  # This is a floor, not a nicety: billing_profile_id is the only thing keeping
+  # the postage sweep off the historical backlog right now, and it's nullable on
+  # every legacy row. The day someone backfills it (to fix reporting, say),
+  # Warehouse::UpdateMailingInfoJob runs within five minutes and bills years of
+  # already-shipped packages to whoever it just attached.
+  BILLING_EPOCH = Time.utc(2026, 9, 9).freeze
+
   belongs_to :template, class_name: "Warehouse::Template", optional: true
   belongs_to :user
   belongs_to :origin_batch, class_name: "Batch", optional: true
@@ -213,9 +224,34 @@ class Warehouse::Order < ApplicationRecord
     Billing.charge!(ledger_entries.unclaimed.charges.labor, name: "Labor for #{hc_id}")
   end
 
+  # Whether this order is allowed to accrue ledger entries at all.
+  def billable? = billing_profile.present? && created_at.present? && created_at > BILLING_EPOCH
+
   def charge_postage!
     return unless billing_profile.present?
     Billing.charge!(ledger_entries.unclaimed.charges.postage, name: "Postage for #{hc_id}")
+  end
+
+  # A canceled order never gets picked or packed, so the labor obligation goes
+  # away with it — otherwise the entry sits there pending and
+  # BillingSettlementSweepJob charges for work nobody did.
+  #
+  # Unless a transfer already claimed the entry: then the money is moving (or
+  # has moved) and the ledger is append-only, so we leave it alone and note why
+  # the org was billed for a package that never shipped. Refunding that is a
+  # human decision — Billing.credit! — not something a cancellation webhook
+  # gets to make.
+  #
+  # Lives on the model, and hangs off the mark_canceled transition, so the web
+  # cancel path and Warehouse::UpdateCancellationsJob both get it.
+  def release_unearned_labor!
+    ledger_entries.labor.live.each do |entry|
+      if entry.pending? && !entry.hcb_transfer&.holds_entries?
+        entry.void!(reason: "order #{hc_id} canceled before it shipped")
+      else
+        entry.update!(metadata: entry.metadata.merge("canceled_after_charge" => true))
+      end
+    end
   end
 
   def zenv_attributes_changed?
@@ -311,6 +347,7 @@ class Warehouse::Order < ApplicationRecord
 
     event :mark_canceled do
       transitions from: :dispatched, to: :canceled
+      after { release_unearned_labor! }
     end
   end
 

@@ -43,9 +43,12 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
           aasm_state: "mailed"
         )
 
-        # Create postage ledger entry if billing profile is present and postage is known
+        # Create postage ledger entry if the order is billable and postage is
+        # known. `billable?` includes the BILLING_EPOCH floor, which keeps a
+        # future backfill of billing_profile_id from sweeping the entire
+        # pre-ledger backlog into a charge.
         # Guard: only create if no postage entry exists yet for this order
-        if order.billing_profile.present? &&
+        if order.billable? &&
            zen_order[:shipping_handling].to_d.positive? &&
            !order.ledger_entries.postage.exists?
           order.ledger_entries.create!(
