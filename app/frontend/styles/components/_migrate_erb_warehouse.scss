@@ -29,8 +29,37 @@
 .action-state--success { color: var(--green); }
 .action-state-icon { font-size: 2em; }
 
-// Error list in the SKU form (looser than .error-box-list's styling).
-.sku-error-list { margin: 0.25rem 0 0; padding-left: 1rem; }
+// Error list in warehouse forms (looser than .error-box-list's styling).
+.form-error-list { margin: 0.25rem 0 0; padding-left: 1rem; }
 
 // "$" + input row for a cost field (SKU form).
 .cost-input-row { display: flex; align-items: center; gap: 0.25rem; }
+
+// Purchase order row in the index list. `.po-row` is also a JS query hook
+// for the status filter script, so the name has to stay.
+.po-row { padding: 0.5rem 0; }
+
+// Popover menu body (row of stacked links under a "..." toggle).
+.popover-menu { display: flex; flex-direction: column; }
+
+// Wider popover body that holds a small form (return-for-revision reason).
+.popover-body { padding: 0.75rem; min-width: 20rem; }
+
+// Small top/left margin nudge, repeated across warehouse detail views.
+.mt-quarter { margin-top: 0.25rem; }
+.ml-quarter { margin-left: 0.25rem; }
+
+// Warning-bordered callout card (PO show: blocked/returned SKU requests).
+.sku-requests-alert { border: 1px solid var(--yellow); padding: 0.75rem; }
+
+// One row in the blocking-SKU-requests list on PO show.
+.sku-request-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color, #333);
+}
+
+// Inline "assign SKU code" input next to the approve button.
+.sku-code-input { width: 8rem; padding: 0.15rem 0.35rem; font-size: 0.85em; }

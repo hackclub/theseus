@@ -1,8 +1,8 @@
 <%= form_with(model: purchase_order, url: purchase_order.persisted? ? warehouse_purchase_order_path(purchase_order) : warehouse_purchase_orders_path) do |form| %>
   <% if purchase_order.errors.any? %>
-    <div class="mb-1" style="color: var(--red)">
+    <div class="mb-1 text-danger">
       <strong>[!] <%= pluralize(purchase_order.errors.count, "error") %>:</strong>
-      <ul style="margin: 0.25rem 0 0; padding-left: 1rem;">
+      <ul class="form-error-list">
         <% purchase_order.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -15,19 +15,19 @@
     <hr>
     <div class="mt-half">
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Supplier name <span style="color: var(--red);">*</span></label>
+        <label class="text-muted label-block">Supplier name <span class="text-danger">*</span></label>
         <input type="text" name="warehouse_purchase_order[supplier_name]" value="<%= purchase_order.supplier_name %>" required class="w-100">
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Supplier ID</label>
+        <label class="text-muted label-block">Supplier ID</label>
         <input type="text" name="warehouse_purchase_order[supplier_id]" value="<%= purchase_order.supplier_id %>" class="w-100">
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Required by date</label>
-        <%= form.date_field :required_by_date, style: "width: 100%;" %>
+        <label class="text-muted label-block">Required by date</label>
+        <%= form.date_field :required_by_date, class: "w-100" %>
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Notes</label>
+        <label class="text-muted label-block">Notes</label>
         <textarea name="warehouse_purchase_order[notes]" rows="3" class="w-100"><%= purchase_order.notes %></textarea>
       </div>
     </div>

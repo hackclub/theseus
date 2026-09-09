@@ -1,9 +1,9 @@
 <% content_for :title, "Edit Purchase Order #{@purchase_order.order_number.presence || "##{@purchase_order.id}"}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_purchase_order_path(@purchase_order) %>" class="text-muted" style="text-decoration: none">← <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></a>
-    <strong style="font-size: 1.15em;">Edit Purchase Order</strong>
+    <a href="<%= warehouse_purchase_order_path(@purchase_order) %>" class="text-muted no-underline">← <%= @purchase_order.order_number.presence || "##{@purchase_order.id}" %></a>
+    <strong class="text-title">Edit Purchase Order</strong>
     <% badge_class = { "draft" => "badge", "open" => "badge badge-info", "completed" => "badge badge-success", "deleted" => "badge badge-danger" }[@purchase_order.status] || "badge" %>
     <span class="<%= badge_class %>"><%= @purchase_order.humanized_state %></span>
   </div>

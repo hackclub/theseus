@@ -2,8 +2,8 @@
 
 <div class="toolbar">
   <div class="flex-row">
-    <a href="<%= warehouse_skus_path %>" class="text-muted" style="text-decoration: none">&larr; SKUs</a>
-    <strong style="font-size: 1.15em;">Purchase Orders</strong>
+    <a href="<%= warehouse_skus_path %>" class="text-muted no-underline">&larr; SKUs</a>
+    <strong class="text-title">Purchase Orders</strong>
     <%= render Components::Shared::Jumpcode.new(path: warehouse_purchase_orders_path) %>
   </div>
   <div class="flex-row">
@@ -73,12 +73,12 @@
   <section>
     <% @purchase_orders.each_with_index do |po, i| %>
       <% if i > 0 %><hr><% end %>
-      <div class="po-row" data-status="<%= po.status %>" style="padding: 0.5rem 0;">
+      <div class="po-row" data-status="<%= po.status %>">
         <div class="flex-row">
           <%= link_to po.order_number.presence || "##{po.id}", warehouse_purchase_order_path(po), class: "mono fw-medium" %>
           <span class="<%= badge_classes[po.status] || "badge" %>"><%= po.humanized_state %></span>
           <span class="text-muted"><%= po.supplier_name %></span>
-          <span style="flex: 1;"></span>
+          <span class="flex-1"></span>
           <span class="fw-medium"><%= po.line_items.sum(&:quantity) %> units</span>
           <span class="text-muted"><%= number_to_currency(po.total_cost) %></span>
           <% if po.required_by_date.present? %>
@@ -88,7 +88,7 @@
           <% admin_tool do %>
             <details class="popover">
               <summary tabindex="0" class="btn-sm">&ctdot;</summary>
-              <div style="display:flex;flex-direction:column">
+              <div class="popover-menu">
                 <a href="<%= warehouse_purchase_order_path(po) %>">&nbsp;&#x1F441; View</a>
                 <% if po.draft? || po.returned? %>
                   <a href="<%= edit_warehouse_purchase_order_path(po) %>">&#x270E; Edit</a>
@@ -105,7 +105,7 @@
     <% end %>
   </section>
 <% else %>
-  <section style="text-align: center; padding: 2rem;">
+  <section class="empty-state">
     <strong>No purchase orders yet</strong>
     <div class="text-muted mt-half">Create your first purchase order to get started.</div>
     <div class="mt-1"><a href="<%= new_warehouse_purchase_order_path %>">Create Purchase Order</a></div>
