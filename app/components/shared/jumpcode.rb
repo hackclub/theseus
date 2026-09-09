@@ -8,7 +8,7 @@ class Components::Shared::Jumpcode < Components::Base
   def view_template
     return unless @code
 
-    div(style: "display:flex;gap:0.5rem;align-items:center", class: "jumpcode") do
+    div(class: "jumpcode") do
       span(
         class: "badge",
         title: "Press ⌘K and type #{@code}",
@@ -18,7 +18,7 @@ class Components::Shared::Jumpcode < Components::Base
         plain " #{@code}"
       end
 
-      details(class: "popover jumpcode-help", style: "position:relative") do
+      details(class: "popover jumpcode-help") do
         summary(tabindex: "0", class: "btn-sm") { "?" }
         div(class: "jumpcode-popover") do
           p do

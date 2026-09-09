@@ -10,10 +10,10 @@ class Components::Shared::PageHeader < Components::Base
   end
 
   def view_template
-    div(style: "display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:2rem") do
-      div(style: "display:flex;flex-direction:column") do
-        div(style: "display:flex;gap:0.5rem;align-items:center") do
-          h1(style: "margin: 0;") { @title }
+    div(class: "page-header") do
+      div(class: "page-header-main") do
+        div(class: "flex-row") do
+          h1(class: "m-0") { @title }
           if @jumpcode
             render Components::Shared::Jumpcode.new(code: @jumpcode)
           elsif @jumpcode_path
@@ -25,7 +25,7 @@ class Components::Shared::PageHeader < Components::Base
         end
       end
       if @actions_block
-        div(style: "display:flex;gap:0.5rem;align-items:center") do
+        div(class: "flex-row") do
           @actions_block.call
         end
       end

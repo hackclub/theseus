@@ -91,3 +91,45 @@
 // ── Letter queues / instant queues ──────────────────────
 
 .field-note-sm { font-size: 0.9em; }
+
+// ── Action bar ─────────────────────────────────────────
+
+.dev-badge { color: var(--foreground2); font-size: 0.7em; margin-left: 0.15rem; }
+.actionbar-right { display: flex; gap: 1rem; align-items: center; }
+.impersonation-warning { color: var(--yellow); font-weight: bold; }
+.impersonation-stop-btn { background: none; border: none; color: var(--red); font: inherit; font-weight: bold; cursor: pointer; padding: 0; }
+.user-menu-panel {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  min-width: 8rem;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+.user-menu-username { color: var(--foreground2); padding-bottom: 0.5rem; }
+.user-menu-logout-btn { background: none; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0.5rem 0 0; text-align: left; text-decoration: none; }
+.tasks-badge-count { font-size: 0.8em; }
+
+// ── User picker ────────────────────────────────────────
+
+.user-picker-icon { width: 1rem; height: 1rem; vertical-align: middle; margin-right: 0.25rem; }
+.user-picker-menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Page toolbar / header / sidebar ─────────────────────
+
+.page-toolbar-title { font-size: 1.15em; flex-shrink: 0; }
+.sidebar-approvals-link { display: flex; justify-content: space-between; align-items: center; }
+.page-header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+.page-header-main { display: flex; flex-direction: column; }

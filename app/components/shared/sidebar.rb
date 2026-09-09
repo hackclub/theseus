@@ -32,7 +32,7 @@ class Components::Shared::Sidebar < Components::Base
             ::Warehouse::PurchaseOrder.where(status: "submitted").count
           end
           selected = active?(warehouse_approvals_path)
-          a(href: warehouse_approvals_path, class: ("selected" if selected), style: "display:flex;justify-content:space-between;align-items:center;") do
+          a(href: warehouse_approvals_path, class: [ "sidebar-approvals-link", ("selected" if selected) ]) do
             plain "Approvals"
             span(class: "badge") { approval_count.to_s } if approval_count > 0
           end
