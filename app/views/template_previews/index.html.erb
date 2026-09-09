@@ -1,7 +1,7 @@
 <% content_for :title, "Template Previews" %>
 
 <div class="toolbar">
-  <strong style="font-size: 1.15em;">Letter Template Previews</strong>
+  <strong class="text-title">Letter Template Previews</strong>
   <span class="spacer"></span>
 </div>
 
@@ -10,16 +10,16 @@
     <tr>
       <th>Template</th>
       <th>Class</th>
-      <th style="text-align: right;">Actions</th>
+      <th class="text-right">Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @templates.each do |template| %>
       <tr>
-        <td><a href="<%= template_preview_path(template) %>" target="_blank" style="text-decoration: none; font-weight: 500;"><%= template.to_s.split("::").last.humanize %></a></td>
+        <td><a href="<%= template_preview_path(template) %>" target="_blank" class="link-medium"><%= template.to_s.split("::").last.humanize %></a></td>
         <td><code class="text-muted"><%= template %></code></td>
-        <td style="text-align: right;">
-          <div style="display:flex;gap:0.5rem;justify-content: flex-end;">
+        <td class="text-right">
+          <div class="actions-end">
             <a href="<%= template_preview_path(template) %>" target="_blank">⎘ PDF</a>
             <a href="<%= template_preview_path(template, qr: true) %>" target="_blank">⎘ With QR</a>
           </div>
