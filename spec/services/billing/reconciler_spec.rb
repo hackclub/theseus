@@ -86,6 +86,18 @@ RSpec.describe Billing::Reconciler do
     expect(old.metadata["reconciled_by"]).to eq("absent")
   end
 
+  it "measures the grace period from the last attempt, not from creation" do
+    # NSF backoff can keep a transfer alive for hours; the attempt that went
+    # unknown is what HCB is still catching up on.
+    t = unknown_transfer(500, created_at: 3.hours.ago)
+    t.update!(attempts: 4, last_attempted_at: 10.minutes.ago)
+    stub_hq_transactions
+
+    expect(described_class.new(t).call.outcome).to eq(:waiting)
+    expect(t.reload).to be_unknown
+    expect(t.metadata["reconciled_by"]).to be_nil
+  end
+
   it "flags ambiguous matches for a human instead of guessing" do
     mails = capture_billing_mail
     t = unknown_transfer(500)

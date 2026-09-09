@@ -43,7 +43,7 @@ class Billing::Reconciler
       Billing::Executor.new(transfer).send(:write_memo, remote)
       Result.new(transfer, :completed, remote.id)
     when 0
-      if transfer.created_at < GRACE.ago
+      if last_activity_at < GRACE.ago
         transfer.fail!("not found on HCB after #{GRACE.inspect}; safe to retry", retryable: true)
         transfer.update!(metadata: transfer.metadata.merge("reconciled_at" => Time.current.iso8601, "reconciled_by" => "absent"))
         Result.new(transfer, :failed, "absent")
@@ -61,6 +61,13 @@ class Billing::Reconciler
   end
 
   private
+
+  # The clock starts at the last time we actually talked to HCB, not at
+  # creation. A transfer can sit in NSF backoff for hours and only go
+  # `unknown` on a late attempt; measured from `created_at` the very next
+  # reconcile run would call a transfer that HCB has not finished listing
+  # "absent" and hand it back to the sweep to send again.
+  def last_activity_at = [ transfer.last_attempted_at, transfer.created_at ].compact.max
 
   def matching_remote_transfers
     known = HCB::Transfer.where.not(remote_id: nil).where.not(id: transfer.id).pluck(:remote_id).to_set
