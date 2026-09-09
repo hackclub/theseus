@@ -48,19 +48,19 @@ class Components::MoneyNotice < Components::Base
     div(class: "money-notice__head") do
       span(class: "money-notice__glyph") { GLYPH }
       span { title }
-      span(class: "money-notice__sub") { subtitle }
+      span(class: "money-notice__sub") { subtitle } if subtitle
     end
   end
 
   def title
-    return "Refund notice" if @refund
-    @proceed ? "Billing notice" : "Billing preview"
+    return "Refund" if @refund
+    @proceed ? "Charge" : "Cost estimate"
   end
 
   def subtitle
-    return "money is coming back to you" if @refund
-    return "what this will cost" if @proceed.nil?
-    @quote.now_cents.positive? ? "you are about to spend money" : "you are agreeing to be billed"
+    return nil if @proceed.nil?
+    return "credit back to the org" if @refund
+    "pay via HCB"
   end
 
   def no_profiles

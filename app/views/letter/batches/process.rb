@@ -240,7 +240,7 @@ class Views::Letter::Batches::Process < Views::Base
 
   def cost_update_script
     script do
-      plain(<<~JS.html_safe)
+      raw(<<~JS.html_safe)
         (function() {
           var radios = document.querySelectorAll('.postage-radio');
           var paymentSection = document.getElementById('payment-section');
