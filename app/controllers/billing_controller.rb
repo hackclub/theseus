@@ -25,6 +25,15 @@ class BillingController < ApplicationController
   def retry_transfer
     authorize LedgerEntry, :retry_transfer?
     transfer = HCB::Transfer.find(params[:transfer_id])
+
+    # HCB v4 has no idempotency keys. An unknown transfer may already have been
+    # processed, so re-sending it is a fresh movement of money — never do that
+    # off a stray link or a double-submit; it takes an explicit force=1.
+    if transfer.unknown? && params[:force] != "1"
+      return redirect_back fallback_location: billing_index_path,
+        alert: "Transfer #{transfer.idempotency_key} is UNKNOWN and may already have landed on HCB. Retrying it can charge twice, so it needs an explicit force."
+    end
+
     transfer.retry!
     Billing.execute!(transfer)
     redirect_back fallback_location: billing_index_path, notice: "Transfer #{transfer.idempotency_key} is now #{transfer.state}#{transfer.last_error ? ": #{transfer.last_error}" : ""}"
