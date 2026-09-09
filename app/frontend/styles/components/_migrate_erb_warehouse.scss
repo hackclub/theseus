@@ -1,2 +1,30 @@
 // inline-style migration shard: erb_warehouse
 // area-specific classes only; shared utilities live in utils.scss
+
+// Info blurb under a "new" form (warehouse/orders/new, etc). First paragraph
+// keeps its bottom margin, last one is flush.
+.note-paragraphs p { margin: 0 0 0.5rem; }
+.note-paragraphs p:last-child { margin-bottom: 0; }
+
+// Block hint text under a field/checkbox (like .form-hint but 0.85em, no
+// color of its own — pair with .text-muted).
+.field-note { display: block; font-size: 0.85em; }
+.field-note--mt { margin-top: 0.25rem; }
+
+// Tighter <hr> spacing inside a detail sidebar section.
+.hr-tight { margin: 0.5rem 0; }
+
+// Row inside the order show "Batch" card: label + link on opposite ends.
+.batch-row-flex { display: flex; align-items: center; justify-content: space-between; }
+
+// Preformatted internal-notes block on order show.
+.notes-pre { margin: 0.5rem 0 0; white-space: pre-wrap; }
+
+// Cancel-order link that wraps a full-width button.
+.block-link { display: block; }
+
+// Centered "no actions available" state (shipped/canceled) in the order
+// sidebar. Pair with .text-muted for the canceled variant.
+.action-state { text-align: center; padding: 1rem 0; }
+.action-state--success { color: var(--green); }
+.action-state-icon { font-size: 2em; }

@@ -15,12 +15,12 @@
     <hr>
     <div class="mt-half">
       <div class="mb-1">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Short title (shown to recipient)</label>
+        <label class="text-muted label-block">Short title (shown to recipient)</label>
         <input type="text" name="warehouse_order[user_facing_title]" value="<%= warehouse_order.user_facing_title %>" class="w-100" autofocus>
       </div>
 
       <div>
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Recipient email</label>
+        <label class="text-muted label-block">Recipient email</label>
         <input type="email" name="warehouse_order[recipient_email]" value="<%= warehouse_order.recipient_email %>" class="w-100">
       </div>
     </div>
@@ -52,14 +52,14 @@
     <hr>
     <div class="mt-half">
       <div class="mb-1">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Internal notes</label>
+        <label class="text-muted label-block">Internal notes</label>
         <textarea name="warehouse_order[internal_notes]" rows="3" class="w-100"><%= warehouse_order.internal_notes %></textarea>
       </div>
 
       <label>
         <input type="checkbox" name="warehouse_order[notify_on_dispatch]" value="1" <%= "checked" if warehouse_order.notify_on_dispatch %>>
         Send the recipient a "sent to warehouse" email
-        <span class="text-muted" style="display: block; font-size: 0.85em">They'll get an email when it ships regardless</span>
+        <span class="text-muted field-note">They'll get an email when it ships regardless</span>
       </label>
     </div>
   </section>
@@ -69,14 +69,14 @@
       <strong>Billing</strong>
       <hr>
       <div class="mt-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Billing Profile</label>
+        <label class="text-muted label-block">Billing Profile</label>
         <select name="warehouse_order[billing_profile_id]" class="w-100">
           <option value="">None</option>
           <% current_user.billing_profiles.each do |profile| %>
             <option value="<%= profile.id %>" <%= "selected" if warehouse_order.billing_profile_id == profile.id %>><%= profile.organization_name %></option>
           <% end %>
         </select>
-        <span class="text-muted" style="display: block; font-size: 0.85em; margin-top: 0.25rem">Which HCB organization pays for this order?</span>
+        <span class="text-muted field-note field-note--mt">Which HCB organization pays for this order?</span>
         <div class="money-note mt-half">
           <span class="money-notice__glyph">$</span>
           <span>Labor ($1.80 + $0.20 per SKU) is billed when you send this order to the warehouse. Postage is billed at cost when it ships. You'll see the exact amount before anything is charged.</span>

@@ -1,9 +1,9 @@
 <% content_for :title, "Order #{@warehouse_order.hc_id}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_orders_path %>" class="text-muted" style="text-decoration: none">← Orders</a>
-    <strong style="font-size: 1.15em;">Order <%= @warehouse_order.hc_id %></strong>
+    <a href="<%= warehouse_orders_path %>" class="text-muted no-underline">← Orders</a>
+    <strong class="text-title">Order <%= @warehouse_order.hc_id %></strong>
     <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
   </div>
   <div class="flex-row">
@@ -12,7 +12,7 @@
       <span class="text-muted"><%= @warehouse_order.user_facing_title %></span>
     <% end %>
     <% @warehouse_order.tags.compact_blank.each do |tag| %>
-      <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span class="badge"><%= tag %></span></a>
+      <a href="<%= tag_stats_path(tag) %>" class="no-underline"><span class="badge"><%= tag %></span></a>
     <% end %>
   </div>
   <span class="spacer"></span>
@@ -62,10 +62,10 @@
       <table class="mt-half w-100">
         <thead>
           <tr>
-            <th style="text-align: left;">SKU</th>
-            <th style="text-align: right;">Qty</th>
-            <th style="text-align: right;">Cost to HC</th>
-            <th style="text-align: right;">Declared</th>
+            <th class="text-left">SKU</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Cost to HC</th>
+            <th class="text-right">Declared</th>
           </tr>
         </thead>
         <tbody>
@@ -75,18 +75,18 @@
                 <%= link_to li.sku.name, warehouse_sku_path(li.sku) %>
                 <span class="text-muted"><code><%= li.sku.sku %></code></span>
               </td>
-              <td style="text-align: right; font-variant-numeric: tabular-nums;"><strong><%= li.quantity %></strong></td>
-              <td class="text-muted" style="text-align: right; font-variant-numeric: tabular-nums"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
-              <td class="text-muted" style="text-align: right; font-variant-numeric: tabular-nums"><%= number_to_currency(li.sku.declared_unit_cost) %></td>
+              <td class="text-right tabular"><strong><%= li.quantity %></strong></td>
+              <td class="text-muted text-right tabular"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
+              <td class="text-muted text-right tabular"><%= number_to_currency(li.sku.declared_unit_cost) %></td>
             </tr>
           <% end %>
         </tbody>
         <tfoot>
           <tr>
             <td><strong>Total</strong></td>
-            <td style="text-align: right; font-variant-numeric: tabular-nums;"><strong><%= @warehouse_order.line_items.sum(&:quantity) %></strong></td>
-            <td style="text-align: right; font-variant-numeric: tabular-nums;"><strong><%= number_to_currency(@warehouse_order.contents_actual_cost_to_hc) %></strong></td>
-            <td style="text-align: right; font-variant-numeric: tabular-nums;"><strong><%= number_to_currency(@warehouse_order.contents_declared_unit_cost) %></strong></td>
+            <td class="text-right tabular"><strong><%= @warehouse_order.line_items.sum(&:quantity) %></strong></td>
+            <td class="text-right tabular"><strong><%= number_to_currency(@warehouse_order.contents_actual_cost_to_hc) %></strong></td>
+            <td class="text-right tabular"><strong><%= number_to_currency(@warehouse_order.contents_declared_unit_cost) %></strong></td>
           </tr>
         </tfoot>
       </table>
@@ -105,7 +105,7 @@
           <%= ISO3166::Country[@warehouse_order.address.country]&.common_name || @warehouse_order.address.country %>
         </span>
         <% if @warehouse_order.recipient_email.present? %>
-          <hr style="margin:0.5rem 0">
+          <hr class="hr-tight">
           <span class="text-muted">✉</span> <%= link_to @warehouse_order.recipient_email, "mailto:#{@warehouse_order.recipient_email}" %>
         <% end %>
       </div>
@@ -147,7 +147,7 @@
         <strong>Batch</strong>
         <hr>
         <div class="mt-half">
-          <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="batch-row-flex">
             <span>
               <strong>Batch #<%= @warehouse_order.batch.id %></strong>
               <span class="text-muted"><%= @warehouse_order.batch.aasm.current_state.to_s.titleize %></span>
@@ -162,7 +162,7 @@
       <section class="mb-1">
         <strong>Internal Notes</strong>
         <hr>
-        <pre style="margin: 0.5rem 0 0; white-space: pre-wrap;"><%= @warehouse_order.internal_notes %></pre>
+        <pre class="notes-pre"><%= @warehouse_order.internal_notes %></pre>
       </section>
     <% end %>
 
@@ -194,20 +194,20 @@
 
         <% if @warehouse_order.may_mark_canceled? && policy(@warehouse_order).cancel? %>
           <% has_action = true %>
-          <a href="<%= cancel_warehouse_order_path(@warehouse_order) %>" class="mt-half" style="display: block">
+          <a href="<%= cancel_warehouse_order_path(@warehouse_order) %>" class="mt-half block-link">
             <button class="btn-danger btn-sm w-100">× Cancel Order</button>
           </a>
         <% end %>
 
         <% unless has_action %>
           <% if @warehouse_order.mailed? %>
-            <div style="text-align: center; padding: 1rem 0; color: var(--green);">
-              <span style="font-size: 2em;">✓</span>
+            <div class="action-state action-state--success">
+              <span class="action-state-icon">✓</span>
               <div class="mt-half"><strong>Shipped</strong></div>
             </div>
           <% elsif @warehouse_order.canceled_at.present? %>
-            <div class="text-muted" style="text-align: center; padding: 1rem 0">
-              <span style="font-size: 2em;">×</span>
+            <div class="text-muted action-state">
+              <span class="action-state-icon">×</span>
               <div class="mt-half"><strong>Canceled</strong></div>
             </div>
           <% else %>
@@ -229,7 +229,7 @@
         <span class="detail-label">Postage</span>
         <span><%= @warehouse_order.postage_cost.present? ? number_to_currency(@warehouse_order.postage_cost) : "—" %></span>
       </div>
-      <hr style="margin:0.5rem 0">
+      <hr class="hr-tight">
       <div class="detail-grid">
         <span class="detail-label"><strong>Total</strong></span>
         <span><strong><%= number_to_currency(@warehouse_order.total_cost) %></strong></span>

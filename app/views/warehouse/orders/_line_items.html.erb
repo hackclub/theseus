@@ -1,24 +1,24 @@
 <table class="w-100 mt-half">
   <thead>
     <tr>
-      <th style="text-align: left;">SKU</th>
-      <th style="text-align: right;">Qty</th>
-      <th style="text-align: right;">Cost to HC</th>
-      <th style="text-align: right;">Declared</th>
+      <th class="text-left">SKU</th>
+      <th class="text-right">Qty</th>
+      <th class="text-right">Cost to HC</th>
+      <th class="text-right">Declared</th>
     </tr>
   </thead>
   <tbody>
     <% order.line_items.each do |li| %>
       <tr>
-        <td style="padding: 0.25rem 0.5rem;">
-          <a href="<%= warehouse_sku_path(li.sku) %>" style="text-decoration: none;"><%= li.sku.name %></a>
+        <td class="cell-pad">
+          <a href="<%= warehouse_sku_path(li.sku) %>" class="no-underline"><%= li.sku.name %></a>
           <span class="text-muted"> (<code><%= li.sku.sku %></code>)</span>
         </td>
-        <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= li.quantity %></td>
-        <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
-        <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;">
+        <td class="num-cell"><%= li.quantity %></td>
+        <td class="num-cell"><%= number_to_currency(li.sku.actual_cost_to_hc) %></td>
+        <td class="num-cell">
           <% if li.sku.declared_unit_cost.zero? %>
-            <span style="color: var(--red);" title="No cost data — will block dispatch">⚠ $0.00</span>
+            <span class="text-danger" title="No cost data — will block dispatch">⚠ $0.00</span>
           <% else %>
             <%= number_to_currency(li.sku.declared_unit_cost) %>
           <% end %>
@@ -27,11 +27,11 @@
     <% end %>
   </tbody>
   <tfoot>
-    <tr style="font-weight: bold;">
-      <td style="padding: 0.25rem 0.5rem;">Total</td>
+    <tr class="fw-bold">
+      <td class="cell-pad">Total</td>
       <td></td>
-      <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(order.contents_actual_cost_to_hc) %></td>
-      <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(order.contents_declared_unit_cost) %></td>
+      <td class="num-cell"><%= number_to_currency(order.contents_actual_cost_to_hc) %></td>
+      <td class="num-cell"><%= number_to_currency(order.contents_declared_unit_cost) %></td>
     </tr>
   </tfoot>
 </table>

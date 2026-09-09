@@ -1,9 +1,9 @@
 <% content_for :title, "Cancel Order #{@warehouse_order.hc_id}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_order_path(@warehouse_order) %>" class="text-muted" style="text-decoration: none">← Order <%= @warehouse_order.hc_id %></a>
-    <strong style="font-size: 1.15em;">Cancel Order</strong>
+    <a href="<%= warehouse_order_path(@warehouse_order) %>" class="text-muted no-underline">← Order <%= @warehouse_order.hc_id %></a>
+    <strong class="text-title">Cancel Order</strong>
     <span class="badge badge-danger">Destructive</span>
   </div>
 </div>
@@ -19,9 +19,9 @@
         <strong>Cancellation Details</strong>
         <hr>
         <div class="mt-half">
-          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Reason for cancellation</label>
+          <label class="text-muted label-block">Reason for cancellation</label>
           <textarea name="cancellation_reason" rows="3" required class="w-100"></textarea>
-          <span class="text-muted" style="font-size: 0.85em">Visible to AGH crew</span>
+          <span class="text-muted text-sm">Visible to AGH crew</span>
         </div>
       </section>
 

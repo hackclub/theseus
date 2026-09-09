@@ -1,9 +1,9 @@
 <% content_for :title, "Edit Order #{@warehouse_order.hc_id}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_order_path(@warehouse_order) %>" class="text-muted" style="text-decoration: none">← Order <%= @warehouse_order.hc_id %></a>
-    <strong style="font-size: 1.15em;">Edit Order</strong>
+    <a href="<%= warehouse_order_path(@warehouse_order) %>" class="text-muted no-underline">← Order <%= @warehouse_order.hc_id %></a>
+    <strong class="text-title">Edit Order</strong>
     <%= render 'warehouse/orders/status_badge', order: @warehouse_order %>
   </div>
 </div>
