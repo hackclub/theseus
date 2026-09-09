@@ -26,37 +26,37 @@ class Components::ReturnAddresses::Form < Components::Base
       div(class: "form-stack") do
         div(class: "form-grid-auto") do
           div(class: "mb-1") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Name *" }
+            label(class: "label-block text-muted") { "Name *" }
             input(type: "text", name: "return_address[name]", value: return_address.name, required: true, class: "w-100")
             small(class: "text-muted") { "Organization or personal name" }
           end
 
           div(class: "mb-1") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Address Line 1 *" }
+            label(class: "label-block text-muted") { "Address Line 1 *" }
             input(type: "text", name: "return_address[line_1]", value: return_address.line_1, required: true, class: "w-100")
             small(class: "text-muted") { "Street address, P.O. box, etc." }
           end
         end
 
         div(class: "mb-1") do
-          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Address Line 2" }
+          label(class: "label-block text-muted") { "Address Line 2" }
           input(type: "text", name: "return_address[line_2]", value: return_address.line_2, class: "w-100")
           small(class: "text-muted") { "Apartment, suite, unit, etc. (optional)" }
         end
 
         div(class: "form-grid-auto--sm") do
           div(class: "mb-1") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "City *" }
+            label(class: "label-block text-muted") { "City *" }
             input(type: "text", name: "return_address[city]", value: return_address.city, required: true, class: "w-100")
           end
 
           div(class: "mb-1") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "State *" }
+            label(class: "label-block text-muted") { "State *" }
             input(type: "text", name: "return_address[state]", value: return_address.state, required: true, class: "w-100")
           end
 
           div(class: "mb-1") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Postal Code *" }
+            label(class: "label-block text-muted") { "Postal Code *" }
             input(type: "text", name: "return_address[postal_code]", value: return_address.postal_code, required: true, class: "w-100")
           end
         end
@@ -86,7 +86,7 @@ class Components::ReturnAddresses::Form < Components::Base
             input(type: "checkbox", name: "return_address[shared]", value: "1", checked: return_address.shared)
             plain " Make this address shared"
           end
-          small(class: "text-muted", style: "display: block;") { "Allow other users to select this return address for their letters" }
+          small(class: "text-muted form-field-hint") { "Allow other users to select this return address for their letters" }
         end
 
         input(type: "hidden", name: "return_address[user_id]", value: current_user&.id)
