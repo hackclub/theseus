@@ -66,35 +66,74 @@ class Warehouse::Batch < Batch
     }
 
   has_many :orders, class_name: "Warehouse::Order"
+  # Orders keep origin_batch_id even if they're later detached from the batch,
+  # which is what makes process! safe to re-run.
+  has_many :originated_orders, class_name: "Warehouse::Order", foreign_key: :origin_batch_id, inverse_of: :origin_batch
 
   def self.model_name = Batch.model_name
 
   # how many bad rows we'll name before giving up and just counting them
   PREFLIGHT_ERROR_LIMIT = 25
 
+  # Re-runnable. A dispatch that blows up on row k leaves the batch in
+  # fields_mapped with the first k orders already created and sent, so every
+  # phase here reconciles against what's already on disk instead of assuming a
+  # clean slate.
   def process!(options = {})
     return false unless fields_mapped?
 
-    # Build every order first and validate the lot. Saving as we go would leave a
-    # half-created batch behind the moment one row is missing a phone number for
-    # customs, and the good half is already on its way to the warehouse by then.
-    new_orders = addresses.map { |address| build_order_for(address) }
-    return false unless preflight(new_orders)
+    undispatched = reconcile_orders!
+    return false if undispatched.nil?
 
-    transaction { new_orders.each(&:save!) }
+    undispatched.each(&:dispatch!)
 
-    new_orders.each(&:dispatch!)
-
-    # One charge for the whole batch's labor. If a transfer is in flight the
-    # entries stay unclaimed and the sweep batches them.
+    # One charge for the whole batch's labor. `unclaimed` makes this idempotent:
+    # entries a previous run already claimed belong to a transfer and won't be
+    # picked up again. If a transfer is in flight the entries stay unclaimed and
+    # the sweep batches them.
     if billing_profile.present?
       Billing.charge!(
-        LedgerEntry.unclaimed.charges.labor.where(ledgerable: orders),
+        LedgerEntry.unclaimed.charges.labor.where(ledgerable: originated_orders),
         name: "Labor for batch #{public_id}",
       )
     end
 
     mark_processed!
+  end
+
+  # Brings the batch's orders in line with its addresses and returns the ones
+  # still waiting to go to the warehouse, or nil if the batch doesn't validate.
+  #
+  # Build every missing order first and validate the lot. Saving as we go would
+  # leave a half-created batch behind the moment one row is missing a phone
+  # number for customs, and the good half is already on its way to the warehouse
+  # by then.
+  #
+  # The row lock stops two clicks on "Process" from both deciding the same
+  # address needs a new order. It is released before we dispatch: dispatch!
+  # talks to Zenventory over HTTP, and holding the transaction open across that
+  # would mean one bad order rolls back the orders we already created *and*
+  # dispatched — leaving live Zenventory orders with no Theseus rows behind
+  # them, and a retry that rebuilds them under fresh hc_ids and ships everything
+  # twice.
+  private def reconcile_orders!
+    with_lock do
+      next nil unless fields_mapped?
+
+      # origin_batch_id sticks to an order for life, so it's the honest answer
+      # to "did this batch already produce an order for this address?" — and it
+      # lines up 1:1 with the unique idempotency_key we'd otherwise collide on.
+      existing = originated_orders.to_a
+      claimed = existing.map(&:address_id).to_set
+      new_orders = addresses.reject { |address| claimed.include?(address.id) }
+                            .map { |address| build_order_for(address) }
+
+      next nil unless preflight(new_orders)
+
+      new_orders.each(&:save!)
+
+      (existing + new_orders).select(&:draft?)
+    end
   end
 
   # Surfaces every unmailable row at once instead of blowing up on the first one.
