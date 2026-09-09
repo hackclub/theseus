@@ -1,7 +1,7 @@
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= letter_batch_path(@batch) %>" class="text-muted" style="text-decoration: none">← Batch #<%= @batch.id %></a>
-    <strong style="font-size: 1.15em;">Regenerate Labels</strong>
+    <a href="<%= letter_batch_path(@batch) %>" class="text-muted no-underline">← Batch #<%= @batch.id %></a>
+    <strong class="text-title">Regenerate Labels</strong>
   </div>
 </div>
 
@@ -31,7 +31,7 @@
         </div>
       </section>
 
-      <div class="mt-1" style="display:flex; gap:0.5rem">
+      <div class="mt-1 flex-gap-half">
         <button type="submit" class="btn-success">⟳ Regenerate Labels</button>
         <a href="<%= letter_batch_path(@batch) %>"><button>Cancel</button></a>
       </div>
