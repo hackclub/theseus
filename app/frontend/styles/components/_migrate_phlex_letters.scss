@@ -165,6 +165,10 @@
 .dialog-subtitle { margin: 0 0 1rem; }
 .dialog-footer { display: flex; gap: 0.5rem; justify-content: flex-end; padding: 1rem 0; }
 
+// ── Billing ──────────────────────────────────────────────
+
+.billing-summary-card { flex: 1; min-width: 200px; }
+
 // ── Batches::Show (generic Batch, not Letter::Batch) ─────
 
 // Danger-zone section outlined in red instead of the default border.
