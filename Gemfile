@@ -132,7 +132,7 @@ gem "selectize-rails", "~> 0.12.6"
 
 gem "slack-notifier", "~> 2.4"
 
-gem "nokogiri", "~> 1.18"
+gem "nokogiri", "~> 1.19"
 
 gem "vite_rails"
 
@@ -155,7 +155,7 @@ gem "parallel", "~> 1.26"
 gem "sentry-ruby"
 gem "sentry-rails"
 
-gem "rmagick", "~> 5.3"
+gem "rmagick", "~> 6.1"
 
 gem "jb", "~> 0.8.2"
 

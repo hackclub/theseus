@@ -101,12 +101,17 @@ module SnailMail
         if index > 0
           combined_pdf.start_new_page
         end
-        
+
         # Set the document context and render
         component.document = combined_pdf
-        component.before_template if component.respond_to?(:before_template)
-        component.view_template
-        component.after_template if component.respond_to?(:after_template)
+        begin
+          component.before_template if component.respond_to?(:before_template)
+          component.view_template
+          component.after_template if component.respond_to?(:after_template)
+        rescue Prawn::Errors::CannotFit => e
+          address = letter.address
+          raise Error, "Letter #{letter.id} (\"#{address&.line1}\", #{address&.city}, #{address&.state}) – address too long to fit on label"
+        end
       end
 
       combined_pdf

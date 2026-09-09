@@ -10,31 +10,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "record_type", null: false
-    t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.string "key", null: false
-    t.string "filename", null: false
-    t.string "content_type"
-    t.text "metadata"
-    t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
+    t.string "content_type"
     t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -45,66 +45,66 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "addresses", force: :cascade do |t|
+    t.bigint "batch_id"
+    t.string "city"
+    t.integer "country"
+    t.datetime "created_at", null: false
+    t.string "email"
     t.string "first_name"
+    t.uuid "import_token"
     t.string "last_name"
     t.string "line_1"
     t.string "line_2"
-    t.string "city"
-    t.string "state"
-    t.string "postal_code"
-    t.integer "country"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "phone_number"
-    t.bigint "batch_id"
-    t.string "email"
-    t.uuid "import_token"
+    t.string "postal_code"
+    t.string "state"
+    t.datetime "updated_at", null: false
     t.index ["batch_id"], name: "index_addresses_on_batch_id"
     t.index ["import_token"], name: "index_addresses_on_import_token", where: "(import_token IS NOT NULL)"
   end
 
   create_table "api_keys", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.datetime "revoked_at"
-    t.boolean "pii"
-    t.text "token_ciphertext"
-    t.string "token_bidx"
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "may_impersonate"
-    t.boolean "qz_only"
     t.bigint "billing_profile_id"
+    t.datetime "created_at", null: false
+    t.boolean "may_impersonate"
+    t.string "name"
+    t.boolean "pii"
+    t.boolean "qz_only"
+    t.datetime "revoked_at"
+    t.string "token_bidx"
+    t.text "token_ciphertext"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["billing_profile_id"], name: "index_api_keys_on_billing_profile_id"
     t.index ["token_bidx"], name: "index_api_keys_on_token_bidx", unique: true
     t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
 
   create_table "batches", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.jsonb "field_mapping"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "type", null: false
-    t.bigint "warehouse_template_id"
-    t.integer "address_count"
-    t.string "warehouse_user_facing_title"
     t.string "aasm_state"
-    t.decimal "letter_height"
-    t.decimal "letter_width"
-    t.decimal "letter_weight"
-    t.bigint "letter_mailer_id_id"
-    t.bigint "letter_return_address_id"
-    t.integer "letter_processing_category"
-    t.date "letter_mailing_date"
-    t.citext "tags", default: [], array: true
-    t.string "letter_return_address_name"
-    t.bigint "letter_queue_id"
+    t.integer "address_count"
+    t.jsonb "audit_log"
+    t.datetime "created_at", null: false
+    t.jsonb "field_mapping"
     t.bigint "hcb_payment_account_id"
     t.string "hcb_transfer_id"
-    t.jsonb "process_options"
+    t.decimal "letter_height"
+    t.bigint "letter_mailer_id_id"
+    t.date "letter_mailing_date"
+    t.integer "letter_processing_category"
+    t.bigint "letter_queue_id"
+    t.bigint "letter_return_address_id"
+    t.string "letter_return_address_name"
+    t.decimal "letter_weight"
+    t.decimal "letter_width"
     t.string "process_error"
-    t.jsonb "audit_log"
+    t.jsonb "process_options"
+    t.citext "tags", default: [], array: true
+    t.string "type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "warehouse_template_id"
+    t.string "warehouse_user_facing_title"
     t.index ["aasm_state"], name: "index_batches_on_aasm_state"
     t.index ["hcb_payment_account_id"], name: "index_batches_on_hcb_payment_account_id"
     t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
@@ -117,157 +117,157 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "blazer_audits", force: :cascade do |t|
-    t.bigint "user_id"
+    t.datetime "created_at"
+    t.string "data_source"
     t.bigint "query_id"
     t.text "statement"
-    t.string "data_source"
-    t.datetime "created_at"
+    t.bigint "user_id"
     t.index ["query_id"], name: "index_blazer_audits_on_query_id"
     t.index ["user_id"], name: "index_blazer_audits_on_user_id"
   end
 
   create_table "blazer_checks", force: :cascade do |t|
-    t.bigint "creator_id"
-    t.bigint "query_id"
-    t.string "state"
-    t.string "schedule"
-    t.text "emails"
-    t.text "slack_channels"
     t.string "check_type"
-    t.text "message"
-    t.datetime "last_run_at"
     t.datetime "created_at", null: false
+    t.bigint "creator_id"
+    t.text "emails"
+    t.datetime "last_run_at"
+    t.text "message"
+    t.bigint "query_id"
+    t.string "schedule"
+    t.text "slack_channels"
+    t.string "state"
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_blazer_checks_on_creator_id"
     t.index ["query_id"], name: "index_blazer_checks_on_query_id"
   end
 
   create_table "blazer_dashboard_queries", force: :cascade do |t|
-    t.bigint "dashboard_id"
-    t.bigint "query_id"
-    t.integer "position"
     t.datetime "created_at", null: false
+    t.bigint "dashboard_id"
+    t.integer "position"
+    t.bigint "query_id"
     t.datetime "updated_at", null: false
     t.index ["dashboard_id"], name: "index_blazer_dashboard_queries_on_dashboard_id"
     t.index ["query_id"], name: "index_blazer_dashboard_queries_on_query_id"
   end
 
   create_table "blazer_dashboards", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.bigint "creator_id"
     t.string "name"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_blazer_dashboards_on_creator_id"
   end
 
   create_table "blazer_queries", force: :cascade do |t|
-    t.bigint "creator_id"
-    t.string "name"
-    t.text "description"
-    t.text "statement"
-    t.string "data_source"
-    t.string "status"
     t.datetime "created_at", null: false
+    t.bigint "creator_id"
+    t.string "data_source"
+    t.text "description"
+    t.string "name"
+    t.text "statement"
+    t.string "status"
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_blazer_queries_on_creator_id"
   end
 
   create_table "common_tags", force: :cascade do |t|
-    t.string "tag"
-    t.boolean "implies_ysws"
     t.datetime "created_at", null: false
+    t.boolean "implies_ysws"
+    t.string "tag"
     t.datetime "updated_at", null: false
   end
 
   create_table "flipper_features", force: :cascade do |t|
-    t.string "key", null: false
     t.datetime "created_at", null: false
+    t.string "key", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_flipper_features_on_key", unique: true
   end
 
   create_table "flipper_gates", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.string "feature_key", null: false
     t.string "key", null: false
-    t.text "value"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "value"
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "description"
-    t.jsonb "serialized_properties"
-    t.text "on_finish"
-    t.text "on_success"
-    t.text "on_discard"
-    t.text "callback_queue_name"
     t.integer "callback_priority"
-    t.datetime "enqueued_at"
+    t.text "callback_queue_name"
+    t.datetime "created_at", null: false
+    t.text "description"
     t.datetime "discarded_at"
+    t.datetime "enqueued_at"
     t.datetime "finished_at"
     t.datetime "jobs_finished_at"
+    t.text "on_discard"
+    t.text "on_finish"
+    t.text "on_success"
+    t.jsonb "serialized_properties"
+    t.datetime "updated_at", null: false
   end
 
   create_table "good_job_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "active_job_id", null: false
-    t.text "job_class"
-    t.text "queue_name"
-    t.jsonb "serialized_params"
-    t.datetime "scheduled_at"
-    t.datetime "finished_at"
-    t.text "error"
-    t.integer "error_event", limit: 2
-    t.text "error_backtrace", array: true
-    t.uuid "process_id"
+    t.datetime "created_at", null: false
     t.interval "duration"
+    t.text "error"
+    t.text "error_backtrace", array: true
+    t.integer "error_event", limit: 2
+    t.datetime "finished_at"
+    t.text "job_class"
+    t.uuid "process_id"
+    t.text "queue_name"
+    t.datetime "scheduled_at"
+    t.jsonb "serialized_params"
+    t.datetime "updated_at", null: false
     t.index ["active_job_id", "created_at"], name: "index_good_job_executions_on_active_job_id_and_created_at"
     t.index ["process_id", "created_at"], name: "index_good_job_executions_on_process_id_and_created_at"
   end
 
   create_table "good_job_processes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.jsonb "state"
     t.integer "lock_type", limit: 2
+    t.jsonb "state"
+    t.datetime "updated_at", null: false
   end
 
   create_table "good_job_settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.text "key"
+    t.datetime "updated_at", null: false
     t.jsonb "value"
     t.index ["key"], name: "index_good_job_settings_on_key", unique: true
   end
 
   create_table "good_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.text "queue_name"
-    t.integer "priority"
-    t.jsonb "serialized_params"
-    t.datetime "scheduled_at"
-    t.datetime "performed_at"
-    t.datetime "finished_at"
-    t.text "error"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "active_job_id"
-    t.text "concurrency_key"
-    t.text "cron_key"
-    t.uuid "retried_good_job_id"
-    t.datetime "cron_at"
-    t.uuid "batch_id"
     t.uuid "batch_callback_id"
-    t.boolean "is_discrete"
-    t.integer "executions_count"
-    t.text "job_class"
+    t.uuid "batch_id"
+    t.text "concurrency_key"
+    t.datetime "created_at", null: false
+    t.datetime "cron_at"
+    t.text "cron_key"
+    t.text "error"
     t.integer "error_event", limit: 2
+    t.integer "executions_count"
+    t.datetime "finished_at"
+    t.boolean "is_discrete"
+    t.text "job_class"
     t.text "labels", array: true
-    t.uuid "locked_by_id"
     t.datetime "locked_at"
+    t.uuid "locked_by_id"
+    t.datetime "performed_at"
+    t.integer "priority"
+    t.text "queue_name"
+    t.uuid "retried_good_job_id"
+    t.datetime "scheduled_at"
+    t.jsonb "serialized_params"
+    t.datetime "updated_at", null: false
     t.index ["active_job_id", "created_at"], name: "index_good_jobs_on_active_job_id_and_created_at"
     t.index ["batch_callback_id"], name: "index_good_jobs_on_batch_callback_id", where: "(batch_callback_id IS NOT NULL)"
     t.index ["batch_id"], name: "index_good_jobs_on_batch_id", where: "(batch_id IS NOT NULL)"
@@ -286,45 +286,45 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "hcb_oauth_connections", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.text "access_token_ciphertext"
-    t.text "refresh_token_ciphertext"
-    t.datetime "expires_at"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "expires_at"
     t.datetime "invalidated_at"
+    t.text "refresh_token_ciphertext"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_hcb_oauth_connections_on_user_id"
   end
 
   create_table "hcb_payment_accounts", force: :cascade do |t|
-    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
     t.bigint "hcb_oauth_connection_id", null: false
     t.string "organization_id"
     t.string "organization_name"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["hcb_oauth_connection_id"], name: "index_hcb_payment_accounts_on_hcb_oauth_connection_id"
     t.index ["organization_id"], name: "index_hcb_payment_accounts_on_organization_id"
     t.index ["user_id"], name: "index_hcb_payment_accounts_on_user_id"
   end
 
   create_table "hcb_transfers", force: :cascade do |t|
-    t.bigint "billing_profile_id", null: false
     t.integer "amount_cents", null: false
-    t.string "remote_id"
-    t.integer "state", default: 0, null: false
-    t.string "last_error"
+    t.integer "attempts", default: 0, null: false
+    t.bigint "billing_profile_id", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "direction", default: 0, null: false
     t.string "hq_organization_id", null: false
     t.string "idempotency_key", null: false
-    t.string "name"
-    t.text "memo"
-    t.integer "attempts", default: 0, null: false
     t.datetime "last_attempted_at"
-    t.datetime "next_attempt_at"
+    t.string "last_error"
+    t.text "memo"
     t.jsonb "metadata", default: {}
+    t.string "name"
+    t.datetime "next_attempt_at"
+    t.string "remote_id"
+    t.integer "state", default: 0, null: false
+    t.datetime "updated_at", null: false
     t.index ["billing_profile_id"], name: "index_hcb_transfers_on_billing_profile_id"
     t.index ["hq_organization_id"], name: "index_hcb_transfers_on_hq_organization_id"
     t.index ["idempotency_key"], name: "index_hcb_transfers_on_idempotency_key", unique: true
@@ -334,18 +334,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "ledger_entries", force: :cascade do |t|
-    t.bigint "billing_profile_id", null: false
-    t.string "ledgerable_type", null: false
-    t.bigint "ledgerable_id", null: false
-    t.integer "category", null: false
     t.integer "amount_cents", null: false
-    t.integer "state", default: 0, null: false
-    t.datetime "settled_at"
-    t.jsonb "metadata", default: {}
+    t.bigint "billing_profile_id", null: false
+    t.integer "category", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.bigint "hcb_transfer_id"
+    t.bigint "ledgerable_id", null: false
+    t.string "ledgerable_type", null: false
+    t.jsonb "metadata", default: {}
     t.bigint "reverses_id"
+    t.datetime "settled_at"
+    t.integer "state", default: 0, null: false
+    t.datetime "updated_at", null: false
     t.index ["billing_profile_id", "state"], name: "index_ledger_entries_on_billing_profile_id_and_state"
     t.index ["billing_profile_id"], name: "index_ledger_entries_on_billing_profile_id"
     t.index ["category"], name: "index_ledger_entries_on_category"
@@ -358,27 +358,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "letter_queues", force: :cascade do |t|
-    t.string "name"
-    t.string "slug"
-    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "hcb_payment_account_id"
+    t.boolean "include_qr_code", default: true
     t.decimal "letter_height"
-    t.decimal "letter_width"
-    t.decimal "letter_weight"
-    t.integer "letter_processing_category"
-    t.date "letter_mailing_date"
     t.bigint "letter_mailer_id_id"
+    t.date "letter_mailing_date"
+    t.integer "letter_processing_category"
     t.bigint "letter_return_address_id"
     t.string "letter_return_address_name"
-    t.string "user_facing_title"
-    t.citext "tags", default: [], array: true
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "type"
-    t.string "template"
+    t.decimal "letter_weight"
+    t.decimal "letter_width"
+    t.string "name"
     t.string "postage_type"
+    t.string "slug"
+    t.citext "tags", default: [], array: true
+    t.string "template"
+    t.string "type"
+    t.datetime "updated_at", null: false
+    t.string "user_facing_title"
+    t.bigint "user_id", null: false
     t.bigint "usps_payment_account_id"
-    t.boolean "include_qr_code", default: true
-    t.bigint "hcb_payment_account_id"
     t.index ["hcb_payment_account_id"], name: "index_letter_queues_on_hcb_payment_account_id"
     t.index ["letter_mailer_id_id"], name: "index_letter_queues_on_letter_mailer_id_id"
     t.index ["letter_return_address_id"], name: "index_letter_queues_on_letter_return_address_id"
@@ -387,39 +387,39 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "letters", force: :cascade do |t|
-    t.integer "processing_category"
-    t.text "body"
     t.string "aasm_state"
-    t.bigint "usps_mailer_id_id", null: false
-    t.decimal "postage"
-    t.integer "imb_serial_number"
     t.bigint "address_id", null: false
+    t.bigint "batch_id"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.integer "created_via", default: 0, null: false
+    t.decimal "height"
+    t.string "idempotency_key"
     t.integer "imb_rollover_count"
+    t.integer "imb_serial_number"
+    t.string "indicia_error"
+    t.string "indicia_state"
+    t.bigint "letter_queue_id"
+    t.datetime "mailed_at"
+    t.date "mailing_date"
+    t.jsonb "metadata"
+    t.boolean "non_machinable"
+    t.decimal "postage"
+    t.integer "postage_type"
+    t.datetime "printed_at"
+    t.integer "processing_category"
+    t.datetime "received_at"
     t.string "recipient_email"
+    t.bigint "return_address_id", null: false
+    t.string "return_address_name"
+    t.text "rubber_stamps"
+    t.citext "tags", default: [], array: true
+    t.datetime "updated_at", null: false
+    t.string "user_facing_title"
+    t.bigint "user_id", null: false
+    t.bigint "usps_mailer_id_id", null: false
     t.decimal "weight"
     t.decimal "width"
-    t.decimal "height"
-    t.boolean "non_machinable"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "rubber_stamps"
-    t.bigint "batch_id"
-    t.bigint "return_address_id", null: false
-    t.jsonb "metadata"
-    t.integer "postage_type"
-    t.date "mailing_date"
-    t.citext "tags", default: [], array: true
-    t.string "user_facing_title"
-    t.datetime "printed_at"
-    t.datetime "mailed_at"
-    t.datetime "received_at"
-    t.bigint "user_id", null: false
-    t.string "return_address_name"
-    t.bigint "letter_queue_id"
-    t.string "idempotency_key"
-    t.integer "created_via", default: 0, null: false
-    t.string "indicia_state"
-    t.string "indicia_error"
     t.index ["aasm_state"], name: "index_letters_on_aasm_state"
     t.index ["address_id"], name: "index_letters_on_address_id"
     t.index ["batch_id"], name: "index_letters_on_batch_id"
@@ -434,87 +434,87 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "public_api_keys", force: :cascade do |t|
-    t.bigint "public_user_id", null: false
-    t.string "token_ciphertext"
-    t.datetime "revoked_at"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "name"
+    t.bigint "public_user_id", null: false
+    t.datetime "revoked_at"
     t.string "token_bidx"
+    t.string "token_ciphertext"
+    t.datetime "updated_at", null: false
     t.index ["public_user_id"], name: "index_public_api_keys_on_public_user_id"
     t.index ["token_bidx"], name: "index_public_api_keys_on_token_bidx", unique: true
   end
 
   create_table "public_impersonations", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "justification"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "justification"
     t.string "target_email"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_public_impersonations_on_user_id"
   end
 
   create_table "public_login_codes", force: :cascade do |t|
-    t.string "token"
-    t.datetime "expires_at"
     t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.string "token"
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
     t.datetime "used_at"
+    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_public_login_codes_on_user_id"
   end
 
   create_table "public_users", force: :cascade do |t|
-    t.string "email"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "opted_out_of_map", default: false
+    t.string "email"
     t.string "hca_id"
+    t.boolean "opted_out_of_map", default: false
+    t.datetime "updated_at", null: false
     t.index ["hca_id"], name: "index_public_users_on_hca_id", unique: true
   end
 
   create_table "return_addresses", force: :cascade do |t|
-    t.string "name"
+    t.string "city"
+    t.integer "country"
+    t.datetime "created_at", null: false
     t.string "line_1"
     t.string "line_2"
-    t.string "city"
-    t.string "state"
+    t.string "name"
     t.string "postal_code"
-    t.integer "country"
     t.boolean "shared"
-    t.bigint "user_id"
-    t.datetime "created_at", null: false
+    t.string "state"
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.index ["user_id"], name: "index_return_addresses_on_user_id"
   end
 
   create_table "toolchest_oauth_access_grants", force: :cascade do |t|
-    t.string "resource_owner_id", null: false
     t.bigint "application_id", null: false
-    t.string "token_digest", null: false
-    t.text "redirect_uri", null: false
-    t.string "scopes", default: "", null: false
     t.string "code_challenge"
     t.string "code_challenge_method"
-    t.string "mount_key", default: "default", null: false
-    t.datetime "expires_at", null: false
-    t.datetime "revoked_at"
     t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "mount_key", default: "default", null: false
+    t.text "redirect_uri", null: false
+    t.string "resource_owner_id", null: false
+    t.datetime "revoked_at"
+    t.string "scopes", default: "", null: false
+    t.string "token_digest", null: false
     t.datetime "updated_at", null: false
     t.index ["application_id"], name: "index_toolchest_oauth_access_grants_on_application_id"
     t.index ["token_digest"], name: "index_toolchest_oauth_access_grants_on_token_digest", unique: true
   end
 
   create_table "toolchest_oauth_access_tokens", force: :cascade do |t|
-    t.string "resource_owner_id"
     t.bigint "application_id", null: false
-    t.string "token", null: false
-    t.string "refresh_token"
-    t.string "scopes"
-    t.string "mount_key", default: "default", null: false
-    t.datetime "expires_at"
-    t.datetime "revoked_at"
     t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.string "mount_key", default: "default", null: false
+    t.string "refresh_token"
+    t.string "resource_owner_id"
+    t.datetime "revoked_at"
+    t.string "scopes"
+    t.string "token", null: false
     t.datetime "updated_at", null: false
     t.index ["application_id"], name: "index_toolchest_oauth_access_tokens_on_application_id"
     t.index ["refresh_token"], name: "index_toolchest_oauth_access_tokens_on_refresh_token", unique: true
@@ -522,69 +522,69 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "toolchest_oauth_applications", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "uid", null: false
-    t.string "secret"
-    t.text "redirect_uri", null: false
-    t.string "scopes", default: "", null: false
     t.boolean "confidential", default: true, null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.text "redirect_uri", null: false
+    t.string "scopes", default: "", null: false
+    t.string "secret"
+    t.string "uid", null: false
     t.datetime "updated_at", null: false
     t.index ["uid"], name: "index_toolchest_oauth_applications_on_uid", unique: true
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "slack_id"
-    t.string "email"
-    t.boolean "is_admin"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "icon_url"
-    t.string "username"
-    t.boolean "can_warehouse"
     t.boolean "can_impersonate_public"
+    t.boolean "can_use_indicia", default: false, null: false
+    t.boolean "can_warehouse"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "hca_id"
     t.bigint "home_mid_id", default: 1, null: false
     t.bigint "home_return_address_id", default: 1, null: false
-    t.string "hca_id"
-    t.boolean "can_use_indicia", default: false, null: false
+    t.string "icon_url"
+    t.boolean "is_admin"
     t.boolean "is_warehouse_czar", default: false, null: false
     t.jsonb "settings", default: {}, null: false
+    t.string "slack_id"
+    t.datetime "updated_at", null: false
+    t.string "username"
     t.index ["hca_id"], name: "index_users_on_hca_id", unique: true
     t.index ["home_mid_id"], name: "index_users_on_home_mid_id"
     t.index ["home_return_address_id"], name: "index_users_on_home_return_address_id"
   end
 
   create_table "usps_indicia", force: :cascade do |t|
-    t.integer "processing_category"
-    t.float "postage_weight"
-    t.boolean "nonmachinable"
-    t.string "usps_sku"
-    t.decimal "postage"
-    t.date "mailing_date"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "usps_payment_account_id", null: false
-    t.bigint "letter_id"
-    t.jsonb "raw_json_response"
-    t.boolean "flirted"
     t.decimal "fees"
+    t.boolean "flirted"
     t.bigint "hcb_payment_account_id"
     t.string "hcb_transfer_id"
+    t.bigint "letter_id"
+    t.date "mailing_date"
+    t.boolean "nonmachinable"
+    t.decimal "postage"
+    t.float "postage_weight"
+    t.integer "processing_category"
+    t.jsonb "raw_json_response"
+    t.datetime "updated_at", null: false
+    t.bigint "usps_payment_account_id", null: false
+    t.string "usps_sku"
     t.index ["hcb_payment_account_id"], name: "index_usps_indicia_on_hcb_payment_account_id"
     t.index ["letter_id"], name: "index_usps_indicia_on_letter_id"
     t.index ["usps_payment_account_id"], name: "index_usps_indicia_on_usps_payment_account_id"
   end
 
   create_table "usps_iv_mtr_events", force: :cascade do |t|
+    t.bigint "batch_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "happened_at"
     t.bigint "letter_id"
-    t.bigint "batch_id", null: false
-    t.jsonb "payload"
-    t.string "opcode"
-    t.string "zip_code"
     t.bigint "mailer_id_id", null: false
-    t.datetime "created_at", null: false
+    t.string "opcode"
+    t.jsonb "payload"
     t.datetime "updated_at", null: false
+    t.string "zip_code"
     t.index ["batch_id"], name: "index_usps_iv_mtr_events_on_batch_id"
     t.index ["letter_id"], name: "index_usps_iv_mtr_events_on_letter_id"
     t.index ["mailer_id_id", "happened_at"], name: "index_usps_iv_mtr_events_on_mailer_id_id_and_happened_at"
@@ -593,95 +593,95 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "usps_iv_mtr_raw_json_batches", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "message_group_id"
     t.jsonb "payload"
     t.boolean "processed"
-    t.string "message_group_id"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "usps_mailer_ids", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.string "crid"
     t.string "mid"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "name"
     t.integer "rollover_count"
     t.bigint "sequence_number"
+    t.datetime "updated_at", null: false
   end
 
   create_table "usps_payment_accounts", force: :cascade do |t|
-    t.bigint "usps_mailer_id_id", null: false
-    t.integer "account_type"
     t.string "account_number"
+    t.integer "account_type"
+    t.boolean "ach"
+    t.datetime "created_at", null: false
+    t.string "manifest_mid"
+    t.string "name"
     t.string "permit_number"
     t.string "permit_zip"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name"
-    t.string "manifest_mid"
-    t.boolean "ach"
+    t.bigint "usps_mailer_id_id", null: false
     t.index ["usps_mailer_id_id"], name: "index_usps_payment_accounts_on_usps_mailer_id_id"
   end
 
   create_table "versions", force: :cascade do |t|
-    t.string "whodunnit"
+    t.bigint "api_key_id"
     t.datetime "created_at"
+    t.string "event", null: false
+    t.inet "ip"
     t.bigint "item_id", null: false
     t.string "item_type", null: false
-    t.string "event", null: false
     t.jsonb "object"
-    t.inet "ip"
-    t.bigint "api_key_id"
     t.jsonb "object_changes"
+    t.string "whodunnit"
     t.index ["created_at"], name: "index_versions_on_created_at"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
   create_table "warehouse_line_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "order_id"
     t.integer "quantity"
     t.bigint "sku_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "order_id"
     t.bigint "template_id"
+    t.datetime "updated_at", null: false
     t.index ["order_id"], name: "index_warehouse_line_items_on_order_id"
     t.index ["sku_id"], name: "index_warehouse_line_items_on_sku_id"
     t.index ["template_id"], name: "index_warehouse_line_items_on_template_id"
   end
 
   create_table "warehouse_orders", force: :cascade do |t|
-    t.string "hc_id"
     t.string "aasm_state"
-    t.string "recipient_email"
-    t.bigint "user_id", null: false
-    t.boolean "surprise"
-    t.string "user_facing_title"
-    t.string "user_facing_description"
-    t.text "internal_notes"
-    t.integer "zenventory_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.bigint "address_id", null: false
-    t.datetime "dispatched_at"
-    t.datetime "mailed_at"
+    t.bigint "batch_id"
+    t.bigint "billing_profile_id"
     t.datetime "canceled_at"
     t.string "carrier"
-    t.string "service"
-    t.string "tracking_number"
-    t.decimal "postage_cost"
-    t.decimal "weight"
-    t.string "idempotency_key"
-    t.boolean "notify_on_dispatch"
-    t.bigint "batch_id"
-    t.bigint "template_id"
-    t.jsonb "metadata"
-    t.citext "tags", default: [], array: true
-    t.decimal "labor_cost", precision: 10, scale: 2
     t.decimal "contents_cost", precision: 10, scale: 2
+    t.datetime "created_at", null: false
     t.integer "created_via", default: 0, null: false
+    t.datetime "dispatched_at"
+    t.string "hc_id"
+    t.string "idempotency_key"
+    t.text "internal_notes"
+    t.decimal "labor_cost", precision: 10, scale: 2
+    t.datetime "mailed_at"
+    t.jsonb "metadata"
+    t.boolean "notify_on_dispatch"
     t.bigint "origin_batch_id"
-    t.bigint "billing_profile_id"
+    t.decimal "postage_cost"
+    t.string "recipient_email"
+    t.string "service"
+    t.boolean "surprise"
+    t.citext "tags", default: [], array: true
+    t.bigint "template_id"
+    t.string "tracking_number"
+    t.datetime "updated_at", null: false
+    t.string "user_facing_description"
+    t.string "user_facing_title"
+    t.bigint "user_id", null: false
+    t.decimal "weight"
+    t.integer "zenventory_id"
     t.index ["aasm_state"], name: "index_warehouse_orders_on_aasm_state"
     t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
     t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
@@ -697,33 +697,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "warehouse_purchase_order_line_items", force: :cascade do |t|
-    t.bigint "purchase_order_id", null: false
-    t.bigint "sku_id"
-    t.integer "quantity", null: false
-    t.decimal "unit_cost", precision: 10, scale: 2
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.bigint "purchase_order_id", null: false
+    t.integer "quantity", null: false
+    t.bigint "sku_id"
     t.bigint "sku_request_id"
+    t.decimal "unit_cost", precision: 10, scale: 2
+    t.datetime "updated_at", null: false
     t.index ["purchase_order_id"], name: "index_warehouse_purchase_order_line_items_on_purchase_order_id"
     t.index ["sku_id"], name: "index_warehouse_purchase_order_line_items_on_sku_id"
     t.index ["sku_request_id"], name: "index_warehouse_purchase_order_line_items_on_sku_request_id"
   end
 
   create_table "warehouse_purchase_orders", force: :cascade do |t|
-    t.string "supplier_name"
-    t.integer "supplier_id"
-    t.string "order_number"
-    t.text "notes"
-    t.date "required_by_date"
-    t.string "status", default: "draft"
-    t.integer "zenventory_id"
-    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "reviewed_by_id"
-    t.datetime "submitted_at"
+    t.text "notes"
+    t.string "order_number"
+    t.date "required_by_date"
     t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
     t.text "reviewer_notes"
+    t.string "status", default: "draft"
+    t.datetime "submitted_at"
+    t.integer "supplier_id"
+    t.string "supplier_name"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "zenventory_id"
     t.index ["order_number"], name: "index_warehouse_purchase_orders_on_order_number"
     t.index ["reviewed_by_id"], name: "index_warehouse_purchase_orders_on_reviewed_by_id"
     t.index ["user_id"], name: "index_warehouse_purchase_orders_on_user_id"
@@ -732,35 +732,35 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
 
   create_table "warehouse_purpose_codes", force: :cascade do |t|
     t.string "code"
-    t.string "description"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "description"
     t.integer "sequence_number"
+    t.datetime "updated_at", null: false
     t.index ["code"], name: "index_warehouse_purpose_codes_on_code"
   end
 
   create_table "warehouse_sku_requests", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "reviewed_by_id"
-    t.bigint "warehouse_sku_id"
-    t.string "name", null: false
-    t.text "description"
+    t.string "aasm_state", default: "draft", null: false
+    t.string "assigned_sku_code"
     t.string "category"
-    t.decimal "unit_cost", precision: 10, scale: 2
     t.string "country_of_origin"
-    t.string "hs_code"
+    t.datetime "created_at", null: false
     t.text "customs_description"
-    t.string "program"
+    t.text "description"
     t.date "expected_arrival"
     t.integer "expected_quantity"
-    t.string "suggested_sku_code"
-    t.string "assigned_sku_code"
-    t.string "aasm_state", default: "draft", null: false
+    t.string "hs_code"
+    t.string "name", null: false
+    t.string "program"
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
     t.text "reviewer_notes"
     t.datetime "submitted_at"
-    t.datetime "reviewed_at"
-    t.datetime "created_at", null: false
+    t.string "suggested_sku_code"
+    t.decimal "unit_cost", precision: 10, scale: 2
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "warehouse_sku_id"
     t.index ["aasm_state"], name: "index_warehouse_sku_requests_on_aasm_state"
     t.index ["reviewed_by_id"], name: "index_warehouse_sku_requests_on_reviewed_by_id"
     t.index ["user_id"], name: "index_warehouse_sku_requests_on_user_id"
@@ -768,32 +768,32 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_160000) do
   end
 
   create_table "warehouse_skus", force: :cascade do |t|
-    t.string "sku"
-    t.text "description"
-    t.decimal "average_po_cost"
-    t.text "customs_description"
-    t.integer "in_stock"
-    t.boolean "ai_enabled"
-    t.boolean "enabled"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "hs_code"
-    t.string "country_of_origin"
-    t.integer "category"
-    t.string "name"
     t.decimal "actual_cost_to_hc"
+    t.boolean "ai_enabled"
+    t.decimal "average_po_cost"
+    t.integer "category"
+    t.string "country_of_origin"
+    t.datetime "created_at", null: false
+    t.text "customs_description"
     t.decimal "declared_unit_cost_override"
-    t.string "zenventory_id"
+    t.text "description"
+    t.boolean "enabled"
+    t.string "hs_code"
+    t.integer "in_stock"
     t.integer "inbound"
+    t.string "name"
+    t.string "sku"
+    t.datetime "updated_at", null: false
+    t.string "zenventory_id"
     t.index ["sku"], name: "index_warehouse_skus_on_sku", unique: true
   end
 
   create_table "warehouse_templates", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "name"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "name"
     t.boolean "public"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_warehouse_templates_on_user_id"
   end
 

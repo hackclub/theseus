@@ -734,6 +734,7 @@ Rails.application.routes.draw do
             post "from_template/:template_id", to: "warehouse_orders#from_template", as: :from_template
           end
         end
+        resources :warehouse_skus, path: "warehouse/skus", only: [ :show ]
       end
     end
   end

@@ -1,0 +1,22 @@
+# Countries where we can't send mail or packages.
+# Update as USPS service alerts / warehouse policy change.
+
+shared:
+  # USPS international mail service suspended.
+  # Source: USPS international-prices/v3 API + OFAC sanctions list.
+  usps_restricted:
+    - BY  # Belarus
+    - CU  # Cuba
+    - IR  # Iran
+    - KP  # North Korea
+    - SD  # Sudan
+    - SO  # Somalia
+    - SS  # South Sudan
+    - SY  # Syria
+    - YE  # Yemen
+
+  # Additional countries the AGH warehouse won't ship to.
+  # (On top of usps_restricted — these are parcels-only restrictions.)
+  agh_restricted:
+    - PS  # Palestine
+    - RU  # Russia

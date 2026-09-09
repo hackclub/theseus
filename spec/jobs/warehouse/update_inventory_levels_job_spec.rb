@@ -18,6 +18,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
   before do
     allow(Warehouse::InventoryAlertMailer).to receive(:cost_alert).and_return(alert_mailer)
     allow(alert_mailer).to receive(:deliver_later)
+    allow(Zenventory).to receive(:get_items).and_return([])
   end
 
   describe "happy path" do
@@ -150,6 +151,117 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
       expect(Warehouse::InventoryAlertMailer).to have_received(:cost_alert) do |args|
         costless = args[:costless_skus].map(&:sku)
         expect(costless).not_to include("Har/No/Cost2")
+      end
+    end
+  end
+
+  describe "costless SKUs with no inventory and nothing incoming" do
+    let!(:sku) { create(:warehouse_sku, sku: "Har/No/Stock", enabled: true) }
+
+    before do
+      allow(Zenventory).to receive(:get_purchase_orders).and_return([])
+    end
+
+    context "when there's no stock and nothing inbound" do
+      before do
+        allow(Zenventory).to receive(:get_inventory).and_return([
+          inventory_item("Har/No/Stock", sellable: 0, inbound: 0, id: 5001),
+        ])
+      end
+
+      it "does not send an alert" do
+        described_class.perform_now
+        expect(Warehouse::InventoryAlertMailer).not_to have_received(:cost_alert)
+      end
+    end
+
+    context "when there's stock on hand" do
+      before do
+        allow(Zenventory).to receive(:get_inventory).and_return([
+          inventory_item("Har/No/Stock", sellable: 5, inbound: 0, id: 5002),
+        ])
+      end
+
+      it "sends an alert" do
+        described_class.perform_now
+        expect(Warehouse::InventoryAlertMailer).to have_received(:cost_alert) do |args|
+          expect(args[:costless_skus].map(&:sku)).to include("Har/No/Stock")
+        end
+      end
+    end
+
+    context "when there's nothing on hand but a PO is inbound" do
+      before do
+        allow(Zenventory).to receive(:get_inventory).and_return([
+          inventory_item("Har/No/Stock", sellable: 0, inbound: 10, id: 5003),
+        ])
+      end
+
+      it "sends an alert" do
+        described_class.perform_now
+        expect(Warehouse::InventoryAlertMailer).to have_received(:cost_alert) do |args|
+          expect(args[:costless_skus].map(&:sku)).to include("Har/No/Stock")
+        end
+      end
+    end
+  end
+
+  describe "falling back to zenventory's default unit cost" do
+    let!(:sku) { create(:warehouse_sku, sku: "Har/Default/Cost", enabled: true) }
+
+    before do
+      allow(Zenventory).to receive(:get_inventory).and_return([
+        inventory_item("Har/Default/Cost", sellable: 5, id: 6001),
+      ])
+    end
+
+    context "when there are no POs to average" do
+      before do
+        allow(Zenventory).to receive(:get_purchase_orders).and_return([])
+        allow(Zenventory).to receive(:get_items).and_return([
+          { sku: "Har/Default/Cost", unitCost: 12.5 },
+        ])
+      end
+
+      it "uses the zenventory default unit cost" do
+        described_class.perform_now
+        expect(sku.reload.average_po_cost.to_f).to eq(12.5)
+      end
+
+      it "does not send an alert" do
+        described_class.perform_now
+        expect(Warehouse::InventoryAlertMailer).not_to have_received(:cost_alert)
+      end
+    end
+
+    context "when the zenventory default unit cost is zero" do
+      before do
+        allow(Zenventory).to receive(:get_purchase_orders).and_return([])
+        allow(Zenventory).to receive(:get_items).and_return([
+          { sku: "Har/Default/Cost", unitCost: 0 },
+        ])
+      end
+
+      it "leaves average_po_cost nil and still alerts" do
+        described_class.perform_now
+        expect(sku.reload.average_po_cost).to be_nil
+        expect(Warehouse::InventoryAlertMailer).to have_received(:cost_alert)
+      end
+    end
+
+    context "when there's already a PO-based average" do
+      before do
+        allow(Zenventory).to receive(:get_purchase_orders).and_return([
+          po(id: 600, items: [po_item("Har/Default/Cost", quantity: 10, unit_cost: 3.0)]),
+        ])
+        allow(Zenventory).to receive(:get_items).and_return([
+          { sku: "Har/Default/Cost", unitCost: 99.0 },
+        ])
+      end
+
+      it "prefers the real PO average over the default" do
+        described_class.perform_now
+        expect(sku.reload.average_po_cost.to_f).to eq(3.0)
       end
     end
   end

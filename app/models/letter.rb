@@ -284,6 +284,7 @@ class Letter < ApplicationRecord
           USPS::PricingEngine.metered_price(processing_category, weight, non_machinable)
         else
           USPS::PricingEngine.fcmi_price(processing_category, weight, address.country, non_machinable)
+
         end
       when "stamps"
         if %i(queued).include?(aasm.current_state)

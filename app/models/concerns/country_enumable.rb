@@ -5,7 +5,8 @@ module CountryEnumable
 
   included do
     def self.countries_for_select
-      countries = self.countries.keys.map do |alpha2|
+      restricted = Rails.configuration.country_restrictions.usps_restricted
+      countries = self.countries.keys.reject { |c| c.to_s.in?(restricted) }.map do |alpha2|
         [ alpha2, ISO3166::Country[alpha2].common_name ]
       end.sort_by { |c| I18n.transliterate(c.last) }
       countries.unshift([ "US", "United States" ], [ "CA", "Canada" ]).uniq!

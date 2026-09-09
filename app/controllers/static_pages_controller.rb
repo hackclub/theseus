@@ -26,7 +26,7 @@ class StaticPagesController < ApplicationController
 
   def problems
     enabled = Warehouse::SKU.where(enabled: true)
-    @blocking = enabled.select { |s| !s.declared_unit_cost.positive? }
+    @blocking = enabled.select { |s| !s.declared_unit_cost.positive? && (s.in_stock.present? || s.inbound.present?) }
     @no_po_cost = enabled.where(average_po_cost: [nil, 0]).reject { |s| @blocking.include?(s) }
     @backordered = enabled.where("in_stock < 0").where("inbound IS NULL OR inbound < ABS(in_stock)")
     @stuck_orders = Warehouse::Order.where(aasm_state: "dispatched")

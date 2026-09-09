@@ -57,7 +57,7 @@ class HCB::OauthConnectionsController < ApplicationController
   def hcb_oauth_authorize_url
     hcb_oauth_client.auth_code.authorize_url(
       redirect_uri: callback_hcb_oauth_connection_url,
-      scope: "read write",
+      scope: "restricted organizations:read transfers:write transactions:write",
       state: session[:hcb_oauth_state],
     )
   end

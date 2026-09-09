@@ -58,4 +58,16 @@
       <% end %>
     </select>
   </div>
+
+  <div class="mb-half" style="display:flex; gap:1rem">
+    <div style="flex: 1;">
+      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Phone number</label>
+      <input type="tel" name="<%= a.field_name(:phone_number) %>" value="<%= a.object&.phone_number %>" class="w-100" placeholder="Required for international shipments">
+    </div>
+    <div style="flex: 1;">
+      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Email</label>
+      <input type="email" name="<%= a.field_name(:email) %>" value="<%= a.object&.email %>" class="w-100">
+    </div>
+  </div>
+
 <% end %>

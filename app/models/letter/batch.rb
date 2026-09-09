@@ -141,6 +141,9 @@ class Letter::Batch < Batch
           )
         end
       end
+    rescue USPS::USPSError => e
+      Rails.logger.warn("Skipping letter #{letter.id} (#{letter.address.country}) in postage_cost: #{e.message}")
+      0
     end
   end
 
@@ -206,6 +209,8 @@ class Letter::Batch < Batch
 
         differences[:intl] += indicia_price - retail_price
       end
+    rescue USPS::USPSError => e
+      Rails.logger.warn("Skipping letter #{letter.id} (#{letter.address.country}) in postage_cost_difference: #{e.message}")
     end
   end
 
@@ -267,6 +272,7 @@ class Letter::Batch < Batch
         height: letter_height,
         width: letter_width,
         weight: letter_weight,
+        processing_category: letter_processing_category,
         mailing_date: letter_mailing_date,
         usps_mailer_id_id: letter_mailer_id_id,
         return_address_id: letter_return_address_id,

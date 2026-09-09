@@ -99,6 +99,12 @@ class Letter::BatchesController < BaseBatchesController
   def update
     authorize @batch, policy_class: Letter::BatchPolicy
     if @batch.update(batch_params)
+      validate_postage_types
+      if @batch.errors.any?
+        render :edit, status: :unprocessable_entity
+        return
+      end
+
       @batch.propagate_to_letters!
       redirect_to letter_batch_path(@batch), notice: "Batch was successfully updated."
     else
@@ -308,7 +314,7 @@ class Letter::BatchesController < BaseBatchesController
   private
 
   def batch_params
-    params.require(:letter_batch).permit(
+    permitted = params.require(:letter_batch).permit(
       :csv,
       :addresses_data,
       :letter_template_id,
@@ -323,10 +329,11 @@ class Letter::BatchesController < BaseBatchesController
       :letter_processing_category,
       tags: [],
     )
+    normalize_processing_category(permitted)
   end
 
   def letter_batch_params
-    params.require(:batch).permit(
+    permitted = params.require(:batch).permit(
       :csv,
       :letter_height,
       :letter_width,
@@ -347,6 +354,22 @@ class Letter::BatchesController < BaseBatchesController
       :non_machinable,
       tags: [],
     )
+    normalize_processing_category(permitted)
   end
 
+  def normalize_processing_category(permitted)
+    if permitted[:letter_processing_category].present?
+      permitted[:letter_processing_category] = Letter.processing_categories.fetch(permitted[:letter_processing_category], permitted[:letter_processing_category])
+    end
+    permitted
+  end
+
+
+  def validate_postage_types
+    return unless @batch.letter_return_address&.us?
+    us_postage_type = batch_params[:us_postage_type]
+    intl_postage_type = batch_params[:intl_postage_type]
+    @batch.errors.add(:us_postage_type, "must be either 'stamps' or 'indicia'") if us_postage_type.present? && !%w[stamps indicia].include?(us_postage_type)
+    @batch.errors.add(:intl_postage_type, "must be either 'stamps' or 'indicia'") if intl_postage_type.present? && !%w[stamps indicia].include?(intl_postage_type)
+  end
 end

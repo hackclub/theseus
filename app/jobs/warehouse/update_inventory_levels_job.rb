@@ -12,6 +12,11 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
 
     Rails.logger.info("achievement get! fetched #{inventory.length} inventory items ^_^")
 
+    default_unit_costs = Zenventory
+                            .get_items
+                            .index_by { |i| i[:sku] }
+                            .transform_values { |i| nilify(i[:unitCost]) }
+
     Rails.logger.info("crunching unit cost numbers...")
     purchase_orders = Zenventory.get_purchase_orders
     all_po_items = purchase_orders.flat_map { |po| po[:items].map { |item| item.merge(po_id: po[:id]) } }
@@ -49,7 +54,7 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
     Warehouse::SKU.all.each do |i|
       sku = i.sku
       inv_item = inventory[sku]
-      unit_cost = unit_costs[sku]
+      unit_cost = unit_costs[sku] || default_unit_costs[sku]
       unless inv_item
         Rails.logger.error("no item for #{sku} in warehouse inventory!")
         next
@@ -61,17 +66,51 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
         zenventory_id: inv_item.dig(:item, :id)
       )
 
-      if i.enabled? && !i.declared_unit_cost.positive? && !zero_cost_sku_names.include?(sku)
+      if i.enabled? && !i.declared_unit_cost.positive? && !zero_cost_sku_names.include?(sku) && (i.in_stock.present? || i.inbound.present?)
         costless_skus << i
       end
     end
 
-    if costless_skus.any?
-      Rails.logger.warn("#{costless_skus.length} enabled SKU(s) have no cost data at all: #{costless_skus.map(&:sku).join(', ')}")
+    local_skus = Warehouse::SKU.pluck(:sku).to_set
+    new_sku_codes = []
+
+    inventory.each do |sku_code, inv_item|
+      next if local_skus.include?(sku_code)
+
+      name = inv_item.dig(:item, :description) || sku_code
+      sku = Warehouse::SKU.find_or_create_by!(sku: sku_code) do |s|
+        s.name = name
+        s.category = Warehouse::SKU.guess_category(name, sku_code)
+        s.enabled = true
+        s.zenventory_id = inv_item.dig(:item, :id)
+        s.in_stock = nilify(inv_item[:sellable])
+        s.inbound = nilify(inv_item[:inbound])
+        s.average_po_cost = unit_costs[sku_code] || default_unit_costs[sku_code]
+      end
+      new_sku_codes << sku_code if sku.previously_new_record?
+    rescue => e
+      Rails.logger.error("failed to create SKU #{sku_code}: #{e.message}")
     end
 
+    if new_sku_codes.any?
+      Rails.logger.info("created #{new_sku_codes.length} new SKU(s) from zenventory: #{new_sku_codes.join(', ')}")
+    end
+
+    new_sku_codes.each do |sku_code|
+      sku = Warehouse::SKU.find_by(sku: sku_code)
+      next unless sku&.enabled? && !sku.declared_unit_cost.positive? && (sku.in_stock.present? || sku.inbound.present?)
+      costless_skus << sku unless zero_cost_sku_names.include?(sku_code)
+    end
+
+    uncategorized_skus = Warehouse::SKU.where(category: :unknown).to_a
+
     if costless_skus.any?
+      Rails.logger.warn("#{costless_skus.length} enabled SKU(s) have no cost data at all: #{costless_skus.map(&:sku).join(', ')}")
       Warehouse::InventoryAlertMailer.cost_alert(costless_skus:).deliver_later
+    end
+
+    if uncategorized_skus.any?
+      Warehouse::InventoryAlertMailer.category_alert(uncategorized_skus:).deliver_later
     end
   end
 

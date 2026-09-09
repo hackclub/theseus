@@ -39,6 +39,7 @@ class Address < ApplicationRecord
   def self.strip_gremlins(str) = str&.delete(GREMLINS)&.presence
 
   validates_presence_of :first_name, :line_1, :city, :state, :postal_code, :country
+  validate :country_not_usps_restricted
 
   before_validation :strip_gremlins_from_fields
 
@@ -78,5 +79,13 @@ class Address < ApplicationRecord
     self.city = Address.strip_gremlins(city)
     self.state = Address.strip_gremlins(state)
     self.postal_code = Address.strip_gremlins(postal_code)
+  end
+
+  def country_not_usps_restricted
+    return if country.blank?
+    restricted = Rails.configuration.country_restrictions.usps_restricted
+    if country.to_s.in?(restricted)
+      errors.add(:base, "USPS does not currently deliver to #{ISO3166::Country[country]&.common_name || country}")
+    end
   end
 end

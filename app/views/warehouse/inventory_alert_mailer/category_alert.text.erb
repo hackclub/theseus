@@ -1,0 +1,13 @@
+hey nora!! just found some SKUs that i couldn't figure out a category for.
+
+i guessed what i could from the names but these ones stumped me:
+<ul>
+<% @uncategorized_skus.each do |sku| -%>
+  <li><%= link_to "#{sku.sku} — #{sku.name}", sku.zenventory_url || "#" %></li>
+<% end -%>
+</ul>
+
+you can fix this by setting a category on the SKU in theseus.
+
+ok that's all!!
+- your favorite cronjob

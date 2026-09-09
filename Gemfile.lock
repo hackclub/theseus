@@ -542,7 +542,7 @@ GEM
     request_store (1.7.0)
       rack (>= 1.4)
     rexml (3.4.4)
-    rmagick (5.5.0)
+    rmagick (6.3.0)
       observer (~> 0.1)
       pkg-config (~> 1.4)
     rqrcode (2.2.0)
@@ -769,7 +769,7 @@ DEPENDENCIES
   literal (~> 1.8)
   lockbox (~> 2.0)
   net-http (~> 0.6.0)
-  nokogiri (~> 1.18)
+  nokogiri (~> 1.19)
   norairrecord (~> 0.4.0)
   oauth2 (~> 2.0)
   omniauth (~> 2.1)
@@ -787,7 +787,7 @@ DEPENDENCIES
   rails (~> 8.1)
   redcarpet (~> 3.6)
   redis (~> 5.4)
-  rmagick (~> 5.3)
+  rmagick (~> 6.1)
   rqrcode (~> 2.2)
   rspec-rails
   rubocop-rails-omakase

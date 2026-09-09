@@ -17,7 +17,7 @@ module SnailMail
           valign: :center,
           overflow: :shrink_to_fit,
           min_font_size: 4,
-          disable_wrap_by_char: true,
+          disable_wrap_by_char: letter.address.us?,
         }
 
         opts = default_options.merge(options)

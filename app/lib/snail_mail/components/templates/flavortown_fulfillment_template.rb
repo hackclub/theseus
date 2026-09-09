@@ -29,13 +29,13 @@ module SnailMail
 
           # Render destination address
           render_destination_address(
-            100,
+            120,
             155,
-            230,
+            200,
             55,
             size: 12,
             valign: :center,
-            align: :center
+            align: :left
           )
 
           # Render postal elements

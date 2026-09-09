@@ -31,28 +31,17 @@ module API
         return if performed?
 
         address = parse_address_from_params(permit_address_params)
+        return if address.nil?
+
         @warehouse_order = Warehouse::Order.from_template(@template, warehouse_order_params.merge(
           address:, user: current_user, billing_profile:,
         ))
         authorize @warehouse_order
 
         # Build additional line items from contents if provided
-        if params[:contents].present?
-          contents_params.each do |content_item|
-            sku = Warehouse::SKU.find_by(sku: content_item[:sku])
-            unless sku
-              render json: { error: "SKU not found: #{content_item[:sku]}" }, status: :unprocessable_entity
-              return
-            end
-            @warehouse_order.line_items.build(
-              sku: sku,
-              quantity: content_item[:quantity],
-            )
-          end
-        end
+        return unless build_line_items(contents_params)
 
-        address.save!
-        @warehouse_order.save!
+        save_order_with!(address)
         @warehouse_order.dispatch!
         render :show, status: :created
       end
@@ -62,31 +51,50 @@ module API
         return if performed?
 
         address = parse_address_from_params(permit_address_params)
+        return if address.nil?
+
         @warehouse_order = Warehouse::Order.new(warehouse_order_params.merge(
           address:, user: current_user, billing_profile:,
         ))
         authorize @warehouse_order
-        address.save!
 
-        # Build line items from contents
-        contents_params.each do |content_item|
+        return unless build_line_items(contents_params)
+
+        save_order_with!(address)
+        @warehouse_order.dispatch!
+        render :show, status: :created
+      end
+
+      private
+
+      # The address and its order live and die together. Saving the address first left
+      # one behind every time the order was rejected -- which went from rare to routine
+      # once international orders started needing a phone number for customs.
+      #
+      # dispatch! stays outside: it talks to Zenventory over the network, and a remote
+      # order we've rolled the local record back on is worse than no order at all.
+      def save_order_with!(address)
+        ActiveRecord::Base.transaction do
+          address.save!
+          @warehouse_order.save!
+        end
+      end
+
+      # Returns false (having rendered an error) if any SKU is unknown.
+      def build_line_items(contents)
+        contents.each do |content_item|
           sku = Warehouse::SKU.find_by(sku: content_item[:sku])
           unless sku
             render json: { error: "SKU not found: #{content_item[:sku]}" }, status: :unprocessable_entity
-            return
+            return false
           end
           @warehouse_order.line_items.build(
             sku: sku,
             quantity: content_item[:quantity],
           )
         end
-
-        @warehouse_order.save!
-        @warehouse_order.dispatch!
-        render :show, status: :created
+        true
       end
-
-      private
 
       def set_warehouse_order
         @warehouse_order = policy_scope(Warehouse::Order).find_by!(hc_id: params[:id])

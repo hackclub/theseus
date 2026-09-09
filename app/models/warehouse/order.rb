@@ -88,6 +88,7 @@ class Warehouse::Order < ApplicationRecord
 
   validates :line_items, presence: true
   validates :recipient_email, presence: true
+  validates :address, international_contact: { email: :recipient_email }
   validate :can_mail_parcels_to_country
   validate :billing_profile_required, on: :create
   validate :billing_profile_belongs_to_user
@@ -415,7 +416,12 @@ class Warehouse::Order < ApplicationRecord
   end
 
   def can_mail_parcels_to_country
-    errors.add(:base, :cant_mail, message: "We can't currently ship to #{ISO3166::Country[address.country]&.common_name || address.country} from the warehouse.") if %i[IR PS CU KP RU].include? address.country&.to_sym
+    return if address&.country.blank?
+    restrictions = Rails.configuration.country_restrictions
+    blocked = restrictions.usps_restricted + restrictions.agh_restricted
+    if address.country.to_s.in?(blocked)
+      errors.add(:base, :cant_mail, message: "We can't currently ship to #{ISO3166::Country[address.country]&.common_name || address.country} from the warehouse.")
+    end
   end
 
   def billing_profile_required

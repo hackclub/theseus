@@ -7,7 +7,7 @@ module SnailMail
       SIZES = {
         standard: [6 * 72, 4 * 72], # 4x6 inches (432 x 288 points)
         envelope: [9.5 * 72, 4.125 * 72], # #10 envelope (684 x 297 points)
-        half_letter: [8 * 72, 5 * 72], # half-letter (576 x 360 points)
+        half_letter: [8.27 * 72, 5.83 * 72], # A5 (595.44 x 419.76 points)
       }.freeze
 
       # Template configuration methods - can be overridden in subclasses

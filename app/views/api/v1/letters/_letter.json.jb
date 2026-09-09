@@ -10,4 +10,5 @@ return_address[:name] = letter.return_address_name_line
   label_url: pii { if_expand(:label) { rails_blob_url(letter.label) if letter.label.attached? } },
   rubber_stamps: letter.rubber_stamps,
   metadata: letter.metadata || {},
+  events: if_expand(:events) { letter.events },
 }.compact_blank

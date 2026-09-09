@@ -52,5 +52,6 @@ module Theseus
     config.exceptions_app = routes
 
     config.flipper_features = config_for(:flipper_features)
+    config.country_restrictions = config_for(:country_restrictions)
   end
 end
