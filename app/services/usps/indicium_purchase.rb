@@ -5,7 +5,7 @@
 # BatchProcessJob and only use the buy step.)
 #
 #   1. lock the letter; create the indicium if needed
-#   2. charge HCB for the estimated postage (skipped if already settled)
+#   2. charge HCB for the estimated postage (skipped if already paid for)
 #   3. buy from USPS
 #   4. if USPS provably didn't sell us anything, credit the charge back
 #
@@ -61,7 +61,13 @@ class USPS::IndiciumPurchase
 
   def ensure_charged!
     existing = indicium.ledger_entries.indicia.charges.live.order(:id).last
-    return existing if existing&.settled?
+    if existing&.settled?
+      # Settled is not the same as paid for. If `buy!` credited this charge
+      # back after USPS failed, the money came home and the indicium row
+      # survived — reusing it here would buy postage for a net of zero.
+      return existing if existing.net_cents.positive?
+      existing = nil
+    end
     raise Billing::Unconfirmed.new(existing.hcb_transfer) if existing&.pending? && existing.hcb_transfer&.unknown?
 
     entry = existing || indicium.ledger_entries.create!(

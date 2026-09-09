@@ -83,6 +83,26 @@ RSpec.describe USPS::IndiciumPurchase do
     expect(hcb_disbursements.map { |d| d[:direction] }).to eq(%i[debit credit])
   end
 
+  it "does not reuse a settled charge that was fully refunded; it charges again" do
+    stub_buy { raise "USPS down" }
+    expect { purchase }.to raise_error(described_class::PurchaseFailed)
+    refunded = LedgerEntry.charges.sole
+    expect(refunded).to be_settled
+    expect(refunded.net_cents).to eq(0)
+    expect(letter.reload.usps_indicium).to be_present   # the indicium row survives
+
+    stub_buy
+    indicium = purchase
+
+    expect(indicium.postage).to eq(0.73)
+    expect(LedgerEntry.charges.count).to eq(2)
+    fresh = LedgerEntry.charges.order(:id).last
+    expect(fresh).not_to eq(refunded)
+    expect(fresh).to be_settled
+    expect(fresh.net_cents).to eq(estimate_cents)
+    expect(hcb_disbursements.map { |d| d[:direction] }).to eq(%i[debit credit debit])
+  end
+
   it "does NOT refund when USPS already sold postage but saving failed" do
     stub_buy { |ind| ind.raw_json_response = { "indiciaImage" => "x" }; raise "save failed" }
     allow(Sentry).to receive(:capture_exception)
