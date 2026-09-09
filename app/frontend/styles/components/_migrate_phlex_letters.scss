@@ -117,8 +117,6 @@
 .py-half { padding: 0.5rem 0; }
 .picklist-toolbar { display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem 0; font-size: 0.85em; }
 
-// Selection-preview text; `display` is toggled from JS (grid-picklist.js) via
-// the style attribute, so it stays inline — this only carries the static look.
 // ── Row action icons (return_addresses, admin/usps, common_tags) ─
 
 // Muted icon-only action link ("✎", "⌂") with a trailing gap before the next.
@@ -179,6 +177,9 @@
 // Danger-zone section outlined in red instead of the default border.
 .danger-zone-border { border-color: var(--red); }
 
+// Selection-preview text (Letter::Batches::Show picklist); `display` is
+// toggled from JS (grid-picklist.js) via the style attribute, so it stays
+// inline — this only carries the static look.
 .picklist-preview {
   margin: 0.5rem 0;
   font-size: 0.85em;
