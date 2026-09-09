@@ -37,7 +37,7 @@ RSpec.describe "billing consent pages" do
   it "buy indicia page and the letter sidebar form" do
     letter = create(:letter, user: user, usps_mailer_id: mailer_id, return_address: return_address, postage_type: "indicia", batch: nil)
     html = render_action(LettersController, :buy_indicia, letter: letter)
-    expect(html).to include("Billing notice").and include("Clubs").and include("Buy Indicia").and include(letter.public_id)
+    expect(html).to include("Charge").and include("Clubs").and include("Buy Indicia").and include(letter.public_id)
 
     html = render_action(LettersController, :show, letter: letter)
     expect(html).to include("billing-consent-sidebar")
@@ -62,14 +62,14 @@ RSpec.describe "billing consent pages" do
     order = Warehouse::Order.from_template(template, user: user, recipient_email: "a@b.c", address: create(:address, country: "US"), billing_profile: profile)
     order.save!
     html = render_action(Warehouse::OrdersController, :show, warehouse_order: order)
-    expect(html).to include("Billing notice").and include("$2.00").and include("later").and include("Send to Warehouse")
+    expect(html).to include("Charge").and include("$2.00").and include("later").and include("Send to Warehouse")
   end
 
   it "warehouse batch process form picks the payer" do
     batch = Warehouse::Batch.create!(user: user, warehouse_template: template)
     batch.addresses.create!(create(:address).attributes.except("id", "created_at", "updated_at"))
     html = render_view(Warehouse::BatchesController, Views::Warehouse::Batches::Process.new(batch: batch))
-    expect(html).to include("Billing notice").and include("Process Batch").and include("batch[hcb_payment_account_id]").and include("labor for 1 order")
+    expect(html).to include("Charge").and include("Process Batch").and include("batch[hcb_payment_account_id]").and include("labor for 1 order")
   end
 
   it "instant queue settings say who pays" do
