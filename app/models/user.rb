@@ -64,6 +64,34 @@ class User < ApplicationRecord
 
   def hcb_connection_invalidated? = hcb_oauth_connection&.invalidated? || false
 
+
+  def self.from_hack_club_auth(auth_hash)
+    hca_id = auth_hash.dig("uid")
+    return nil unless hca_id
+
+    # Try to find by hca_id first
+    user = find_by(hca_id: hca_id)
+
+    # If not found, try to migrate from slack_id
+    unless user
+      slack_id = auth_hash.dig("extra", "raw_info", "slack_id")
+      if slack_id.present?
+        user = find_by(slack_id: slack_id)
+        if user
+          # Migrate user to use hca_id
+          user.hca_id = hca_id
+        end
+      end
+    end
+
+    return nil unless user
+
+    user.email = auth_hash.dig("info", "email")
+    user.username ||= auth_hash.dig("info", "name")
+
+    user.save!
+    user
+  end
   def setting(key)
     settings&.dig(key.to_s)
   end
