@@ -7,12 +7,6 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-SourceTag.find_or_create_by!(
-  name: "Theseus web interface",
-  slug: "theseus_web",
-  owner: "Nora",
-)
-
 ReturnAddress.find_or_create_by!(id: 1) do |address|
   address.name = "Hack Club"
   address.line_1 = "15 Falls Rd."
