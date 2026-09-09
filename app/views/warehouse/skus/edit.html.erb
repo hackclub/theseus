@@ -1,9 +1,9 @@
 <% content_for :title, "Edit SKU #{@warehouse_sku.sku}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" class="text-muted" style="text-decoration: none">← <%= @warehouse_sku.sku %></a>
-    <strong style="font-size: 1.15em;">Edit SKU</strong>
+    <a href="<%= warehouse_sku_path(@warehouse_sku) %>" class="text-muted no-underline">← <%= @warehouse_sku.sku %></a>
+    <strong class="text-title">Edit SKU</strong>
   </div>
 </div>
 

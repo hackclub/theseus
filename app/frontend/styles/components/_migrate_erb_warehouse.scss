@@ -28,3 +28,9 @@
 .action-state { text-align: center; padding: 1rem 0; }
 .action-state--success { color: var(--green); }
 .action-state-icon { font-size: 2em; }
+
+// Error list in the SKU form (looser than .error-box-list's styling).
+.sku-error-list { margin: 0.25rem 0 0; padding-left: 1rem; }
+
+// "$" + input row for a cost field (SKU form).
+.cost-input-row { display: flex; align-items: center; gap: 0.25rem; }

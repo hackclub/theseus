@@ -1,17 +1,17 @@
 <tr id="<%= dom_id sku %>">
-  <td style="padding: 0.25rem 0.5rem;">
-    <a href="<%= warehouse_sku_path(sku) %>" style="font-weight: bold; text-decoration: none;"><code><%= sku.sku %></code></a>
+  <td class="cell-pad">
+    <a href="<%= warehouse_sku_path(sku) %>" class="link-bold"><code><%= sku.sku %></code></a>
     <span class="row-tag"><%= sku.name %></span>
   </td>
-  <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= sku.in_stock || "—" %></td>
-  <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;">
+  <td class="num-cell"><%= sku.in_stock || "—" %></td>
+  <td class="num-cell">
     <% if sku.declared_unit_cost.zero? %>
-      <span style="color: var(--red);" title="No cost data">⚠ $0.00</span>
+      <span class="text-danger" title="No cost data">⚠ $0.00</span>
     <% else %>
       <%= number_to_currency(sku.declared_unit_cost) %>
     <% end %>
   </td>
-  <td style="padding: 0.25rem 0.5rem;">
+  <td class="cell-pad">
     <% if sku.in_stock.to_i > 0 %>
       <span class="badge badge-success">In stock</span>
     <% elsif sku.in_stock.to_i < 0 %>

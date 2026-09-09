@@ -1,8 +1,8 @@
 <%= form_with(model: warehouse_sku) do |form| %>
   <% if warehouse_sku.errors.any? %>
-    <div class="mb-1" style="color: var(--red)">
+    <div class="mb-1 text-danger">
       <strong>[!] <%= pluralize(warehouse_sku.errors.count, "error") %>:</strong>
-      <ul style="margin: 0.25rem 0 0; padding-left: 1rem;">
+      <ul class="sku-error-list">
         <% warehouse_sku.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -15,19 +15,19 @@
     <hr>
     <div class="mt-half">
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">SKU code</label>
+        <label class="text-muted label-block">SKU code</label>
         <input type="text" name="warehouse_sku[sku]" value="<%= warehouse_sku.sku %>" class="w-100">
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Name</label>
+        <label class="text-muted label-block">Name</label>
         <input type="text" name="warehouse_sku[name]" value="<%= warehouse_sku.name %>" class="w-100">
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Description</label>
+        <label class="text-muted label-block">Description</label>
         <textarea name="warehouse_sku[description]" rows="3" class="w-100"><%= warehouse_sku.description %></textarea>
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Category</label>
+        <label class="text-muted label-block">Category</label>
         <select name="warehouse_sku[category]" class="w-100">
           <option value="">— Select —</option>
           <% Warehouse::SKU.categories.keys.each do |cat| %>
@@ -43,37 +43,37 @@
     <hr>
     <div class="mt-half">
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Declared unit cost</label>
-        <div style="display:flex;align-items:center;gap:0.25rem">
+        <label class="text-muted label-block">Declared unit cost</label>
+        <div class="cost-input-row">
           <span>$</span>
-          <input type="text" name="warehouse_sku[unit_cost]" value="<%= warehouse_sku.declared_unit_cost %>" style="flex: 1;">
+          <input type="text" name="warehouse_sku[unit_cost]" value="<%= warehouse_sku.declared_unit_cost %>" class="flex-1">
         </div>
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Customs description</label>
+        <label class="text-muted label-block">Customs description</label>
         <textarea name="warehouse_sku[customs_description]" rows="2" class="w-100"><%= warehouse_sku.customs_description %></textarea>
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Country of origin</label>
+        <label class="text-muted label-block">Country of origin</label>
         <input type="text" name="warehouse_sku[country_of_origin]" value="<%= warehouse_sku.country_of_origin %>" class="w-100">
       </div>
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">HS code</label>
+        <label class="text-muted label-block">HS code</label>
         <input type="text" name="warehouse_sku[hs_code]" value="<%= warehouse_sku.hs_code %>" class="w-100">
       </div>
       <% admin_tool do %>
         <div class="mb-half">
-          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Average PO cost</label>
-          <div style="display:flex;align-items:center;gap:0.25rem">
+          <label class="text-muted label-block">Average PO cost</label>
+          <div class="cost-input-row">
             <span>$</span>
-            <input type="text" name="warehouse_sku[average_po_cost]" value="<%= warehouse_sku.average_po_cost %>" style="flex: 1;">
+            <input type="text" name="warehouse_sku[average_po_cost]" value="<%= warehouse_sku.average_po_cost %>" class="flex-1">
           </div>
         </div>
         <div class="mb-half">
-          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Declared unit cost override</label>
-          <div style="display:flex;align-items:center;gap:0.25rem">
+          <label class="text-muted label-block">Declared unit cost override</label>
+          <div class="cost-input-row">
             <span>$</span>
-            <input type="text" name="warehouse_sku[declared_unit_cost_override]" value="<%= warehouse_sku.declared_unit_cost_override %>" style="flex: 1;">
+            <input type="text" name="warehouse_sku[declared_unit_cost_override]" value="<%= warehouse_sku.declared_unit_cost_override %>" class="flex-1">
           </div>
         </div>
       <% end %>
@@ -85,16 +85,16 @@
     <hr>
     <div class="mt-half">
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">In stock</label>
+        <label class="text-muted label-block">In stock</label>
         <input type="number" name="warehouse_sku[in_stock]" value="<%= warehouse_sku.in_stock %>" class="w-100">
       </div>
       <% admin_tool do %>
         <div class="mb-half">
-          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Inbound</label>
+          <label class="text-muted label-block">Inbound</label>
           <input type="number" name="warehouse_sku[inbound]" value="<%= warehouse_sku.inbound %>" class="w-100">
         </div>
         <div class="mb-half">
-          <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Zenventory ID</label>
+          <label class="text-muted label-block">Zenventory ID</label>
           <input type="text" name="warehouse_sku[zenventory_id]" value="<%= warehouse_sku.zenventory_id %>" class="w-100">
         </div>
       <% end %>
@@ -103,14 +103,14 @@
           <input type="checkbox" name="warehouse_sku[ai_enabled]" value="1" <%= "checked" if warehouse_sku.ai_enabled %>>
           AI enabled
         </label>
-        <div class="text-muted" style="font-size: 0.85em">Allow AI service to use this SKU</div>
+        <div class="text-muted text-sm">Allow AI service to use this SKU</div>
       </div>
       <div class="mb-half">
         <label>
           <input type="checkbox" name="warehouse_sku[enabled]" value="1" <%= "checked" if warehouse_sku.enabled %>>
           Enabled
         </label>
-        <div class="text-muted" style="font-size: 0.85em">SKU is available for ordering</div>
+        <div class="text-muted text-sm">SKU is available for ordering</div>
       </div>
     </div>
   </section>

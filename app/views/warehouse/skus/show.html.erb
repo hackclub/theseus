@@ -1,9 +1,9 @@
 <% content_for :title, @warehouse_sku.sku %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_skus_path %>" class="text-muted" style="text-decoration: none">← SKUs</a>
-    <strong style="font-size: 1.15em;"><%= @warehouse_sku.sku %></strong>
+    <a href="<%= warehouse_skus_path %>" class="text-muted no-underline">← SKUs</a>
+    <strong class="text-title"><%= @warehouse_sku.sku %></strong>
     <% if @warehouse_sku.in_stock.to_i > 10 %>
       <span class="badge badge-success">In stock</span>
     <% elsif @warehouse_sku.in_stock.to_i.between?(1, 10) %>
@@ -86,30 +86,30 @@
         <table class="w-100 mt-half">
           <thead>
             <tr>
-              <th style="text-align: left;">Order</th>
-              <th style="text-align: left;">Recipient</th>
-              <th style="text-align: right;">Qty</th>
-              <th style="text-align: left;">Tracking</th>
-              <th style="text-align: left;">Status</th>
+              <th class="text-left">Order</th>
+              <th class="text-left">Recipient</th>
+              <th class="text-right">Qty</th>
+              <th class="text-left">Tracking</th>
+              <th class="text-left">Status</th>
             </tr>
           </thead>
           <tbody>
             <% @recent_orders.each do |order| %>
               <% line_item = order.line_items.find_by(sku_id: @warehouse_sku.id) %>
               <tr>
-                <td style="padding: 0.25rem 0.5rem;">
-                  <a href="<%= warehouse_order_path(order) %>" style="font-weight: bold; text-decoration: none;"><%= order.hc_id %></a>
+                <td class="cell-pad">
+                  <a href="<%= warehouse_order_path(order) %>" class="link-bold"><%= order.hc_id %></a>
                 </td>
-                <td style="padding: 0.25rem 0.5rem;"><%= order.address&.name_line || "—" %></td>
-                <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
-                <td style="padding: 0.25rem 0.5rem;">
+                <td class="cell-pad"><%= order.address&.name_line || "—" %></td>
+                <td class="num-cell"><%= line_item&.quantity || 0 %></td>
+                <td class="cell-pad">
                   <% if order.tracking_number.present? %>
                     <a href="<%= order.tracking_url %>" target="_blank" class="text-muted"><%= order.pretty_via %> ↗</a>
                   <% else %>
                     <span class="text-muted">—</span>
                   <% end %>
                 </td>
-                <td style="padding: 0.25rem 0.5rem;">
+                <td class="cell-pad">
                   <% badge_class = { "draft" => "badge", "dispatched" => "badge badge-info", "mailed" => "badge badge-success", "canceled" => "badge badge-danger", "errored" => "badge badge-danger" }[order.aasm_state] || "badge" %>
                   <span class="<%= badge_class %>"><%= order.humanized_state %></span>
                 </td>
@@ -118,7 +118,7 @@
           </tbody>
         </table>
       <% else %>
-        <div class="text-muted" style="text-align: center; padding: 1rem 0">No orders yet.</div>
+        <div class="text-muted action-state">No orders yet.</div>
       <% end %>
     </section>
 
@@ -129,24 +129,24 @@
         <table class="w-100 mt-half">
           <thead>
             <tr>
-              <th style="text-align: left;">PO</th>
-              <th style="text-align: left;">Supplier</th>
-              <th style="text-align: right;">Qty</th>
-              <th style="text-align: right;">Unit Cost</th>
-              <th style="text-align: left;">Status</th>
+              <th class="text-left">PO</th>
+              <th class="text-left">Supplier</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Unit Cost</th>
+              <th class="text-left">Status</th>
             </tr>
           </thead>
           <tbody>
             <% @recent_purchase_orders.each do |po| %>
               <% line_item = po.line_items.find_by(sku_id: @warehouse_sku.id) %>
               <tr>
-                <td style="padding: 0.25rem 0.5rem;">
-                  <a href="<%= warehouse_purchase_order_path(po) %>" style="font-weight: bold; text-decoration: none;"><%= po.order_number.presence || "##{po.id}" %></a>
+                <td class="cell-pad">
+                  <a href="<%= warehouse_purchase_order_path(po) %>" class="link-bold"><%= po.order_number.presence || "##{po.id}" %></a>
                 </td>
-                <td class="text-muted" style="padding: 0.25rem 0.5rem"><%= po.supplier_name %></td>
-                <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= line_item&.quantity || 0 %></td>
-                <td style="padding: 0.25rem 0.5rem; text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(line_item&.unit_cost) %></td>
-                <td style="padding: 0.25rem 0.5rem;">
+                <td class="text-muted cell-pad"><%= po.supplier_name %></td>
+                <td class="num-cell"><%= line_item&.quantity || 0 %></td>
+                <td class="num-cell"><%= number_to_currency(line_item&.unit_cost) %></td>
+                <td class="cell-pad">
                   <% badge_class = { "draft" => "badge", "open" => "badge badge-info", "completed" => "badge badge-success", "deleted" => "badge badge-danger" }[po.status] || "badge" %>
                   <span class="<%= badge_class %>"><%= po.humanized_state %></span>
                 </td>
@@ -155,7 +155,7 @@
           </tbody>
         </table>
       <% else %>
-        <div class="text-muted" style="text-align: center; padding: 1rem 0">No purchase orders yet.</div>
+        <div class="text-muted action-state">No purchase orders yet.</div>
       <% end %>
     </section>
 
@@ -168,11 +168,11 @@
       <hr>
       <div class="detail-grid mt-half">
         <span class="detail-label">In Stock</span>
-        <span style="font-weight: bold;"><%= @warehouse_sku.in_stock || "—" %></span>
+        <span class="fw-bold"><%= @warehouse_sku.in_stock || "—" %></span>
         <span class="detail-label">Inbound</span>
-        <span style="font-weight: bold;"><%= @warehouse_sku.inbound || "—" %></span>
+        <span class="fw-bold"><%= @warehouse_sku.inbound || "—" %></span>
         <span class="detail-label">Unit Cost</span>
-        <span style="font-weight: bold;"><%= number_to_currency(@warehouse_sku.declared_unit_cost) %></span>
+        <span class="fw-bold"><%= number_to_currency(@warehouse_sku.declared_unit_cost) %></span>
       </div>
     </section>
   </div>
