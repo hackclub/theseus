@@ -8,10 +8,10 @@ class Views::Warehouse::Batches::Show < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: warehouse_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
-        strong(style: "font-size: 1.15em;") { "Warehouse Batch ##{@batch.id}" }
+        a(href: warehouse_batches_path, class: "link-muted") { "← Batches" }
+        strong(class: "text-title") { "Warehouse Batch ##{@batch.id}" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
       div(class: "flex-row") do
@@ -78,9 +78,9 @@ class Views::Warehouse::Batches::Show < Views::Base
       table(class: "mt-half w-100") do
         thead do
           tr do
-            th(style: "text-align: left;") { "ID" }
-            th(style: "text-align: left;") { "Recipient" }
-            th(style: "text-align: left;") { "Status" }
+            th(class: "text-left") { "ID" }
+            th(class: "text-left") { "Recipient" }
+            th(class: "text-left") { "Status" }
           end
         end
         tbody do
@@ -103,10 +103,10 @@ class Views::Warehouse::Batches::Show < Views::Base
       table(class: "mt-half w-100") do
         thead do
           tr do
-            th(style: "text-align: left;") { "Name" }
-            th(style: "text-align: left;") { "City" }
-            th(style: "text-align: left;") { "State" }
-            th(style: "text-align: left;") { "Country" }
+            th(class: "text-left") { "Name" }
+            th(class: "text-left") { "City" }
+            th(class: "text-left") { "State" }
+            th(class: "text-left") { "Country" }
           end
         end
         tbody do
@@ -133,8 +133,8 @@ class Views::Warehouse::Batches::Show < Views::Base
             button(class: "btn-success w-100") { "▶ Process Batch" }
           end
         elsif @batch.processed?
-          div(style: "text-align: center; padding: 1rem 0; color: var(--green);") do
-            span(style: "font-size: 2em;") { "✓" }
+          div(class: "batch-processed-icon-box") do
+            span(class: "batch-processed-check") { "✓" }
             div(class: "mt-half") { strong { "Processed" } }
           end
         else

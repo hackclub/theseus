@@ -45,3 +45,13 @@
   gap: 0.25rem;
   z-index: 10;
 }
+
+// ── Batches ────────────────────────────────────────────
+
+.form-field-note { color: var(--foreground2); font-size: 0.85em; margin: 0; }
+.batch-new-actions { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+.batch-new-info-p { margin: 0 0 0.5rem; }
+.clear-filter-link { color: var(--foreground2); white-space: nowrap; }
+.batch-tag-chip { color: var(--foreground2); font-size: 0.8em; }
+.batch-processed-icon-box { text-align: center; padding: 1rem 0; color: var(--green); }
+.batch-processed-check { font-size: 2em; }
