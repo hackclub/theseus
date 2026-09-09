@@ -1,19 +1,14 @@
+# Source tags are gone from the application, but main's still-running code
+# reads source_tags and the source_tag_id columns during the rollout. Dropping
+# them here would break every old process still serving traffic.
+#
+# So this migration only does the half that is safe to run while old code is
+# live: it makes the columns nullable, because new code never sets them. The
+# destructive half lives in db/deferred_migrations/20260910000000_drop_source_tags.rb
+# and is run after the deploy has fully rolled out.
 class RemoveSourceTags < ActiveRecord::Migration[8.0]
   def change
-    remove_foreign_key :warehouse_orders, :source_tags
-    remove_foreign_key :warehouse_templates, :source_tags
-
-    remove_index :warehouse_orders, :source_tag_id
-    remove_index :warehouse_templates, :source_tag_id
-
-    remove_column :warehouse_orders, :source_tag_id, :bigint, null: false
-    remove_column :warehouse_templates, :source_tag_id, :bigint, null: false
-
-    drop_table :source_tags do |t|
-      t.string :slug
-      t.string :name
-      t.string :owner
-      t.timestamps
-    end
+    change_column_null :warehouse_orders, :source_tag_id, true if column_exists?(:warehouse_orders, :source_tag_id)
+    change_column_null :warehouse_templates, :source_tag_id, true if column_exists?(:warehouse_templates, :source_tag_id)
   end
 end
