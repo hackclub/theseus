@@ -77,3 +77,13 @@
 .admin-users-form-section { margin-top: 1.5rem; margin-bottom: 1rem; }
 .admin-users-form-section-title { margin: 0 0 0.5rem; }
 .admin-checkbox-field { margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+
+// ── Letters form ───────────────────────────────────────
+
+.letter-form-section { margin-bottom: 2rem; }
+.field-caption { display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25rem; }
+.field-hint-block { display: block; margin-top: 0.25rem; font-size: 0.85em; }
+.mailing-date-input { width: 10rem; }
+.mailing-date-quick-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.address-row { display: flex; gap: 1rem; }
+.flex-2 { flex: 2; }
