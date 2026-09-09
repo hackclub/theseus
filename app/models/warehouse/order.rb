@@ -37,6 +37,7 @@
 #
 # Indexes
 #
+#  index_warehouse_orders_on_aasm_state          (aasm_state)
 #  index_warehouse_orders_on_address_id          (address_id)
 #  index_warehouse_orders_on_batch_id            (batch_id)
 #  index_warehouse_orders_on_billing_profile_id  (billing_profile_id)
@@ -47,6 +48,7 @@
 #  index_warehouse_orders_on_tags                (tags) USING gin
 #  index_warehouse_orders_on_template_id         (template_id)
 #  index_warehouse_orders_on_user_id             (user_id)
+#  index_warehouse_orders_on_zenventory_id       (zenventory_id)
 #
 # Foreign Keys
 #
@@ -142,10 +144,8 @@ class Warehouse::Order < ApplicationRecord
   end
 
   def cancel!(reason)
-    transaction do
-      mark_canceled!
-      Zenventory.cancel_customer_order(zenventory_id, reason)
-    end
+    mark_canceled!
+    Zenventory.cancel_customer_order(zenventory_id, reason)
   end
 
   class MissingCostsError < StandardError; end
@@ -160,21 +160,23 @@ class Warehouse::Order < ApplicationRecord
         "Please go find Nora right now."
     end
 
-    ActiveRecord::Base.transaction do
-      lock!  # row-level lock prevents concurrent dispatch
-      raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
-      order = Zenventory.create_customer_order(
-        {
-          orderNumber: "hack.club/#{hc_id}",
-          customer: customer_attributes,
-          shippingAddress: shipping_address_attributes,
-          billingAddress: { sameAsShipping: true },
-          items: generate_order_items,
-        }
-      )
-      mark_dispatched!(order[:id])
+    # Zenventory call outside the transaction so we don't hold a row lock
+    # across an HTTP round-trip. If the POST succeeds but the transition
+    # fails, we have an orphaned Zenventory order — recoverable on retry.
+    payload = {
+      orderNumber: "hack.club/#{hc_id}",
+      customer: customer_attributes,
+      shippingAddress: shipping_address_attributes,
+      billingAddress: { sameAsShipping: true },
+      items: generate_order_items,
+    }
+    zenventory_order = Zenventory.create_customer_order(payload)
 
-      # Create labor ledger entry inside transaction
+    ActiveRecord::Base.transaction do
+      lock!
+      raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
+      mark_dispatched!(zenventory_order[:id])
+
       if billing_profile.present? && labor_cost.present? && labor_cost.positive?
         ledger_entries.create!(
           billing_profile: billing_profile,

@@ -154,27 +154,25 @@ class Warehouse::PurchaseOrder < ApplicationRecord
   end
 
   def dispatch!
-    ActiveRecord::Base.transaction do
-      raise "Not all SKUs resolved" unless all_skus_resolved?
-      raise AASM::InvalidTransition, "wrong state" unless may_mark_open?
+    raise "Not all SKUs resolved" unless all_skus_resolved?
+    raise AASM::InvalidTransition, "wrong state" unless may_mark_open?
 
-      po_params = {
-        supplier: { id: supplier_id, name: supplier_name }.compact,
-        requiredByDate: required_by_date&.iso8601,
-        notes: notes,
-        items: line_items.map do |li|
-          {
-            sku: li.sku.sku,
-            quantity: li.quantity,
-            unitCost: li.unit_cost&.to_f
-          }.compact
-        end
-      }.compact
+    po_params = {
+      supplier: { id: supplier_id, name: supplier_name }.compact,
+      requiredByDate: required_by_date&.iso8601,
+      notes: notes,
+      items: line_items.map do |li|
+        {
+          sku: li.sku.sku,
+          quantity: li.quantity,
+          unitCost: li.unit_cost&.to_f
+        }.compact
+      end
+    }.compact
 
-      response = Zenventory.create_purchase_order(po_params)
-      update!(zenventory_id: response[:id], order_number: response[:orderNumber])
-      mark_open!
-    end
+    response = Zenventory.create_purchase_order(po_params)
+    update!(zenventory_id: response[:id], order_number: response[:orderNumber])
+    mark_open!
   end
 
   def sync_from_zenventory!

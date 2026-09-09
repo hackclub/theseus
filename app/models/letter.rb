@@ -39,6 +39,7 @@
 #
 # Indexes
 #
+#  index_letters_on_aasm_state         (aasm_state)
 #  index_letters_on_address_id         (address_id)
 #  index_letters_on_batch_id           (batch_id)
 #  index_letters_on_created_via        (created_via)
@@ -182,7 +183,7 @@ class Letter < ApplicationRecord
   validate :validate_postage_type_by_return_address
 
   before_validation :set_created_via_defaults, on: :create
-  before_save :set_postage
+  before_save :set_postage, if: :should_reprice?
 
   def mailing_date_not_in_past
     if mailing_date < Date.current
@@ -263,6 +264,10 @@ class Letter < ApplicationRecord
   end
 
   private
+
+  def should_reprice?
+    new_record? || postage_type_changed? || weight_changed? || non_machinable_changed?
+  end
 
   def set_postage
     self.postage = case postage_type
