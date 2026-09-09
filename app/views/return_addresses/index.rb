@@ -25,14 +25,14 @@ class Views::ReturnAddresses::Index < Views::Base
             th { "Address Line" }
             th { "City / State" }
             th { "Default?" }
-            th(style: "text-align: right;") { "Actions" }
+            th(class: "text-right") { "Actions" }
           end
         end
         tbody do
           return_addresses.each do |address|
             tr do
               td do
-                a(href: edit_return_address_path(address), style: "text-decoration: none; font-weight: 600;") do
+                a(href: edit_return_address_path(address), class: "link-strong") do
                   plain address.name
                 end
                 whitespace
@@ -51,7 +51,7 @@ class Views::ReturnAddresses::Index < Views::Base
                   plain "—"
                 end
               end
-              td(style: "text-align: right;") do
+              td(class: "text-right") do
                 render_actions(address)
               end
             end
@@ -59,8 +59,8 @@ class Views::ReturnAddresses::Index < Views::Base
         end
       end
     else
-      div(style: "text-align: center; padding: 2rem;") do
-        h2(style: "margin: 0;") { "No return addresses found" }
+      div(class: "empty-state") do
+        h2(class: "m-0") { "No return addresses found" }
         p(class: "text-muted") { "Create your first return address to get started." }
         a(href: new_return_address_path) { button(class: "btn-success") { "Create Return Address" } }
       end
@@ -84,16 +84,16 @@ class Views::ReturnAddresses::Index < Views::Base
   def render_actions(address)
     return unless address.user == current_user || current_user&.admin?
 
-    a(href: edit_return_address_path(address), style: "color: var(--foreground2); margin-right: 0.5rem;") { "✎" }
+    a(href: edit_return_address_path(address), class: "icon-link") { "✎" }
 
     unless address == current_user&.home_return_address
       a(
         href: set_as_home_return_address_path(address),
         data: { turbo_method: :post },
-        style: "color: var(--foreground2); margin-right: 0.5rem;"
+        class: "icon-link"
       ) { "⌂" }
     end
 
-    button_to "✕", return_address_path(address), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Are you sure you want to delete this return address?')"
+    button_to "✕", return_address_path(address), method: :delete, form: { class: "form-inline" }, class: "btn-link-danger", onclick: "return confirm('Are you sure you want to delete this return address?')"
   end
 end

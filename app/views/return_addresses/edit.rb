@@ -6,10 +6,10 @@ class Views::ReturnAddresses::Edit < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: return_addresses_path, style: "text-decoration: none; color: var(--foreground2);") { "← Return Addresses" }
-        strong(style: "font-size: 1.15em;") { "Edit Return Address" }
+        a(href: return_addresses_path, class: "link-muted") { "← Return Addresses" }
+        strong(class: "text-title") { "Edit Return Address" }
       end
     end
 

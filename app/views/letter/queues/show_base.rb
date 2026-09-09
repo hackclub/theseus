@@ -39,10 +39,10 @@ class Views::Letter::Queues::ShowBase < Views::Base
   # --- Header ---
 
   def header_section
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: letter_queues_path, style: "text-decoration: none; color: var(--foreground2);") { "← Queues" }
-        strong(style: "font-size: 1.15em;") { queue.name }
+        a(href: letter_queues_path, class: "link-muted") { "← Queues" }
+        strong(class: "text-title") { queue.name }
         type_badge
         queue_status_badge
       end
@@ -129,12 +129,12 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   def letters_section
     section(class: "mb-1") do
-      div(style: "display:flex;align-items:center") do
+      div(class: "row-flex") do
         strong { "Letters" }
-        span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{letters.count})" } if letters.any?
-        span(style: "flex: 1;")
+        span(class: "text-muted ml-half") { "(#{letters.count})" } if letters.any?
+        span(class: "flex-1")
         if search.present? || status.present?
-          a(href: queue_show_path, style: "color: var(--foreground2); font-size: 0.9em;") { "× Clear filters" }
+          a(href: queue_show_path, class: "clear-filters-link") { "× Clear filters" }
         end
       end
       hr
@@ -156,7 +156,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
           end
         end
       else
-        div(style: "text-align: center; padding: 2rem;", class: "text-muted") do
+        div(class: "empty-state text-muted") do
           if search.present? || status.present?
             plain "No letters match your filters."
           else
@@ -168,9 +168,9 @@ class Views::Letter::Queues::ShowBase < Views::Base
   end
 
   def letters_filter_bar
-    div(style: "display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;") do
-      div(style: "flex: 1;") do
-        form(action: queue_show_path, method: "get", style: "display: flex;") do
+    div(class: "letters-filter-bar") do
+      div(class: "flex-1") do
+        form(action: queue_show_path, method: "get", class: "d-flex") do
           input(type: "hidden", name: "status", value: status) if status.present?
           input(
             type: "text",
@@ -194,11 +194,11 @@ class Views::Letter::Queues::ShowBase < Views::Base
         end
 
         if is_active
-          a(href: href, style: "text-decoration: none;") do
+          a(href: href, class: "no-underline") do
             button(class: "#{state_badge_class(state)} btn-sm") { "#{count} #{state}" }
           end
         else
-          a(href: href, style: "text-decoration: none; color: var(--foreground2);") { "#{count} #{state}" }
+          a(href: href, class: "link-muted") { "#{count} #{state}" }
         end
       end
     end
@@ -219,7 +219,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
       hr
       div(class: "mt-half") do
         make_batch_section
-        a(href: edit_queue_path, style: "display: block; margin-top: 0.5rem;") do
+        a(href: edit_queue_path, class: "action-link-block") do
           button(class: "btn-sm w-100") { "✎ Edit Queue" }
         end
       end
@@ -235,13 +235,13 @@ class Views::Letter::Queues::ShowBase < Views::Base
       hr
       div(class: "mt-half") do
         active_states.each do |state|
-          div(style: "display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;") do
+          div(class: "stat-row") do
             span(class: "text-muted") { state.capitalize }
             span(class: "badge #{state_badge_class(state)}") { letter_counts[state].to_s }
           end
         end
-        hr(style: "margin: 0.5rem 0;")
-        div(style: "display:flex;align-items:center;justify-content:space-between;") do
+        hr(class: "mt-half mb-half")
+        div(class: "stat-total-row") do
           strong { "Total" }
           strong { LETTER_STATES.sum { |s| letter_counts.fetch(s, 0) }.to_s }
         end
@@ -254,14 +254,14 @@ class Views::Letter::Queues::ShowBase < Views::Base
   def letter_row(letter)
     tr do
       td do
-        a(href: letter_path(letter), style: "text-decoration: none;") { letter.public_id }
+        a(href: letter_path(letter), class: "no-underline") { letter.public_id }
       end
       td do
         name = [ letter.address&.first_name, letter.address&.last_name ].compact_blank.join(" ")
         plain name.presence || "—"
       end
       td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
-      td(class: "text-muted", style: "text-align: right;") { letter.created_at.strftime("%b %-d") }
+      td(class: "text-muted text-right") { letter.created_at.strftime("%b %-d") }
     end
   end
 
@@ -302,7 +302,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
   def render_user_mention(user)
     div(class: "flex-row") do
       if user.icon_url.present?
-        img(src: user.icon_url, width: 20, height: 20, style: "border-radius: 50%;", alt: "")
+        img(src: user.icon_url, width: 20, height: 20, class: "avatar-round", alt: "")
       end
       span { user.username }
     end
@@ -313,7 +313,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
       details(class: "mt-1") do
         summary(class: "text-muted pointer") { "Inspect #{record.class.name.underscore}" }
         section(class: "mt-half") do
-          pre(style: "margin: 0; overflow-x: auto; font-size: 0.85em;") { JSON.pretty_generate(record.as_json) }
+          pre(class: "json-inspector") { JSON.pretty_generate(record.as_json) }
         end
       end
     end

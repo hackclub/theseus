@@ -8,10 +8,10 @@ class Views::APIKeys::New < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: api_keys_path, style: "text-decoration: none; color: var(--foreground2);") { "← API Keys" }
-        strong(style: "font-size: 1.15em;") { "New API Key" }
+        a(href: api_keys_path, class: "link-muted") { "← API Keys" }
+        strong(class: "text-title") { "New API Key" }
       end
     end
 
@@ -23,9 +23,9 @@ class Views::APIKeys::New < Views::Base
           div(class: "mt-half") do
             form_with model: api_key, url: api_keys_path, local: true do |f|
               div(class: "mb-1") do
-                label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Name" }
+                label(class: "form-field-label") { "Name" }
                 input(type: "text", name: "api_key[name]", autofocus: true, class: "w-100")
-                p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0;") { "Short description (think \"high-seas\")" }
+                p(class: "field-hint") { "Short description (think \"high-seas\")" }
               end
 
               fieldset(class: "fieldset-reset") do
@@ -35,27 +35,27 @@ class Views::APIKeys::New < Views::Base
                   input(type: "checkbox", name: "api_key[pii]", value: "1")
                   plain " PII Access"
                 end
-                p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 1rem 1rem;") { "Should this key be able to read address data? (probably not!)" }
+                p(class: "checkbox-hint") { "Should this key be able to read address data? (probably not!)" }
 
                 admin_tool do
                   label do
                     input(type: "checkbox", name: "api_key[may_impersonate]", value: "1")
                     plain " Can Impersonate"
                   end
-                  p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 1rem 1rem;") { "Can this key impersonate other back office users? (don't enable unless needed)" }
+                  p(class: "checkbox-hint") { "Can this key impersonate other back office users? (don't enable unless needed)" }
                 end
               end
 
               if current_user.billing_profiles.any?
                 div(class: "mb-1 mt-1") do
-                  label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Default Billing Profile" }
+                  label(class: "form-field-label") { "Default Billing Profile" }
                   select(name: "api_key[billing_profile_id]", class: "w-100") do
                     option(value: "") { "None (no billing)" }
                     current_user.billing_profiles.each do |profile|
                       option(value: profile.id) { profile.organization_name }
                     end
                   end
-                  p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0;") { "Warehouse orders created through this key will bill this organization." }
+                  p(class: "field-hint") { "Warehouse orders created through this key will bill this organization." }
                 end
               end
 
@@ -69,9 +69,9 @@ class Views::APIKeys::New < Views::Base
         section do
           strong { "About API Keys" }
           hr
-          div(class: "mt-half text-muted") do
-            p(style: "margin: 0 0 0.5rem;") { "API keys grant programmatic access to the system." }
-            p(style: "margin: 0;") { "PII access should only be enabled when the integration specifically needs address data." }
+          div(class: "mt-half text-muted help-text") do
+            p { "API keys grant programmatic access to the system." }
+            p { "PII access should only be enabled when the integration specifically needs address data." }
           end
         end
       end

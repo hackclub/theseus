@@ -6,10 +6,10 @@ class Views::Letter::InstantQueues::Edit < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: letter_instant_queue_path(@queue), style: "text-decoration: none; color: var(--foreground2);") { "← #{@queue.name}" }
-        strong(style: "font-size: 1.15em;") { "Edit Queue" }
+        a(href: letter_instant_queue_path(@queue), class: "link-muted") { "← #{@queue.name}" }
+        strong(class: "text-title") { "Edit Queue" }
       end
     end
 

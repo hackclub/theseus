@@ -39,9 +39,9 @@ class Views::Letter::Batches::Map < Views::Base
   end
 
   def view_template
-    div(style: "display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;") do
-      a(href: letter_batch_path(@batch), style: "text-decoration:none;color:var(--foreground2);") { "← Batch ##{@batch.public_id}" }
-      strong(style: "font-size:1.15em;") { "Map CSV Fields" }
+    div(class: "flex-row mb-1") do
+      a(href: letter_batch_path(@batch), class: "link-muted") { "← Batch ##{@batch.public_id}" }
+      strong(class: "text-title") { "Map CSV Fields" }
     end
 
     p(class: "text-muted") do
@@ -62,7 +62,7 @@ class Views::Letter::Batches::Map < Views::Base
             guess = guess_field(header)
             tr do
               td { strong { header } }
-              td(class: "text-muted", style: "max-width:20ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;") do
+              td(class: "text-muted truncate-20ch") do
                 plain @sample_row[header].to_s
               end
               td do

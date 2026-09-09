@@ -14,7 +14,7 @@ class Views::Admin::CommonTags::Index < Views::Base
     )
 
     if @common_tags.empty?
-      div(style: "text-align:center;padding:3rem 1rem;color:var(--foreground2);") do
+      div(class: "empty-state-lg text-muted") do
         p { "No common tags yet." }
         a(href: new_admin_common_tag_path) do
           button(class: "btn-success") { "+ New Tag" }
@@ -26,7 +26,7 @@ class Views::Admin::CommonTags::Index < Views::Base
           tr do
             th { "Tag" }
             th { "YSWS" }
-            th(style: "text-align: right;") { "" }
+            th(class: "text-right") { "" }
           end
         end
         tbody do
@@ -42,9 +42,9 @@ class Views::Admin::CommonTags::Index < Views::Base
                   span(class: "badge") { "No" }
                 end
               end
-              td(style: "text-align:right;white-space:nowrap;") do
-                a(href: edit_admin_common_tag_path(common_tag), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
-                button_to "✕", admin_common_tag_path(common_tag), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this tag?')"
+              td(class: "actions-cell") do
+                a(href: edit_admin_common_tag_path(common_tag), class: "icon-link") { "✎" }
+                button_to "✕", admin_common_tag_path(common_tag), method: :delete, form: { class: "form-inline" }, class: "btn-link-danger", onclick: "return confirm('Delete this tag?')"
               end
             end
           end

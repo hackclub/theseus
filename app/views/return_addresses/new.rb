@@ -6,10 +6,10 @@ class Views::ReturnAddresses::New < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: return_addresses_path, style: "text-decoration: none; color: var(--foreground2);") { "← Return Addresses" }
-        strong(style: "font-size: 1.15em;") { "New Return Address" }
+        a(href: return_addresses_path, class: "link-muted") { "← Return Addresses" }
+        strong(class: "text-title") { "New Return Address" }
       end
     end
 
@@ -27,7 +27,7 @@ class Views::ReturnAddresses::New < Views::Base
           strong { "Info" }
           hr
           div(class: "mt-half text-muted") do
-            p(style: "margin: 0;") { "Return addresses appear as the sender on outgoing mail." }
+            p(class: "m-0") { "Return addresses appear as the sender on outgoing mail." }
           end
         end
       end

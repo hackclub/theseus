@@ -13,10 +13,10 @@ class Views::Letter::Batches::Edit < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
-        strong(style: "font-size: 1.15em;") { "Edit Batch" }
+        a(href: letter_batch_path(@batch), class: "link-muted") { "← Batch ##{@batch.id}" }
+        strong(class: "text-title") { "Edit Batch" }
       end
     end
 
@@ -51,7 +51,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
           tag_picker(f)
 
-          div(style: "display:flex;gap:0.5rem;margin-top:1rem;") do
+          div(class: "form-actions-row") do
             button(type: "submit", class: "btn-success") { "✓ Update Batch" }
             a(href: letter_batch_path(@batch)) { button { "Cancel" } }
           end
@@ -101,7 +101,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
     end
 
     div(class: "mb-1") do
-      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Custom Return Address Name" }
+      label(class: "form-field-label") { "Custom Return Address Name" }
       input(type: "text", name: "letter_batch[letter_return_address_name]", value: @batch.letter_return_address_name, class: "w-100")
       p(class: "form-hint") { "Leave blank to use the return address name" }
     end

@@ -21,7 +21,9 @@ class Views::Admin::Users::Show < Views::Base
           img(
             src: @user.icon_url,
             alt: @user.username,
-            style: "width:64px;height:64px;border-radius:50%;object-fit:cover;"
+            width: 64,
+            height: 64,
+            class: "avatar-round object-cover"
           )
         end
       end
@@ -116,7 +118,7 @@ class Views::Admin::Users::Show < Views::Base
           user_enabled = flag.enabled?(@user)
           desc = Rails.configuration.flipper_features[flag.name]
 
-          div(style: "display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;") do
+          div(class: "flag-row") do
             case flag.state
             when :on
               span(class: "badge badge-success") { "on" }
@@ -126,24 +128,24 @@ class Views::Admin::Users::Show < Views::Base
               span(class: "badge badge-warning") { "cond" }
             end
 
-            a(href: "#{flipper_path}/features/#{flag.name}", target: "_blank", style: "font-family:monospace;") { flag.name }
+            a(href: "#{flipper_path}/features/#{flag.name}", target: "_blank", class: "mono") { flag.name }
 
             if desc.present?
-              abbr(title: desc, style: "color:var(--foreground2);cursor:help;") { "(?)" }
+              abbr(title: desc, class: "help-hint") { "(?)" }
             end
 
-            span(style: "flex:1;")
+            span(class: "flex-1")
 
             if global
-              span(style: "color:var(--foreground2);font-style:italic;") { "on for everyone" }
+              span(class: "text-muted-italic") { "on for everyone" }
             elsif user_enabled
               span(class: "badge badge-success") { "enabled" }
-              form_with(url: flip_admin_user_path(@user, flag: flag.name, state: false), method: :post, style: "display:inline;") do
+              form_with(url: flip_admin_user_path(@user, flag: flag.name, state: false), method: :post, class: "form-inline") do
                 button(type: "submit", class: "btn-sm") { "disable" }
               end
             else
               span(class: "text-muted") { "disabled" }
-              form_with(url: flip_admin_user_path(@user, flag: flag.name, state: true), method: :post, style: "display:inline;") do
+              form_with(url: flip_admin_user_path(@user, flag: flag.name, state: true), method: :post, class: "form-inline") do
                 button(type: "submit", class: "btn-sm") { "enable" }
               end
             end
@@ -166,7 +168,7 @@ class Views::Admin::Users::Show < Views::Base
       section do
         h3(class: "mt-0") do
           plain "Recent Billing"
-          span(class: "text-muted", style: "font-weight:normal;font-size:0.85em;margin-left:0.5rem;") do
+          span(class: "text-muted billing-orgs-label") do
             plain "(#{billing_profiles.map(&:organization_name).join(", ")})"
           end
         end
@@ -203,7 +205,7 @@ class Views::Admin::Users::Show < Views::Base
     # Impersonate
     if @user != current_user
       section do
-        form_with(url: impersonate_user_path(@user), method: :post, style: "display:inline") do
+        form_with(url: impersonate_user_path(@user), method: :post, class: "form-inline") do
           button(type: "submit", class: "btn-warning") { "🥸 Impersonate #{@user.username}" }
         end
       end

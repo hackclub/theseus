@@ -30,12 +30,12 @@ class Views::Settings::Show < Views::Base
               )
               label { "Email me about warehouse approvals" }
             end
-            small(class: "text-muted", style: "display:block;margin-top:0.25rem;margin-left:1.5rem;") do
+            small(class: "text-muted checkbox-note") do
               plain "You'll get an email when SKU requests and purchase orders are submitted for review."
             end
           end
         else
-          p(class: "text-muted", style: "margin:0.5rem 0 0;") { "No notification settings available for your account." }
+          p(class: "text-muted mt-half-reset") { "No notification settings available for your account." }
         end
       end
 

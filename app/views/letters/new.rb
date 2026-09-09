@@ -6,9 +6,9 @@ class Views::Letters::New < Views::Base
   end
 
   def view_template
-    div(style: "display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;") do
-      a(href: letters_path, style: "text-decoration:none;color:var(--foreground2);") { "← Letters" }
-      strong(style: "font-size:1.15em;") { "New Letter" }
+    div(class: "flex-row mb-1") do
+      a(href: letters_path, class: "link-muted") { "← Letters" }
+      strong(class: "text-title") { "New Letter" }
     end
 
     render Components::Letters::Form.new(letter: @letter)

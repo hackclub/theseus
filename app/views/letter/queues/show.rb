@@ -24,14 +24,14 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
     return unless queued_count > 0
 
     details(id: "make-batch-dialog") do
-      summary(style: "list-style: none;") do
+      summary(class: "summary-plain") do
         button(class: "btn-success w-100") { "⊞ Make Batch" }
       end
 
       div(class: "mt-half") do
         form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
           div(class: "mb-half") do
-            label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "How many letters?" }
+            label(class: "form-field-label") { "How many letters?" }
             input(type: "text", name: "limit", class: "w-100")
             small(class: "text-muted") { "Blank = all #{queued_count}" }
           end
@@ -48,7 +48,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
 
     section(class: "mb-1") do
       strong { "Batches" }
-      span(class: "text-muted", style: "margin-left: 0.5rem;") { "(#{batches.count})" }
+      span(class: "text-muted ml-half") { "(#{batches.count})" }
       hr
 
       table do
@@ -64,7 +64,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
           batches.each do |batch|
             tr do
               td do
-                a(href: letter_batch_path(batch), style: "text-decoration: none;") { "Batch ##{batch.id}" }
+                a(href: letter_batch_path(batch), class: "no-underline") { "Batch ##{batch.id}" }
               end
               td { plain "#{batch.letters.size}" }
               td(class: "text-muted") { batch.created_at.strftime("%b %-d, %Y") }

@@ -19,7 +19,7 @@ class Views::Billing::Index < Views::Base
       div(class: "flex-wrap-row mb-1h") do
         @billing_profiles.each do |profile|
           entries = profile.ledger_entries
-          section(style: "flex:1;min-width:200px") do
+          section(class: "billing-summary-card") do
             strong { profile.organization_name }
             div(class: "detail-grid mt-half") do
               span(class: "detail-label") { "Net billed" }

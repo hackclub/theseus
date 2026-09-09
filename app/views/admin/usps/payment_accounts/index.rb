@@ -14,7 +14,7 @@ class Views::Admin::USPS::PaymentAccounts::Index < Views::Base
     )
 
     if @payment_accounts.empty?
-      div(style: "text-align:center;padding:3rem 1rem;") do
+      div(class: "empty-state-lg") do
         p(class: "text-muted") { "No payment accounts yet." }
         a(href: new_admin_usps_payment_account_path, class: "btn-success") { "+ New Payment Account" }
       end
@@ -26,21 +26,21 @@ class Views::Admin::USPS::PaymentAccounts::Index < Views::Base
             th { "Type" }
             th { "Mailer ID" }
             th { "ACH" }
-            th(style: "text-align: right;") { "" }
+            th(class: "text-right") { "" }
           end
         end
         tbody do
           @payment_accounts.each do |account|
             tr do
               td do
-                a(href: admin_usps_payment_account_path(account), style: "text-decoration:none;font-weight:600;") { account.name }
+                a(href: admin_usps_payment_account_path(account), class: "link-strong") { account.name }
               end
               td { type_badge(account) }
               td(class: "text-muted") { mailer_id_label(account) }
               td { ach_badge(account) }
-              td(style: "text-align:right;white-space:nowrap;") do
-                a(href: edit_admin_usps_payment_account_path(account), style: "color:var(--foreground2);margin-right:0.5rem;") { "✎" }
-                button_to "✕", admin_usps_payment_account_path(account), method: :delete, form: { style: "display:inline;" }, style: "background:none;border:none;color:var(--red);cursor:pointer;font:inherit;padding:0;", onclick: "return confirm('Delete this payment account?')"
+              td(class: "actions-cell") do
+                a(href: edit_admin_usps_payment_account_path(account), class: "icon-link") { "✎" }
+                button_to "✕", admin_usps_payment_account_path(account), method: :delete, form: { class: "form-inline" }, class: "btn-link-danger", onclick: "return confirm('Delete this payment account?')"
               end
             end
           end
