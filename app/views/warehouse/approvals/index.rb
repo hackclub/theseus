@@ -23,14 +23,14 @@ class Views::Warehouse::Approvals::Index < Views::Base
   private
 
   def pending_sku_requests_section
-    section(style: "margin-bottom:2rem;") do
+    section(class: "approval-section") do
       h2(class: "flex-row") do
         plain "Pending SKU Requests"
         span(class: "badge") { @pending_sku_requests.size.to_s }
       end
 
       if @pending_sku_requests.empty?
-        div(style: "padding:1.5rem;text-align:center;") do
+        div(class: "approval-empty") do
           span(class: "text-muted") { "No pending SKU requests" }
         end
       else
@@ -41,7 +41,7 @@ class Views::Warehouse::Approvals::Index < Views::Base
               th { "Category" }
               th { "Requested By" }
               th { "Submitted" }
-              th(style: "text-align:right;") { "" }
+              th(class: "text-right") { "" }
             end
           end
           tbody do
@@ -51,8 +51,8 @@ class Views::Warehouse::Approvals::Index < Views::Base
                 td(class: "text-muted") { req.category&.humanize }
                 td(class: "text-muted") { req.user&.username || "—" }
                 td(class: "text-muted") { req.submitted_at&.strftime("%b %d, %Y %H:%M") || "—" }
-                td(style: "text-align:right;") do
-                  a(href: warehouse_sku_request_path(req), style: "text-decoration:none;font-weight:600;") { "Review →" }
+                td(class: "text-right") do
+                  a(href: warehouse_sku_request_path(req), class: "link-strong") { "Review →" }
                 end
               end
             end
@@ -63,14 +63,14 @@ class Views::Warehouse::Approvals::Index < Views::Base
   end
 
   def pending_pos_section
-    section(style: "margin-bottom:2rem;") do
+    section(class: "approval-section") do
       h2(class: "flex-row") do
         plain "Pending Purchase Orders"
         span(class: "badge") { @pending_pos.size.to_s }
       end
 
       if @pending_pos.empty?
-        div(style: "padding:1.5rem;text-align:center;") do
+        div(class: "approval-empty") do
           span(class: "text-muted") { "No pending purchase orders" }
         end
       else
@@ -83,7 +83,7 @@ class Views::Warehouse::Approvals::Index < Views::Base
               th { "Total Cost" }
               th { "Submitted By" }
               th { "Submitted" }
-              th(style: "text-align:right;") { "" }
+              th(class: "text-right") { "" }
             end
           end
           tbody do
@@ -95,8 +95,8 @@ class Views::Warehouse::Approvals::Index < Views::Base
                 td(class: "text-muted") { number_to_currency(po.total_cost) }
                 td(class: "text-muted") { po.user&.username || "—" }
                 td(class: "text-muted") { po.submitted_at&.strftime("%b %d, %Y %H:%M") || "—" }
-                td(style: "text-align:right;") do
-                  a(href: warehouse_purchase_order_path(po), style: "text-decoration:none;font-weight:600;") { "Review →" }
+                td(class: "text-right") do
+                  a(href: warehouse_purchase_order_path(po), class: "link-strong") { "Review →" }
                 end
               end
             end
@@ -107,7 +107,7 @@ class Views::Warehouse::Approvals::Index < Views::Base
   end
 
   def blocked_pos_section
-    section(style: "margin-bottom:2rem;") do
+    section(class: "approval-section") do
       h2(class: "flex-row") do
         plain "Approved but Blocked POs"
         span(class: "badge badge-warning") { @blocked_pos.size.to_s }
@@ -119,7 +119,7 @@ class Views::Warehouse::Approvals::Index < Views::Base
             th { "Order #" }
             th { "Supplier" }
             th { "Blocking SKU Requests" }
-            th(style: "text-align:right;") { "" }
+            th(class: "text-right") { "" }
           end
         end
         tbody do
@@ -130,11 +130,11 @@ class Views::Warehouse::Approvals::Index < Views::Base
               td do
                 po.unresolved_sku_requests.each_with_index do |req, i|
                   plain ", " if i > 0
-                  a(href: warehouse_sku_request_path(req), style: "text-decoration:none;") { req.name }
+                  a(href: warehouse_sku_request_path(req), class: "no-underline") { req.name }
                 end
               end
-              td(style: "text-align:right;") do
-                a(href: warehouse_purchase_order_path(po), style: "text-decoration:none;font-weight:600;") { "View →" }
+              td(class: "text-right") do
+                a(href: warehouse_purchase_order_path(po), class: "link-strong") { "View →" }
               end
             end
           end
