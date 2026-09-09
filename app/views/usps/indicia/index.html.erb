@@ -2,7 +2,7 @@
 
 <div class="toolbar">
   <div class="flex-row">
-    <strong style="font-size: 1.15em;">Indicia</strong>
+    <strong class="text-title">Indicia</strong>
     <span class="text-muted"><%= number_with_delimiter(@usps_indicia.count) %> purchased</span>
   </div>
   <span class="spacer"></span>
@@ -15,7 +15,7 @@
       <tr>
         <th>ID</th>
         <th>SKU</th>
-        <th style="text-align: right;">Postage</th>
+        <th class="text-right">Postage</th>
         <th>Date</th>
         <th>Category</th>
       </tr>
@@ -23,9 +23,9 @@
     <tbody>
       <% @usps_indicia.each do |indicium| %>
         <tr>
-          <td><a href="<%= usps_indicium_path(indicium) %>" style="text-decoration: none;"><strong><%= indicium.public_id %></strong></a></td>
+          <td><a href="<%= usps_indicium_path(indicium) %>" class="no-underline"><strong><%= indicium.public_id %></strong></a></td>
           <td><code><%= indicium.usps_sku %></code></td>
-          <td style="text-align: right; font-variant-numeric: tabular-nums;"><%= number_to_currency(indicium.postage) %></td>
+          <td class="text-right tabular"><%= number_to_currency(indicium.postage) %></td>
           <td class="text-muted"><%= indicium.mailing_date&.strftime("%b %d") || "—" %></td>
           <td class="text-muted"><%= indicium.processing_category || "—" %></td>
         </tr>
@@ -33,8 +33,8 @@
     </tbody>
   </table>
 <% else %>
-  <section style="text-align: center; padding: 2rem;">
+  <section class="empty-state">
     <strong>No indicia yet</strong>
-    <div class="text-muted" style="margin-top: 0.25rem;">Purchased postage will appear here.</div>
+    <div class="text-muted mt-quarter">Purchased postage will appear here.</div>
   </section>
 <% end %>

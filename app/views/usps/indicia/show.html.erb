@@ -1,9 +1,9 @@
 <% content_for :title, "Indicium #{@usps_indicium.public_id}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= usps_indicia_path %>" class="text-muted" style="text-decoration: none;">← Indicia</a>
-    <strong style="font-size: 1.15em;">Indicium</strong>
+    <a href="<%= usps_indicia_path %>" class="text-muted no-underline">← Indicia</a>
+    <strong class="text-title">Indicium</strong>
     <%= render Components::Shared::PublicId.new(value: @usps_indicium.public_id) %>
   </div>
   <span class="spacer"></span>
