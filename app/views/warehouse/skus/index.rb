@@ -47,8 +47,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
       type: "text",
       name: "sku_search",
       placeholder: "Search by SKU, name, or description...",
-      class: "toolbar-search",
-      style: "width:100%;margin-bottom:0.75rem;"
+      class: "toolbar-search w-100 sku-search-bar"
     )
   end
 
@@ -57,13 +56,13 @@ class Views::Warehouse::SKUs::Index < Views::Base
     low_stock = warehouse_skus.count { |s| s.in_stock.to_i.between?(1, 10) }
     backordered = warehouse_skus.count { |s| s.in_stock.to_i < 0 }
 
-    div(class: "stat-filters", id: "stats-container", style: "border-bottom:none;margin-bottom:0.5rem;") do
+    div(class: "stat-filters sku-stats-bar", id: "stats-container") do
       stat_btn("In Stock", in_stock, "in-stock", "green")
       stat_btn("Low Stock", low_stock, "low-stock", "yellow") if low_stock > 0
       stat_btn("Backordered", backordered, "backordered", "red") if backordered > 0
     end
 
-    div(style: "display:flex;gap:0.5rem;margin-bottom:1rem;") do
+    div(class: "sku-view-toggle") do
       if @view == "flat"
         a(href: warehouse_skus_path(include_non_inventory: @include_non_inventory)) do
           button(class: "btn-sm") { "Grouped view" }
@@ -80,9 +79,8 @@ class Views::Warehouse::SKUs::Index < Views::Base
 
   def stat_btn(label, value, filter_key, color)
     button(
-      class: "stat-filter",
-      data: { filter: filter_key },
-      style: "cursor:pointer;background:none;border:none;font:inherit;"
+      class: "stat-filter stat-btn-reset",
+      data: { filter: filter_key }
     ) do
       span(class: "stat-count", style: "color:var(--#{color})") { value.to_s }
       span(class: "stat-label") { label }
@@ -102,7 +100,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
     backordered = skus.count { |s| s.in_stock.to_i < 0 }
 
     details(open: true, class: "sku-category", data: { category: category }) do
-      summary(style: "display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;") do
+      summary(class: "sku-category-summary") do
         span(class: "text-muted") { category_icon(category) }
         strong { category&.humanize || "Uncategorized" }
         span(class: "badge", id: "counter-#{category}") { skus.count.to_s }
@@ -116,11 +114,11 @@ class Views::Warehouse::SKUs::Index < Views::Base
           tr do
             th { "SKU" }
             th { "Name" }
-            th(style: "text-align:right") { "Stock" }
-            th(style: "text-align:right") { "Inbound" }
-            th(style: "text-align:right") { "Cost" }
+            th(class: "text-right") { "Stock" }
+            th(class: "text-right") { "Inbound" }
+            th(class: "text-right") { "Cost" }
             th { "Status" }
-            th(style: "text-align:center") { "" }
+            th(class: "text-center") { "" }
           end
         end
         tbody do
@@ -131,7 +129,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
               data: { search: search_text, status: stock_status(sku) }
             ) do
               td do
-                a(href: warehouse_sku_path(sku), style: "text-decoration:none;font-weight:600;") { sku.sku }
+                a(href: warehouse_sku_path(sku), class: "link-strong") { sku.sku }
               end
               td do
                 plain sku.name
@@ -144,11 +142,11 @@ class Views::Warehouse::SKUs::Index < Views::Base
                   span(class: "badge") { "Disabled" }
                 end
               end
-              td(style: "text-align:right;font-variant-numeric:tabular-nums;") { sku.in_stock&.to_s || "—" }
-              td(style: "text-align:right;color:var(--foreground2);font-variant-numeric:tabular-nums;") { sku.inbound&.to_s || "—" }
-              td(style: "text-align:right;font-variant-numeric:tabular-nums;") { helpers.number_to_currency(sku.declared_unit_cost) }
+              td(class: "text-right tabular") { sku.in_stock&.to_s || "—" }
+              td(class: "text-right tabular text-muted") { sku.inbound&.to_s || "—" }
+              td(class: "text-right tabular") { helpers.number_to_currency(sku.declared_unit_cost) }
               td { stock_badge(sku) }
-              td(style: "text-align:center") { sku_actions(sku) }
+              td(class: "text-center") { sku_actions(sku) }
             end
           end
         end
@@ -165,11 +163,11 @@ class Views::Warehouse::SKUs::Index < Views::Base
           th { "SKU" }
           th { "Name" }
           th { "Category" }
-          th(style: "text-align:right") { "Stock" }
-          th(style: "text-align:right") { "Inbound" }
-          th(style: "text-align:right") { "Cost" }
+          th(class: "text-right") { "Stock" }
+          th(class: "text-right") { "Inbound" }
+          th(class: "text-right") { "Cost" }
           th { "Status" }
-          th(style: "text-align:center") { "" }
+          th(class: "text-center") { "" }
         end
       end
       tbody(id: "flat-table-body") do
@@ -187,15 +185,15 @@ class Views::Warehouse::SKUs::Index < Views::Base
             }
           ) do
             td do
-              a(href: warehouse_sku_path(sku), style: "text-decoration:none;font-weight:600;font-family:monospace;") { sku.sku }
+              a(href: warehouse_sku_path(sku), class: "link-strong mono") { sku.sku }
             end
             td { sku.name }
             td(class: "text-muted") { sku.category&.humanize || "—" }
-            td(style: "text-align:right;font-weight:600;font-variant-numeric:tabular-nums;") { sku.in_stock&.to_s || "—" }
-            td(style: "text-align:right;color:var(--foreground2);font-variant-numeric:tabular-nums;") { sku.inbound&.to_s || "—" }
-            td(style: "text-align:right;font-variant-numeric:tabular-nums;") { helpers.number_to_currency(sku.declared_unit_cost) }
+            td(class: "text-right fw-600 tabular") { sku.in_stock&.to_s || "—" }
+            td(class: "text-right tabular text-muted") { sku.inbound&.to_s || "—" }
+            td(class: "text-right tabular") { helpers.number_to_currency(sku.declared_unit_cost) }
             td { stock_badge(sku) }
-            td(style: "text-align:center") { sku_actions(sku) }
+            td(class: "text-center") { sku_actions(sku) }
           end
         end
       end
@@ -231,15 +229,15 @@ class Views::Warehouse::SKUs::Index < Views::Base
   end
 
   def sku_actions(sku)
-    details(class: "popover", style: "position:relative") do
+    details(class: "popover") do
       summary(tabindex: "0", class: "btn-sm") { "⋯" }
-      div(style: "position:absolute;right:0;top:100%;min-width:10rem;background:Canvas;border:1px solid var(--background2);padding:0.5rem;display:flex;flex-direction:column;gap:0.25rem;z-index:10;") do
-        a(href: warehouse_sku_path(sku), style: "text-decoration:none;color:inherit;") { "View details" }
+      div(class: "sku-actions-menu") do
+        a(href: warehouse_sku_path(sku), class: "link-reset") { "View details" }
         if sku.zenventory_url.present?
-          a(href: sku.zenventory_url, target: "_blank", style: "text-decoration:none;color:inherit;") { "Open in Zenventory ↗" }
+          a(href: sku.zenventory_url, target: "_blank", class: "link-reset") { "Open in Zenventory ↗" }
         end
         if current_user&.is_admin?
-          a(href: edit_warehouse_sku_path(sku), style: "text-decoration:none;color:inherit;") { "Edit" }
+          a(href: edit_warehouse_sku_path(sku), class: "link-reset") { "Edit" }
         end
       end
     end
