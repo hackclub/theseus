@@ -247,6 +247,19 @@ RSpec.describe Billing do
       expect(Billing.charge!([e], name: "x")).to be_unknown
     end
 
+    it "treats a missing ENV var as definite, not unknown" do
+      mails = capture_billing_mail
+      hcb_raises(KeyError.new("key not found: \"HCB_WAREHOUSE_ORG_ID\""))
+      transfer = Billing.charge!([e], name: "x")
+
+      expect(transfer).to be_failed
+      expect(transfer).not_to be_retryable
+      expect(transfer.last_error).to include("HCB_WAREHOUSE_ORG_ID")
+      expect(e.reload).to be_pending
+      expect(hcb_disbursements).to be_empty
+      expect(mails).to have_received(:transfer_failed).once
+    end
+
     it "raises typed errors in strict mode" do
       hcb_raises(Faraday::TimeoutError.new("boom"))
       expect { Billing.charge!([e], name: "x", strict: true) }.to raise_error(Billing::Unconfirmed)

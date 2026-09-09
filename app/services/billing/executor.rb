@@ -26,8 +26,8 @@ class Billing::Executor
     OAuth2::Error,               # token refresh happens before the request is sent
     OAuth2::ConnectionError,     # oauth2 re-wraps transport errors during refresh; still pre-request
     OAuth2::TimeoutError,
-    Faraday::SSLError            # handshake failed: nothing was sent
-
+    Faraday::SSLError,           # handshake failed: nothing was sent
+    KeyError                     # a missing ENV var (ENV.fetch) raises before anything is sent
   ].freeze
 
   # Faraday::ConnectionFailed also wraps ECONNRESET/EPIPE, which can happen
@@ -43,6 +43,7 @@ class Billing::Executor
 
   # These need a human (relink, fix config) rather than a backoff.
   NOT_RETRYABLE = [
+    KeyError,                    # missing configuration; retrying changes nothing
     HCBV4::UnauthorizedError,
     HCBV4::ForbiddenError,
     HCBV4::NotFoundError,
