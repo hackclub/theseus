@@ -9,7 +9,7 @@
   <% @lb.each_with_index do |u, i| %>
     <p>
       #<%= i+1 %>:
-      <img src="<%= u.icon_url %>" width="16" height="16" style="position: relative; top: 50%; transform: translateY(15%);">
+      <img src="<%= u.icon_url %>" width="16" height="16" class="icon-baseline-fix">
       <%= u.username %> – <%= u.letter_count %>
     </p>
   <% end %>

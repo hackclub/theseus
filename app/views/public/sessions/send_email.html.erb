@@ -1,4 +1,4 @@
-<div class="window" style="width: 320px">
+<div class="window w-320">
   <div class="title-bar">
     <div class="title-bar-text">Logging in...</div>
     <div class="title-bar-controls">
@@ -9,7 +9,7 @@
     <p>Email sent to <%= @email %>!</p>
     <p>Click the link in it to log in...</p>
     <% dev_tool do %>
-      <span style="color: lime !important">you're in dev! go check <%= link_to "letter opener", letter_opener_web_path %>!</span>
+      <span class="text-lime">you're in dev! go check <%= link_to "letter opener", letter_opener_web_path %>!</span>
     <% end %>
   </div>
 </div>

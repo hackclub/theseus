@@ -42,8 +42,8 @@
           <span><%= number_to_currency(batch.labor_cost) %></span>
           <span class="detail-label">Shipping</span>
           <span><%= number_to_currency(batch.postage_cost) %></span>
-          <span class="detail-label" style="font-weight: bold;">Total</span>
-          <span style="font-weight: bold;"><%= number_to_currency(batch.total_cost) %></span>
+          <span class="detail-label fw-bold">Total</span>
+          <span class="fw-bold"><%= number_to_currency(batch.total_cost) %></span>
         </div>
       </section>
     <% elsif batch.respond_to?(:total_cost) %>
@@ -52,7 +52,7 @@
         <hr>
         <div class="detail-grid mt-half">
           <span class="detail-label">Total</span>
-          <span style="font-weight: bold;"><%= number_to_currency(batch.total_cost) %></span>
+          <span class="fw-bold"><%= number_to_currency(batch.total_cost) %></span>
         </div>
       </section>
     <% end %>
@@ -61,7 +61,7 @@
       <section class="mb-1">
         <strong>Labels</strong>
         <hr>
-        <div class="mt-half" style="display:flex; align-items:center; gap:0.5rem">
+        <div class="mt-half flex-row">
           <span class="text-muted">PDF labels available</span>
           <span class="spacer"></span>
           <a href="<%= rails_blob_path(batch.pdf_label, disposition: "attachment") %>" target="_blank"><button class="btn-success btn-sm">↓ Download PDF</button></a>
@@ -83,8 +83,8 @@
           <% process_path = batch.is_a?(Letter::Batch) ? process_confirm_letter_batch_path(batch) : process_confirm_warehouse_batch_path(batch) %>
           <a href="<%= process_path %>"><button class="btn-success w-100">▶ Process Batch</button></a>
         <% when "processed" %>
-          <div style="text-align: center; padding: 1rem 0; color: var(--green);">
-            <span style="font-size: 2em;">✓</span>
+          <div class="text-center text-success panel-centered">
+            <span class="batch-processed-icon">✓</span>
             <div class="mt-half"><strong>Processed</strong></div>
           </div>
         <% end %>

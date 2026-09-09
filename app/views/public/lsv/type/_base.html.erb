@@ -17,29 +17,29 @@
 <% end %>
   <div class="window-body">
     <div class="field-row mb-1">
-      <b style="margin: 0;"><%= base.title_text %></b>
+      <b class="m-0"><%= base.title_text %></b>
     </div>
 
     <div class="field-row mb-half">
-      <label style="width: 80px;">Type:</label>
+      <label class="w-80">Type:</label>
       <span><%= base.type_text %></span>
     </div>
 
     <div class="field-row mb-half">
-      <label style="width: 80px;">Status:</label>
+      <label class="w-80">Status:</label>
       <span><%= base.status_text %></span>
     </div>
 
     <% if base["Warehouse-Service"] %>
       <div class="field-row mb-half">
-        <label style="width: 80px;">Service:</label>
+        <label class="w-80">Service:</label>
         <span><%= base["Warehouse–Service"] %></span>
       </div>
     <% end %>
 
     <% if base.tracking_number %>
       <div class="field-row mb-half">
-        <label style="width: 80px;">Tracking:</label>
+        <label class="w-80">Tracking:</label>
         <% if base.tracking_link %>
           <%= link_to(base.tracking_number, base.tracking_link, target: "_blank", class: "link") %>
         <% else %>
@@ -50,9 +50,9 @@
 
     <% if base.description %>
       <div class="field-row mb-half">
-        <label style="width: 80px;"><%= base.description.is_a?(Array) ? "Contents:" : "Description:" %></label>
+        <label class="w-80"><%= base.description.is_a?(Array) ? "Contents:" : "Description:" %></label>
         <% if base.description.is_a? Array %>
-          <ul class="tree-view" style="margin: 0;">
+          <ul class="tree-view m-0">
             <% base.description.each do |item| %>
               <li><%= item %></li>
             <% end %>
@@ -64,13 +64,13 @@
     <% end %>
 
     <div class="field-row mb-half">
-      <label style="width: 80px;">Created:</label>
+      <label class="w-80">Created:</label>
       <span><%= base.created_at %></span>
     </div>
 
     <% back_office_tool do %>
       <div class="field-row mb-half">
-        <label style="width: 80px;">Airtable:</label>
+        <label class="w-80">Airtable:</label>
         <span class="internal"><%= link_to(base.source_id, base.source_url, target: "_blank") %></span>
       </div>
     <% end %>

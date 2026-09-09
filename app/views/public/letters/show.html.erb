@@ -20,7 +20,7 @@
 <p>
 <details>
   <summary>details for nerds</summary>
-  <div class="sunken-panel w-100" style="height: 200px">
+  <div class="sunken-panel w-100 h-200">
     <table class="interactive">
       <thead>
       <tr>
@@ -62,12 +62,12 @@
 </p>
 <%= render partial: 'application/admin_inspector', locals: { record: @letter } %>
 <% if (@from_qr || current_user) && @letter.may_mark_mailed? %>
-  <section class="field-row" style="justify-content: flex-end">
+  <section class="field-row justify-end">
     <%= button_to "MARK MAILED", public_mark_mailed_letter_path(@letter, qr: 1), style: "font-size: 24px; padding: 20px 40px; font-weight: bold;" %>
   </section>
 <% end %>
 <% if @letter.mailed_at && !@letter.received_at %>
-  <section class="field-row" style="justify-content: flex-end">
+  <section class="field-row justify-end">
     <%= button_to "i got this letter!", public_mark_received_letter_path(@letter), method: :post, form: { data: { turbo_confirm: "are you sure you received this letter?" } } %>
   </section>
 <% end %>

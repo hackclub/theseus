@@ -4,26 +4,26 @@
   <table class="w-100">
     <thead>
       <tr>
-        <th style="text-align: left;">Name</th>
-        <th style="text-align: left;">Address</th>
-        <th style="text-align: left;">City</th>
-        <th style="text-align: left;">State</th>
-        <th style="text-align: left;">Postal Code</th>
-        <th style="text-align: left;">Country</th>
+        <th class="text-left">Name</th>
+        <th class="text-left">Address</th>
+        <th class="text-left">City</th>
+        <th class="text-left">State</th>
+        <th class="text-left">Postal Code</th>
+        <th class="text-left">Country</th>
       </tr>
     </thead>
     <tbody>
       <% addresses.each do |address| %>
         <tr>
-          <td style="padding: 0.25rem 0.5rem;"><%= "#{address.first_name} #{address.last_name}" %></td>
-          <td style="padding: 0.25rem 0.5rem;">
+          <td class="cell-pad"><%= "#{address.first_name} #{address.last_name}" %></td>
+          <td class="cell-pad">
             <%= address.line_1 %>
             <% if address.line_2.present? %><br><%= address.line_2 %><% end %>
           </td>
-          <td style="padding: 0.25rem 0.5rem;"><%= address.city %></td>
-          <td style="padding: 0.25rem 0.5rem;"><%= address.state %></td>
-          <td style="padding: 0.25rem 0.5rem;"><code><%= address.postal_code %></code></td>
-          <td style="padding: 0.25rem 0.5rem;"><%= address.country %></td>
+          <td class="cell-pad"><%= address.city %></td>
+          <td class="cell-pad"><%= address.state %></td>
+          <td class="cell-pad"><code><%= address.postal_code %></code></td>
+          <td class="cell-pad"><%= address.country %></td>
         </tr>
       <% end %>
     </tbody>

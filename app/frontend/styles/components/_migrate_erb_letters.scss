@@ -1,2 +1,52 @@
 // inline-style migration shard: erb_letters
 // area-specific classes only; shared utilities live in utils.scss
+
+// letters/show
+.letter-header { display: flex; align-items: baseline; gap: 0.75rem; }
+.letter-addr-grid { display: flex; gap: 1.5rem; }
+.letter-addr-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; }
+.letter-addr-block { font-family: monospace; font-size: 0.9em; line-height: 1.6; margin-top: 0.25rem; }
+.letter-section { margin: 1rem 0; }
+.letter-postage-row { display: flex; align-items: baseline; gap: 0.5rem; }
+.letter-postage-amount { font-size: 1.1em; font-variant-numeric: tabular-nums; }
+.letter-timeline { margin: 1rem 0; font-size: 0.9em; }
+.mono-status { font-family: monospace; }
+.letter-preview-frame { border: 1px solid var(--background2); border-radius: 4px; overflow: hidden; }
+.letter-preview-iframe { height: 18rem; border: none; }
+.letter-sidebar-actions { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9em; }
+.letter-action-link { text-decoration: none; padding: 0.2rem 0; }
+.letter-hr-tight { margin: 0.25rem 0; }
+.letter-delete-btn { border-color: var(--red); }
+.link-inherit { color: inherit; }
+.mt-quarter { margin-top: 0.25rem; }
+.mt-three-quarter { margin-top: 0.75rem; }
+
+// letter/batches
+.batch-progress-bar--spaced { margin-bottom: 0.75rem; }
+.flex-gap-half { display: flex; gap: 0.5rem; }
+.progress-summary-row { display: flex; gap: 1.5rem; align-items: center; }
+.progress-count { font-size: 1.5em; font-variant-numeric: tabular-nums; }
+.progress-count-sm { font-size: 1.5em; }
+
+// batches
+.panel-centered { text-align: center; padding: 1rem 0; }
+.batch-processed-icon { font-size: 2em; }
+.flex-gap-1 { display: flex; gap: 1rem; }
+
+// addresses
+.flex-2 { flex: 2; }
+
+// tags
+.tag-flex-wrap { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag-stat-box { text-align: center; padding: 1rem 0.5rem; }
+.tag-stat-value { font-size: 1.5em; font-weight: bold; }
+
+// static_pages
+.hint-tight { margin: 0.25rem 0 0; }
+
+// template_previews
+.link-medium { text-decoration: none; font-weight: 500; }
+.actions-end { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+// public_ids
+.hint-bottom { margin: 0 0 0.5rem; }

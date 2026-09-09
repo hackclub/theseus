@@ -13,44 +13,44 @@
 <%= form.fields_for :address do |a| %>
   <% current_country = a.object&.country %>
 
-  <div class="mb-half" style="display:flex; gap:1rem">
-    <div style="flex: 1;">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">First name <span style="color: var(--red);">*</span></label>
+  <div class="mb-half flex-gap-1">
+    <div class="flex-1">
+      <label class="text-muted label-block">First name <span class="text-danger">*</span></label>
       <input type="text" name="<%= a.field_name(:first_name) %>" value="<%= a.object&.first_name %>" required class="w-100">
     </div>
-    <div style="flex: 1;">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Last name</label>
+    <div class="flex-1">
+      <label class="text-muted label-block">Last name</label>
       <input type="text" name="<%= a.field_name(:last_name) %>" value="<%= a.object&.last_name %>" class="w-100">
     </div>
   </div>
 
   <div class="mb-half">
-    <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Street address <span style="color: var(--red);">*</span></label>
+    <label class="text-muted label-block">Street address <span class="text-danger">*</span></label>
     <input type="text" name="<%= a.field_name(:line_1) %>" value="<%= a.object&.line_1 %>" required class="w-100">
   </div>
 
   <div class="mb-half">
-    <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Apt, suite, unit</label>
+    <label class="text-muted label-block">Apt, suite, unit</label>
     <input type="text" name="<%= a.field_name(:line_2) %>" value="<%= a.object&.line_2 %>" class="w-100">
   </div>
 
-  <div class="mb-half" style="display:flex; gap:1rem">
-    <div style="flex: 2;">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">City <span style="color: var(--red);">*</span></label>
+  <div class="mb-half flex-gap-1">
+    <div class="flex-2">
+      <label class="text-muted label-block">City <span class="text-danger">*</span></label>
       <input type="text" name="<%= a.field_name(:city) %>" value="<%= a.object&.city %>" required class="w-100">
     </div>
-    <div style="flex: 1;">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">State <span style="color: var(--red);">*</span></label>
+    <div class="flex-1">
+      <label class="text-muted label-block">State <span class="text-danger">*</span></label>
       <input type="text" name="<%= a.field_name(:state) %>" value="<%= a.object&.state %>" required class="w-100">
     </div>
-    <div style="flex: 1;">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Postal code <span style="color: var(--red);">*</span></label>
+    <div class="flex-1">
+      <label class="text-muted label-block">Postal code <span class="text-danger">*</span></label>
       <input type="text" name="<%= a.field_name(:postal_code) %>" value="<%= a.object&.postal_code %>" required class="w-100">
     </div>
   </div>
 
   <div class="mb-half">
-    <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Country <span style="color: var(--red);">*</span></label>
+    <label class="text-muted label-block">Country <span class="text-danger">*</span></label>
     <select name="<%= a.field_name(:country) %>" required class="w-100">
       <option value="">Select country…</option>
       <% all_ordered.each do |code, display| %>
@@ -59,13 +59,13 @@
     </select>
   </div>
 
-  <div class="mb-half" style="display:flex; gap:1rem">
-    <div style="flex: 1;">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Phone number</label>
+  <div class="mb-half flex-gap-1">
+    <div class="flex-1">
+      <label class="text-muted label-block">Phone number</label>
       <input type="tel" name="<%= a.field_name(:phone_number) %>" value="<%= a.object&.phone_number %>" class="w-100" placeholder="Required for international shipments">
     </div>
-    <div style="flex: 1;">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Email</label>
+    <div class="flex-1">
+      <label class="text-muted label-block">Email</label>
       <input type="email" name="<%= a.field_name(:email) %>" value="<%= a.object&.email %>" class="w-100">
     </div>
   </div>

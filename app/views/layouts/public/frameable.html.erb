@@ -19,7 +19,7 @@
   <% end %>>
 <% unless @framed %>
     <%= render 'public/backend_controls' %>
-    <div class="window" style="min-width: calc(min(516px, 100vw - 40px)); max-width: fit-content <%=yield :additional_style %>">
+    <div class="window public-window" style="<%=yield :additional_style %>">
   <div class="title-bar">
     <div class="title-bar-text"><%= yield :window_title %></div>
     <div class="title-bar-controls">
