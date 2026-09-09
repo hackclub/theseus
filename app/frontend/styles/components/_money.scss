@@ -190,6 +190,13 @@
   color: var(--money);
   border: 1px solid var(--money-border);
 }
+// money going the other way. .money-notice--credit already retints --money, so
+// this only matters when a "back" tag appears outside a credit notice — but the
+// tag is the one place the direction has to read on its own.
+.money-notice__tag--back {
+  background: var(--money-back);
+  color: var(--money-back-bg);
+}
 
 .money-notice__balance {
   display: grid;

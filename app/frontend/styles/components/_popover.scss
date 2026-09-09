@@ -1,0 +1,17 @@
+// ── Popovers ───────────────────────────────────────────
+//
+// `<details class="popover">` with a `<summary>` toggle and an absolutely
+// positioned panel inside. The panel positions itself against this box, which
+// is the only thing the class has ever done (every call site currently repeats
+// `style="position:relative"` inline — this makes the class carry it).
+
+.popover {
+  position: relative;
+}
+
+// The "?" next to a jumpcode. Its panel is .jumpcode-popover, styled in
+// theseus.scss; the wrapper just keeps the toggle from inheriting the bold
+// weight of the surrounding heading rows.
+.jumpcode-help {
+  font-weight: normal;
+}
