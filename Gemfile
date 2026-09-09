@@ -129,6 +129,7 @@ gem "acts-as-taggable-array-on", "~> 0.7.0"
 
 gem "selectize-rails", "~> 0.12.6"
 
+gem "ivymeter", "~> 0.1.0"
 
 gem "slack-notifier", "~> 2.4"
 
