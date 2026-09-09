@@ -169,6 +169,11 @@
 
 .billing-summary-card { flex: 1; min-width: 200px; }
 
+// ── Settings ─────────────────────────────────────────────
+
+.checkbox-note { display: block; margin-top: 0.25rem; margin-left: 1.5rem; }
+.mt-half-reset { margin: 0.5rem 0 0; }
+
 // ── Batches::Show (generic Batch, not Letter::Batch) ─────
 
 // Danger-zone section outlined in red instead of the default border.
