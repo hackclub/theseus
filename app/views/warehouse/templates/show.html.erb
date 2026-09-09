@@ -1,9 +1,9 @@
 <% content_for :title, @warehouse_template.name %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_templates_path %>" class="text-muted" style="text-decoration: none">← Templates</a>
-    <strong style="font-size: 1.15em;"><%= @warehouse_template.name %></strong>
+    <a href="<%= warehouse_templates_path %>" class="text-muted no-underline">← Templates</a>
+    <strong class="text-title"><%= @warehouse_template.name %></strong>
     <% if @warehouse_template.public %>
       <span class="badge badge-info">Shared</span>
     <% end %>

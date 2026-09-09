@@ -1,9 +1,9 @@
 <% content_for :title, "Edit Template" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= warehouse_template_path(@warehouse_template) %>" class="text-muted" style="text-decoration: none">← <%= @warehouse_template.name %></a>
-    <strong style="font-size: 1.15em;">Edit Template</strong>
+    <a href="<%= warehouse_template_path(@warehouse_template) %>" class="text-muted no-underline">← <%= @warehouse_template.name %></a>
+    <strong class="text-title">Edit Template</strong>
   </div>
 </div>
 

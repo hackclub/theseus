@@ -2,7 +2,7 @@
 
 <div class="toolbar">
   <div class="flex-row">
-    <strong style="font-size: 1.15em;">Order Templates</strong>
+    <strong class="text-title">Order Templates</strong>
     <%= render Components::Shared::Jumpcode.new(path: warehouse_templates_path) %>
   </div>
   <div class="flex-row">
@@ -18,8 +18,8 @@
     <hr>
     <% current_user.warehouse_templates.each_with_index do |template, i| %>
       <% if i > 0 %><hr><% end %>
-      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-        <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
+      <a href="<%= warehouse_template_path(template) %>" class="link-reset template-row">
+        <span class="fw-medium flex-1"><%= template.name %></span>
         <span class="text-muted"><%= template.line_items.count %> items</span>
         <% if template.public %>
           <span class="badge badge-info">Shared</span>
@@ -36,14 +36,14 @@
   <% if Warehouse::Template.shared.any? %>
     <% Warehouse::Template.shared.each_with_index do |template, i| %>
       <% if i > 0 %><hr><% end %>
-      <a href="<%= warehouse_template_path(template) %>" class="link-reset" style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
-        <span class="fw-medium" style="flex: 1;"><%= template.name %></span>
+      <a href="<%= warehouse_template_path(template) %>" class="link-reset template-row">
+        <span class="fw-medium flex-1"><%= template.name %></span>
         <span class="text-muted"><%= template.line_items.count %> items</span>
         <span class="text-muted">by <%= template.user&.username || "unknown" %></span>
       </a>
     <% end %>
   <% else %>
-    <div class="text-muted" style="text-align: center; padding: 2rem">
+    <div class="text-muted empty-state">
       No public templates yet. Shared templates from other users will appear here.
     </div>
   <% end %>

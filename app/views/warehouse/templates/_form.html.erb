@@ -1,8 +1,8 @@
 <%= form_with(model: warehouse_template) do |form| %>
   <% if warehouse_template.errors.any? %>
-    <div class="mb-1" style="color: var(--red)">
+    <div class="mb-1 text-danger">
       <strong>[!] <%= pluralize(warehouse_template.errors.count, "error") %>:</strong>
-      <ul style="margin: 0.25rem 0 0; padding-left: 1rem;">
+      <ul class="form-error-list">
         <% warehouse_template.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -15,7 +15,7 @@
     <hr>
     <div class="mt-half">
       <div class="mb-half">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">Template name <span style="color: var(--red);">*</span></label>
+        <label class="text-muted label-block">Template name <span class="text-danger">*</span></label>
         <input type="text" name="warehouse_template[name]" value="<%= warehouse_template.name %>" required class="w-100">
       </div>
       <label>

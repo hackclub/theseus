@@ -63,3 +63,6 @@
 
 // Inline "assign SKU code" input next to the approve button.
 .sku-code-input { width: 8rem; padding: 0.15rem 0.35rem; font-size: 0.85em; }
+
+// One row in the order-templates index (own or public template list).
+.template-row { padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; }
