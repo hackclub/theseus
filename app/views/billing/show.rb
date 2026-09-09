@@ -18,7 +18,7 @@ class Views::Billing::Show < Views::Base
         span { span(class: "badge badge-info") { @entry.category } }
 
         span(class: "detail-label") { "Amount" }
-        span(class: "fw-600 text-lg") { money(@entry.amount_cents) }
+        span(class: "fw-600 text-lg") { number_to_currency(@entry.amount_cents / 100.0) }
 
         if @entry.reverses.present?
           span(class: "detail-label") { "Credit against" }
@@ -29,10 +29,10 @@ class Views::Billing::Show < Views::Base
           span(class: "detail-label") { "Credits" }
           span do
             @entry.reversals.each do |credit|
-              a(href: billing_path(credit)) { money(credit.amount_cents) }
+              a(href: billing_path(credit)) { number_to_currency(credit.amount_cents / 100.0) }
               plain " "
             end
-            plain "(net #{money(@entry.net_cents)})"
+            plain "(net #{number_to_currency(@entry.net_cents / 100.0)})"
           end
         end
 

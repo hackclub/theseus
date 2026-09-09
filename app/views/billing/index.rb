@@ -23,15 +23,15 @@ class Views::Billing::Index < Views::Base
             strong { profile.organization_name }
             div(class: "detail-grid mt-half") do
               span(class: "detail-label") { "Net billed" }
-              span { money(entries.live.sum(:amount_cents)) }
+              span { number_to_currency(entries.live.sum(:amount_cents) / 100.0) }
 
               span(class: "detail-label") { "Settled" }
-              span { money(entries.settled.sum(:amount_cents)) }
+              span { number_to_currency(entries.settled.sum(:amount_cents) / 100.0) }
 
               span(class: "detail-label") { "Pending" }
               pending = entries.pending.sum(:amount_cents)
               if pending != 0
-                span(class: "badge badge-warning") { money(pending) }
+                span(class: "badge badge-warning") { number_to_currency(pending / 100.0) }
               else
                 span(class: "text-muted") { "$0.00" }
               end
@@ -52,7 +52,7 @@ class Views::Billing::Index < Views::Base
       if nsf.any?
         div(class: "banner banner-error mb-1h") do
           strong { "⚠ #{helpers.pluralize(nsf.map(&:billing_profile_id).uniq.size, "organization")} can't pay: " }
-          plain nsf.map { |t| "#{t.billing_profile.organization_name} owes #{money(t.amount_cents)} (#{t.attempts}/#{HCB::Transfer::MAX_ATTEMPTS} attempts#{t.gave_up? ? ", gave up" : ""})" }.join("; ")
+          plain nsf.map { |t| "#{t.billing_profile.organization_name} owes #{number_to_currency(t.amount_cents / 100.0)} (#{t.attempts}/#{HCB::Transfer::MAX_ATTEMPTS} attempts#{t.gave_up? ? ", gave up" : ""})" }.join("; ")
           plain ". Linked by: #{nsf.map { |t| t.billing_profile.user&.email }.compact.uniq.join(", ")}."
         end
       end
@@ -71,7 +71,7 @@ class Views::Billing::Index < Views::Base
                   td { t.billing_profile.organization_name }
                   td { t.direction }
                   td { code { t.hq_organization_id } }
-                  td { money(t.amount_cents) }
+                  td { number_to_currency(t.amount_cents / 100.0) }
                   td { transfer_cell(t) }
                   td { "#{t.attempts}#{t.next_attempt_at ? " (next #{t.next_attempt_at.strftime("%H:%M")})" : ""}#{t.metadata["nsf"] ? " · NSF" : ""}" }
                   td(class: "text-muted") { t.last_error }
@@ -112,7 +112,7 @@ class Views::Billing::Index < Views::Base
               td do
                 span(class: "badge badge-info") { entry.category }
               end
-              td(class: "fw-600#{entry.credit? ? " text-success" : ""}") { money(entry.amount_cents) }
+              td(class: "fw-600#{entry.credit? ? " text-success" : ""}") { number_to_currency(entry.amount_cents / 100.0) }
               td { ledgerable_link(entry) }
               td { entry.billing_profile.organization_name }
               td { state_badge(entry.state) }

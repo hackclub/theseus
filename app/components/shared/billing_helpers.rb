@@ -3,8 +3,6 @@
 module Components::Shared::BillingHelpers
   private
 
-  def money(cents) = number_to_currency(cents / 100.0)
-
   def state_badge(state)
     variant = case state
               when "settled" then "badge-success"

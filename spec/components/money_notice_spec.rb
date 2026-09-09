@@ -18,8 +18,8 @@ RSpec.describe Components::MoneyNotice do
 
   it "shows the payer, every line, the balance verdict, and a proceed button with the amount" do
     html = render(described_class.new(lines: lines, profiles: [ profile ], proceed: "Send to Warehouse", balances: { profile.id => 720 }))
-    expect(html).to include("Billing notice").and include("Clubs")
-    expect(html).to include("$3.60").and include("labor for pkg_x").and include("at cost")
+    expect(html).to include("Charge").and include("Clubs")
+    expect(html).to include("$3.60").and include("labor for pkg_x").and include("$?.??")
     expect(html).to include("money-notice__balance--low").and include("crowbars")
     expect(html).to include("btn-money").and include("Send to Warehouse")
     expect(html).to include('name="hcb_payment_account_id"')
@@ -51,12 +51,12 @@ RSpec.describe Components::MoneyNotice do
 
   it "flips to a refund notice" do
     html = render(described_class.new(lines: [ Billing::Quote::Line.new(category: :indicia, label: "overpaid", when: :now, amount_cents: 6120, count: 1) ], profiles: [ profile ], locked: true, refund: true, proceed: "Refund"))
-    expect(html).to include("money-notice--credit").and include("Refund notice").and include("will be credited").and include("$61.20")
+    expect(html).to include("money-notice--credit").and include("Refund").and include("will be credited").and include("$61.20")
   end
 
   it "renders a preview with no button" do
     html = render(described_class.new(lines: lines, profiles: [ profile ], balances: { profile.id => 100_000 }))
-    expect(html).to include("money-notice--preview").and include("Billing preview")
+    expect(html).to include("money-notice--preview").and include("Cost estimate")
     expect(html).not_to include("btn-money")
   end
 end

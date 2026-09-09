@@ -2,6 +2,7 @@
 
 class Components::MoneyNotice < Components::Base
   GLYPH = "$"
+  MARKS = { ok: "✓", insufficient: "✕", low: "⚠" }.freeze
 
   def initialize(lines:, profiles:, field: "hcb_payment_account_id", selected: nil, proceed: nil, cancel_href: nil,
                  refund: false, locked: false, unbilled: false, id: "billing-consent", refresh_url: nil, connect_href: nil, balances: nil)
@@ -46,7 +47,7 @@ class Components::MoneyNotice < Components::Base
 
   def head
     div(class: "money-notice__head") do
-      span(class: "money-notice__glyph") { GLYPH }
+      svg(viewBox: "0 0 16 16", class: "money-notice__icon", fill: "currentColor", aria_hidden: "true") { raw(icon_svg("bank")) }
       span { title }
       span(class: "money-notice__sub") { subtitle } if subtitle
     end
@@ -97,16 +98,16 @@ class Components::MoneyNotice < Components::Base
       tbody do
         @quote.lines.each { |line| line_row(line) }
       end
-      if @quote.lines.size > 1 || @quote.later?
+      if totals?
         tfoot do
           tr do
-            td(class: "money-notice__amt") { money(@quote.now_cents) }
+            td(class: "money-notice__amt") { readout(number_to_currency(@quote.now_cents / 100.0)) }
             td(class: "money-notice__label") { @refund ? "total credit" : "due now" }
             td(class: "money-notice__when") { "" }
           end
           if @quote.later?
             tr do
-              td(class: "money-notice__amt money-notice__amt--est") { later_total }
+              td(class: "money-notice__amt") { readout(later_total, est: true) }
               td(class: "money-notice__label") { "billed later, at cost" }
               td(class: "money-notice__when") { "" }
             end
@@ -118,18 +119,30 @@ class Components::MoneyNotice < Components::Base
 
   def line_row(line)
     tr do
-      td(class: "money-notice__amt#{line.known? ? "" : " money-notice__amt--est"}") { amount(line) }
+      td(class: "money-notice__amt") { readout(amount(line), est: !line.known?) }
       td(class: "money-notice__label") { line.label }
       td(class: "money-notice__when") { tag_for(line) }
     end
   end
 
+  UNKNOWN = "$?.??"
+
+  # totals only earn their rows when they actually sum something
+  def totals?
+    @quote.lines.count(&:now?) > 1 || @quote.lines.count(&:later?) > 1
+  end
+
+  # the dark inset cell the digits live in. est: not a real number yet.
+  def readout(text, est: false)
+    span(class: est ? "money-notice__readout money-notice__readout--est" : "money-notice__readout") { text }
+  end
+
   def amount(line)
-    line.known? ? money(line.amount_cents) : "at cost"
+    line.known? ? number_to_currency(line.amount_cents / 100.0) : UNKNOWN
   end
 
   def later_total
-    @quote.later_cents.zero? ? "at cost" : "~#{money(@quote.later_cents)}"
+    @quote.later_cents.zero? ? UNKNOWN : "~#{number_to_currency(@quote.later_cents / 100.0)}"
   end
 
   def tag_for(line)
@@ -147,7 +160,8 @@ class Components::MoneyNotice < Components::Base
       cents = @balances ? @balances[profile.id] : ::Billing::Balance.cents_for(profile)
       level = @quote.assess(cents)
       div(class: "money-notice__balance money-notice__balance--#{level}", hidden: profile.id != @selected&.id, data: { balance_for: profile.id }) do
-        balance_text(profile, cents, level)
+        span(class: "money-notice__mark") { MARKS.fetch(level, "?") }
+        span { balance_text(profile, cents, level) }
       end
     end
   end
@@ -156,16 +170,17 @@ class Components::MoneyNotice < Components::Base
     org = profile.organization_name
     case level
     when :ok
-      plain "✓ #{org} has #{money(cents)}. Covered."
+      plain "#{org} has #{number_to_currency(cents / 100.0)}. Covered."
     when :insufficient
-      plain "✕ #{org} has #{money(cents)}, which does not cover the #{money(@quote.now_cents)} due now. This charge will fail. Top up first."
+      plain "#{org} has #{number_to_currency(cents / 100.0)}, which does not cover the #{number_to_currency(@quote.now_cents / 100.0)} due now. This charge will fail. Top up first."
     when :low
-      plain "⚠ #{org} has #{money(cents)}. "
+      plain "#{org} has #{number_to_currency(cents / 100.0)}. "
       plain(@quote.now_cents.positive? ? "That covers today, but it's thin" : "That's thin")
-      plain(@quote.later? ? " for what's billed later. " : ". ")
+      plain(@quote.later? ? " for what's billed later." : ".")
+      br
       plain "Top up before then, or we'll come round with crowbars and a keen interest in your kneecaps."
     else
-      plain "? Couldn't check #{org}'s balance right now. Make sure it's funded before you proceed."
+      plain "Couldn't check #{org}'s balance right now. Make sure it's funded before you proceed."
     end
   end
 
@@ -175,12 +190,10 @@ class Components::MoneyNotice < Components::Base
       a(href: @cancel_href) { "Cancel" } if @cancel_href
       button(type: "submit", class: "btn-money", data: { disable_with: "Working…" }) do
         span { @proceed }
-        span(class: "btn-money__amt") { @profiles.empty? ? "unbilled" : (@refund || @quote.now_cents.positive? ? money(@quote.now_cents) : "later") }
+        span(class: "btn-money__amt") { @profiles.empty? ? "unbilled" : (@refund || @quote.now_cents.positive? ? number_to_currency(@quote.now_cents / 100.0) : "later") }
       end
     end
   end
-
-  def money(cents) = number_to_currency(cents.to_i.abs / 100.0)
 
   def script_once
     script(data: { money_notice_script: true }) do

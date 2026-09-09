@@ -11,20 +11,54 @@
 }
 
 .money-notice {
+  --money-fold: 14px;
+  --money-readout:    light-dark(#0b5d4f, #081a15); // readout cells stay dark in both schemes, like layton's
+  --money-readout-fg: light-dark(#a9e4d1, #8fd6c3);
+  --money-field:      light-dark(#ffffff, #081a15);
+  --money-flap:       light-dark(#8fd6c3, #3f8a76); // underside of the fold; must contrast the bar in both schemes
+  --money-hi: color-mix(in srgb, var(--money) 38%, transparent); // the lighter inner line, layton-style
+  position: relative;
   border: 1px solid var(--money-border);
   border-left-width: 6px;
-  border-radius: 4px;
+  border-radius: 0;
+  clip-path: polygon(0 0, calc(100% - var(--money-fold)) 0, 100% var(--money-fold), 100% 100%, 0 100%);
+
+  // inner highlight line, just inside the outline
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--money-hi);
+    pointer-events: none;
+    z-index: 1;
+  }
+  // the underside of the folded corner
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: var(--money-fold); height: var(--money-fold);
+    background: linear-gradient(to bottom left, transparent 50%, var(--money-flap) 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
   background: var(--money-bg);
   color: var(--money-ink);
   margin: 1rem 0;
   font-variant-numeric: tabular-nums;
 
+  // credit: the same box in purple ink. retinting the tokens here cascades
+  // into every descendant (head, foot band, rules, tag, button).
   &.money-notice--credit {
-    border-color: var(--money-back);
-    background: var(--money-back-bg);
-    .money-notice__head { background: var(--money-back); }
-    .money-notice__tag--back { background: var(--money-back); color: white; }
-    .btn-money { background: var(--money-back); }
+    --money:        var(--money-back);
+    --money-ink:    light-dark(#231c5a, #e6e1fb);
+    --money-bg:     var(--money-back-bg);
+    --money-bg2:    light-dark(#e2ddf6, #272050);
+    --money-border: light-dark(#4a3f9e, #6b5fc9); // a step darker than the bar, like the green one
+    --money-readout:    light-dark(#4a3f9e, #0f0b26);
+    --money-readout-fg: light-dark(#dcd6fb, #b9aef5);
+    --money-field:      light-dark(#ffffff, #0f0b26);
+    --money-flap:       light-dark(#c9c0f8, #6b5fc9);
   }
 
   &.money-notice--preview {
@@ -39,7 +73,7 @@
   display: flex;
   align-items: baseline;
   gap: 0.75rem;
-  padding: 0.35rem 0.85rem;
+  padding: 0.5rem calc(1rem + var(--money-fold)) 0.5rem 1rem; // clear the folded corner
   background: var(--money);
   color: var(--money-bg);
   font-size: 0.75em;
@@ -48,6 +82,7 @@
   font-weight: 700;
 
   .money-notice__sub {
+    margin-left: auto;
     font-weight: 400;
     letter-spacing: 0.05ch;
     opacity: 0.85;
@@ -61,25 +96,36 @@
   letter-spacing: 0;
 }
 
+.money-notice__icon {
+  width: 1.3em;
+  height: 1.3em;
+  flex: none;
+  align-self: center;
+}
+
 .money-notice__body {
-  padding: 0.85rem;
+  padding: 1.1rem 1.1rem 1.15rem;
 }
 
 .money-notice__payer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.6rem;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
 
+  // a Classic Mac popup: boxed, square, hard shadow
   select {
     font: inherit;
-    padding: 0.2rem 0.4rem;
+    line-height: 1.2;
+    padding: 0.1rem 0.4rem;
     border: 1px solid var(--money-border);
-    border-radius: 3px;
-    background: var(--background0);
+    border-radius: 0;
+    box-shadow: inset 1px 1px 0 color-mix(in srgb, black 35%, transparent);
+    background: var(--money-field);
     color: inherit;
     max-width: 100%;
+    &:focus-visible { outline: none; border-color: var(--money); }
   }
   strong { font-weight: 700; }
 }
@@ -87,32 +133,45 @@
 .money-notice__lines {
   width: 100%;
   border-collapse: collapse;
-  margin: 0.25rem 0 0.6rem;
+  margin: 0 0 0.75rem;
   font-size: 0.95em;
 
   td {
-    padding: 0.3rem 0.4rem;
-    border-top: 1px solid var(--money-bg2);
+    padding: 0.2rem 0.5rem;
+    border: none; // the readouts segment the rows; no hairlines (and no grey global ones either)
     vertical-align: baseline;
   }
-  tr:first-child td { border-top: none; }
+  tbody tr:hover { background: transparent; }
 
-  .money-notice__amt {
-    width: 9ch;
-    text-align: right;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .money-notice__amt--est { font-weight: 400; }
+  .money-notice__amt { width: 1%; padding-left: 0; white-space: nowrap; }
+  td + td { padding-left: 0.75rem; }
   .money-notice__label { width: auto; }
   .money-notice__when { width: 6ch; text-align: right; }
 
   tfoot td {
-    border-top: 2px solid var(--money-border);
+    border-top: 3px double var(--money-border);
     font-weight: 700;
+    padding-top: 0.55rem;
   }
+  tfoot tr + tr td { border-top: none; padding-top: 0; }
   tfoot .money-notice__label { color: var(--money); font-size: 0.8em; letter-spacing: 0.08ch; text-transform: uppercase; }
+}
+
+// readout: the dark inset cell the digits live in, like layton's HR./MIN. boxes
+.money-notice__readout {
+  display: inline-block;
+  min-width: 9.5ch;
+  padding: 0.22rem 0.6rem;
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  color: var(--money-readout-fg);
+  background: var(--money-readout);
+  box-shadow: inset 0 0 0 1px var(--money-border), inset 1px 1px 0 1px color-mix(in srgb, black 30%, transparent);
+}
+.money-notice__readout--est {
+  font-weight: 400;
+  color: color-mix(in srgb, var(--money-readout-fg) 70%, transparent);
 }
 
 .money-notice__tag {
@@ -120,7 +179,7 @@
   font-size: 0.7em;
   letter-spacing: 0.1ch;
   padding: 0.1em 0.45em;
-  border-radius: 2px;
+  border-radius: 0;
   background: var(--money);
   color: var(--money-bg);
   font-weight: 700;
@@ -133,11 +192,28 @@
 }
 
 .money-notice__balance {
+  display: grid;
+  grid-template-columns: 1.5em 1fr;
+  column-gap: 0.4em;
+  text-wrap: pretty;
   border-top: 1px solid var(--money-bg2);
-  padding-top: 0.6rem;
+  padding-top: 0.9rem;
   font-size: 0.9em;
   line-height: 1.4;
 
+  // a small filled square in the verdict color, glyph knocked out of it
+  .money-notice__mark {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    line-height: 1.25em;
+    text-align: center;
+    font-size: 0.85em;
+    font-weight: 700;
+    background: currentColor;
+    -webkit-text-fill-color: var(--money-bg);
+    margin-top: 0.1em;
+  }
   code { font-size: 0.95em; }
   &[hidden] { display: none; }
 }
@@ -149,13 +225,27 @@
 .money-notice__foot {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.85rem;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
   border-top: 1px solid var(--money-border);
   background: var(--money-bg2);
 
   .spacer { flex: 1; }
-  a { color: var(--foreground2); }
+
+  // cancel: the same button shape, hollow
+  a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--money-border);
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px var(--money-hi);
+    color: var(--money-ink);
+    font-weight: 600;
+    text-decoration: none;
+    &:hover { background: color-mix(in srgb, var(--money) 12%, transparent); }
+    &:active { transform: translateY(1px); }
+  }
 }
 
 .money-notice__none {
@@ -167,14 +257,16 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.45rem 0.9rem;
-  border: none;
-  border-radius: 4px;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--money-border);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--money) 70%, white);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
   color: var(--money-bg);
   background: var(--money);
+  &:active { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--money) 70%, black); transform: translateY(1px); }
 
   .btn-money__amt {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -182,6 +274,7 @@
     border-left: 1px solid color-mix(in srgb, currentColor 40%, transparent);
   }
   &:hover { filter: brightness(1.08); }
+  &:focus-visible { outline: 2px solid var(--money); outline-offset: 2px; }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
