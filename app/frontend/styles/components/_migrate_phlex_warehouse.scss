@@ -66,3 +66,14 @@
 .task-empty-check { font-size: 2em; color: var(--green); }
 .task-empty-note { margin: 0.25rem 0 0; }
 .task-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+
+// ── Admin forms ────────────────────────────────────────
+//
+// .form-actions is repeated verbatim across several admin (and warehouse)
+// forms as the submit-button wrapper — a solid candidate to promote to a
+// shared utility if more forms pick up the pattern.
+.form-actions { padding-top: 1rem; }
+.form-check-label--inline { display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+.admin-users-form-section { margin-top: 1.5rem; margin-bottom: 1rem; }
+.admin-users-form-section-title { margin: 0 0 0.5rem; }
+.admin-checkbox-field { margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }

@@ -24,8 +24,8 @@ class Components::Admin::Users::Form < Components::Base
         render Components::Shared::FormField.new(label: "Icon URL", name: "user[icon_url]", value: @user.icon_url, hint: "Avatar image URL")
 
         # Permissions section
-        div(style: "margin-top:1.5rem;margin-bottom:1rem;") do
-          h3(style: "margin:0 0 0.5rem;") { "Permissions" }
+        div(class: "admin-users-form-section") do
+          h3(class: "admin-users-form-section-title") { "Permissions" }
 
           checkbox_field("Admin", "user[is_admin]", @user.is_admin)
           checkbox_field("Can Use Indicia", "user[can_use_indicia]", @user.can_use_indicia)
@@ -35,14 +35,14 @@ class Components::Admin::Users::Form < Components::Base
         end
 
         # Defaults section
-        div(style: "margin-top:1.5rem;margin-bottom:1rem;") do
-          h3(style: "margin:0 0 0.5rem;") { "Defaults" }
+        div(class: "admin-users-form-section") do
+          h3(class: "admin-users-form-section-title") { "Defaults" }
 
           select_field("Home Mailer ID", "user[home_mid_id]", mailer_id_options, @user.home_mid_id)
           select_field("Home Return Address", "user[home_return_address_id]", return_address_options, @user.home_return_address_id)
         end
 
-        div(style: "padding-top:1rem;") do
+        div(class: "form-actions") do
           button(type: "submit", class: "btn-success") { @user.persisted? ? "Update User" : "Create User" }
         end
       end
@@ -60,10 +60,10 @@ class Components::Admin::Users::Form < Components::Base
   private
 
   def checkbox_field(label_text, name, value)
-    div(style: "margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;") do
+    div(class: "admin-checkbox-field") do
       input(type: "hidden", name: name, value: "0")
-      input(type: "checkbox", name: name, value: "1", checked: value, style: "margin:0;")
-      label(style: "color:var(--foreground2);margin:0;") { label_text }
+      input(type: "checkbox", name: name, value: "1", checked: value, class: "m-0")
+      label(class: "text-muted m-0") { label_text }
     end
   end
 
