@@ -488,6 +488,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.index ["user_id"], name: "index_return_addresses_on_user_id"
   end
 
+  create_table "source_tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.string "owner"
+    t.string "slug"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "toolchest_oauth_access_grants", force: :cascade do |t|
     t.bigint "application_id", null: false
     t.string "code_challenge"
@@ -672,6 +680,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.decimal "postage_cost"
     t.string "recipient_email"
     t.string "service"
+    t.bigint "source_tag_id"
     t.boolean "surprise"
     t.citext "tags", default: [], array: true
     t.bigint "template_id"
@@ -690,6 +699,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
     t.index ["idempotency_key"], name: "index_warehouse_orders_on_idempotency_key", unique: true
     t.index ["origin_batch_id"], name: "index_warehouse_orders_on_origin_batch_id"
+    t.index ["source_tag_id"], name: "index_warehouse_orders_on_source_tag_id"
     t.index ["tags"], name: "index_warehouse_orders_on_tags", using: :gin
     t.index ["template_id"], name: "index_warehouse_orders_on_template_id"
     t.index ["user_id"], name: "index_warehouse_orders_on_user_id"
@@ -792,8 +802,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.datetime "created_at", null: false
     t.string "name"
     t.boolean "public"
+    t.bigint "source_tag_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["source_tag_id"], name: "index_warehouse_templates_on_source_tag_id"
     t.index ["user_id"], name: "index_warehouse_templates_on_user_id"
   end
 
@@ -848,6 +860,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
   add_foreign_key "warehouse_orders", "batches"
   add_foreign_key "warehouse_orders", "batches", column: "origin_batch_id"
   add_foreign_key "warehouse_orders", "hcb_payment_accounts", column: "billing_profile_id"
+  add_foreign_key "warehouse_orders", "source_tags"
   add_foreign_key "warehouse_orders", "users"
   add_foreign_key "warehouse_orders", "warehouse_templates", column: "template_id"
   add_foreign_key "warehouse_purchase_order_line_items", "warehouse_purchase_orders", column: "purchase_order_id"
@@ -858,5 +871,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
   add_foreign_key "warehouse_sku_requests", "users"
   add_foreign_key "warehouse_sku_requests", "users", column: "reviewed_by_id"
   add_foreign_key "warehouse_sku_requests", "warehouse_skus"
+  add_foreign_key "warehouse_templates", "source_tags"
   add_foreign_key "warehouse_templates", "users"
 end
