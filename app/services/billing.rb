@@ -77,5 +77,8 @@ module Billing
     billing_profile.hcb_transfers.where(state: [:pending, :unknown]).exists?
   end
 
-  def self.mock? = ENV["MOCK_HCB"].present?
+  # Never in production: mock mode completes transfers without moving money.
+  # config/initializers/billing.rb refuses to boot if it is set there anyway,
+  # so this is belt and braces.
+  def self.mock? = ENV["MOCK_HCB"].present? && !Rails.env.production?
 end
