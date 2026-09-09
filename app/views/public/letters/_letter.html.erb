@@ -23,6 +23,6 @@
   <td><%= letter.aasm_state.humanize %></td>
   <td>
     <%= link_to "Open", public_letter_path(letter), 
-        onclick: "openIframeWindow(this.href, 'Letter: #{letter.display_name}'); return false;", class: 'open-link' %>
+        data: { title: "Letter: #{letter.display_name}" }, onclick: "openIframeWindow(this.href, this.dataset.title); return false;", class: 'open-link' %>
   </td>
 </tr>

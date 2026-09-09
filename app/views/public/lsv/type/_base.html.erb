@@ -7,7 +7,7 @@
     <td class="td"><%= base.status_text %></td>
     <td class="td">
       <%= link_to "Open", show_lsv_path(LSV.slug_for(base), base.id),
-                  onclick: "openIframeWindow(this.href, '#{base.type_text}: #{base.title_text}'); return false;", 
+                  data: { title: "#{base.type_text}: #{base.title_text}" }, onclick: "openIframeWindow(this.href, this.dataset.title); return false;", 
                   class: 'btn' %>
     </td>
   </tr>

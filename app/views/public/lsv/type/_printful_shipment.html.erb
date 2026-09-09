@@ -7,7 +7,7 @@
     <td class="td"><%= printful_shipment.status_text %></td>
     <td class="td">
       <%= link_to "Open", show_lsv_path(LSV.slug_for(printful_shipment), printful_shipment.id),
-                  onclick: "openIframeWindow(this.href, '#{printful_shipment.type_text}: #{printful_shipment.title_text}'); return false;", 
+                  data: { title: "#{printful_shipment.type_text}: #{printful_shipment.title_text}" }, onclick: "openIframeWindow(this.href, this.dataset.title); return false;", 
                   class: 'btn' %>
     </td>
   </tr>
