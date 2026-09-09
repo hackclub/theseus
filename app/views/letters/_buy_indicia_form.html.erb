@@ -1,7 +1,7 @@
 <%= form_with(url: buy_indicia_letter_path(letter), method: :post) do |form| %>
   <% if current_user.billing_profiles.any? %>
     <div class="mb-half">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">USPS Account</label>
+      <label class="text-muted label-block">USPS Account</label>
       <select name="usps_payment_account_id" required class="w-100">
         <% USPS::PaymentAccount.all.each do |account| %>
           <option value="<%= account.id %>" <%= "selected" if account.id == USPS::PaymentAccount.first&.id %>><%= account.name %></option>

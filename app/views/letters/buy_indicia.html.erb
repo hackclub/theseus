@@ -1,9 +1,9 @@
 <% content_for :title, "Buy Indicia — #{@letter.public_id}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= letter_path(@letter) %>" class="text-muted" style="text-decoration: none">← <%= @letter.public_id %></a>
-    <strong style="font-size: 1.15em;">Buy Indicia</strong>
+    <a href="<%= letter_path(@letter) %>" class="text-muted no-underline">← <%= @letter.public_id %></a>
+    <strong class="text-title">Buy Indicia</strong>
   </div>
 </div>
 
@@ -34,7 +34,7 @@
       <div class="mt-half">
         <%= form_with(url: buy_indicia_letter_path(@letter), method: :post) do |form| %>
           <div class="mb-half">
-            <label class="text-muted" style="display: block; margin-bottom: 0.25rem">USPS Payment Account</label>
+            <label class="text-muted label-block">USPS Payment Account</label>
             <select name="usps_payment_account_id" required class="w-100">
               <option value="">Select account…</option>
               <% USPS::PaymentAccount.all.each do |account| %>
