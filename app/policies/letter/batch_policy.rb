@@ -19,6 +19,8 @@ class Letter::BatchPolicy < ApplicationPolicy
   alias_method :process_form?, :map_fields?
   alias_method :process_batch?, :map_fields?
 
+  def refund_overpayment? = user_is_admin
+
   def process_batch_with_indicia?
     (record_belongs_to_user || user_is_admin) && user.can_use_indicia?
   end

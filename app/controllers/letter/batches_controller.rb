@@ -250,7 +250,7 @@ class Letter::BatchesController < BaseBatchesController
   end
 
   def refund_overpayment
-    authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    authorize @batch, :refund_overpayment?, policy_class: Letter::BatchPolicy
 
     # Phase 1: compute and reserve under the batch lock. The credit entry is
     # created here (pending), so a second click sees a smaller net and bails.
