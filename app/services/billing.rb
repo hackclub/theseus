@@ -44,12 +44,21 @@ module Billing
   end
 
   # Which HQ organization gets paid for a given kind of work.
+  #
+  # Set-but-empty is treated like missing: ENV.fetch would happily return ""
+  # and we would POST a blank to_organization_id to HCB. KeyError is in
+  # Billing::Executor::DEFINITE, so a misconfigured environment fails the
+  # transfer outright instead of parking it in unknown.
   def self.destination_for(category)
     case category.to_s
-    when "indicia" then ENV.fetch("HCB_USPS_ORG_ID")
-    when "labor", "postage", "contents" then ENV.fetch("HCB_WAREHOUSE_ORG_ID")
+    when "indicia" then env!("HCB_USPS_ORG_ID")
+    when "labor", "postage", "contents" then env!("HCB_WAREHOUSE_ORG_ID")
     else raise ArgumentError, "no HCB destination for category #{category.inspect}"
     end
+  end
+
+  def self.env!(name)
+    ENV.fetch(name).presence || raise(KeyError, "#{name} is blank")
   end
 
   # Create a credit entry against `reverses` and send the money back.
