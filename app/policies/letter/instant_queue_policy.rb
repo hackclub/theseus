@@ -5,4 +5,7 @@
 # Permissions are identical to a regular queue: owner-or-admin for show/edit/
 # update, any signed-in user for new/create, admin-only for destroy.
 class Letter::InstantQueuePolicy < Letter::QueuePolicy
+  # API poll for pending letters — returns recipient names and addresses, so it
+  # is owner-or-admin, same as show?. The API also requires a pii-scoped token.
+  def queued? = show?
 end
