@@ -23,6 +23,6 @@ class ReworkBillingLedger < ActiveRecord::Migration[8.0]
     # ── batches: branch-only charge amount superseded by the ledger ──
     # (hcb_transfer_id on batches and usps_indicia predates the ledger and is
     #  kept read-only as a historical record; see Billing::Backfill.)
-    remove_column :batches, :hcb_transfer_amount_cents, :integer
+    remove_column :batches, :hcb_transfer_amount_cents, :integer if column_exists?(:batches, :hcb_transfer_amount_cents)
   end
 end

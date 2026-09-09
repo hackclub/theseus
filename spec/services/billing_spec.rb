@@ -115,6 +115,44 @@ RSpec.describe Billing do
     end
   end
 
+  describe ".destination_for" do
+    def with_env(name, value)
+      had = ENV.key?(name)
+      old = ENV[name]
+      ENV[name] = value
+      yield
+    ensure
+      had ? ENV[name] = old : ENV.delete(name)
+    end
+
+    it "treats a blank HCB_USPS_ORG_ID as missing instead of charging a blank org" do
+      e = entry(500, category: :indicia)
+
+      with_env("HCB_USPS_ORG_ID", "") do
+        expect { Billing.destination_for(:indicia) }.to raise_error(KeyError, /HCB_USPS_ORG_ID is blank/)
+        expect { Billing.charge!([ e ], name: "x") }.to raise_error(KeyError)
+      end
+
+      # nothing sent, nothing claimed
+      expect(hcb_disbursements).to be_empty
+      expect(HCB::Transfer.count).to eq(0)
+      expect(e.reload).to be_pending
+      expect(LedgerEntry.unclaimed).to include(e)
+    end
+
+    it "treats a blank HCB_WAREHOUSE_ORG_ID as missing" do
+      e = entry(500, category: :labor)
+
+      with_env("HCB_WAREHOUSE_ORG_ID", "") do
+        expect { Billing.destination_for(:labor) }.to raise_error(KeyError, /HCB_WAREHOUSE_ORG_ID is blank/)
+        expect { Billing.charge!([ e ], name: "x") }.to raise_error(KeyError)
+      end
+
+      expect(hcb_disbursements).to be_empty
+      expect(HCB::Transfer.count).to eq(0)
+    end
+  end
+
   describe "error classification" do
     let(:e) { entry(500) }
 
@@ -245,6 +283,19 @@ RSpec.describe Billing do
     it "marks 5xx as unknown" do
       hcb_raises(api_error(HCBV4::ServerError, "Internal Server Error", status: 500))
       expect(Billing.charge!([e], name: "x")).to be_unknown
+    end
+
+    it "treats a missing ENV var as definite, not unknown" do
+      mails = capture_billing_mail
+      hcb_raises(KeyError.new("key not found: \"HCB_WAREHOUSE_ORG_ID\""))
+      transfer = Billing.charge!([e], name: "x")
+
+      expect(transfer).to be_failed
+      expect(transfer).not_to be_retryable
+      expect(transfer.last_error).to include("HCB_WAREHOUSE_ORG_ID")
+      expect(e.reload).to be_pending
+      expect(hcb_disbursements).to be_empty
+      expect(mails).to have_received(:transfer_failed).once
     end
 
     it "raises typed errors in strict mode" do

@@ -1,7 +1,7 @@
+# Column + backfill only; the index is built concurrently in 20260211204939.
 class AddCreatedViaToLetters < ActiveRecord::Migration[8.0]
   def change
     add_column :letters, :created_via, :integer, null: false, default: 0
-    add_index :letters, :created_via
 
     reversible do |dir|
       dir.up do
