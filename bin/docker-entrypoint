@@ -6,7 +6,13 @@ if [ -z "${LD_PRELOAD+x}" ]; then
     export LD_PRELOAD
 fi
 
-# If running the rails server then create or migrate existing database
+# If running the rails server then create or migrate existing database.
+#
+# Deliberately web-only: the web container owns migrations. The worker shares
+# this entrypoint but never migrates, so it must not be restarted before web
+# has finished migrating — a worker booting first would run jobs against the
+# old schema, and two containers racing db:prepare is worse. Deploy order is
+# web, then worker. See the CMD note in Dockerfile.worker.
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
 fi

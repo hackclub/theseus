@@ -74,5 +74,10 @@ USER 1000:1000
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start GoodJob worker
+# Start GoodJob worker.
+#
+# This container does NOT migrate: bin/docker-entrypoint only runs db:prepare
+# for `./bin/rails server`. Restart the worker only after the web container has
+# migrated, otherwise it picks up jobs written against a schema it does not
+# have yet.
 CMD ["bundle", "exec", "good_job", "start"]
