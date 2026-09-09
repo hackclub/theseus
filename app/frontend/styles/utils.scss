@@ -2,3 +2,22 @@
 .pointer { cursor: pointer; }
 .w-100 { width: 100%; }
 #confetti { pointer-events: none; }
+
+// Spacing
+.mt-0 { margin-top: 0; }
+.mt-half { margin-top: 0.5rem; }
+.mt-1 { margin-top: 1rem; }
+.mb-0 { margin-bottom: 0; }
+.mb-half { margin-bottom: 0.5rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-1h { margin-bottom: 1.5rem; }
+
+// Flex
+.flex-row { display: flex; align-items: center; gap: 0.5rem; }
+.flex-wrap-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+// Type
+.fw-600 { font-weight: 600; }
+.text-success { color: var(--green); }
+.text-lg { font-size: 1.25em; }
+.code-block { margin: 0; font-size: 0.85em; }
