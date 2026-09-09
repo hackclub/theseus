@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Views::Billing::Index < Views::Base
+  include Components::Shared::BillingHelpers
+
   def initialize(ledger_entries:, billing_profiles:)
     @ledger_entries = ledger_entries
     @billing_profiles = billing_profiles
@@ -14,12 +16,12 @@ class Views::Billing::Index < Views::Base
 
     # Summary cards per billing profile
     if @billing_profiles.any?
-      div(style: "display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;") do
+      div(class: "flex-wrap-row mb-1h") do
         @billing_profiles.each do |profile|
           entries = profile.ledger_entries
-          section(style: "flex:1;min-width:200px;") do
+          section(style: "flex:1;min-width:200px") do
             strong { profile.organization_name }
-            div(class: "detail-grid", style: "margin-top:0.5rem;") do
+            div(class: "detail-grid mt-half") do
               span(class: "detail-label") { "Net billed" }
               span { money(entries.live.sum(:amount_cents)) }
 
@@ -48,8 +50,8 @@ class Views::Billing::Index < Views::Base
     if helpers.current_user&.admin?
       attention = HCB::Transfer.where(state: [:failed, :unknown]).includes(:billing_profile).order(:created_at)
       if attention.any?
-        section(style: "margin-bottom:1.5rem;") do
-          h3(style: "margin-top:0;") { "Transfers needing attention" }
+        section(class: "mb-1h") do
+          h3(class: "mt-0") { "Transfers needing attention" }
           table do
             thead { tr { th { "Created" }; th { "Org" }; th { "Direction" }; th { "HQ org" }; th { "Amount" }; th { "State" }; th { "Attempts" }; th { "Error" }; th { "" } } }
             tbody do
@@ -99,7 +101,7 @@ class Views::Billing::Index < Views::Base
               td do
                 span(class: "badge badge-info") { entry.category }
               end
-              td(style: "font-weight:600;", class: (entry.credit? ? "text-success" : nil)) { money(entry.amount_cents) }
+              td(class: "fw-600#{entry.credit? ? " text-success" : ""}") { money(entry.amount_cents) }
               td { ledgerable_link(entry) }
               td { entry.billing_profile.organization_name }
               td { state_badge(entry.state) }
@@ -110,7 +112,7 @@ class Views::Billing::Index < Views::Base
       end
 
       # Pagination
-      div(style: "margin-top:1rem;") do
+      div(class: "mt-1") do
         raw helpers.paginate(@ledger_entries)
       end
     else
@@ -118,52 +120,5 @@ class Views::Billing::Index < Views::Base
     end
   end
 
-  private
 
-  def money(cents)
-    sign = cents.negative? ? "-" : ""
-    "#{sign}$#{"%.2f" % (cents.abs / 100.0)}"
-  end
-
-  def state_badge(state)
-    variant = case state
-              when "settled" then "badge-success"
-              when "pending" then "badge-warning"
-              when "voided" then "badge"
-              end
-    span(class: "badge #{variant}") { state }
-  end
-
-  def transfer_cell(transfer)
-    return span(class: "text-muted") { "—" } unless transfer
-    variant = case transfer.state
-              when "completed" then "badge-success"
-              when "pending" then "badge-warning"
-              when "unknown" then "badge-warning"
-              when "failed" then "badge-danger"
-              end
-    span(class: "badge #{variant}", title: transfer.last_error) { transfer.state }
-    plain " "
-    code(class: "text-muted", title: transfer.idempotency_key) { transfer.remote_id&.truncate(16) || transfer.idempotency_key }
-  end
-
-  def ledgerable_link(entry)
-    case entry.ledgerable_type
-    when "Warehouse::Order"
-      order = entry.ledgerable
-      a(href: warehouse_order_path(order)) { order.hc_id || "Order ##{order.id}" }
-    when "Batch"
-      batch = entry.ledgerable
-      a(href: letter_batch_path(batch)) { batch.public_id }
-    when "USPS::Indicium"
-      indicium = entry.ledgerable
-      if indicium.letter.present?
-        a(href: letter_path(indicium.letter)) { "Indicium #{indicium.public_id}" }
-      else
-        plain "Indicium #{indicium.public_id}"
-      end
-    else
-      plain "#{entry.ledgerable_type} ##{entry.ledgerable_id}"
-    end
-  end
 end

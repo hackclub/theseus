@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Views::Billing::Show < Views::Base
+  include Components::Shared::BillingHelpers
+
   def initialize(ledger_entry:)
     @entry = ledger_entry
   end
@@ -16,7 +18,7 @@ class Views::Billing::Show < Views::Base
         span { span(class: "badge badge-info") { @entry.category } }
 
         span(class: "detail-label") { "Amount" }
-        span(style: "font-weight:600;font-size:1.25em;") { money(@entry.amount_cents) }
+        span(class: "fw-600 text-lg") { money(@entry.amount_cents) }
 
         if @entry.reverses.present?
           span(class: "detail-label") { "Credit against" }
@@ -69,48 +71,12 @@ class Views::Billing::Show < Views::Base
         if @entry.metadata.present? && @entry.metadata.any?
           span(class: "detail-label") { "Metadata" }
           span do
-            pre(style: "margin:0;font-size:0.85em;") { JSON.pretty_generate(@entry.metadata) }
+            pre(class: "code-block") { JSON.pretty_generate(@entry.metadata) }
           end
         end
       end
     end
   end
 
-  private
 
-  def money(cents)
-    sign = cents.negative? ? "-" : ""
-    "#{sign}$#{"%.2f" % (cents.abs / 100.0)}"
-  end
-
-  def state_badge(state)
-    variant = case state
-              when "settled" then "badge-success"
-              when "pending" then "badge-warning"
-              when "voided" then "badge"
-              end
-    span(class: "badge #{variant}") { state }
-  end
-
-  def ledgerable_detail(entry)
-    case entry.ledgerable_type
-    when "Warehouse::Order"
-      order = entry.ledgerable
-      a(href: warehouse_order_path(order)) do
-        plain "#{order.user_facing_title || "Warehouse Order"} (#{order.hc_id})"
-      end
-    when "Batch"
-      batch = entry.ledgerable
-      a(href: letter_batch_path(batch)) { "Letter Batch #{batch.public_id}" }
-    when "USPS::Indicium"
-      indicium = entry.ledgerable
-      if indicium.letter.present?
-        a(href: letter_path(indicium.letter)) { "Indicium #{indicium.public_id} → Letter #{indicium.letter.public_id}" }
-      else
-        plain "Indicium #{indicium.public_id}"
-      end
-    else
-      plain "#{entry.ledgerable_type} ##{entry.ledgerable_id}"
-    end
-  end
 end

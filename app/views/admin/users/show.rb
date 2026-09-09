@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Views::Admin::Users::Show < Views::Base
+  include Components::Shared::BillingHelpers
+
   def initialize(user:)
     @user = user
   end
@@ -221,34 +223,5 @@ class Views::Admin::Users::Show < Views::Base
   def stat_link(label, count, path)
     span(class: "detail-label") { label }
     span { a(href: path) { count.to_s } }
-  end
-
-  def state_badge(state)
-    variant = case state
-              when "settled" then "badge-success"
-              when "pending" then "badge-warning"
-              when "voided" then "badge"
-              end
-    span(class: "badge #{variant}") { state }
-  end
-
-  def ledgerable_link(entry)
-    case entry.ledgerable_type
-    when "Warehouse::Order"
-      order = entry.ledgerable
-      a(href: warehouse_order_path(order)) { order.hc_id || "Order ##{order.id}" }
-    when "Batch"
-      batch = entry.ledgerable
-      a(href: letter_batch_path(batch)) { batch.public_id }
-    when "USPS::Indicium"
-      indicium = entry.ledgerable
-      if indicium.letter.present?
-        a(href: letter_path(indicium.letter)) { "Indicium #{indicium.public_id}" }
-      else
-        plain "Indicium #{indicium.public_id}"
-      end
-    else
-      plain "#{entry.ledgerable_type} ##{entry.ledgerable_id}"
-    end
   end
 end
