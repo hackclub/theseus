@@ -68,7 +68,7 @@ class Views::Warehouse::SKURequests::Index < Views::Base
     when "draft" then ""
     when "submitted" then "badge-info"
     when "approved", "synced" then "badge-success"
-    when "rejected" then "badge-danger"
+    when "returned" then "badge-warning"
     else ""
     end
     span(class: "badge #{css}".strip) { state.to_s.humanize }

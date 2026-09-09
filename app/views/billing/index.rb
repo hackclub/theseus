@@ -77,10 +77,16 @@ class Views::Billing::Index < Views::Base
                   td(class: "text-muted") { t.last_error }
                   td do
                     next span(class: "text-muted") { "no pending entries" } if t.ledger_entries.pending.none?
-                    form(action: retry_transfer_billing_index_path(transfer_id: t.id), method: "post", class: "form-inline",
-                         onsubmit: (t.unknown? ? "return confirm('This transfer is UNKNOWN. Only retry if you have checked HCB and it is NOT there. Continue?')" : nil)) do
+                    form(action: retry_transfer_billing_index_path(transfer_id: t.id), method: "post", class: "form-inline") do
                       input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
-                      button(type: "submit", class: "btn-sm #{t.unknown? ? "btn-danger" : "btn-warning"}") { t.unknown? ? "Force retry" : "Retry now" }
+                      if t.unknown?
+                        # HCB has no idempotency: if this one did land, sending it
+                        # again takes the money a second time. Make them say so.
+                        input(type: "hidden", name: "force", value: "1")
+                        button(type: "submit", class: "btn-sm btn-danger", data: { turbo_confirm: force_retry_confirm(t) }) { "Force retry (may double charge)" }
+                      else
+                        button(type: "submit", class: "btn-sm btn-warning") { "Retry now" }
+                      end
                     end
                   end
                 end
@@ -131,5 +137,15 @@ class Views::Billing::Index < Views::Base
     end
   end
 
+  private
 
+  # An unknown transfer may already have been processed by HCB — we never got
+  # the answer. HCB v4 has no idempotency keys, so a retry is a second,
+  # independent movement of money.
+  def force_retry_confirm(transfer)
+    "This transfer is UNKNOWN: it may ALREADY have landed on HCB. " \
+    "HCB cannot de-duplicate it, so retrying can charge " \
+    "#{transfer.billing_profile.organization_name} #{number_to_currency(transfer.amount_cents / 100.0)} a second time. " \
+    "Only continue if you have checked HCB by hand and this transfer is NOT there."
+  end
 end

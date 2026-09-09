@@ -146,11 +146,22 @@ class Billing::Executor
   # the transfer is still completed and the sweep repairs the entries.
   def record!(result)
     transfer.complete!(result.id)
+    forget_balance!
   rescue => e
     Sentry.capture_exception(e, level: :fatal, tags: { money: true, billing_record_failed: true },
       extra: { transfer_id: transfer.id, remote_id: result.id }) if defined?(Sentry)
     transfer.update_columns(state: HCB::Transfer.states[:completed], remote_id: result.id, last_error: "recorded remote id; settling entries failed: #{e.message}".truncate(255)) unless transfer.reload.completed?
+    forget_balance!
     raise
+  end
+
+  # The consent screens quote a cached HCB balance (60s TTL). Money just
+  # moved — down for a debit, up for a credit — so that number is now a lie.
+  # Never let a cache miss look like a transfer that failed.
+  def forget_balance!
+    Billing::Balance.forget!(transfer.billing_profile)
+  rescue => e
+    Rails.logger.warn("[billing] could not clear cached balance for profile #{transfer.billing_profile_id}: #{e.class}: #{e.message}")
   end
 
   # Best effort. A memo that fails to write must never look like a charge

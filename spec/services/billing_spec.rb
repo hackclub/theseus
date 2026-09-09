@@ -391,4 +391,46 @@ RSpec.describe Billing do
       expect(transfer.memo).to eq("[theseus] refund indicia #{batch.public_id} $3.00 (T##{credit.id} reverses T##{original.id}) · overpaid")
     end
   end
+
+  # The consent screens quote Billing::Balance.cents_for, which caches for a
+  # minute. Money that just moved must not be quoted from before it moved.
+  describe "cached HCB balance" do
+    before { allow(Rails).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new) }
+
+    it "is dropped when a charge completes" do
+      expect(Billing::Balance.cents_for(profile)).to eq(10_000_000)
+      expect(Rails.cache.read(Billing::Balance.key(profile))).to eq(10_000_000)
+
+      transfer = Billing.charge!([ entry(500) ], name: "Postage")
+      expect(transfer).to be_completed
+      expect(Rails.cache.read(Billing::Balance.key(profile))).to be_nil
+
+      # ...and the next read goes back to HCB rather than reusing the stale one.
+      allow_any_instance_of(BillingProfile).to receive(:organization).and_return(double(balance_cents: 9_999_500, name: "Test Org"))
+      expect(Billing::Balance.cents_for(profile)).to eq(9_999_500)
+    end
+
+    it "is dropped when a credit completes" do
+      original = entry(1000).tap { |x| Billing.charge!([ x ], name: "charge") }.reload
+      Billing::Balance.cents_for(profile)
+      expect(Rails.cache.read(Billing::Balance.key(profile))).to eq(10_000_000)
+
+      expect(Billing.credit!(reverses: original, amount_cents: 300, name: "Refund")).to be_completed
+      expect(Rails.cache.read(Billing::Balance.key(profile))).to be_nil
+    end
+
+    it "does not touch the cache when the transfer never completes" do
+      hcb_raises(api_error(HCBV4::BadRequestError, "nope", status: 400))
+      Billing::Balance.cents_for(profile)
+
+      transfer = Billing.charge!([ entry(500) ], name: "Postage")
+      expect(transfer).to be_failed
+      expect(Rails.cache.read(Billing::Balance.key(profile))).to eq(10_000_000)
+    end
+
+    it "still completes the transfer when clearing the cache blows up" do
+      allow(Billing::Balance).to receive(:forget!).and_raise("cache is down")
+      expect(Billing.charge!([ entry(500) ], name: "Postage")).to be_completed
+    end
+  end
 end
