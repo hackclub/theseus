@@ -20,7 +20,7 @@ class Views::Letter::Batches::New < Views::Base
       end
     end
 
-    error_messages
+render Components::Shared::ErrorMessages.new(record: @batch)
 
     form_with(model: @batch, url: letter_batches_path, scope: :letter_batch, multipart: true) do |f|
       section(style: "margin-bottom: 1rem;") do
@@ -65,17 +65,6 @@ class Views::Letter::Batches::New < Views::Base
 
   private
 
-  def error_messages
-    return unless @batch.errors.any?
-
-    section(style: "margin-bottom: 1rem; border-color: var(--red);") do
-      strong(style: "color: var(--red);") { "#{@batch.errors.count} #{"error".pluralize(@batch.errors.count)} prevented saving" }
-      hr
-      ul(style: "margin: 0.5rem 0 0; padding-left: 1rem;") do
-        @batch.errors.full_messages.each { |msg| li { msg } }
-      end
-    end
-  end
 
   def sender_fields(f)
     addresses = ReturnAddress.shared.or(ReturnAddress.owned_by(current_user))

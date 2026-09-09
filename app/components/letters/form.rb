@@ -13,7 +13,7 @@ class Components::Letters::Form < Components::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    error_messages
+render Components::Shared::ErrorMessages.new(record: letter)
 
     form_with(model: letter, url: form_url) do |f|
       # Letter Specs
@@ -112,18 +112,6 @@ class Components::Letters::Form < Components::Base
     letter.persisted? ? letter_path(letter) : letters_path
   end
 
-  def error_messages
-    return unless letter.errors.any?
-
-    div(class: "banner banner-error", style: "margin-bottom:1rem;") do
-      strong { "[!] Hey, slight issue:" }
-      ul(class: "error-list") do
-        letter.errors.each do |error|
-          li { error.full_message }
-        end
-      end
-    end
-  end
 
   def mailing_date_field(f)
     div(style: "margin-bottom:1rem;") do

@@ -22,7 +22,7 @@ class Views::Warehouse::Batches::Edit < Views::Base
       end
     end
 
-    error_messages
+render Components::Shared::ErrorMessages.new(record: @batch)
 
     div(class: "show-layout") do
       div(class: "show-main") do
@@ -83,18 +83,6 @@ class Views::Warehouse::Batches::Edit < Views::Base
 
   private
 
-  def error_messages
-    return unless @batch.errors.any?
-
-    div(class: "banner banner-error", style: "margin-bottom: 1rem;") do
-      strong { "[!] Hey, slight issue:" }
-      ul(class: "error-list") do
-        @batch.errors.each do |error|
-          li { error.full_message }
-        end
-      end
-    end
-  end
 
   def tag_picker(f)
     section(style: "margin-bottom: 1rem;") do

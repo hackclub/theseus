@@ -13,7 +13,7 @@ class Components::Letter::Queues::Form < Components::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    error_messages
+render Components::Shared::ErrorMessages.new(record: queue)
 
     form_with(model: queue, url: form_url, scope: :letter_queue) do |f|
       section_heading("The important part")
@@ -104,18 +104,6 @@ class Components::Letter::Queues::Form < Components::Base
     queue.new_record? ? letter_queues_path : letter_queue_path(queue)
   end
 
-  def error_messages
-    return unless queue.errors.any?
-
-    div(class: "error-box") do
-      strong { "#{queue.errors.count} #{"error".pluralize(queue.errors.count)} prohibited this queue from being saved:" }
-      ul(class: "error-box-list") do
-        queue.errors.each do |error|
-          li { error.full_message }
-        end
-      end
-    end
-  end
 
   def section_heading(text)
     h3(class: "form-section-heading") { text }
