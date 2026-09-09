@@ -6,10 +6,10 @@ class Views::Letter::Queues::New < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: letter_queues_path, style: "text-decoration: none; color: var(--foreground2);") { "← Queues" }
-        strong(style: "font-size: 1.15em;") { "New Batch Queue" }
+        a(href: letter_queues_path, class: "link-muted") { "← Queues" }
+        strong(class: "text-title") { "New Batch Queue" }
       end
     end
 
@@ -23,9 +23,9 @@ class Views::Letter::Queues::New < Views::Base
         section do
           strong { "Help" }
           hr
-          div(class: "mt-half text-muted") do
-            p(style: "margin: 0 0 0.5rem;") { "Batch queues collect letters and let you create batches for bulk processing and printing." }
-            p(style: "margin: 0;") { "You'll need a return address and mailer ID configured before sending." }
+          div(class: "mt-half text-muted help-text") do
+            p { "Batch queues collect letters and let you create batches for bulk processing and printing." }
+            p { "You'll need a return address and mailer ID configured before sending." }
           end
         end
       end

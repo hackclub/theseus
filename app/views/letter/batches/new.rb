@@ -13,10 +13,10 @@ class Views::Letter::Batches::New < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: letter_batches_path, style: "text-decoration: none; color: var(--foreground2);") { "← Batches" }
-        strong(style: "font-size: 1.15em;") { "New Letter Batch" }
+        a(href: letter_batches_path, class: "link-muted") { "← Batches" }
+        strong(class: "text-title") { "New Letter Batch" }
       end
     end
 
@@ -48,7 +48,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
         hr
         div(class: "mt-half") do
           input(type: "file", name: "letter_batch[csv]", accept: ".csv", required: true)
-          p(class: "text-muted", style: "margin:0.5rem 0 0;font-size:0.85em;") do
+          p(class: "text-muted csv-hint") do
             plain "Upload a CSV with address columns. You'll map them on the next page."
           end
         end
@@ -56,7 +56,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
       tag_picker(f)
 
-      div(style: "display:flex;gap:0.5rem;margin-top:1rem;") do
+      div(class: "form-actions-row") do
         button(type: "submit", class: "btn-success") { "Upload & Map →" }
         a(href: letter_batches_path) { "Cancel" }
       end
@@ -103,7 +103,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
     end
 
     div(class: "mb-1") do
-      label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Custom Return Address Name" }
+      label(class: "form-field-label") { "Custom Return Address Name" }
       input(type: "text", name: "letter_batch[letter_return_address_name]", class: "w-100")
       p(class: "form-hint") { "Leave blank to use the return address name" }
     end

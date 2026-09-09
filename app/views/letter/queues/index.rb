@@ -37,13 +37,13 @@ class Views::Letter::Queues::Index < Views::Base
       end
 
       admin_tool do
-        button_to mark_printed_instants_mailed_letter_queues_path, method: :post, style: "display: inline;" do
+        button_to mark_printed_instants_mailed_letter_queues_path, method: :post, class: "form-inline" do
           button(class: "btn-danger btn-sm") { "Mark printed instants mailed" }
         end
       end
 
       if user_id.present? || queue_type.present?
-        a(href: letter_queues_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
+        a(href: letter_queues_path, class: "text-muted nowrap") { "× Clear" }
       end
     end
 
@@ -87,7 +87,7 @@ class Views::Letter::Queues::Index < Views::Base
 
           tr do
             td do
-              a(href: href, style: "text-decoration: none; font-weight: 500;") { queue.name }
+              a(href: href, class: "no-underline fw-medium") { queue.name }
             end
             td do
               if is_instant
@@ -96,10 +96,10 @@ class Views::Letter::Queues::Index < Views::Base
                 span(class: "badge badge-info") { "Batch" }
               end
             end
-            td(style: queued > 0 ? "color: var(--blue);" : "color: var(--foreground2);") do
+            td(class: queued > 0 ? "text-info" : "text-muted") do
               plain fmt(queued)
             end
-            td(style: printed > 0 ? "color: var(--green);" : "color: var(--foreground2);") do
+            td(class: printed > 0 ? "text-success" : "text-muted") do
               plain fmt(printed)
             end
             td(class: "text-muted") { plain fmt(mailed) }
@@ -131,8 +131,8 @@ class Views::Letter::Queues::Index < Views::Base
   end
 
   def blankslate
-    section(style: "text-align: center; padding: 2rem;") do
-      h2(style: "margin: 0;") { "No queues found" }
+    section(class: "empty-state") do
+      h2(class: "m-0") { "No queues found" }
       if queue_type.present? || user_id.present?
         p(class: "text-muted") { "Try adjusting your filters." }
       else

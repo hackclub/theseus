@@ -10,10 +10,10 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: letter_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
-        strong(style: "font-size: 1.15em;") { "Process Batch" }
+        a(href: letter_batch_path(@batch), class: "link-muted") { "← Batch ##{@batch.id}" }
+        strong(class: "text-title") { "Process Batch" }
       end
     end
 
@@ -26,9 +26,9 @@ class Views::Letter::Batches::Process < Views::Base
           templates_box
           options_box
 
-          div(id: "stamps-only-actions", style: "display:none;gap:0.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--background2);") do
+          div(id: "stamps-only-actions", class: "actions-divider-row", style: "display:none;") do
             button(type: "submit", class: "btn-success", data: { disable_with: "Processing…" }) { "▶ Start Processing" }
-            a(href: letter_batch_path(@batch), style: "color:var(--foreground2);align-self:center;") { "Cancel" }
+            a(href: letter_batch_path(@batch), class: "cancel-link") { "Cancel" }
           end
         end
 
@@ -48,8 +48,8 @@ class Views::Letter::Batches::Process < Views::Base
       strong { "Details" }
       hr
 
-      div(style: "margin-top:0.75rem;") do
-        label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Batch Title" }
+      div(class: "mt-075") do
+        label(class: "form-field-label") { "Batch Title" }
         input(
           type: "text",
           name: "batch[user_facing_title]",
@@ -57,11 +57,11 @@ class Views::Letter::Batches::Process < Views::Base
           class: "w-100",
           autofocus: true
         )
-        p(class: "text-muted", style: "margin:0.25rem 0 0;font-size:0.85em;") { "Visible to recipients. Shows in the batch list." }
+        p(class: "field-hint") { "Visible to recipients. Shows in the batch list." }
       end
 
-      div(style: "margin-top:0.75rem;") do
-        label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Mailing Date" }
+      div(class: "mt-075") do
+        label(class: "form-field-label") { "Mailing Date" }
         input(
           type: "date",
           name: "batch[letter_mailing_date]",
@@ -138,16 +138,16 @@ class Views::Letter::Batches::Process < Views::Base
       strong { "Postage" }
       hr
 
-      div(style: "display:flex;gap:2rem;margin-top:0.75rem;") do
+      div(class: "postage-columns") do
         div do
           strong { "US Mail" }
-          span(class: "text-muted", style: "margin-left:0.5rem;") { "(#{us_count} letters)" }
-          div(style: "margin-top:0.25rem;display:flex;gap:1rem;") do
-            label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
+          span(class: "text-muted ml-half") { "(#{us_count} letters)" }
+          div(class: "postage-radio-group") do
+            label(class: "postage-radio-label") do
               input(type: "radio", name: "batch[us_postage_type]", value: "stamps", class: "postage-radio")
               plain " Stamps"
             end
-            label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
+            label(class: "postage-radio-label") do
               input(type: "radio", name: "batch[us_postage_type]", value: "indicia", checked: true, class: "postage-radio")
               plain " Indicia"
             end
@@ -157,13 +157,13 @@ class Views::Letter::Batches::Process < Views::Base
         if intl_count > 0
           div do
             strong { "International" }
-            span(class: "text-muted", style: "margin-left:0.5rem;") { "(#{intl_count} letters)" }
-            div(style: "margin-top:0.25rem;display:flex;gap:1rem;") do
-              label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
+            span(class: "text-muted ml-half") { "(#{intl_count} letters)" }
+            div(class: "postage-radio-group") do
+              label(class: "postage-radio-label") do
                 input(type: "radio", name: "batch[intl_postage_type]", value: "stamps", class: "postage-radio")
                 plain " Stamps"
               end
-              label(style: "display:flex;align-items:center;gap:0.25rem;cursor:pointer;") do
+              label(class: "postage-radio-label") do
                 input(type: "radio", name: "batch[intl_postage_type]", value: "indicia", checked: true, class: "postage-radio")
                 plain " Indicia"
               end
@@ -172,7 +172,7 @@ class Views::Letter::Batches::Process < Views::Base
         end
       end
 
-      div(class: "detail-grid", style: "margin-top:0.75rem;") do
+      div(class: "detail-grid mt-075") do
         span(class: "detail-label") { "Estimated cost" }
         strong(id: "total_postage_cost") { number_to_currency(@batch.postage_cost) }
       end
@@ -192,8 +192,8 @@ class Views::Letter::Batches::Process < Views::Base
       # USPS account — admin only, others get the default
       if current_user&.admin?
         admin_tool(element: "div") do
-          div(style: "margin-top:0.75rem;") do
-            label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "USPS Payment Account" }
+          div(class: "mt-075") do
+            label(class: "form-field-label") { "USPS Payment Account" }
             select(name: "batch[usps_payment_account_id]", class: "w-100") do
               USPS::PaymentAccount.all.each do |pa|
                 option(value: pa.id, selected: pa.id == default_usps_id.to_i) { pa.display_name }

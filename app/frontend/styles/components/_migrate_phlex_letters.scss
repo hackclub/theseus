@@ -1,2 +1,129 @@
 // inline-style migration shard: phlex_letters
 // area-specific classes only; shared utilities live in utils.scss
+
+// Sidebar "About/Help" blurb: two stacked paragraphs, first one gets a small
+// gap before the next; last paragraph sits flush.
+.help-text p {
+  margin: 0;
+}
+.help-text p + p {
+  margin-top: 0.5rem;
+}
+
+// Promotion candidates: generic enough for utils.scss, but that file's off
+// limits for this shard.
+.nowrap { white-space: nowrap; }
+.text-info { color: var(--blue); }
+.ml-half { margin-left: 0.5rem; }
+.d-flex { display: flex; }
+
+// <summary> markers removed for custom disclosure widgets (make-batch dialog).
+.summary-plain { list-style: none; }
+
+// ── Letter/Queues::ShowBase ─────────────────────────────
+
+// Bare flex row, no gap — items are spaced with margins instead.
+.row-flex { display: flex; align-items: center; }
+
+// Letter-count filter bar above the queue's letter table.
+.letters-filter-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+
+// Small muted link ("× Clear filters").
+.clear-filters-link { color: var(--foreground2); font-size: 0.9em; }
+
+// Sidebar "Edit Queue" link that wraps a full-width button.
+.action-link-block { display: block; margin-top: 0.5rem; }
+
+// Per-state count row and its "Total" footer row in the stats sidebar.
+.stat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.25rem 0; }
+.stat-total-row { display: flex; align-items: center; justify-content: space-between; }
+
+// Small round user avatar in a mention/attribution line.
+.avatar-round { border-radius: 50%; }
+
+// JSON inspector <pre> in the admin_inspector details widget.
+.json-inspector { margin: 0; overflow-x: auto; font-size: 0.85em; }
+
+// ── Letter::Batches::Validate ────────────────────────────
+
+.validate-count-line { margin: 0 0 0.25rem; color: var(--foreground2); }
+.validate-error-heading { margin-top: 1.25rem; }
+.validate-error-label {
+  font-size: 0.85em;
+  color: var(--foreground2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.validate-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--background2);
+}
+.w-4rem { width: 4rem; }
+.mt-quarter { margin-top: 0.25rem; }
+.color-inherit { color: inherit; }
+
+// ── Letter::Batches new/edit forms ───────────────────────
+
+.csv-hint { margin: 0.5rem 0 0; font-size: 0.85em; }
+.form-actions-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
+
+// CSV sample cell in the field-mapping table; truncates long values.
+.truncate-20ch { max-width: 20ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+// ── Letter::Batches::Process ─────────────────────────────
+
+.mt-075 { margin-top: 0.75rem; }
+.field-hint { color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0; }
+
+// Postage/stamps-vs-indicia toggle row. `display` is set from JS
+// (cost_update_script) via the style attribute, so it stays inline —
+// this only carries the static layout.
+.actions-divider-row {
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--background2);
+}
+.cancel-link { color: var(--foreground2); align-self: center; }
+.postage-columns { display: flex; gap: 2rem; margin-top: 0.75rem; }
+.postage-radio-group { margin-top: 0.25rem; display: flex; gap: 1rem; }
+.postage-radio-label { display: flex; align-items: center; gap: 0.25rem; cursor: pointer; }
+
+// ── Letter::Batches::Show ────────────────────────────────
+
+.mb-075 { margin-bottom: 0.75rem; }
+.retry-actions-row { margin-top: 0.75rem; display: flex; gap: 0.5rem; }
+.print-subset-row { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.75rem; }
+.secondary-actions-col { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9em; }
+.action-row { display: flex; gap: 0.5rem; align-items: center; }
+.btn-link-block { display: block; text-align: center; text-decoration: none; }
+.my-quarter { margin: 0.25rem 0; }
+.reprint-toggle { color: var(--yellow); font-size: 0.85em; cursor: pointer; }
+.reprint-warning-box {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 4px;
+}
+.reprint-warning-title { margin: 0 0 0.5rem; color: var(--error-fg); font-weight: 600; }
+.reprint-warning-text { margin: 0 0 0.5rem; font-size: 0.85em; color: var(--error-fg); }
+.mono { font-family: monospace; }
+.text-unprinted { color: var(--background2); }
+.py-half { padding: 0.5rem 0; }
+.picklist-toolbar { display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem 0; font-size: 0.85em; }
+
+// Selection-preview text; `display` is toggled from JS (grid-picklist.js) via
+// the style attribute, so it stays inline — this only carries the static look.
+.picklist-preview {
+  margin: 0.5rem 0;
+  font-size: 0.85em;
+  color: var(--foreground2);
+  max-height: 6rem;
+  overflow-y: auto;
+  font-family: monospace;
+}

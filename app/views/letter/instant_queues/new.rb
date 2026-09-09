@@ -6,10 +6,10 @@ class Views::Letter::InstantQueues::New < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: letter_queues_path, style: "text-decoration: none; color: var(--foreground2);") { "← Queues" }
-        strong(style: "font-size: 1.15em;") { "New Instant Queue" }
+        a(href: letter_queues_path, class: "link-muted") { "← Queues" }
+        strong(class: "text-title") { "New Instant Queue" }
       end
     end
 
@@ -23,9 +23,9 @@ class Views::Letter::InstantQueues::New < Views::Base
         section do
           strong { "Help" }
           hr
-          div(class: "mt-half text-muted") do
-            p(style: "margin: 0 0 0.5rem;") { "Instant queues process letters individually via the API — each letter is printed and mailed as soon as it arrives." }
-            p(style: "margin: 0;") { "Configure a template, postage type, and payment account for automatic processing." }
+          div(class: "mt-half text-muted help-text") do
+            p { "Instant queues process letters individually via the API — each letter is printed and mailed as soon as it arrives." }
+            p { "Configure a template, postage type, and payment account for automatic processing." }
           end
         end
       end

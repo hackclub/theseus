@@ -39,7 +39,7 @@ class Views::Letter::Batches::Index < Views::Base
       end
 
       if state.present? || search.present? || user_id.present?
-        a(href: letter_batches_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
+        a(href: letter_batches_path, class: "text-muted nowrap") { "× Clear" }
       end
     end
   end
@@ -90,7 +90,7 @@ class Views::Letter::Batches::Index < Views::Base
   def render_batch_row(batch)
     tr do
       td do
-        a(href: letter_batch_path(batch), style: "text-decoration: none; font-weight: 500;") do
+        a(href: letter_batch_path(batch), class: "no-underline fw-medium") do
           if batch.user_facing_title.present?
             plain batch.user_facing_title
           else
@@ -98,7 +98,7 @@ class Views::Letter::Batches::Index < Views::Base
           end
         end
         if batch.user_facing_title.present?
-          span(class: "text-muted", style: "margin-left:0.5rem;font-size:0.85em;") { "##{batch.id}" }
+          span(class: "text-muted ml-half text-sm") { "##{batch.id}" }
         end
       end
       td(class: "text-muted") { batch.origin || "—" }
