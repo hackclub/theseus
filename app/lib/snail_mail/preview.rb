@@ -1,3 +1,5 @@
+require "ostruct"
+
 require "open3"
 require "rmagick"
 require "parallel"
