@@ -1,7 +1,7 @@
 <% content_for :title, "Customs Receipts" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
-  <strong style="font-size: 1.15em;">Generate Customs Receipt</strong>
+<div class="toolbar mb-0 no-border-bottom">
+  <strong class="text-title">Generate Customs Receipt</strong>
   <span class="spacer"></span>
 </div>
 
@@ -11,7 +11,7 @@
   <div class="mt-half">
     <%= form_with url: generate_customs_receipts_path, method: :get do |f| %>
       <div class="mb-1">
-        <label class="text-muted" style="display: block; margin-bottom: 0.25rem">ID or Tracking Number</label>
+        <label class="text-muted label-block">ID or Tracking Number</label>
         <input type="text" name="search" autofocus placeholder="ID (recASDF/pkg!SDfJK) or original tracking number (ASnnnnn...)" class="w-100">
       </div>
       <button type="submit" class="btn-success">⎘ Generate</button>
