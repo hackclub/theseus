@@ -119,9 +119,17 @@ class Letter::Batch < Batch
 
   alias_method :total_cost, :postage_cost
 
+  # What USPS actually took, read off the indicia rather than the letter's
+  # `indicia_state`. `postage` is only ever persisted by the trailing `save!`
+  # in USPS::Indicium#buy!, i.e. after USPS sold us postage, so a non-null
+  # postage IS the purchase. `indicia_state` is written afterwards and only by
+  # BatchProcessJob, so it's a strict subset: main-era letters (and anything
+  # bought through USPS::IndiciumPurchase) have a real indicium and a nil
+  # state. Filtering on the state made those read as $0 spent, which showed up
+  # as a full-batch "Overpaid" the moment the charge was backfilled.
   def actual_spent_cents
-    (letters.where(indicia_state: "purchased")
-      .joins(:usps_indicium)
+    (letters.joins(:usps_indicium)
+      .where.not(usps_indicia: { postage: nil })
       .sum("COALESCE(usps_indicia.postage, 0) + COALESCE(usps_indicia.fees, 0)") * 100).ceil
   end
 
