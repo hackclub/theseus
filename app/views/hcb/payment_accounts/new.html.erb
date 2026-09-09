@@ -1,9 +1,9 @@
 <% content_for :title, "Add HCB Organization" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= hcb_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">← HCB Accounts</a>
-    <strong style="font-size: 1.15em;">Add Organization</strong>
+    <a href="<%= hcb_payment_accounts_path %>" class="text-muted no-underline">← HCB Accounts</a>
+    <strong class="text-title">Add Organization</strong>
   </div>
 </div>
 
@@ -14,22 +14,22 @@
       <hr>
       <div class="mt-half text-muted">Choose which HCB organization to use for paying postage.</div>
       <% @organizations.each do |org| %>
-        <label class="pointer" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--background2)">
+        <label class="pointer org-picker-row">
           <%= f.radio_button :organization_id, org.id %>
-          <span style="font-weight: 500;"><%= org.name %></span>
+          <span class="fw-medium"><%= org.name %></span>
         </label>
       <% end %>
     </section>
 
-    <div style="display:flex;align-items:center;gap:0.5rem;justify-content: flex-end;">
-      <a href="<%= hcb_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">Cancel</a>
+    <div class="form-actions-end">
+      <a href="<%= hcb_payment_accounts_path %>" class="text-muted no-underline">Cancel</a>
       <button type="submit" class="btn-success">Add Organization</button>
     </div>
   <% end %>
 <% else %>
-  <section style="text-align: center; padding: 2rem;">
+  <section class="empty-state">
     <strong>No organizations available</strong>
-    <div class="text-muted" style="margin-top: 0.25rem;">You don't belong to any HCB organizations, or all your organizations are already linked.</div>
+    <div class="text-muted mt-quarter">You don't belong to any HCB organizations, or all your organizations are already linked.</div>
     <div class="mt-1"><a href="<%= hcb_payment_accounts_path %>" class="text-muted">← Back</a></div>
   </section>
 <% end %>

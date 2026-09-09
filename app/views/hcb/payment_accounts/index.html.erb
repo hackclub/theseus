@@ -2,7 +2,7 @@
 
 <div class="toolbar">
   <div class="flex-row">
-    <strong style="font-size: 1.15em;">Billing Profiles</strong>
+    <strong class="text-title">Billing Profiles</strong>
   </div>
   <span class="spacer"></span>
   <% if current_user.hcb_connected? %>
@@ -25,17 +25,17 @@
           <tbody>
             <% @payment_accounts.each do |account| %>
               <tr>
-                <td><code style="font-size:0.85em;"><%= account.public_id %></code></td>
-                <td><a href="<%= hcb_payment_account_path(account) %>" style="text-decoration: none;"><strong><%= account.organization_name %></strong></a></td>
+                <td><code class="text-sm"><%= account.public_id %></code></td>
+                <td><a href="<%= hcb_payment_account_path(account) %>" class="no-underline"><strong><%= account.organization_name %></strong></a></td>
                 <td class="text-muted"><%= account.created_at.strftime("%b %d, %Y") %></td>
               </tr>
             <% end %>
           </tbody>
         </table>
       <% else %>
-        <section style="text-align: center; padding: 2rem;">
+        <section class="empty-state">
           <strong>No organizations linked yet</strong>
-          <div class="text-muted" style="margin-top: 0.25rem;">Add one to start paying for postage.</div>
+          <div class="text-muted mt-quarter">Add one to start paying for postage.</div>
         </section>
       <% end %>
     </div>
@@ -46,8 +46,8 @@
         <hr>
         <div class="mt-half">
           <div class="flex-row">
-            <span style="color: var(--green);">✓</span>
-            <span style="font-weight: 500; color: var(--green);">HCB Connected</span>
+            <span class="text-success">✓</span>
+            <span class="fw-medium text-success">HCB Connected</span>
           </div>
           <div class="text-muted mt-half">
             Your account is linked to HCB. You can pay for postage using any of your organizations' funds.
@@ -57,8 +57,8 @@
     </div>
   </div>
 <% else %>
-  <section style="text-align: center; padding: 2rem; max-width: 30rem; margin: 2rem auto;">
-    <strong style="font-size: 1.15em;">🔗 Connect to HCB</strong>
+  <section class="hcb-connect-card">
+    <strong class="text-title">🔗 Connect to HCB</strong>
     <div class="text-muted mt-half mb-1">Link your HCB account to pay for postage directly from your organization's funds.</div>
     <a href="<%= new_hcb_oauth_connection_path %>"><button class="btn-success">Connect HCB Account</button></a>
   </section>

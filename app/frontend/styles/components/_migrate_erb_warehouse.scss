@@ -75,3 +75,15 @@
 
 // Right-aligned form action row (Cancel + submit).
 .form-actions-end { display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; }
+
+// One radio row in the "pick an HCB organization" list.
+.org-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--background2);
+}
+
+// Centered "connect to HCB" call-to-action card.
+.hcb-connect-card { text-align: center; padding: 2rem; max-width: 30rem; margin: 2rem auto; }

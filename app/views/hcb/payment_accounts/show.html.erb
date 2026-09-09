@@ -1,9 +1,9 @@
 <% content_for :title, "#{@payment_account.organization_name} — Billing Profile" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= hcb_payment_accounts_path %>" class="text-muted" style="text-decoration: none;">← Billing Profiles</a>
-    <strong style="font-size: 1.15em;"><%= @payment_account.organization_name %></strong>
+    <a href="<%= hcb_payment_accounts_path %>" class="text-muted no-underline">← Billing Profiles</a>
+    <strong class="text-title"><%= @payment_account.organization_name %></strong>
   </div>
   <span class="spacer"></span>
   <%= form_with url: hcb_payment_account_path(@payment_account), method: :delete, data: { turbo_confirm: "Remove this organization?" }, class: "form-inline" do %>
