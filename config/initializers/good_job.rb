@@ -1,7 +1,9 @@
 Rails.application.configure do
   config.good_job.preserve_job_records = true
   config.good_job.enable_cron = Rails.env.production?
-  config.good_job.execution_mode = Rails.env.production? ? :external : :async
+  # :async runs jobs on a background thread, which in the test env means outside
+  # the example's transaction — flaky at best. Tests run jobs inline instead.
+  config.good_job.execution_mode = Rails.env.production? ? :external : (Rails.env.test? ? :inline : :async)
 
   config.good_job.cron = {
     update_mailing_info: {
