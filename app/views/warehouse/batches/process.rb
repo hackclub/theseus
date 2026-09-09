@@ -8,10 +8,10 @@ class Views::Warehouse::Batches::Process < Views::Base
   end
 
   def view_template
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
-        strong(style: "font-size: 1.15em;") { "Process Warehouse Batch" }
+        a(href: warehouse_batch_path(@batch), class: "link-muted") { "← Batch ##{@batch.id}" }
+        strong(class: "text-title") { "Process Warehouse Batch" }
       end
     end
 

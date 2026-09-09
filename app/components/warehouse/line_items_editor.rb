@@ -17,16 +17,16 @@ class Components::Warehouse::LineItemsEditor < Components::Base
 
   def view_template
     div("x-data": alpine_data_json, "x-cloak": true) do
-      section("x-ref": "list", style: "padding:0;") do
+      section("x-ref": "list", class: "line-items-editor__list") do
         div("x-show": "visibleItems().length > 0") do
           table do
             thead do
               tr do
                 th { "Item" }
-                th(style: "width:8rem") { "Stock" }
-                th(style: "width:6rem") { "Qty" }
-                th(style: "width:8rem") { "Unit Cost" } if @show_unit_cost
-                th(style: "width:3rem")
+                th(class: "line-items-editor__col-stock") { "Stock" }
+                th(class: "line-items-editor__col-qty") { "Qty" }
+                th(class: "line-items-editor__col-unit-cost") { "Unit Cost" } if @show_unit_cost
+                th(class: "line-items-editor__col-actions")
               end
             end
             tbody do
@@ -39,7 +39,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
         render_empty_state
       end
 
-      div(style: "margin-top:0.75rem;") { add_item_panel }
+      div(class: "line-items-editor__add-panel") { add_item_panel }
       hidden_fields
       sku_filter_script
     end
@@ -58,7 +58,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
       td do
         strong("x-text": "item.sku_name")
         whitespace
-        code(class: "text-muted", style: "font-size:0.85em;", "x-text": "item.sku_code")
+        code(class: "text-muted text-sm", "x-text": "item.sku_code")
       end
       td do
         template_tag("x-if": "item.sku_stock != null") do
@@ -74,12 +74,12 @@ class Components::Warehouse::LineItemsEditor < Components::Base
           type: "number",
           "x-model.number": "item.quantity",
           min: 1,
-          style: "width:4rem;text-align:center;"
+          class: "line-items-editor__qty-input"
         )
       end
       if @show_unit_cost
         td do
-          div(style: "display:flex;align-items:center;gap:0.2rem;") do
+          div(class: "line-items-editor__cost-row") do
             span(class: "text-muted") { "$" }
             input(
               type: "number",
@@ -87,16 +87,15 @@ class Components::Warehouse::LineItemsEditor < Components::Base
               min: 0,
               step: "0.01",
               placeholder: "0.00",
-              style: "width:5rem;"
+              class: "line-items-editor__cost-input"
             )
           end
         end
       end
-      td(style: "text-align:right;") do
+      td(class: "text-right") do
         button(
           type: "button",
-          class: "btn-sm",
-          style: "color:var(--red);border-color:var(--red);",
+          class: "btn-sm line-items-editor__remove-btn",
           "aria-label": "Remove item",
           "@click": "removeItem(item._index)"
         ) { "✕" }
@@ -105,22 +104,22 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   end
 
   def render_empty_state
-    div("x-show": "visibleItems().length === 0", style: "text-align:center;padding:2rem 1rem;color:var(--foreground2);") do
-      div(style: "font-size:2em;margin-bottom:0.5rem;") { "📦" }
-      p(style: "margin:0;") do
+    div("x-show": "visibleItems().length === 0", class: "line-items-editor__empty") do
+      div(class: "line-items-editor__empty-icon") { "📦" }
+      p(class: "m-0") do
         strong { "No items added" }
       end
-      p(style: "margin:0.25rem 0 0;") { "Click the button below to add SKUs." }
+      p(class: "line-items-editor__empty-hint") { "Click the button below to add SKUs." }
     end
   end
 
   # SKU Select Panel
 
   def add_item_panel
-    details(class: "popover", id: "sku-select-panel", style: "position:relative;display:inline-block;") do
-      summary(tabindex: "0", class: "btn-success", style: "display:inline-flex;width:auto;") { "+ #{@add_button_text}" }
-      div(style: "position:absolute;left:0;top:100%;min-width:24rem;max-height:40rem;overflow-y:auto;background:Canvas;border:1px solid var(--background2);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:20;") do
-        div(style: "padding:0.5rem;position:sticky;top:0;background:Canvas;border-bottom:1px solid var(--background2);") do
+    details(class: "popover line-items-editor__add-details", id: "sku-select-panel") do
+      summary(tabindex: "0", class: "btn-success line-items-editor__add-btn") { "+ #{@add_button_text}" }
+      div(class: "line-items-editor__sku-panel") do
+        div(class: "line-items-editor__sku-filter-bar") do
           input(
             type: "text",
             placeholder: "Filter SKUs...",
@@ -131,7 +130,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
         end
         div(id: "sku-select-list") do
           if pending_sku_requests.any?
-            div(style: "padding:0.4rem 0.75rem;color:var(--yellow);font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;") do
+            div(class: "line-items-editor__pending-heading") do
               plain "Pending SKU Requests"
             end
             pending_sku_requests.each do |req|
@@ -143,16 +142,16 @@ class Components::Warehouse::LineItemsEditor < Components::Base
               ) do
                 strong { req.name }
                 whitespace
-                span(class: "badge badge-warning", style: "font-size:0.75em;") { "pending" }
+                span(class: "badge badge-warning line-items-editor__pending-badge") { "pending" }
                 if req.category.present?
-                  span(style: "color:var(--foreground2);font-size:0.85em;margin-left:0.5rem;") { req.category.humanize }
+                  span(class: "line-items-editor__pending-category") { req.category.humanize }
                 end
               end
             end
-            hr(style: "margin:0.25rem 0;")
+            hr(class: "line-items-editor__pending-divider")
           end
           skus_by_category.each do |category, category_skus|
-            div(style: "padding:0.4rem 0.75rem;color:var(--foreground2);font-size:0.8em;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;") do
+            div(class: "line-items-editor__category-heading") do
               plain (category || "uncategorized").to_s.humanize
             end
             category_skus.each do |sku|
@@ -164,9 +163,9 @@ class Components::Warehouse::LineItemsEditor < Components::Base
               ) do
                 strong { sku.name }
                 whitespace
-                code(style: "font-size:0.85em;color:var(--foreground2);") { sku.sku }
+                code(class: "text-sm text-muted") { sku.sku }
                 if (desc = sku_description_text(sku)).present?
-                  span(style: "color:var(--foreground2);font-size:0.85em;") { desc }
+                  span(class: "text-muted text-sm") { desc }
                 end
               end
             end

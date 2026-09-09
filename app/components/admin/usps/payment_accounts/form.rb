@@ -62,7 +62,7 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
         # ACH checkbox
         render Components::Shared::FormField.new(label: "ACH", input: false) do
           input(type: "hidden", name: "usps_payment_account[ach]", value: "0")
-          label(style: "display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;") do
+          label(class: "form-check-label--inline") do
             if @payment_account.ach?
               input(type: "checkbox", name: "usps_payment_account[ach]", value: "1", checked: true)
             else
@@ -72,7 +72,7 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
           end
         end
 
-        div(style: "padding-top:1rem;") do
+        div(class: "form-actions") do
           button(type: "submit", class: "btn-success") do
             plain(@payment_account.persisted? ? "Update Payment Account" : "Create Payment Account")
           end

@@ -1,2 +1,190 @@
 // inline-style migration shard: phlex_warehouse
 // area-specific classes only; shared utilities live in utils.scss
+
+// generic monospace text (repeated across sku codes)
+.mono { font-family: monospace; }
+
+// ── SKU requests ───────────────────────────────────────
+
+.sku-requests-empty { text-align: center; padding: 3rem 0; color: var(--foreground2); }
+.sku-request-edit-link { color: var(--foreground2); margin-right: 0.5rem; }
+.sku-request-returned-banner { margin-bottom: 1rem; border-color: var(--warning-border); background: var(--warning-bg); }
+.sku-request-returned-content { display: flex; align-items: flex-start; gap: 0.5rem; }
+.sku-request-returned-icon { font-size: 1.2em; }
+.sku-request-returned-notes { margin-top: 0.25rem; }
+.sku-request-summary-row { display: flex; gap: 2rem; flex-wrap: wrap; }
+.sku-request-review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+.sku-request-review-grid__full { grid-column: 1 / -1; }
+.sku-code-input { font-size: 1.1em; }
+.sku-request-review-hint { display: block; margin-top: 0.25rem; }
+.sku-request-unit-cost-row { display: flex; align-items: center; gap: 0.25rem; }
+.sku-request-approve-actions { margin-top: 1rem; display: flex; gap: 0.5rem; }
+.sku-request-return-row { display: flex; align-items: flex-end; gap: 0.5rem; }
+.sku-request-zenventory-box { margin-top: 0.75rem; padding: 0.75rem; background: var(--info-bg); border: 1px solid var(--info-border); border-radius: 4px; }
+.sku-request-zenventory-title { color: var(--info-fg); }
+.sku-request-zenventory-desc { margin: 0.25rem 0 0.75rem; color: var(--info-fg); font-size: 0.9em; }
+.sku-request-image { max-width: 100%; max-height: 300px; border-radius: 4px; }
+
+// ── SKUs index ─────────────────────────────────────────
+
+.sku-search-bar { margin-bottom: 0.75rem; }
+.sku-stats-bar { border-bottom: none; margin-bottom: 0.5rem; }
+.sku-view-toggle { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.stat-btn-reset { cursor: pointer; background: none; border: none; font: inherit; }
+.sku-category-summary { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+.sku-actions-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  min-width: 10rem;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 10;
+}
+
+// ── Batches ────────────────────────────────────────────
+
+.form-field-note { color: var(--foreground2); font-size: 0.85em; margin: 0; }
+.batch-new-actions { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+.batch-new-info-p { margin: 0 0 0.5rem; }
+.clear-filter-link { color: var(--foreground2); white-space: nowrap; }
+.batch-tag-chip { color: var(--foreground2); font-size: 0.8em; }
+.batch-processed-icon-box { text-align: center; padding: 1rem 0; color: var(--green); }
+.batch-processed-check { font-size: 2em; }
+
+// ── Approvals ──────────────────────────────────────────
+
+.approval-section { margin-bottom: 2rem; }
+.approval-empty { padding: 1.5rem; text-align: center; }
+
+// ── Tasks ──────────────────────────────────────────────
+
+.task-empty-check { font-size: 2em; color: var(--green); }
+.task-empty-note { margin: 0.25rem 0 0; }
+.task-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+
+// ── Admin forms ────────────────────────────────────────
+//
+// .form-actions is repeated verbatim across several admin (and warehouse)
+// forms as the submit-button wrapper — a solid candidate to promote to a
+// shared utility if more forms pick up the pattern.
+.form-actions { padding-top: 1rem; }
+.form-check-label--inline { display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+.admin-users-form-section { margin-top: 1.5rem; margin-bottom: 1rem; }
+.admin-users-form-section-title { margin: 0 0 0.5rem; }
+.admin-checkbox-field { margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+
+// ── Letters form ───────────────────────────────────────
+
+.letter-form-section { margin-bottom: 2rem; }
+.field-caption { display: block; color: var(--foreground2); font-size: 0.85em; margin-top: 0.25rem; }
+.field-hint-block { display: block; margin-top: 0.25rem; font-size: 0.85em; }
+.mailing-date-input { width: 10rem; }
+.mailing-date-quick-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.address-row { display: flex; gap: 1rem; }
+.flex-2 { flex: 2; }
+
+// ── Letter queues / instant queues ──────────────────────
+
+.field-note-sm { font-size: 0.9em; }
+
+// ── Action bar ─────────────────────────────────────────
+
+.dev-badge { color: var(--foreground2); font-size: 0.7em; margin-left: 0.15rem; }
+.actionbar-right { display: flex; gap: 1rem; align-items: center; }
+.impersonation-warning { color: var(--yellow); font-weight: bold; }
+.impersonation-stop-btn { background: none; border: none; color: var(--red); font: inherit; font-weight: bold; cursor: pointer; padding: 0; }
+.user-menu-panel {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  min-width: 8rem;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+.user-menu-username { color: var(--foreground2); padding-bottom: 0.5rem; }
+.user-menu-logout-btn { background: none; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0.5rem 0 0; text-align: left; text-decoration: none; }
+.tasks-badge-count { font-size: 0.8em; }
+
+// ── User picker ────────────────────────────────────────
+
+.user-picker-icon { width: 1rem; height: 1rem; vertical-align: middle; margin-right: 0.25rem; }
+.user-picker-menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Page toolbar / header / sidebar ─────────────────────
+
+.page-toolbar-title { font-size: 1.15em; flex-shrink: 0; }
+.sidebar-approvals-link { display: flex; justify-content: space-between; align-items: center; }
+.page-header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+.page-header-main { display: flex; flex-direction: column; }
+
+// ── Home page ──────────────────────────────────────────
+
+.home-section-header { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.025rem; color: var(--foreground2); }
+.home-stat-filters { margin-top: 0.25rem; }
+.quick-links-row { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1rem; }
+.quick-links-panel { min-width: 10rem; }
+.quick-links-title { margin: 0 0 0.25rem; }
+.quick-links-list { list-style: none; padding: 0; margin: 0; }
+
+// ── Warehouse SKU request form ──────────────────────────
+// (form-actions and label-block/text-muted are reused from earlier sections)
+
+// ── Line items editor ────────────────────────────────────
+
+.line-items-editor__list { padding: 0; }
+.line-items-editor__col-stock { width: 8rem; }
+.line-items-editor__col-qty { width: 6rem; }
+.line-items-editor__col-unit-cost { width: 8rem; }
+.line-items-editor__col-actions { width: 3rem; }
+.line-items-editor__add-panel { margin-top: 0.75rem; }
+.line-items-editor__qty-input { width: 4rem; text-align: center; }
+.line-items-editor__cost-row { display: flex; align-items: center; gap: 0.2rem; }
+.line-items-editor__cost-input { width: 5rem; }
+.line-items-editor__remove-btn { color: var(--red); border-color: var(--red); }
+.line-items-editor__empty { text-align: center; padding: 2rem 1rem; color: var(--foreground2); }
+.line-items-editor__empty-icon { font-size: 2em; margin-bottom: 0.5rem; }
+.line-items-editor__empty-hint { margin: 0.25rem 0 0; }
+.line-items-editor__add-details { display: inline-block; }
+.line-items-editor__add-btn { display: inline-flex; width: auto; }
+.line-items-editor__sku-panel {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  min-width: 24rem;
+  max-height: 40rem;
+  overflow-y: auto;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 20;
+}
+.line-items-editor__sku-filter-bar {
+  padding: 0.5rem;
+  position: sticky;
+  top: 0;
+  background: Canvas;
+  border-bottom: 1px solid var(--background2);
+}
+.line-items-editor__pending-heading { padding: 0.4rem 0.75rem; color: var(--yellow); font-size: 0.8em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.line-items-editor__pending-badge { font-size: 0.75em; }
+.line-items-editor__pending-category { color: var(--foreground2); font-size: 0.85em; margin-left: 0.5rem; }
+.line-items-editor__pending-divider { margin: 0.25rem 0; }
+.line-items-editor__category-heading { padding: 0.4rem 0.75rem; color: var(--foreground2); font-size: 0.8em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }

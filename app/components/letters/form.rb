@@ -17,8 +17,8 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
     form_with(model: letter, url: form_url) do |f|
       # Letter Specs
-      section(style: "margin-bottom:2rem;") do
-        h2(style: "margin:0;") { "Letter Specs" }
+      section(class: "letter-form-section") do
+        h2(class: "m-0") { "Letter Specs" }
         hr
         div(
           data_svelte_component: "letter-attributes-picker",
@@ -35,15 +35,15 @@ render Components::Shared::ErrorMessages.new(record: letter)
       end
 
       # Recipient Address
-      section(style: "margin-bottom:2rem;") do
-        h2(style: "margin:0;") { "Recipient Address" }
+      section(class: "letter-form-section") do
+        h2(class: "m-0") { "Recipient Address" }
         hr
         address_fields(f)
       end
 
       # Sender & Postage
-      section(style: "margin-bottom:2rem;") do
-        h2(style: "margin:0;") { "Sender & Postage" }
+      section(class: "letter-form-section") do
+        h2(class: "m-0") { "Sender & Postage" }
         hr
         sender_postage_fields(f)
       end
@@ -51,8 +51,8 @@ render Components::Shared::ErrorMessages.new(record: letter)
       postage_script
 
       # Extras
-      section(style: "margin-bottom:2rem;") do
-        h2(style: "margin:0;") { "Extras" }
+      section(class: "letter-form-section") do
+        h2(class: "m-0") { "Extras" }
         hr
         field_group(label: "Title", caption: "Optional — shown on the letter list") do
           input(
@@ -100,10 +100,10 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
   def field_group(label:, caption: nil, &block)
     div(class: "mb-1") do
-      tag(:label, style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { label }
+      tag(:label, class: "label-block text-muted") { label }
       yield
       if caption
-        span(style: "display:block;color:var(--foreground2);font-size:0.85em;margin-top:0.25rem;") { caption }
+        span(class: "field-caption") { caption }
       end
     end
   end
@@ -115,25 +115,25 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
   def mailing_date_field(f)
     div(class: "mb-1") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Mailing date" }
+      label(class: "label-block text-muted") { "Mailing date" }
       input(
         type: "date",
         name: "letter[mailing_date]",
         id: "letter_mailing_date",
         value: (letter.mailing_date || letter.default_mailing_date)&.iso8601,
         min: letter.new_record? ? Date.current.iso8601 : nil,
-        style: "width:10rem;"
+        class: "mailing-date-input"
       )
-      div(style: "display:flex;gap:0.5rem;margin-top:0.5rem;") do
+      div(class: "mailing-date-quick-actions") do
         button(
           type: "button",
           data_mailing_date: Date.tomorrow.iso8601,
-          style: "font-size:0.85em;"
+          class: "text-sm"
         ) { "Tomorrow" }
         button(
           type: "button",
           data_mailing_date: Date.current.next_occurring(:monday).iso8601,
-          style: "font-size:0.85em;"
+          class: "text-sm"
         ) { "Next Monday" }
       end
     end
@@ -157,13 +157,13 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
       div(id: form_id) do
         # Name row
-        div(style: "display:flex;gap:1rem;") do
-          div(style: "flex:1;") do
+        div(class: "address-row") do
+          div(class: "flex-1") do
             field_group(label: "First name") do
               input(type: "text", name: a.field_name(:first_name), value: a.object&.first_name, required: true, class: "w-100")
             end
           end
-          div(style: "flex:1;") do
+          div(class: "flex-1") do
             field_group(label: "Last name") do
               input(type: "text", name: a.field_name(:last_name), value: a.object&.last_name, class: "w-100")
             end
@@ -179,18 +179,18 @@ render Components::Shared::ErrorMessages.new(record: letter)
         end
 
         # City / State / Postal row
-        div(style: "display:flex;gap:1rem;") do
-          div(style: "flex:2;") do
+        div(class: "address-row") do
+          div(class: "flex-2") do
             field_group(label: "City") do
               input(type: "text", name: a.field_name(:city), value: a.object&.city, required: true, class: "w-100")
             end
           end
-          div(style: "flex:1;") do
+          div(class: "flex-1") do
             field_group(label: "State") do
               input(type: "text", name: a.field_name(:state), value: a.object&.state, required: true, class: "w-100")
             end
           end
-          div(style: "flex:1;") do
+          div(class: "flex-1") do
             field_group(label: "Postal code") do
               input(type: "text", name: a.field_name(:postal_code), value: a.object&.postal_code, required: true, class: "w-100")
             end
@@ -250,7 +250,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
           option(value: addr.id, selected: addr.id == letter.return_address_id) { addr.display_name }
         end
       end
-      span(style: "display:block;margin-top:0.25rem;font-size:0.85em;") do
+      span(class: "field-hint-block") do
         a(href: return_addresses_path(from_letter: true)) { "Manage return addresses" }
       end
     end
@@ -260,9 +260,9 @@ render Components::Shared::ErrorMessages.new(record: letter)
     end
 
     # Postage type (hidden by default, shown by JS for US addresses)
-    div(id: "postage-options", style: "display:none;margin-bottom:1rem;") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "Postage type" }
-      div(style: "display:flex;gap:1rem;") do
+    div(id: "postage-options", class: "mb-1", style: "display:none;") do
+      label(class: "label-block text-muted") { "Postage type" }
+      div(class: "address-row") do
         label do
           input(type: "radio", name: "letter[postage_type]", value: "stamps", checked: letter.postage_type == "stamps" || letter.postage_type.blank?)
           plain " Stamps"
@@ -272,7 +272,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
           plain " Indicia (Metered)"
         end
       end
-      span(style: "display:block;color:var(--foreground2);font-size:0.85em;margin-top:0.25rem;") { "Indicia is slightly cheaper for standard letters" }
+      span(class: "field-caption") { "Indicia is slightly cheaper for standard letters" }
     end
 
     # Mailer ID
@@ -346,7 +346,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
           option(value: tag, selected: letter.tags&.include?(tag)) { tag }
         end
       end
-      span(style: "display:block;color:var(--foreground2);font-size:0.85em;margin-top:0.25rem;") do
+      span(class: "field-caption") do
         plain "Select from common tags or create your own"
       end
     end

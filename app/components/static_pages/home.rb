@@ -36,13 +36,13 @@ class Components::StaticPages::Home < Components::Base
   end
 
   def section_header(text)
-    strong(style: "font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.025rem; color: var(--foreground2);") { text }
+    strong(class: "home-section-header") { text }
   end
 
   def needs_attention_section
     div(class: "mb-1") do
       section_header("Needs Attention")
-      div(class: "stat-filters", style: "margin-top: 0.25rem;") do
+      div(class: "stat-filters home-stat-filters") do
         if stats[:orders_to_dispatch].to_i > 0
           kpi_chip("To Dispatch", stats[:orders_to_dispatch], warehouse_orders_path(state: "draft"), "yellow")
         end
@@ -56,7 +56,7 @@ class Components::StaticPages::Home < Components::Base
   def this_week_section
     div(class: "mb-1") do
       section_header("This Week")
-      div(class: "stat-filters", style: "margin-top: 0.25rem;") do
+      div(class: "stat-filters home-stat-filters") do
         kpi_chip("In Transit", stats[:orders_in_transit], warehouse_orders_path(state: "dispatched"))
         kpi_chip("Shipped", stats[:orders_shipped_this_week], warehouse_orders_path(state: "mailed"))
         kpi_chip("Mailed", stats[:letters_mailed_this_week], letters_path(status: "mailed"))
@@ -75,7 +75,7 @@ class Components::StaticPages::Home < Components::Base
 
   def quick_links_section
     wh = policy(::Warehouse::Order.new).index?
-    div(style: "display:flex;gap:2rem;flex-wrap:wrap;margin-top:1rem") do
+    div(class: "quick-links-row") do
       if wh
         warehouse_links = [
           { label: "Orders", href: warehouse_orders_path, icon: "📦", check: -> { true } },
@@ -83,7 +83,7 @@ class Components::StaticPages::Home < Components::Base
           { label: "SKUs", href: warehouse_skus_path, icon: "📁", check: -> { policy(::Warehouse::SKU.new).index? } },
           { label: "Purchase Orders", href: warehouse_purchase_orders_path, icon: "📦", check: -> { policy(::Warehouse::PurchaseOrder.new).index? } }
         ]
-        div(style: "min-width:10rem") { link_panel("Warehouse", warehouse_links) }
+        div(class: "quick-links-panel") { link_panel("Warehouse", warehouse_links) }
       end
 
       mail_links = [
@@ -92,20 +92,20 @@ class Components::StaticPages::Home < Components::Base
         { label: "Mail Scanner", href: scanner_letters_path, icon: "↯", check: -> { policy(::Letter.new).index? } },
         { label: "Return Addresses", href: return_addresses_path, icon: "🏠", check: -> { policy(ReturnAddress.new).index? } }
       ]
-      div(style: "min-width:10rem") { link_panel("Mail", mail_links) }
+      div(class: "quick-links-panel") { link_panel("Mail", mail_links) }
 
       tools_links = [
         { label: "ID Lookup", href: public_ids_path, icon: "⌕", check: -> { true } },
         *(policy(:customs_receipt).index? ? [ { label: "Customs Receipts", href: customs_receipts_path, icon: "⎘", check: -> { true } } ] : []),
         { label: "Public Site", href: public_root_path, icon: "🌐", check: -> { true } }
       ]
-      div(style: "min-width:10rem") { link_panel("Tools", tools_links) }
+      div(class: "quick-links-panel") { link_panel("Tools", tools_links) }
     end
   end
 
   def link_panel(title, links)
-    h3(style: "margin:0 0 0.25rem") { title }
-    ul(style: "list-style:none;padding:0;margin:0") do
+    h3(class: "quick-links-title") { title }
+    ul(class: "quick-links-list") do
       links.each do |link|
         next unless link[:check].call
         li do

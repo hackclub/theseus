@@ -17,7 +17,7 @@ class Components::Shared::PageToolbar < Components::Base
 
   def view_template(&block)
     div(class: "toolbar") do
-      strong(style: "font-size: 1.15em; flex-shrink: 0;") { @title }
+      strong(class: "page-toolbar-title") { @title }
 
       if @jumpcode_path
         render Components::Shared::Jumpcode.new(path: @jumpcode_path)

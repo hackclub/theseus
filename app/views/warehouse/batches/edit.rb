@@ -14,10 +14,10 @@ class Views::Warehouse::Batches::Edit < Views::Base
   def view_template
     vite_javascript_tag("taggable")
 
-    div(class: "toolbar", style: "border-bottom: none; margin-bottom: 0;") do
+    div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
-        a(href: warehouse_batch_path(@batch), style: "text-decoration: none; color: var(--foreground2);") { "← Batch ##{@batch.id}" }
-        strong(style: "font-size: 1.15em;") { "Edit Warehouse Batch" }
+        a(href: warehouse_batch_path(@batch), class: "link-muted") { "← Batch ##{@batch.id}" }
+        strong(class: "text-title") { "Edit Warehouse Batch" }
         render Components::Shared::StatusBadge.new(status: @batch.aasm.current_state, type: :batch)
       end
     end
@@ -33,7 +33,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
             div(class: "mt-half") do
               if @allowed_templates.any?
                 div(class: "mb-1") do
-                  label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;", for: "batch_warehouse_template_id") { "Template" }
+                  label(class: "label-block text-muted", for: "batch_warehouse_template_id") { "Template" }
                   select(
                     name: "batch[warehouse_template_id]",
                     id: "batch_warehouse_template_id",
@@ -47,7 +47,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
               end
 
               div(class: "mb-1") do
-                label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Title" }
+                label(class: "label-block text-muted") { "Title" }
                 input(type: "text", name: "batch[warehouse_user_facing_title]", value: @batch.warehouse_user_facing_title, class: "w-100")
               end
             end
@@ -55,7 +55,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
           tag_picker(f)
 
-          div(style: "display:flex;align-items:center;gap:0.5rem;margin-top:1rem") do
+          div(class: "batch-new-actions") do
             a(href: warehouse_batch_path(@batch)) { "Cancel" }
             button(type: "submit", class: "btn-success") { "✓ Update Batch" }
           end
@@ -98,7 +98,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
             option(value: tag, selected: @batch.tags&.include?(tag)) { tag }
           end
         end
-        p(style: "color: var(--foreground2); font-size: 0.85em; margin: 0;") { "Select from common tags or create your own" }
+        p(class: "form-field-note") { "Select from common tags or create your own" }
       end
     end
   end

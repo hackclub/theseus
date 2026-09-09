@@ -20,13 +20,13 @@ render Components::Shared::ErrorMessages.new(record: queue)
 
       div(class: "form-grid mb-3") do
         div(class: "mb-1") do
-          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Name *" }
+          label(class: "label-block text-muted") { "Name *" }
           input(type: :text, name: "letter_instant_queue[name]", value: queue.name, required: true, class: "w-100")
         end
         div(class: "mb-1") do
-          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Display Title" }
+          label(class: "label-block text-muted") { "Display Title" }
           input(type: :text, name: "letter_instant_queue[user_facing_title]", value: queue.user_facing_title, class: "w-100")
-          span(class: "text-muted", style: "font-size: 0.9em;") { "Optional title shown to users" }
+          span(class: "text-muted field-note-sm") { "Optional title shown to users" }
         end
       end
 
@@ -74,9 +74,9 @@ render Components::Shared::ErrorMessages.new(record: queue)
       )
 
       div(class: "form-field-lg") do
-        label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Custom return address name" }
+        label(class: "label-block text-muted") { "Custom return address name" }
         input(type: :text, name: "letter_instant_queue[letter_return_address_name]", value: queue.letter_return_address_name, class: "w-100")
-        span(class: "text-muted", style: "font-size: 0.9em;") { "Leave blank to use the address' default name" }
+        span(class: "text-muted field-note-sm") { "Leave blank to use the address' default name" }
       end
 
       section_heading("Instant queue settings")
@@ -131,7 +131,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       # Admin slug
       admin_tool do
         div(class: "form-field-lg") do
-          label(style: "display: block; color: var(--foreground2); margin-bottom: 0.25rem;") { "Slug" }
+          label(class: "label-block text-muted") { "Slug" }
           input(type: :text, name: "letter_instant_queue[slug]", value: queue.slug, class: "w-100")
         end
       end

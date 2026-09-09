@@ -7,8 +7,8 @@ class Components::Shared::ActionBar < Components::Base
   register_value_helper :impersonating?
 
   def view_template
-    div(id: "theseus-actionbar", style: "display:flex;align-items:center;justify-content:space-between") do
-      div(style: "display:flex;gap:0.5rem;align-items:center") do
+    div(id: "theseus-actionbar") do
+      div(class: "flex-row") do
         # mobile sidebar toggle
         button(
           class: "sidebar-toggle btn-sm",
@@ -16,15 +16,15 @@ class Components::Shared::ActionBar < Components::Base
         ) { "☰" }
 
         # brand
-        a(href: root_path, style: "text-decoration:none;color:inherit") do
+        a(href: root_path, class: "link-reset") do
           b { "Theseus" }
           if Rails.env.development?
-            sup(style: "color:var(--foreground2);font-size:0.7em;margin-left:0.15rem") { "dev" }
+            sup(class: "dev-badge") { "dev" }
           end
         end
       end
 
-      div(style: "display:flex;gap:1rem;align-items:center") do
+      div(class: "actionbar-right") do
         render_user_context
         render_impersonation_banner if current_user && impersonating?
 
@@ -53,39 +53,39 @@ class Components::Shared::ActionBar < Components::Base
   end
 
   def render_impersonation_banner
-    span(style: "color: var(--yellow); font-weight: bold;") do
+    span(class: "impersonation-warning") do
       plain "⚠ Impersonating #{current_user.username}"
     end
 
-    form_with(url: stop_impersonating_path, method: :delete, style: "display:inline") do
+    form_with(url: stop_impersonating_path, method: :delete, class: "form-inline") do
       button(
         type: "submit",
-        style: "background:none;border:none;color:var(--red);font:inherit;font-weight:bold;cursor:pointer;padding:0;"
+        class: "impersonation-stop-btn"
       ) { "Stop" }
     end
   end
 
   def render_user_menu
-    details(class: "popover", style: "position:relative") do
+    details(class: "popover") do
       summary(tabindex: "0", class: "btn-sm") do
         plain impersonating? ? "👁" : "👤"
       end
 
-      div(style: "position:absolute;right:0;top:100%;min-width:8rem;background:Canvas;border:1px solid var(--background2);padding:0.5rem;display:flex;flex-direction:column") do
-        span(style: "color:var(--foreground2);padding-bottom:0.5rem") do
+      div(class: "user-menu-panel") do
+        span(class: "user-menu-username") do
           plain current_user.username
         end
         hr
-        button_to "Log out", signout_path, method: :delete, style: "background:none;border:none;color:inherit;cursor:pointer;font:inherit;padding:0.5rem 0 0;text-align:left;text-decoration:none;"
+        button_to "Log out", signout_path, method: :delete, class: "user-menu-logout-btn"
       end
     end
   end
 
   def render_tasks_badge
     count = Rails.cache.read("user_tasks/#{current_user.id}")&.size
-    a(href: tasks_path, style: "text-decoration:none;") do
+    a(href: tasks_path, class: "no-underline") do
       if count && count > 0
-        span(class: "badge badge-info", style: "font-size:0.8em;") { count.to_s }
+        span(class: "badge badge-info tasks-badge-count") { count.to_s }
       else
         button(class: "btn-sm") { "✓" }
       end

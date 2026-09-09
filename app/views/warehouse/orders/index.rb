@@ -85,7 +85,7 @@ class Views::Warehouse::Orders::Index < Views::Base
             th { "ID" }
             th { "Date" }
             th { "Recipient" }
-            th(style: "text-align: right;") { "Items" }
+            th(class: "text-right") { "Items" }
             th { "Status" }
           end
         end
@@ -93,19 +93,19 @@ class Views::Warehouse::Orders::Index < Views::Base
           warehouse_orders.each do |order|
             tr do
               td do
-                a(href: warehouse_order_path(order), style: "text-decoration: none;") { order.hc_id }
+                a(href: warehouse_order_path(order), class: "no-underline") { order.hc_id }
               end
               td(class: "text-muted") { plain order.created_at.strftime("%b %d") }
               td { plain order.address&.name_line || "—" }
-              td(style: "text-align: right;") { plain order.line_items.sum(&:quantity).to_s }
+              td(class: "text-right") { plain order.line_items.sum(&:quantity).to_s }
               td { status_badge(order) }
             end
           end
         end
       end
     else
-      section(style: "text-align: center; padding: 2rem;") do
-        h2(style: "margin: 0;") { "No orders found" }
+      section(class: "empty-state") do
+        h2(class: "m-0") { "No orders found" }
         if search.present? || state.present?
           p(class: "text-muted") { "Try adjusting your search or filters." }
         else

@@ -38,7 +38,7 @@ class Views::Warehouse::Batches::Index < Views::Base
       end
 
       if search.present? || user_id.present?
-        a(href: warehouse_batches_path, style: "color: var(--foreground2); white-space: nowrap;") { "× Clear" }
+        a(href: warehouse_batches_path, class: "clear-filter-link") { "× Clear" }
       end
     end
   end
@@ -87,13 +87,13 @@ class Views::Warehouse::Batches::Index < Views::Base
   def render_batch_row(batch)
     tr do
       td do
-        a(href: warehouse_batch_path(batch), style: "text-decoration: none;") do
+        a(href: warehouse_batch_path(batch), class: "no-underline") do
           plain "##{batch.id}"
         end
         if batch.tags.any?
           plain " "
           batch.tags.first(2).compact_blank.each do |t|
-            span(style: "color: var(--foreground2); font-size: 0.8em;") { t }
+            span(class: "batch-tag-chip") { t }
             plain " "
           end
         end
@@ -107,8 +107,8 @@ class Views::Warehouse::Batches::Index < Views::Base
   end
 
   def blankslate
-    section(style: "text-align: center; padding: 2rem;") do
-      h2(style: "margin: 0;") { "📦 No warehouse batches yet" }
+    section(class: "empty-state") do
+      h2(class: "m-0") { "📦 No warehouse batches yet" }
       p(class: "text-muted") { "Create a batch to ship items to multiple addresses at once." }
       a(href: new_warehouse_batch_path, class: "btn-success") { "+ New Batch" }
     end
