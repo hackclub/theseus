@@ -56,7 +56,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
         render Components::Shared::FormField.new(label: "Suggested SKU Code", name: "warehouse_sku_request[suggested_sku_code]",
           value: @sku_request.suggested_sku_code, hint: "Optional — czar will assign the final code")
 
-        div(style: "padding-top:1rem;") do
+        div(class: "form-actions") do
           button(type: "submit", class: "btn-success") do
             plain(@sku_request.persisted? ? "Update SKU Request" : "Create SKU Request")
           end
@@ -77,7 +77,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
   def category_select
     div(class: "mb-1") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
+      label(class: "label-block text-muted") do
         plain "Category"
         plain " *"
       end
@@ -96,12 +96,12 @@ class Components::Warehouse::SKURequests::Form < Components::Base
 
   def image_field
     div(class: "mb-1") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
+      label(class: "label-block text-muted") do
         plain "Photo of the item"
         plain " *"
       end
       input(type: "file", name: "warehouse_sku_request[image]", accept: "image/png,image/jpeg,image/gif,image/webp", required: !@sku_request.image.attached?)
-      small(class: "text-muted", style: "display:block;") do
+      small(class: "text-muted form-field-hint") do
         if @sku_request.persisted? && @sku_request.image.attached?
           plain "Current image attached. Upload a new one to replace."
         else

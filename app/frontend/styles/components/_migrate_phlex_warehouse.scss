@@ -142,3 +142,49 @@
 .quick-links-panel { min-width: 10rem; }
 .quick-links-title { margin: 0 0 0.25rem; }
 .quick-links-list { list-style: none; padding: 0; margin: 0; }
+
+// ── Warehouse SKU request form ──────────────────────────
+// (form-actions and label-block/text-muted are reused from earlier sections)
+
+// ── Line items editor ────────────────────────────────────
+
+.line-items-editor__list { padding: 0; }
+.line-items-editor__col-stock { width: 8rem; }
+.line-items-editor__col-qty { width: 6rem; }
+.line-items-editor__col-unit-cost { width: 8rem; }
+.line-items-editor__col-actions { width: 3rem; }
+.line-items-editor__add-panel { margin-top: 0.75rem; }
+.line-items-editor__qty-input { width: 4rem; text-align: center; }
+.line-items-editor__cost-row { display: flex; align-items: center; gap: 0.2rem; }
+.line-items-editor__cost-input { width: 5rem; }
+.line-items-editor__remove-btn { color: var(--red); border-color: var(--red); }
+.line-items-editor__empty { text-align: center; padding: 2rem 1rem; color: var(--foreground2); }
+.line-items-editor__empty-icon { font-size: 2em; margin-bottom: 0.5rem; }
+.line-items-editor__empty-hint { margin: 0.25rem 0 0; }
+.line-items-editor__add-details { display: inline-block; }
+.line-items-editor__add-btn { display: inline-flex; width: auto; }
+.line-items-editor__sku-panel {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  min-width: 24rem;
+  max-height: 40rem;
+  overflow-y: auto;
+  background: Canvas;
+  border: 1px solid var(--background2);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 20;
+}
+.line-items-editor__sku-filter-bar {
+  padding: 0.5rem;
+  position: sticky;
+  top: 0;
+  background: Canvas;
+  border-bottom: 1px solid var(--background2);
+}
+.line-items-editor__pending-heading { padding: 0.4rem 0.75rem; color: var(--yellow); font-size: 0.8em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.line-items-editor__pending-badge { font-size: 0.75em; }
+.line-items-editor__pending-category { color: var(--foreground2); font-size: 0.85em; margin-left: 0.5rem; }
+.line-items-editor__pending-divider { margin: 0.25rem 0; }
+.line-items-editor__category-heading { padding: 0.4rem 0.75rem; color: var(--foreground2); font-size: 0.8em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
