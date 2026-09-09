@@ -1,16 +1,16 @@
 <% content_for :title, "Problems" %>
 
 <div class="toolbar">
-  <strong style="font-size: 1.15em;">Problems</strong>
+  <strong class="text-title">Problems</strong>
   <%= render Components::Shared::Jumpcode.new(path: problems_path) %>
   <span class="spacer"></span>
 </div>
 
 <% if @blocking.empty? && @no_po_cost.empty? && @backordered.empty? && @stuck_orders.empty? %>
-  <div style="text-align: center; padding: 2rem;">
-    <div style="font-size: 2em; color: var(--green);">✓</div>
+  <div class="empty-state">
+    <div class="batch-processed-icon text-success">✓</div>
     <strong>No problems!</strong>
-    <p class="text-muted" style="margin: 0.25rem 0 0;">Go take a nap or something.</p>
+    <p class="text-muted hint-tight">Go take a nap or something.</p>
   </div>
 <% end %>
 
@@ -20,7 +20,7 @@
       <strong>Dispatch Blockers</strong>
       <span class="badge badge-danger">blocking</span>
     </div>
-    <p class="text-muted" style="margin: 0.25rem 0 0;">No cost data at all — orders with these SKUs will refuse to dispatch.</p>
+    <p class="text-muted hint-tight">No cost data at all — orders with these SKUs will refuse to dispatch.</p>
     <hr>
     <table class="mt-half">
       <thead>
@@ -34,7 +34,7 @@
       <tbody>
         <% @blocking.each do |sku| %>
           <tr>
-            <td><a href="<%= warehouse_sku_path(sku) %>" style="text-decoration: none;"><code><%= sku.sku %></code></a></td>
+            <td><a href="<%= warehouse_sku_path(sku) %>" class="no-underline"><code><%= sku.sku %></code></a></td>
             <td><%= sku.name %></td>
             <td><%= sku.in_stock || "—" %></td>
             <td>
@@ -55,7 +55,7 @@
       <strong>Missing PO Cost Data</strong>
       <span class="badge badge-warning">degraded</span>
     </div>
-    <p class="text-muted" style="margin: 0.25rem 0 0;">No <code>average_po_cost</code> from Zenventory — covered by fallback but should be fixed.</p>
+    <p class="text-muted hint-tight">No <code>average_po_cost</code> from Zenventory — covered by fallback but should be fixed.</p>
     <hr>
     <table class="mt-half">
       <thead>
@@ -70,7 +70,7 @@
       <tbody>
         <% @no_po_cost.each do |sku| %>
           <tr>
-            <td><a href="<%= warehouse_sku_path(sku) %>" style="text-decoration: none;"><code><%= sku.sku %></code></a></td>
+            <td><a href="<%= warehouse_sku_path(sku) %>" class="no-underline"><code><%= sku.sku %></code></a></td>
             <td><%= sku.name %></td>
             <td><%= number_to_currency(sku.declared_unit_cost) %></td>
             <td class="text-muted"><%= sku.declared_unit_cost_override&.positive? ? "override" : "???" %></td>
@@ -92,7 +92,7 @@
       <strong>Backordered Without Enough Inbound</strong>
       <span class="badge badge-warning">warning</span>
     </div>
-    <p class="text-muted" style="margin: 0.25rem 0 0;">Oversold and not enough inbound stock to cover the deficit.</p>
+    <p class="text-muted hint-tight">Oversold and not enough inbound stock to cover the deficit.</p>
     <hr>
     <table class="mt-half">
       <thead>
@@ -107,11 +107,11 @@
       <tbody>
         <% @backordered.each do |sku| %>
           <tr>
-            <td><a href="<%= warehouse_sku_path(sku) %>" style="text-decoration: none;"><code><%= sku.sku %></code></a></td>
+            <td><a href="<%= warehouse_sku_path(sku) %>" class="no-underline"><code><%= sku.sku %></code></a></td>
             <td><%= sku.name %></td>
-            <td class="fw-600" style="color: var(--red)"><%= sku.in_stock %></td>
+            <td class="fw-600 text-danger"><%= sku.in_stock %></td>
             <td><%= sku.inbound || 0 %></td>
-            <td class="fw-600" style="color: var(--red)"><%= sku.in_stock.abs - (sku.inbound || 0) %></td>
+            <td class="fw-600 text-danger"><%= sku.in_stock.abs - (sku.inbound || 0) %></td>
           </tr>
         <% end %>
       </tbody>
@@ -125,7 +125,7 @@
       <strong>Stuck Orders</strong>
       <span class="badge badge-danger">blocking</span>
     </div>
-    <p class="text-muted" style="margin: 0.25rem 0 0;">Dispatched 2+ weeks ago, never marked mailed. Possible Zenventory sync issue.</p>
+    <p class="text-muted hint-tight">Dispatched 2+ weeks ago, never marked mailed. Possible Zenventory sync issue.</p>
     <hr>
     <table class="mt-half">
       <thead>
@@ -140,10 +140,10 @@
       <tbody>
         <% @stuck_orders.each do |order| %>
           <tr>
-            <td><a href="<%= warehouse_order_path(order) %>" style="text-decoration: none;"><code><%= order.hc_id %></code></a></td>
+            <td><a href="<%= warehouse_order_path(order) %>" class="no-underline"><code><%= order.hc_id %></code></a></td>
             <td><%= order.recipient_email %></td>
             <td class="text-muted"><%= order.dispatched_at.strftime("%b %d") %></td>
-            <td style="color: var(--red);"><%= distance_of_time_in_words_to_now(order.dispatched_at) %></td>
+            <td class="text-danger"><%= distance_of_time_in_words_to_now(order.dispatched_at) %></td>
             <td>
               <% if order.zenventory_url %>
                 <a href="<%= order.zenventory_url %>" target="_blank">view ↗</a>
