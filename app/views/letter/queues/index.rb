@@ -122,10 +122,10 @@ class Views::Letter::Queues::Index < Views::Base
     @sorted_queues ||= letter_queues.sort_by do |q|
       if q.is_a?(::Letter::InstantQueue)
         printed = count_for(q, "printed")
-        printed > 0 ? [1, -printed] : [2, q.name.downcase]
+        printed > 0 ? [ 1, -printed ] : [ 2, q.name.downcase ]
       else
         queued = count_for(q, "queued")
-        queued > 0 ? [0, -queued] : [2, q.name.downcase]
+        queued > 0 ? [ 0, -queued ] : [ 2, q.name.downcase ]
       end
     end
   end
@@ -143,7 +143,7 @@ class Views::Letter::Queues::Index < Views::Base
   end
 
   def count_for(queue, state)
-    letter_counts[[queue.id, state]] || 0
+    letter_counts[[ queue.id, state ]] || 0
   end
 
   def fmt(n)

@@ -3,7 +3,7 @@ class ReworkBillingLedger < ActiveRecord::Migration[8.0]
     # ── ledger_entries: signed, immutable, with reversal provenance ──
     add_reference :ledger_entries, :reverses, null: true, foreign_key: { to_table: :ledger_entries }
     add_check_constraint :ledger_entries, "amount_cents <> 0", name: "ledger_entries_amount_nonzero"
-    add_index :ledger_entries, [:state, :hcb_transfer_id], name: "index_ledger_entries_unclaimed"
+    add_index :ledger_entries, [ :state, :hcb_transfer_id ], name: "index_ledger_entries_unclaimed"
 
     # ── hcb_transfers: the unit of external-call safety ──
     rename_column :hcb_transfers, :hcb_transaction_id, :remote_id
@@ -18,7 +18,7 @@ class ReworkBillingLedger < ActiveRecord::Migration[8.0]
     add_column :hcb_transfers, :next_attempt_at, :datetime
     add_column :hcb_transfers, :metadata, :jsonb, default: {}
     add_index :hcb_transfers, :idempotency_key, unique: true
-    add_index :hcb_transfers, [:state, :next_attempt_at]
+    add_index :hcb_transfers, [ :state, :next_attempt_at ]
 
     # ── batches: branch-only charge amount superseded by the ledger ──
     # (hcb_transfer_id on batches and usps_indicia predates the ledger and is

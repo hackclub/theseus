@@ -83,7 +83,7 @@ module Billing
   end
 
   def self.in_flight?(billing_profile)
-    billing_profile.hcb_transfers.where(state: [:pending, :unknown]).exists?
+    billing_profile.hcb_transfers.where(state: [ :pending, :unknown ]).exists?
   end
 
   # Never in production: mock mode completes transfers without moving money.

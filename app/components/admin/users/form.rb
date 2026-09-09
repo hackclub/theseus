@@ -85,13 +85,13 @@ class Components::Admin::Users::Form < Components::Base
   def mailer_id_options
     USPS::MailerId.all.map do |mid|
       label = mid.name.presence || mid.mid
-      [label, mid.id]
+      [ label, mid.id ]
     end
   end
 
   def return_address_options
     ReturnAddress.all.map do |addr|
-      [addr.display_name, addr.id]
+      [ addr.display_name, addr.id ]
     end
   end
 end

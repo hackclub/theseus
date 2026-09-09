@@ -46,7 +46,7 @@ Toolchest.configure do |config|
   end
 
   # Every token gets theseus:read so the agent can at least orient itself.
-  config.required_scopes = ["theseus:read"]
+  config.required_scopes = [ "theseus:read" ]
 
   # Consent screen shows checkboxes — users can uncheck scopes they don't want to grant.
   # theseus:read is required (always checked, can't uncheck — the agent needs orientation).
@@ -72,7 +72,7 @@ Toolchest.configure do |config|
     "warehouse_templates:read" => "View warehouse templates",
     "postage:read" => "View postage and indicia info",
     "warehouse_czar" => "Approve POs and dispatch to Zenventory",
-    "admin" => "Admin operations (user management, system config)",
+    "admin" => "Admin operations (user management, system config)"
   }
 
   WAREHOUSE_SCOPES = %w[
@@ -89,8 +89,8 @@ Toolchest.configure do |config|
   # - Admin scope only for admins
   config.allowed_scopes_for do |user, requested_scopes|
     allowed = requested_scopes.dup
-    allowed -= ["admin"] unless user.admin?
-    allowed -= ["warehouse_czar"] unless user.warehouse_czar? || user.admin?
+    allowed -= [ "admin" ] unless user.admin?
+    allowed -= [ "warehouse_czar" ] unless user.warehouse_czar? || user.admin?
     allowed -= WAREHOUSE_SCOPES unless user.can_warehouse? || user.admin?
     allowed
   end

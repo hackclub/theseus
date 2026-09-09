@@ -8,5 +8,5 @@
   title: letter.user_facing_title,
   created_at: letter.created_at,
   updated_at: letter.updated_at,
-  events: if_expand(:events) { letter.events },
+  events: if_expand(:events) { letter.events }
 }.compact

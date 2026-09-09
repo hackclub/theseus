@@ -4,17 +4,17 @@ class Views::Letter::Batches::Map < Views::Base
   include Phlex::Rails::Helpers::FormWith
 
   ADDRESS_FIELDS = [
-    ["", "— skip —"],
-    ["first_name", "First Name *"],
-    ["last_name", "Last Name *"],
-    ["line_1", "Address Line 1 *"],
-    ["line_2", "Address Line 2"],
-    ["city", "City *"],
-    ["state", "State / Province *"],
-    ["postal_code", "ZIP / Postal Code *"],
-    ["country", "Country"],
-    ["email", "Email"],
-    ["phone_number", "Phone"],
+    [ "", "— skip —" ],
+    [ "first_name", "First Name *" ],
+    [ "last_name", "Last Name *" ],
+    [ "line_1", "Address Line 1 *" ],
+    [ "line_2", "Address Line 2" ],
+    [ "city", "City *" ],
+    [ "state", "State / Province *" ],
+    [ "postal_code", "ZIP / Postal Code *" ],
+    [ "country", "Country" ],
+    [ "email", "Email" ],
+    [ "phone_number", "Phone" ]
   ].freeze
 
   REQUIRED = %w[first_name last_name line_1 city state postal_code].freeze
@@ -29,7 +29,7 @@ class Views::Letter::Batches::Map < Views::Base
     "zip" => "postal_code", "postal_code" => "postal_code", "zipcode" => "postal_code", "zip_code" => "postal_code", "postcode" => "postal_code",
     "country" => "country", "country_code" => "country",
     "email" => "email", "e_mail" => "email", "email_address" => "email",
-    "phone" => "phone_number", "phone_number" => "phone_number", "tel" => "phone_number",
+    "phone" => "phone_number", "phone_number" => "phone_number", "tel" => "phone_number"
   }.freeze
 
   def initialize(batch:, csv_headers:, sample_row:)

@@ -36,7 +36,7 @@ module CustomsReceipt
           name: "*mysterious ticking noise...*",
           quantity: 1,
           value: 29.95,
-        ),
+        )
       ],
       shipping_cost: 5.99,
       recipient_address: "ATTN: Director of Commercial Payment\nUS Postal Service\n475 L’Enfant Plz SW Rm 3436\nWashington DC 20260-4110\nUSA",

@@ -9,7 +9,7 @@ module SnailMail
         def view_template
           image(
             image_path("lilia-hcb-stickers-bg.png"),
-            at: [0, 288],
+            at: [ 0, 288 ],
             width: 432,
           )
 

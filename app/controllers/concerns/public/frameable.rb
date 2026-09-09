@@ -21,8 +21,8 @@ module Public::Frameable
 
     def add_framed_param(path)
       uri = URI.parse(path)
-      params = URI.decode_www_form(uri.query || '')
-      params << ['framed', @framed]
+      params = URI.decode_www_form(uri.query || "")
+      params << [ "framed", @framed ]
       uri.query = URI.encode_www_form(params)
       uri.to_s
     end

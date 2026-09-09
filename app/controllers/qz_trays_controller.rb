@@ -1,7 +1,7 @@
 class QZTraysController < ApplicationController
   skip_after_action :verify_authorized
-  skip_before_action :verify_authenticity_token, only: [:sign]
-  skip_before_action :authenticate_user!, only: [:test_print, :cert]
+  skip_before_action :verify_authenticity_token, only: [ :sign ]
+  skip_before_action :authenticate_user!, only: [ :test_print, :cert ]
   def cert
     send_data QZTrayService.certificate
   end
@@ -14,6 +14,6 @@ class QZTraysController < ApplicationController
   end
 
   def test_print
-    send_file(Rails.root.join('app', 'lib', 'test_print.pdf'), type: 'application/pdf', disposition: 'inline')
+    send_file(Rails.root.join("app", "lib", "test_print.pdf"), type: "application/pdf", disposition: "inline")
   end
 end

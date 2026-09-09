@@ -17,7 +17,6 @@ module SnailMail
         end
 
         def view_template
-
           image(
             image_path("stardance/astronomical.png"),
             at: [ -2.5, 295 ],
@@ -59,7 +58,6 @@ module SnailMail
 
           render_postage
         end
-
       end
     end
   end

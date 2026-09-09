@@ -4,6 +4,6 @@
     public_id: bp.public_id,
     organization_name: bp.organization_name,
     organization_id: bp.organization_id,
-    created_at: bp.created_at,
+    created_at: bp.created_at
   }
 end

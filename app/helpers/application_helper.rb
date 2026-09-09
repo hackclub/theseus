@@ -96,9 +96,9 @@ module ApplicationHelper
 
   def flash_scheme(type)
     case type.to_s
-    when 'notice', 'success'
+    when "notice", "success"
       :success
-    when 'alert', 'error'
+    when "alert", "error"
       :danger
     else
       :default
@@ -107,9 +107,9 @@ module ApplicationHelper
 
   def flash_icon(type)
     case type.to_s
-    when 'notice', 'success'
+    when "notice", "success"
       :'check-circle-fill'
-    when 'alert', 'error'
+    when "alert", "error"
       :'alert'
     else
       :info

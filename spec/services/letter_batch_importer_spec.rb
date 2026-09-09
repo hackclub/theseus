@@ -15,7 +15,7 @@ RSpec.describe LetterBatchImporter do
       "address" => "line_1",
       "city" => "city",
       "state" => "state",
-      "zip" => "postal_code",
+      "zip" => "postal_code"
     }
   end
 
@@ -36,7 +36,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          "Alice,Smith,123 Main St,Burlington,VT,05401",
+          "Alice,Smith,123 Main St,Burlington,VT,05401"
         ]
       end
 
@@ -52,7 +52,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          ",Smith,123 Main St,Burlington,VT,05401",
+          ",Smith,123 Main St,Burlington,VT,05401"
         ]
       end
 
@@ -67,7 +67,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          "Alice,Smith,,Burlington,VT,05401",
+          "Alice,Smith,,Burlington,VT,05401"
         ]
       end
 
@@ -82,7 +82,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          "Alice,Smith,123 Main St,Burlington,VT,",
+          "Alice,Smith,123 Main St,Burlington,VT,"
         ]
       end
 
@@ -97,7 +97,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          "Alice,Smith,123 Main St,Burlington,VT,5",
+          "Alice,Smith,123 Main St,Burlington,VT,5"
         ]
       end
 
@@ -112,7 +112,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          "Alice,Smith,123 Main St,Burlington,VT,05401",
+          "Alice,Smith,123 Main St,Burlington,VT,05401"
         ]
       end
 
@@ -131,7 +131,7 @@ RSpec.describe LetterBatchImporter do
           "first_name,last_name,address,city,state,zip",
           "Alice,Smith,123 Main St,Burlington,VT,05401",
           ",Smith,456 Oak Ave,Burlington,VT,05401",
-          "Bob,Jones,789 Elm St,Burlington,VT,05401",
+          "Bob,Jones,789 Elm St,Burlington,VT,05401"
         ]
       end
 
@@ -155,7 +155,7 @@ RSpec.describe LetterBatchImporter do
         [
           "first_name,last_name,address,city,state,zip",
           "Alice,Smith,123 Main St,Burlington,VT,05401",
-          "Bob,Jones,456 Oak Ave,Montpelier,VT,05602",
+          "Bob,Jones,456 Oak Ave,Montpelier,VT,05602"
         ]
       end
 
@@ -191,14 +191,14 @@ RSpec.describe LetterBatchImporter do
           "city" => "city",
           "state" => "state",
           "zip" => "postal_code",
-          "country" => "country",
+          "country" => "country"
         }
       end
 
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip,country",
-          "Alice,Smith,123 Main St,Burlington,VT,123,US",
+          "Alice,Smith,123 Main St,Burlington,VT,123,US"
         ]
       end
 
@@ -213,7 +213,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          "Alice,Smith,123 Main St,Burlington,VT,05401",
+          "Alice,Smith,123 Main St,Burlington,VT,05401"
         ]
       end
 
@@ -229,7 +229,7 @@ RSpec.describe LetterBatchImporter do
         [
           "first_name,last_name,address,city,state,zip",
           ",Smith,123 Main St,Burlington,VT,05401",
-          "Bob,Jones,456 Oak Ave,Burlington,VT,05401",
+          "Bob,Jones,456 Oak Ave,Burlington,VT,05401"
         ]
       end
 
@@ -249,7 +249,7 @@ RSpec.describe LetterBatchImporter do
         "first_name,last_name,address,city,state,zip",
         "Alice,Smith,123 Main St,Burlington,VT,05401",
         "Bob,Jones,,Burlington,VT,05401",
-        "Carol,Lee,789 Elm St,Burlington,VT,05401",
+        "Carol,Lee,789 Elm St,Burlington,VT,05401"
       ]
     end
 
@@ -275,7 +275,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip,favorite_color,shoe_size",
-          "Alice,Smith,123 Main St,Burlington,VT,05401,blue,9",
+          "Alice,Smith,123 Main St,Burlington,VT,05401,blue,9"
         ]
       end
 
@@ -294,14 +294,14 @@ RSpec.describe LetterBatchImporter do
           "city" => "city",
           "state" => "state",
           "zip" => "postal_code",
-          "extra_col" => "",
+          "extra_col" => ""
         }
       end
 
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip,extra_col",
-          "Alice,Smith,123 Main St,Burlington,VT,05401,ignored",
+          "Alice,Smith,123 Main St,Burlington,VT,05401,ignored"
         ]
       end
 
@@ -315,7 +315,7 @@ RSpec.describe LetterBatchImporter do
       let(:csv_rows) do
         [
           "first_name,last_name,address,city,state,zip",
-          "  Ali\u200Ece  , Sm\u200Bith , 123 Main St , Burlington , VT , 05401 ",
+          "  Ali\u200Ece  , Sm\u200Bith , 123 Main St , Burlington , VT , 05401 "
         ]
       end
 

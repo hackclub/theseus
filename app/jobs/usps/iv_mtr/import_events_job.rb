@@ -13,7 +13,7 @@ class USPS::IVMTR::ImportEventsJob < ApplicationJob
         # Extract the mailer ID from the IMB
         imb_mid = event["imbMid"]
         mailer_id = USPS::MailerId.find_by(mid: imb_mid)
-        
+
         # Find or create the event
         USPS::IVMTR::Event.find_or_create_from_payload(
           event,
@@ -21,7 +21,7 @@ class USPS::IVMTR::ImportEventsJob < ApplicationJob
           mailer_id.id
         )
       end
-      
+
       # Mark the batch as processed
       batch.update!(processed: true)
     end

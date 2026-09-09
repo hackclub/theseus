@@ -13,6 +13,6 @@ class CreateLedgerEntries < ActiveRecord::Migration[8.0]
 
     add_index :ledger_entries, :state
     add_index :ledger_entries, :category
-    add_index :ledger_entries, [:billing_profile_id, :state]
+    add_index :ledger_entries, [ :billing_profile_id, :state ]
   end
 end

@@ -4,5 +4,5 @@
   city: return_address.city,
   state: return_address.state,
   postal_code: return_address.postal_code,
-  country: return_address.country,
+  country: return_address.country
 }.compact_blank

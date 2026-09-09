@@ -11,7 +11,6 @@ class USPS::IVMTR::NotifySlackJob < ApplicationJob
   private
 
   def format_slack_message(event)
-
     e = event.hydrated
 
     [
@@ -22,9 +21,9 @@ class USPS::IVMTR::NotifySlackJob < ApplicationJob
                             "type": "mrkdwn",
                             "text": if event.bogon?
                               ":neocat_laptop_notice: hey <@U06QK6AG3RD>! we got a bogon! #{event.imb_serial_number} on #{event.mailer_id.id} @ <!date^#{event.happened_at.to_i}^{date_num} {time_secs}|#{event.happened_at.iso8601}>??"
-                            else
+                                    else
                               ":mailbox_with_mail: new IV event for *Letter #{event.letter.imb_serial_number}/#{event.letter.imb_rollover_count} on #{event.letter.usps_mailer_id.id}* @ <!date^#{event.happened_at.to_i}^{date_num} {time_secs}|#{event.happened_at.iso8601}>!"
-                            end
+                                    end
                         }
                     ]
                 },
@@ -51,12 +50,11 @@ class USPS::IVMTR::NotifySlackJob < ApplicationJob
                     "elements": [
                         {
                             "type": "plain_text",
-                            "text": "#{event.hydrated.opcode.machine_type} / #{event.hydrated.opcode.equipment_description} (iid #{event.public_id})",
+                            "text": "#{event.hydrated.opcode.machine_type} / #{event.hydrated.opcode.equipment_description} (iid #{event.public_id})"
                         }
                     ]
                 }
             ]
-    
   end
 
   def post_to_slack(message)
@@ -64,4 +62,4 @@ class USPS::IVMTR::NotifySlackJob < ApplicationJob
       defaults channel: "#ivmtr-feed", username: "iv-mtr"
     end.ping blocks: message
   end
-end 
+end

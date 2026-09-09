@@ -3,6 +3,6 @@
     id: mid.id,
     name: mid.name,
     mid: mid.mid,
-    crid: mid.crid,
+    crid: mid.crid
   }
 end

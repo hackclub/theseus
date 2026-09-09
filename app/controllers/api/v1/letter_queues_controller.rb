@@ -3,8 +3,8 @@ module API
     class LetterQueuesController < ApplicationController
       include AddressParameterParsing
 
-      before_action :set_letter_queue, only: [:show, :create_letter]
-      before_action :set_instant_letter_queue, only: [:create_instant_letter]
+      before_action :set_letter_queue, only: [ :show, :create_letter ]
+      before_action :set_instant_letter_queue, only: [ :create_instant_letter ]
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         render json: { error: "Queue not found" }, status: :not_found
@@ -13,7 +13,7 @@ module API
       rescue_from ActiveRecord::RecordInvalid do |e|
         render json: {
           error: "Validation failed",
-          details: e.record.errors.full_messages,
+          details: e.record.errors.full_messages
         }, status: :unprocessable_entity
       end
 
@@ -32,7 +32,7 @@ module API
         authorize @letter_queue, :queued?
         raise Pundit::NotAuthorizedError unless current_token&.pii?
 
-        @expand = [:label]
+        @expand = [ :label ]
 
         @letters = @letter_queue.letters.pending
       end
@@ -66,9 +66,9 @@ module API
         @expand << :label
         render :create_letter, status: :created
       rescue ActiveRecord::RecordNotFound
-        return render json: { error: "Queue not found" }, status: :not_found
+        render json: { error: "Queue not found" }, status: :not_found
       rescue ActiveRecord::RecordInvalid => e
-        return render json: { error: e.record.errors.full_messages.join(", ") }, status: :unprocessable_entity
+        render json: { error: e.record.errors.full_messages.join(", ") }, status: :unprocessable_entity
       end
 
       private
@@ -98,7 +98,7 @@ module API
             :city,
             :state,
             :postal_code,
-            :country,
+            :country
           ],
         )
       end

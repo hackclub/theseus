@@ -9,7 +9,7 @@ module SnailMail
       def view_template
         image(
           image_path("kestrel-mail-heidi.png"),
-          at: [107, 216],
+          at: [ 107, 216 ],
           width: 305,
         )
 

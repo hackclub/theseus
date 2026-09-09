@@ -4,7 +4,6 @@ module API
       def show
         @user = authorize current_user
       end
-
     end
   end
 end

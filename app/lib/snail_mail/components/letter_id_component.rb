@@ -10,14 +10,14 @@ module SnailMail
 
       def view_template
         return if options[:include_qr_code]
-        
+
         font(options[:font] || "f25") do
           text_box(
-            letter.public_id, 
-            at: [@x, @y], 
-            size: @size, 
-            overflow: :shrink_to_fit, 
-            valign: :top, 
+            letter.public_id,
+            at: [ @x, @y ],
+            size: @size,
+            overflow: :shrink_to_fit,
+            valign: :top,
             **options.except(:font)
           )
         end

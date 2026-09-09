@@ -64,7 +64,6 @@ class BatchProcessJob < ApplicationJob
     batch.update!(process_error: nil)
     batch.mark_processed! if batch.may_mark_processed?
     broadcast_done(batch)
-
   end
   private
 
@@ -88,7 +87,7 @@ class BatchProcessJob < ApplicationJob
 
     letters_to_buy = batch.letters.includes(:address, :usps_indicium)
                           .where(postage_type: "indicia")
-                          .where(indicia_state: [nil, "failed"])
+                          .where(indicia_state: [ nil, "failed" ])
     total = letters_to_buy.count
     return 0 if total == 0
 
@@ -237,7 +236,7 @@ class BatchProcessJob < ApplicationJob
   def broadcast_cell(batch, letter, state)
     icon = state == "purchased" ? "✓" : "x"
     Turbo::StreamsChannel.broadcast_replace_to(
-      [batch, :progress],
+      [ batch, :progress ],
       target: "cell-#{letter.id}",
       html: "<span id=\"cell-#{letter.id}\" class=\"batch-cell batch-cell-#{state}\" title=\"#{letter.public_id}\">[#{icon}]</span>"
     )
@@ -245,7 +244,7 @@ class BatchProcessJob < ApplicationJob
 
   def broadcast_letter_error(batch, letter, error)
     Turbo::StreamsChannel.broadcast_append_to(
-      [batch, :progress],
+      [ batch, :progress ],
       target: "batch-error-tbody",
       partial: "letter/batches/error_row",
       locals: { letter: letter, error_message: error }
@@ -254,7 +253,7 @@ class BatchProcessJob < ApplicationJob
 
   def broadcast_summary(batch, purchased:, total:, failed:)
     Turbo::StreamsChannel.broadcast_replace_to(
-      [batch, :progress],
+      [ batch, :progress ],
       target: "batch-summary",
       partial: "letter/batches/progress_summary",
       locals: { purchased: purchased, total: total, failed: failed }
@@ -263,7 +262,7 @@ class BatchProcessJob < ApplicationJob
 
   def broadcast_error_banner(batch, message)
     Turbo::StreamsChannel.broadcast_replace_to(
-      [batch, :progress],
+      [ batch, :progress ],
       target: "batch-error-banner",
       html: "<div id=\"batch-error-banner\" class=\"banner banner-error\"><strong>Error:</strong> #{ERB::Util.html_escape(message)}</div>"
     )
@@ -271,7 +270,7 @@ class BatchProcessJob < ApplicationJob
 
   def broadcast_done(batch)
     Turbo::StreamsChannel.broadcast_replace_to(
-      [batch, :progress],
+      [ batch, :progress ],
       target: "batch-actions",
       html: '<div id="batch-actions"><meta http-equiv="refresh" content="0"></div>'
     )

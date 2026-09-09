@@ -16,7 +16,7 @@ class TheseusToolbox < ApplicationToolbox
         warehouse_czar: user.warehouse_czar?,
         can_warehouse: user.can_warehouse?,
         can_use_indicia: user.can_use_indicia?,
-        can_impersonate_public: user.can_impersonate_public?,
+        can_impersonate_public: user.can_impersonate_public?
       },
       defaults: {
         home_return_address: user.home_return_address&.then { |ra|
@@ -24,15 +24,15 @@ class TheseusToolbox < ApplicationToolbox
         },
         home_mailer_id: user.home_mid&.then { |mid|
           { id: mid.id, name: mid.name, mid: mid.mid }
-        },
+        }
       },
       counts: {
         letters: user.letters.count,
         warehouse_orders: user.warehouse_orders.count,
         letter_queues: user.letter_queues.count,
         return_addresses: user.return_addresses.count,
-        billing_profiles: user.billing_profiles.count,
-      },
+        billing_profiles: user.billing_profiles.count
+      }
     }
   end
 
@@ -50,7 +50,7 @@ class TheseusToolbox < ApplicationToolbox
     data[:your_items][:letters] = {
       pending: pending_letters,
       printed: printed_letters,
-      actionable: pending_letters + printed_letters,
+      actionable: pending_letters + printed_letters
     }
 
     # Your draft warehouse orders
@@ -59,7 +59,7 @@ class TheseusToolbox < ApplicationToolbox
       dispatched_orders = user.warehouse_orders.where(aasm_state: "dispatched").count
       data[:your_items][:warehouse_orders] = {
         draft: draft_orders,
-        dispatched: dispatched_orders,
+        dispatched: dispatched_orders
       }
     end
 
@@ -73,7 +73,7 @@ class TheseusToolbox < ApplicationToolbox
       data[:warehouse_review] = {
         pos_awaiting_approval: submitted_pos,
         pos_approved_pending_dispatch: approved_pos,
-        pos_blocked_on_skus: blocked_pos,
+        pos_blocked_on_skus: blocked_pos
       }
     end
 
@@ -83,7 +83,7 @@ class TheseusToolbox < ApplicationToolbox
         backordered_skus: Warehouse::SKU.backordered.count,
         total_users: User.count,
         letters_mailed_today: Letter.where("mailed_at >= ?", Time.current.beginning_of_day).count,
-        orders_dispatched_today: Warehouse::Order.where("dispatched_at >= ?", Time.current.beginning_of_day).count,
+        orders_dispatched_today: Warehouse::Order.where("dispatched_at >= ?", Time.current.beginning_of_day).count
       }
     end
 

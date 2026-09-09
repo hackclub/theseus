@@ -1,7 +1,7 @@
 module API
   module V1
     class LettersController < ApplicationController
-      before_action :set_letter, only: [:show, :mark_printed, :mark_mailed]
+      before_action :set_letter, only: [ :show, :mark_printed, :mark_mailed ]
 
       def show
         authorize @letter

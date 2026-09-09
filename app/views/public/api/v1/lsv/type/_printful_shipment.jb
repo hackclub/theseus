@@ -12,5 +12,5 @@ slug = LSV.slug_for(printful_shipment)
   tracking_number: printful_shipment.tracking_number,
   tracking_link: printful_shipment.tracking_link,
   contents: printful_shipment.description&.map(&:strip),
-  order_id: printful_shipment.fields["%order:pretty_id"],
+  order_id: printful_shipment.fields["%order:pretty_id"]
 }.compact

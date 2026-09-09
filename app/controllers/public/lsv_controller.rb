@@ -24,7 +24,7 @@ module Public
       CustomsReceipt::MSRReceiptJob.perform_later(@msr.id)
 
       flash[:success] = "check your email in a little bit!"
-      return redirect_to show_lsv_path(slug: "msr", id: @msr.id)
+      redirect_to show_lsv_path(slug: "msr", id: @msr.id)
     rescue Norairrecord::RecordNotFoundError
       raise ActiveRecord::RecordNotFound
     end

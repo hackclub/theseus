@@ -4,10 +4,10 @@ namespace :usps do
     puts "Fetching USPS rates..."
 
     # Weight breakpoints for each category
-    letter_weights = [1.0, 2.0, 3.0, 3.5]
-    flat_weights = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0]
-    fcmi_letter_weights = [1.0, 2.0, 3.0, 3.5]
-    fcmi_flat_weights = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 12.0, 15.994]
+    letter_weights = [ 1.0, 2.0, 3.0, 3.5 ]
+    flat_weights = [ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0 ]
+    fcmi_letter_weights = [ 1.0, 2.0, 3.0, 3.5 ]
+    fcmi_flat_weights = [ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 12.0, 15.994 ]
 
     # Countries for FCMI rate groups
     fcmi_countries = { ca: "CA", mx: "MX", other: "GB" }
@@ -38,7 +38,7 @@ namespace :usps do
     intl_nm_surcharge = fetch_international_non_machinable_surcharge
 
     # Use the higher of the two (they should be the same, but just in case)
-    nm_surcharge = [domestic_nm_surcharge, intl_nm_surcharge].max
+    nm_surcharge = [ domestic_nm_surcharge, intl_nm_surcharge ].max
     puts "  Using non-machinable surcharge: $#{nm_surcharge}"
 
     puts "Generating pricing_engine.rb..."

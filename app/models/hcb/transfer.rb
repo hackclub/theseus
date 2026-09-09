@@ -55,14 +55,14 @@ class HCB::Transfer < ApplicationRecord
 
   enum :direction, {
     debit: 0,   # billing profile's org → theseus (a charge)
-    credit: 1,  # theseus → billing profile's org (a refund)
+    credit: 1  # theseus → billing profile's org (a refund)
   }
 
   enum :state, {
     pending: 0,
     completed: 1,
     failed: 2,
-    unknown: 3,
+    unknown: 3
   }
 
   validates :amount_cents, presence: true, numericality: { greater_than: 0, only_integer: true }

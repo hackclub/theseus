@@ -1,5 +1,5 @@
 class APIKeysController < ApplicationController
-  before_action :set_api_key, except: [:index, :new, :create]
+  before_action :set_api_key, except: [ :index, :new, :create ]
 
   def index
     authorize APIKey
@@ -14,7 +14,7 @@ class APIKeysController < ApplicationController
   end
 
   def create
-    permitted_params = [:name, :pii, :qz_only, :billing_profile_id]
+    permitted_params = [ :name, :pii, :qz_only, :billing_profile_id ]
     permitted_params << :may_impersonate if current_user.admin?
 
     key_params = params.require(:api_key).permit(*permitted_params)

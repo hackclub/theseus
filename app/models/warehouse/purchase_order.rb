@@ -188,13 +188,13 @@ class Warehouse::PurchaseOrder < ApplicationRecord
 
     self.status = if zenv_po[:deleted]
                     "deleted"
-                  elsif zenv_po[:completed]
+    elsif zenv_po[:completed]
                     "completed"
-                  elsif zenv_po[:draft]
+    elsif zenv_po[:draft]
                     "draft"
-                  else
+    else
                     "open"
-                  end
+    end
 
     save!
   end

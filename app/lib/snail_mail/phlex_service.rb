@@ -12,14 +12,14 @@ module SnailMail
       # Get page size from component class
       component_class = Components::Registry.get_component_class(template_name)
       page_size = Components::BaseComponent::SIZES[component_class.template_size] || Components::BaseComponent::SIZES[:standard]
-      
+
       # Create component
       component = Components::Registry.component_for(letter, options.merge(template: template_name))
-      
+
       # Use a simple wrapper approach - create the PDF and delegate methods to the component
       class << component
         attr_accessor :document
-        
+
         # Override method_missing to delegate to the document when needed
         def method_missing(method_name, *args, **kwargs, &block)
           if document && document.respond_to?(method_name)
@@ -28,23 +28,23 @@ module SnailMail
             super
           end
         end
-        
+
         def respond_to_missing?(method_name, include_private = false)
           (document && document.respond_to?(method_name, include_private)) || super
         end
       end
-      
+
       # Create Prawn document and set it on the component
       component.document = Prawn::Document.new(
         page_size: page_size,
         margin: options[:margin] || 0,
       )
-      
+
       # Call the component's template methods
       component.before_template if component.respond_to?(:before_template)
       component.view_template
       component.after_template if component.respond_to?(:after_template)
-      
+
       component.document
     end
 
@@ -56,7 +56,7 @@ module SnailMail
       validate_template_cycle(template_cycle) if template_cycle
 
       # If no template cycle is provided, use the default template
-      template_cycle ||= [default_template]
+      template_cycle ||= [ default_template ]
 
       # Get component classes once, avoid repeated lookups
       component_classes = template_cycle.map do |name|
@@ -79,11 +79,11 @@ module SnailMail
       letters.each_with_index do |letter, index|
         template_name = template_cycle[index % template_cycle.length]
         component = Components::Registry.component_for(letter, options.merge(template: template_name))
-        
+
         # Use the same method delegation approach as single label generation
         class << component
           attr_accessor :document
-          
+
           def method_missing(method_name, *args, **kwargs, &block)
             if document && document.respond_to?(method_name)
               document.send(method_name, *args, **kwargs, &block)
@@ -91,12 +91,12 @@ module SnailMail
               super
             end
           end
-          
+
           def respond_to_missing?(method_name, include_private = false)
             (document && document.respond_to?(method_name, include_private)) || super
           end
         end
-        
+
         # Start new page for subsequent letters
         if index > 0
           combined_pdf.start_new_page
@@ -153,7 +153,7 @@ module SnailMail
       raise Error, "Template cycle must be an array" unless template_cycle.is_a?(Array)
       raise Error, "Template cycle cannot be empty" if template_cycle.empty?
 
-      invalid_templates = template_cycle.reject { |name| templates_exist?([name]) }
+      invalid_templates = template_cycle.reject { |name| templates_exist?([ name ]) }
       if invalid_templates.any?
         raise Error, "Invalid templates in cycle: #{invalid_templates.join(", ")}"
       end

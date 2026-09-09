@@ -14,13 +14,13 @@ module SnailMail
 
         def view_template
           render_return_address(5, bounds.top - 45, 190, 90, size: 8, font: "f25")
-          
+
           image(
             image_path("athena/logo-stars.png"),
-            at: [5, bounds.top - 5],
+            at: [ 5, bounds.top - 5 ],
             width: 80,
           )
-          
+
           render_destination_address(
             104,
             196,
@@ -30,7 +30,7 @@ module SnailMail
           )
 
           render_speech_bubble(
-            bubble_position: [72, 202],
+            bubble_position: [ 72, 202 ],
             bubble_width: 306,
             bubble_height: 122,
             bubble_radius: 10,
@@ -42,7 +42,7 @@ module SnailMail
 
           image(
             image_path("athena/nyc-orphy.png"),
-            at: [13, 98],
+            at: [ 13, 98 ],
             height: 97,
           )
 

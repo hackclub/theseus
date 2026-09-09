@@ -432,18 +432,18 @@ Rails.application.routes.draw do
   scope path: "back_office" do
     get "kbar/search", to: "kbar#search"
 
-    resources :public_ids, only: [:index] do
+    resources :public_ids, only: [ :index ] do
       collection do
         post :lookup
       end
     end
 
     namespace :inspect do
-      resources :iv_mtr_events, only: [:show]
-      resources :indicia, only: [:show]
+      resources :iv_mtr_events, only: [ :show ]
+      resources :indicia, only: [ :show ]
     end
     scope :my do
-      resource :tasks, only: %i(show) do
+      resource :tasks, only: %i[show] do
         get :badge
         post :refresh
       end
@@ -452,7 +452,7 @@ Rails.application.routes.draw do
     get "/tags", to: "tags#index"
     get "/tags/:id", to: "tags#show", as: :tag_stats
     post "/tags/refresh", to: "tags#refresh", as: :refresh_tags
-    resources :customs_receipts, only: [:index] do
+    resources :customs_receipts, only: [ :index ] do
       collection do
         get :generate
       end
@@ -536,7 +536,7 @@ Rails.application.routes.draw do
     delete "/stop_impersonating", to: "sessions#stop_impersonating", as: :stop_impersonating
     get "/dev_login", to: "sessions#dev_login" if Rails.env.development?
 
-    resources :billing, only: [:index, :show], controller: "billing" do
+    resources :billing, only: [ :index, :show ], controller: "billing" do
       collection do
         post "transfers/:transfer_id/retry", action: :retry_transfer, as: :retry_transfer
       end
@@ -546,10 +546,10 @@ Rails.application.routes.draw do
     end
 
     namespace :hcb do
-      resource :oauth_connection, only: [:new] do
+      resource :oauth_connection, only: [ :new ] do
         get :callback, on: :collection
       end
-      resources :payment_accounts, only: [:index, :new, :create, :show]
+      resources :payment_accounts, only: [ :index, :new, :create, :show ]
     end
     namespace :warehouse do
       resources :templates
@@ -577,7 +577,7 @@ Rails.application.routes.draw do
           post :reject
         end
       end
-      resources :approvals, only: [:index]
+      resources :approvals, only: [ :index ]
       resources :batches do
         member do
           get "/process", to: "batches#process_form", as: :process_confirm
@@ -611,7 +611,7 @@ Rails.application.routes.draw do
 
   scope :my do
     get "/mail", to: "public/mail#index", as: :my_mail
-    resources :api_keys, module: :public, only: [:index, :new, :create, :show], as: :public_api_keys do
+    resources :api_keys, module: :public, only: [ :index, :new, :create, :show ], as: :public_api_keys do
       member do
         get "/revoke", to: "api_keys#revoke_confirm", as: :revoke_confirm
         post :revoke
@@ -627,14 +627,14 @@ Rails.application.routes.draw do
     end
   end
 
-  resources "letters", module: :public_, only: [:show] do
+  resources "letters", module: :public_, only: [ :show ] do
     member do
       post :mark_received, as: :public_mark_received
       post :mark_mailed, as: :public_mark_mailed
     end
   end
 
-  resource :map, only: [:show], module: :public
+  resource :map, only: [ :show ], module: :public
 
   get "/lsv/:slug/:id", to: "public/lsv#show", as: :show_lsv
   get "/lsv/msr/:id/customs_receipt", to: "public/lsv#customs_receipt", as: :msr_customs_receipt
@@ -682,10 +682,10 @@ Rails.application.routes.draw do
         scope "", module: :api do
           namespace :v1 do
             get :me, to: "users#me"
-            resources :letters, only: [:index, :show]
-            resources :packages, only: [:index, :show]
-            resources :mail, only: [:index]
-            resources :lsv, only: [:index]
+            resources :letters, only: [ :index, :show ]
+            resources :packages, only: [ :index, :show ]
+            resources :mail, only: [ :index ]
+            resources :lsv, only: [ :index ]
             get "/lsv/:slug/:id", to: "lsv#show", as: :lsv
           end
         end
@@ -709,7 +709,7 @@ Rails.application.routes.draw do
             post :mark_mailed
           end
         end
-        resources :letter_queues, only: [:index, :show, :create, :update, :destroy] do
+        resources :letter_queues, only: [ :index, :show, :create, :update, :destroy ] do
           collection do
             post "instant/:id", to: "letter_queues#create_instant_letter", as: :create_instant_letter
             get "instant/:id/queued", to: "letter_queues#queued", as: :show_queued
@@ -724,12 +724,12 @@ Rails.application.routes.draw do
           match :cert, via: :options, to: "qz_trays#preflight"
           match :sign, via: :options, to: "qz_trays#preflight"
         end
-        resources :tags, only: [:index, :show] do
+        resources :tags, only: [ :index, :show ] do
           member do
             get :letters
           end
         end
-        resources :warehouse_orders, only: [:show, :index, :create] do
+        resources :warehouse_orders, only: [ :show, :index, :create ] do
           collection do
             post "from_template/:template_id", to: "warehouse_orders#from_template", as: :from_template
           end
@@ -749,6 +749,6 @@ Rails.application.routes.draw do
   # root "posts#index"
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
-    resources :template_previews, only: [:index, :show], path: "previews/templates"
+    resources :template_previews, only: [ :index, :show ], path: "previews/templates"
   end
 end

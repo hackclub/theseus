@@ -23,7 +23,6 @@ module SnailMail
       end
 
       def font_path(font_name) = File.join(Rails.root, "app", "lib", "snail_mail", "assets", "fonts", font_name)
-
     end
   end
 end

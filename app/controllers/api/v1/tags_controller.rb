@@ -10,8 +10,8 @@ module API
       def show
         @tag = params[:id]
 
-        letter_query = Letter.with_any_tags([@tag]).where(aasm_state: [:mailed, :received])
-        wh_order_query = Warehouse::Order.with_any_tags([@tag]).where.not(aasm_state: [:draft, :errored])
+        letter_query = Letter.with_any_tags([ @tag ]).where(aasm_state: [ :mailed, :received ])
+        wh_order_query = Warehouse::Order.with_any_tags([ @tag ]).where.not(aasm_state: [ :draft, :errored ])
 
         if letter_query.none? && wh_order_query.none?
           render json: { error: "no letters or warehouse orders found for tag #{@tag}...?" }, status: :not_found
@@ -29,7 +29,7 @@ module API
             warehouse_order_postage_cost: wh_order_query.sum(:postage_cost),
             warehouse_order_labor_cost: wh_order_query.sum(:labor_cost),
             warehouse_order_contents_cost: wh_order_query.sum(:contents_cost),
-            warehouse_order_total_cost: wh_order_query.sum(:postage_cost) + wh_order_query.sum(:labor_cost) + wh_order_query.sum(:contents_cost),
+            warehouse_order_total_cost: wh_order_query.sum(:postage_cost) + wh_order_query.sum(:labor_cost) + wh_order_query.sum(:contents_cost)
           }
         end
 

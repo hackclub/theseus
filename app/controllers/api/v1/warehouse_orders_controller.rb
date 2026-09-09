@@ -3,7 +3,7 @@ module API
     class WarehouseOrdersController < ApplicationController
       include AddressParameterParsing
 
-      before_action :set_warehouse_order, only: [:show]
+      before_action :set_warehouse_order, only: [ :show ]
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         render json: { error: "Warehouse order not found" }, status: :not_found
@@ -12,7 +12,7 @@ module API
       rescue_from ActiveRecord::RecordInvalid do |e|
         render json: {
           error: "Validation failed",
-          details: e.record.errors.full_messages,
+          details: e.record.errors.full_messages
         }, status: :unprocessable_entity
       end
 
@@ -133,7 +133,7 @@ module API
         if profile.nil? && Flipper.enabled?(:require_billing_profile_2026_09_08)
           render json: {
             error: "billing_profile_required",
-            message: "A billing profile is required for warehouse orders. Set a default on your API key or pass billing_profile_id per request.",
+            message: "A billing profile is required for warehouse orders. Set a default on your API key or pass billing_profile_id per request."
           }, status: :unprocessable_entity
           return nil
         end
@@ -144,10 +144,10 @@ module API
       def contents_params
         return [] unless params[:contents].present?
 
-        params.expect(contents: [[:sku, :quantity]]).map.with_index do |content_item, index|
+        params.expect(contents: [ [ :sku, :quantity ] ]).map.with_index do |content_item, index|
           content_item.tap do |cp|
-            raise ActionController::ParameterMissing.new([:contents, index, :sku]) unless cp[:sku].present?
-            raise ActionController::ParameterMissing.new([:contents, index, :quantity]) unless cp[:quantity].present?
+            raise ActionController::ParameterMissing.new([ :contents, index, :sku ]) unless cp[:sku].present?
+            raise ActionController::ParameterMissing.new([ :contents, index, :quantity ]) unless cp[:quantity].present?
           end
         end
       end

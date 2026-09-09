@@ -19,7 +19,7 @@ module SnailMail
         def render_front
           image(
             image_path(IMAGE),
-            at: [410, bounds.bottom + 200],
+            at: [ 410, bounds.bottom + 200 ],
             valign: :top,
             width: 150
           )
@@ -45,12 +45,12 @@ module SnailMail
             tl;dr: TS is out of this world!
           EOM
 
-          font "gohu" do text_box text, at: [15, bounds.top-15], width: bounds.right - 200 - 20, size: 14 end
+          font "gohu" do text_box text, at: [ 15, bounds.top-15 ], width: bounds.right - 200 - 20, size: 14 end
 
           if (listing_url = meta["listing_url"]).present?
             SnailMail::QRCodeGenerator.generate_qr_code(self, listing_url, 460, 75, 50)
             font("gohu", size: 7) do
-              text_box("view project", at: [455, 20], width: 60, align: :center)
+              text_box("view project", at: [ 455, 20 ], width: 60, align: :center)
             end
           end
         end
@@ -60,7 +60,7 @@ module SnailMail
           img_info = Prawn::Images::PNG.new(File.binread(img_path))
           target_w = bounds.right + 5
           rendered_h = img_info.height * (target_w / img_info.width.to_f)
-          image(img_path, at: [-2.5, rendered_h], width: target_w)
+          image(img_path, at: [ -2.5, rendered_h ], width: target_w)
           super
         end
       end

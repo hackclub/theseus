@@ -27,7 +27,7 @@ module LSV
 
       def find_by_email(email)
         raise ArgumentError, "no email?" if email.nil? || email.empty?
-        records :filter => "LOWER(TRIM({#{self.email_column}}))='#{email.downcase}'"
+        records filter: "LOWER(TRIM({#{self.email_column}}))='#{email.downcase}'"
       end
     end
 
@@ -64,7 +64,7 @@ module LSV
         shipped: shipped?,
         icon:,
         description:,
-        source_record: source_url,
+        source_record: source_url
       }.compact.to_json
     end
 

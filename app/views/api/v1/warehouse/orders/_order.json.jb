@@ -24,6 +24,6 @@
       due_now_cents: quote.now_cents,
       billed_cents: order.total_billed_cents
     }
-  end)
+            end)
 
 }.compact_blank

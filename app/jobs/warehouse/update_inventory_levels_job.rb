@@ -32,7 +32,7 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
           sku: items.first[:sku],
           count: bad.length,
           total_qty: bad.sum { |item| item[:quantity] },
-          po_ids: bad.map { |i| i[:po_id] }.uniq,
+          po_ids: bad.map { |i| i[:po_id] }.uniq
         }
       end
 

@@ -30,14 +30,14 @@ module Shortcodes
         "ind" => { model: "USPS::Indicium", path: "/back_office/inspect/indicia" },
         "mtr" => { model: "USPS::IVMTR::Event", path: "/back_office/inspect/iv_mtr_events" },
         "wot" => { model: "Warehouse::Template", path: "/back_office/warehouse/templates" },
-        "bp" => { model: "BillingProfile", path: "/back_office/hcb/payment_accounts" },
+        "bp" => { model: "BillingProfile", path: "/back_office/hcb/payment_accounts" }
       }
     end
 
     def search_scopes(user = nil)
       scopes = [
         { key: "letters", label: "Letters", icon: "◇" },
-        { key: "orders", label: "Warehouse Orders", icon: "⊡" },
+        { key: "orders", label: "Warehouse Orders", icon: "⊡" }
       ]
       scopes << { key: "users", label: "Users", icon: "⊛" } if user&.admin?
       scopes
@@ -92,7 +92,7 @@ module Shortcodes
         Shortcode.new(code: "AUSR", label: "Admin Users", icon: "⊛", path: "/back_office/admin/users", gate: ADMIN),
         Shortcode.new(code: "ACTG", label: "Common Tags", icon: "⏿", path: "/back_office/admin/common_tags", gate: ADMIN),
         Shortcode.new(code: "AMID", label: "USPS Mailer IDs", icon: "⊚", path: "/back_office/admin/usps/mailer_ids", gate: ADMIN),
-        Shortcode.new(code: "AEPS", label: "USPS Payment Accts", icon: "⊛", path: "/back_office/admin/usps/payment_accounts", gate: ADMIN),
+        Shortcode.new(code: "AEPS", label: "USPS Payment Accts", icon: "⊛", path: "/back_office/admin/usps/payment_accounts", gate: ADMIN)
       ]
     end
 
@@ -106,7 +106,7 @@ module Shortcodes
       {
         shortcuts: all(user).map(&:to_h),
         prefixes: public_id_prefixes,
-        searchScopes: search_scopes(user),
+        searchScopes: search_scopes(user)
       }.to_json
     end
   end

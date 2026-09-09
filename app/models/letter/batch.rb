@@ -70,7 +70,7 @@ class Letter::Batch < Batch
   has_many :letters, dependent: :destroy
   belongs_to :mailer_id, class_name: "USPS::MailerId", foreign_key: "letter_mailer_id_id", optional: true
   belongs_to :letter_return_address, class_name: "ReturnAddress", optional: true
-  belongs_to :letter_queue, :class_name => "Letter::Queue", optional: true
+  belongs_to :letter_queue, class_name: "Letter::Queue", optional: true
 
   # Add ActiveStorage attachment for the batch label PDF
   has_one_attached :pdf_label
@@ -163,7 +163,6 @@ class Letter::Batch < Batch
       type = (region == :us ? us_postage_type : intl_postage_type) || letter.postage_type
       next unless type == "indicia"
       diff[region] += priced(letter) { indicia_price(letter, non_machinable) - letter.postage_for(postage_type: "stamps", non_machinable: non_machinable) } || 0
-
     end
   end
 
@@ -276,6 +275,6 @@ class Letter::Batch < Batch
 
   def address_fields
     # Only include address fields and rubber_stamps for letter mapping
-    ["rubber_stamps"]
+    [ "rubber_stamps" ]
   end
 end

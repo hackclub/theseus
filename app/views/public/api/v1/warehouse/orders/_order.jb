@@ -16,5 +16,5 @@
   carrier: order.carrier,
   service: order.service,
   weight: order.weight,
-  contents: order.surprise? ? [] : (render(order.line_items) || []),
+  contents: order.surprise? ? [] : (render(order.line_items) || [])
 }.compact

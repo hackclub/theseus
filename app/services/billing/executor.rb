@@ -49,7 +49,7 @@ class Billing::Executor
     HCBV4::NotFoundError,
     HCBV4::AuthenticationError,
     HCB::OauthConnectionInvalidatedError,
-    OAuth2::Error,
+    OAuth2::Error
   ].freeze
 
   INSUFFICIENT = /enough money|insufficient/i

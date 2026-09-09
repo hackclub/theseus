@@ -22,7 +22,7 @@
     country: @order.address.country,
     phone_number: @order.address.phone_number,
     email: @order.address.email,
-    formatted: @order.address.us_format.strip,
+    formatted: @order.address.us_format.strip
   },
 
   line_items: @order.line_items.map { |li|
@@ -31,7 +31,7 @@
       sku_id: li.sku_id,
       sku_code: li.sku&.sku,
       sku_name: li.sku&.name,
-      quantity: li.quantity,
+      quantity: li.quantity
     }
   },
 
@@ -39,7 +39,7 @@
     contents_cost: @order.contents_cost&.to_f,
     labor_cost: @order.labor_cost&.to_f,
     postage_cost: @order.postage_cost&.to_f,
-    total_cost: @order.total_cost&.to_f,
+    total_cost: @order.total_cost&.to_f
   },
 
   tracking: @order.tracking_number.present? ? {
@@ -47,7 +47,7 @@
     carrier: @order.carrier,
     service: @order.service,
     tracking_url: @order.tracking_url,
-    shipping_method: @order.pretty_via,
+    shipping_method: @order.pretty_via
   } : nil,
 
   billing_profile_id: @order.billing_profile&.public_id,
@@ -57,5 +57,5 @@
   updated_at: @order.updated_at.iso8601,
   dispatched_at: @order.dispatched_at&.iso8601,
   mailed_at: @order.mailed_at&.iso8601,
-  canceled_at: @order.canceled_at&.iso8601,
+  canceled_at: @order.canceled_at&.iso8601
 }

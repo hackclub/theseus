@@ -20,7 +20,7 @@ module SnailMail
         def render_front
           image(
             image_path("hackatime/7_day_streak.png"),
-            at: [10, bounds.top - 10],
+            at: [ 10, bounds.top - 10 ],
             height: bounds.top - 20,
           )
 
@@ -47,14 +47,14 @@ module SnailMail
             the Hackatime Advisory Council
           EOM
 
-          font "times" do text_box text, at: [280, bounds.top-15], width: bounds.right - 280 - 20 end
+          font "times" do text_box text, at: [ 280, bounds.top-15 ], width: bounds.right - 280 - 20 end
         end
 
         def render_back
           super
           image(
             image_path("hackatime/this_is_fine.png"),
-            at: [75, 130],
+            at: [ 75, 130 ],
             height: 140
           )
         end

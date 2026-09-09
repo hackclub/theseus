@@ -1,5 +1,5 @@
 {
   letters: expand(:path) do
     render @letters || []
-  end,
+  end
 }

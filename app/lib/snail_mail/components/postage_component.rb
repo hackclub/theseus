@@ -31,11 +31,11 @@ module SnailMail
         requested_stamps = format_stamps_text(stamps)
         postage_info = "i take #{ActiveSupport::NumberHelper.number_to_currency(postage_amount)} in postage, so #{requested_stamps}"
 
-        bounding_box([bounds.right - 55, bounds.top - 5], width: 50, height: 50) do
+        bounding_box([ bounds.right - 55, bounds.top - 5 ], width: 50, height: 50) do
           font("f25") do
             text_box(
               postage_info,
-              at: [1, 48],
+              at: [ 1, 48 ],
               width: 48,
               height: 45,
               size: 8,
@@ -48,16 +48,16 @@ module SnailMail
       end
 
       def render_generic_postage
-        bounding_box([bounds.right - 55, bounds.top - 5], width: 52, height: 50) do
+        bounding_box([ bounds.right - 55, bounds.top - 5 ], width: 52, height: 50) do
           font("f25") do
             text_box(
-              "please affix however much postage your post would like", 
-              at: [1, 48], 
-              width: 50, 
-              height: 45, 
-              size: 8, 
-              align: :center, 
-              min_font_size: 4, 
+              "please affix however much postage your post would like",
+              at: [ 1, 48 ],
+              width: 50,
+              height: 45,
+              size: 8,
+              align: :center,
+              min_font_size: 4,
               overflow: :shrink_to_fit
             )
           end

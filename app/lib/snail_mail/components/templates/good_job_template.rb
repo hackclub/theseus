@@ -9,7 +9,7 @@ module SnailMail
         end
 
         ADDRESS_FONT = "arial"
-        
+
         def self.template_name
           "good job"
         end
@@ -20,10 +20,10 @@ module SnailMail
 
         def render_front
           font "arial" do
-            text_box "good job", size: 99, at: [0, bounds.top], valign: :center, align: :center
+            text_box "good job", size: 99, at: [ 0, bounds.top ], valign: :center, align: :center
           end
 
-          text_box "from: @#{letter.metadata["gj_from"]}\n#{letter.metadata["gj_reason"]}", size: 18, at: [100, 100], align: :left
+          text_box "from: @#{letter.metadata["gj_from"]}\n#{letter.metadata["gj_reason"]}", size: 18, at: [ 100, 100 ], align: :left
         end
       end
     end

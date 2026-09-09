@@ -177,7 +177,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   end
 
   def sku_description_text(sku)
-    parts = [stock_display(sku), sku_cost_display(sku)].compact
+    parts = [ stock_display(sku), sku_cost_display(sku) ].compact
     parts.any? ? "  ·  #{parts.join('  ·  ')}" : ""
   end
 
@@ -331,10 +331,10 @@ class Components::Warehouse::LineItemsEditor < Components::Base
 
   def skus
     @skus ||= case @scope
-              when :all then ::Warehouse::SKU.order(:sku)
-              when :enabled then ::Warehouse::SKU.where(enabled: true).order(:sku)
-              else ::Warehouse::SKU.in_inventory.order(:sku)
-              end
+    when :all then ::Warehouse::SKU.order(:sku)
+    when :enabled then ::Warehouse::SKU.where(enabled: true).order(:sku)
+    else ::Warehouse::SKU.in_inventory.order(:sku)
+    end
   end
 
   def skus_by_category

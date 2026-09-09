@@ -35,7 +35,7 @@ module SnailMail
           render_qr_code(5, 65, 60)
 
           render_letter_id(10, 19, 10)
-          
+
           if letter.rubber_stamps.present?
             font("arial") do
               text_box(
@@ -49,7 +49,7 @@ module SnailMail
               )
             end
           end
-          
+
           render_postage
         end
       end

@@ -28,17 +28,17 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
     before do
       allow(Zenventory).to receive(:get_inventory).and_return([
         inventory_item("Har/Good/One", sellable: 50, inbound: 10, id: 1001),
-        inventory_item("Har/Good/Two", sellable: 25, inbound: 0, id: 1002),
+        inventory_item("Har/Good/Two", sellable: 25, inbound: 0, id: 1002)
       ])
 
       allow(Zenventory).to receive(:get_purchase_orders).and_return([
         po(id: 100, items: [
           po_item("Har/Good/One", quantity: 20, unit_cost: 10.0),
-          po_item("Har/Good/Two", quantity: 50, unit_cost: 5.0),
+          po_item("Har/Good/Two", quantity: 50, unit_cost: 5.0)
         ]),
         po(id: 101, items: [
-          po_item("Har/Good/One", quantity: 30, unit_cost: 15.0),
-        ]),
+          po_item("Har/Good/One", quantity: 30, unit_cost: 15.0)
+        ])
       ])
     end
 
@@ -75,7 +75,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
 
     before do
       allow(Zenventory).to receive(:get_inventory).and_return([
-        inventory_item("Har/Bad/Zero", sellable: 10, id: 2001),
+        inventory_item("Har/Bad/Zero", sellable: 10, id: 2001)
       ])
     end
 
@@ -83,8 +83,8 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
       before do
         allow(Zenventory).to receive(:get_purchase_orders).and_return([
           po(id: 200, items: [
-            po_item("Har/Bad/Zero", quantity: 23, unit_cost: 0),
-          ]),
+            po_item("Har/Bad/Zero", quantity: 23, unit_cost: 0)
+          ])
         ])
       end
 
@@ -103,11 +103,11 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
       before do
         allow(Zenventory).to receive(:get_purchase_orders).and_return([
           po(id: 200, items: [
-            po_item("Har/Bad/Zero", quantity: 10, unit_cost: 0),
+            po_item("Har/Bad/Zero", quantity: 10, unit_cost: 0)
           ]),
           po(id: 201, items: [
-            po_item("Har/Bad/Zero", quantity: 20, unit_cost: 8.0),
-          ]),
+            po_item("Har/Bad/Zero", quantity: 20, unit_cost: 8.0)
+          ])
         ])
       end
 
@@ -131,7 +131,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
     before do
       allow(Zenventory).to receive(:get_inventory).and_return([
         inventory_item("Har/No/Cost", sellable: 5, id: 3001),
-        inventory_item("Har/No/Cost2", sellable: 5, id: 3002),
+        inventory_item("Har/No/Cost2", sellable: 5, id: 3002)
       ])
       allow(Zenventory).to receive(:get_purchase_orders).and_return([])
     end
@@ -165,7 +165,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
     context "when there's no stock and nothing inbound" do
       before do
         allow(Zenventory).to receive(:get_inventory).and_return([
-          inventory_item("Har/No/Stock", sellable: 0, inbound: 0, id: 5001),
+          inventory_item("Har/No/Stock", sellable: 0, inbound: 0, id: 5001)
         ])
       end
 
@@ -178,7 +178,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
     context "when there's stock on hand" do
       before do
         allow(Zenventory).to receive(:get_inventory).and_return([
-          inventory_item("Har/No/Stock", sellable: 5, inbound: 0, id: 5002),
+          inventory_item("Har/No/Stock", sellable: 5, inbound: 0, id: 5002)
         ])
       end
 
@@ -193,7 +193,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
     context "when there's nothing on hand but a PO is inbound" do
       before do
         allow(Zenventory).to receive(:get_inventory).and_return([
-          inventory_item("Har/No/Stock", sellable: 0, inbound: 10, id: 5003),
+          inventory_item("Har/No/Stock", sellable: 0, inbound: 10, id: 5003)
         ])
       end
 
@@ -211,7 +211,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
 
     before do
       allow(Zenventory).to receive(:get_inventory).and_return([
-        inventory_item("Har/Default/Cost", sellable: 5, id: 6001),
+        inventory_item("Har/Default/Cost", sellable: 5, id: 6001)
       ])
     end
 
@@ -219,7 +219,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
       before do
         allow(Zenventory).to receive(:get_purchase_orders).and_return([])
         allow(Zenventory).to receive(:get_items).and_return([
-          { sku: "Har/Default/Cost", unitCost: 12.5 },
+          { sku: "Har/Default/Cost", unitCost: 12.5 }
         ])
       end
 
@@ -238,7 +238,7 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
       before do
         allow(Zenventory).to receive(:get_purchase_orders).and_return([])
         allow(Zenventory).to receive(:get_items).and_return([
-          { sku: "Har/Default/Cost", unitCost: 0 },
+          { sku: "Har/Default/Cost", unitCost: 0 }
         ])
       end
 
@@ -252,10 +252,10 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
     context "when there's already a PO-based average" do
       before do
         allow(Zenventory).to receive(:get_purchase_orders).and_return([
-          po(id: 600, items: [po_item("Har/Default/Cost", quantity: 10, unit_cost: 3.0)]),
+          po(id: 600, items: [ po_item("Har/Default/Cost", quantity: 10, unit_cost: 3.0) ])
         ])
         allow(Zenventory).to receive(:get_items).and_return([
-          { sku: "Har/Default/Cost", unitCost: 99.0 },
+          { sku: "Har/Default/Cost", unitCost: 99.0 }
         ])
       end
 
@@ -271,12 +271,12 @@ RSpec.describe Warehouse::UpdateInventoryLevelsJob, type: :job do
 
     before do
       allow(Zenventory).to receive(:get_inventory).and_return([
-        inventory_item("Har/Override", sellable: 1, id: 4001),
+        inventory_item("Har/Override", sellable: 1, id: 4001)
       ])
       allow(Zenventory).to receive(:get_purchase_orders).and_return([
         po(id: 400, items: [
-          po_item("Har/Override", quantity: 5, unit_cost: 0),
-        ]),
+          po_item("Har/Override", quantity: 5, unit_cost: 0)
+        ])
       ])
     end
 

@@ -20,8 +20,8 @@ class TagsController < ApplicationController
     month = params[:month]&.to_i
 
     # Base queries
-    letter_query = Letter.with_any_tags([tag]).where.not(aasm_state: "queued")
-    wh_order_query = Warehouse::Order.with_any_tags([tag])
+    letter_query = Letter.with_any_tags([ tag ]).where.not(aasm_state: "queued")
+    wh_order_query = Warehouse::Order.with_any_tags([ tag ])
 
     # Apply time period filter
     case time_period
@@ -60,7 +60,7 @@ class TagsController < ApplicationController
     @year = year
     @month = month
     @years = (2020..Time.current.year).to_a.reverse
-    @months = (1..12).map { |m| [Date::MONTHNAMES[m], m] }
+    @months = (1..12).map { |m| [ Date::MONTHNAMES[m], m ] }
   end
 
   def refresh

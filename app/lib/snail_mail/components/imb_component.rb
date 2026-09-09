@@ -16,7 +16,7 @@ module SnailMail
           font: "imb",
           size: 24,
           align: :center,
-          overflow: :shrink_to_fit,
+          overflow: :shrink_to_fit
         }
 
         opts = default_options.merge(options)
@@ -25,7 +25,7 @@ module SnailMail
         font(font_name) do
           text_box(
             generate_imb(letter),
-            at: [@x, @y],
+            at: [ @x, @y ],
             width: @width,
             disable_wrap_by_char: true,
             **opts,

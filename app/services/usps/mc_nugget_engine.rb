@@ -3,7 +3,7 @@ module USPS
     class << self
       FIXED_STAMPS = [
         { value: 0.28, name: "Additional Ounce" },
-        { value: 1.00, name: "$1" },
+        { value: 1.00, name: "$1" }
       ].freeze
 
       UNCOMMON_STAMPS = [
@@ -13,7 +13,7 @@ module USPS
         { value: 0.04, name: "$0.04" },
         { value: 0.03, name: "$0.03" },
         { value: 0.02, name: "$0.02" },
-        { value: 0.01, name: "$0.01" },
+        { value: 0.01, name: "$0.01" }
       ].freeze
 
       def common_stamps
@@ -21,7 +21,7 @@ module USPS
           { value: forever_stamp_value, name: "Forever" },
           { value: global_forever_value, name: "Global Forever" },
           { value: nonmachinable_stamp_value, name: "Non-machinable" },
-          *FIXED_STAMPS,
+          *FIXED_STAMPS
         ]
       end
 
@@ -45,7 +45,7 @@ module USPS
 
         if remaining == remaining.floor
           count = remaining.floor
-          return [{ name: "$1 stamp", count: count, value: 1.00 }] if count > 0
+          return [ { name: "$1 stamp", count: count, value: 1.00 } ] if count > 0
         end
 
         all_stamps = (common_stamps + UNCOMMON_STAMPS).sort_by { |s| -s[:value] }
@@ -66,7 +66,6 @@ module USPS
           { name: "#{name} stamp", count: stamps.count, value: stamps.first[:value] }
         end.sort_by { |s| -s[:count] }
       end
-
     end
   end
 end

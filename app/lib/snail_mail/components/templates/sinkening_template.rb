@@ -22,17 +22,17 @@ module SnailMail
           #   line_width: 3
           # )
           self.line_width = 3
-          stroke { rounded_rectangle([111, 189], 306, 122, 10) }
+          stroke { rounded_rectangle([ 111, 189 ], 306, 122, 10) }
 
 
           image(
             image_path("som/sinkening-boat.png"),
-            at: [20, 90],
+            at: [ 20, 90 ],
             width: 106.4,
             )
           image(
             image_path("som/waves.png"),
-            at: [0, 21],
+            at: [ 0, 21 ],
             width: 6 * 72,
             )
 

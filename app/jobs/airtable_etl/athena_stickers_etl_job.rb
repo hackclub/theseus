@@ -6,7 +6,7 @@ module AirtableETL
       aasm_state: "Theseus – Status",
       mailed_at: "Theseus – Mailed At",
       received_at: "Theseus – Received At",
-      postage: "Theseus – Postage Cost",
+      postage: "Theseus – Postage Cost"
     }
     BASE_KEY = "appwSxpT4lASsosUI"
     TABLE_NAME = "tblBOgmyC9RVK98wD"

@@ -12,7 +12,7 @@ module GeocodingService
                     addresstype: "office",
                     name: "Hack Club HQ",
                     display_name: "Hack Club HQ, 15, Falls Road, Shelburne Village Historic District, Shelburne, Chittenden County, Vermont, 05482, United States",
-                    boundingbox: ["44.3804965", "44.3805965", "-73.2271390", "-73.2270390"] }
+                    boundingbox: [ "44.3804965", "44.3805965", "-73.2271390", "-73.2270390" ] }
 
   class << self
     def geocode_address_model(address, exact: false)
@@ -22,7 +22,7 @@ module GeocodingService
           city: address.city,
           state: address.state,
           postalcode: address.postal_code,
-          country: address.country,
+          country: address.country
         }
 
         result = first_hit(params) || FIFTEEN_FALLS
@@ -39,7 +39,7 @@ module GeocodingService
           city: return_address.city,
           state: return_address.state,
           postalcode: return_address.postal_code,
-          country: return_address.country,
+          country: return_address.country
         }
         params[:street] = return_address.line_1 if exact
 
@@ -82,7 +82,7 @@ module GeocodingService
       # Reduce precision to ~100m resolution (3 decimal places)
       {
         lat: fuzzed_lat.round(3),
-        lon: fuzzed_lon.round(3),
+        lon: fuzzed_lon.round(3)
       }
     end
 
@@ -102,7 +102,7 @@ module GeocodingService
 
       response = conn.get("v1/geocode", {
         address: address,
-        key: ENV["HACKCLUB_GEOCODER_API_KEY"],
+        key: ENV["HACKCLUB_GEOCODER_API_KEY"]
       })
 
       if response.body.key?("error")
@@ -118,7 +118,7 @@ module GeocodingService
         lat: result["lat"].to_s,
         lon: result["lng"].to_s, # hc api returns "lng", we convert to "lon" for consistency with OSM
         display_name: result["formatted_address"],
-        place_id: result.dig("raw_backend_response", "results", 0, "place_id") || "dunno",
+        place_id: result.dig("raw_backend_response", "results", 0, "place_id") || "dunno"
       }
     rescue => e
       Rails.logger.error "Hack Club Geocoder request failed: #{e.message}"

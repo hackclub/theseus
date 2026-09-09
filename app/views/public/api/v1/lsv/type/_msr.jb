@@ -10,6 +10,5 @@ slug = LSV.slug_for(msr)
   title: msr.title_text,
   status: msr.status_text,
   tracking_number: msr.tracking_number,
-  tracking_link: msr.tracking_link,
+  tracking_link: msr.tracking_link
 }
-

@@ -27,4 +27,4 @@ end
 
 OmniAuth.config.path_prefix = "/back_office/auth"
 OmniAuth.config.request_validation_phase = OmniAuth::AuthenticityTokenProtection.new(key: :_csrf_token)
-OmniAuth.config.allowed_request_methods = [:post]
+OmniAuth.config.allowed_request_methods = [ :post ]

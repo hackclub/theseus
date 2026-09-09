@@ -18,7 +18,7 @@ module SnailMail
         def view_template
           image(
             image_path("kestrel-mail-heidi.png"),
-            at: [107, 216],
+            at: [ 107, 216 ],
             width: 305,
           )
 
@@ -41,7 +41,7 @@ module SnailMail
           render_qr_code(5, 65, 60)
           render_letter_id(10, 19, 10)
 
-          bounding_box [10, 220],
+          bounding_box [ 10, 220 ],
                         width: 220,
                         height: 120,
                         valign: :bottom do
@@ -53,7 +53,6 @@ module SnailMail
 
           render_postage
         end
-
       end
     end
   end

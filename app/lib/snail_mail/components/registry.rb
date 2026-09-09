@@ -27,10 +27,10 @@ module SnailMail
           component_class = if component_name
               # Find component by name
               all.find { |c| c.template_name.to_sym == component_name }
-            else
+          else
               # Use default
               default_component_class
-            end
+          end
 
           # Create a new instance of the component
           component_class ||= default_component_class
@@ -74,7 +74,7 @@ module SnailMail
               name: component_class.template_name.to_sym,
               size: component_class.template_size,
               description: component_class.template_description,
-              is_default: component_class.template_name == DEFAULT_TEMPLATE_NAME,
+              is_default: component_class.template_name == DEFAULT_TEMPLATE_NAME
             }
           end
         end

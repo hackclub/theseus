@@ -56,7 +56,7 @@ class Components::Shared::UserPicker < Components::Base
   end
 
   def sorted_users
-    @sorted_users ||= users.sort_by { |u| [u.id == current_user&.id ? 0 : 1, display_name(u).downcase] }
+    @sorted_users ||= users.sort_by { |u| [ u.id == current_user&.id ? 0 : 1, display_name(u).downcase ] }
   end
 
   def display_name(user)

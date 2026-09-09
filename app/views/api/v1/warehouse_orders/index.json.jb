@@ -1,3 +1,3 @@
 {
-  warehouse_orders: @warehouse_orders.map { |o| render o },
+  warehouse_orders: @warehouse_orders.map { |o| render o }
 }

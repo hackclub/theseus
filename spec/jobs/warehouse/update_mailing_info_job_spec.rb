@@ -35,7 +35,7 @@ RSpec.describe Warehouse::UpdateMailingInfoJob do
         weight: 3,
         tracking_number: "9400100000000000000000",
         shipped_date: "2026-09-09T12:00:00Z",
-        shipping_handling: "5.61",
+        shipping_handling: "5.61"
       }
     ])
   end

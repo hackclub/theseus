@@ -1,5 +1,5 @@
 class ReturnAddressesController < ApplicationController
-  before_action :set_return_address, only: [:edit, :update, :destroy]
+  before_action :set_return_address, only: [ :edit, :update, :destroy ]
 
   def index
     authorize ReturnAddress

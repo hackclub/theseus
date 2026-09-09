@@ -86,7 +86,7 @@ class Views::Letter::Batches::Process < Views::Base
           name: "batch[template_cycle]",
           id: "batch_template_cycle",
           multiple: true,
-          size: [8, (standard_templates.length + envelope_templates.length + 2)].min,
+          size: [ 8, (standard_templates.length + envelope_templates.length + 2) ].min,
           class: "multi-select-field"
         ) do
           if standard_templates.present?

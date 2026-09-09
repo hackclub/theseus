@@ -15,7 +15,7 @@ class Letter::PrintLabels
 
     loaded = letters.includes(:address, :usps_indicium, :usps_mailer_id, :return_address)
     template_cycle = (batch.process_options || {})["template_cycle"]
-    template_cycle = [SnailMail::PhlexService.templates_for_size(:standard).first].compact if template_cycle.blank?
+    template_cycle = [ SnailMail::PhlexService.templates_for_size(:standard).first ].compact if template_cycle.blank?
 
     pdf = SnailMail::PhlexService.generate_batch_labels(loaded, template_cycle: template_cycle)
     batch.audit!(:print_subset, count: loaded.size, reprint: @reprint)

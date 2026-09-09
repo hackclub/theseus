@@ -1,7 +1,7 @@
 class LettersToolbox < ApplicationToolbox
-  default_param :letter_id, :string, "Letter ID (e.g. ltr_...)", except: [:search, :create]
-  before_action :set_letter, except: [:search, :create]
-  before_action :require_letter_owner!, only: [:update, :generate_label, :mark_printed, :mark_mailed, :mark_received]
+  default_param :letter_id, :string, "Letter ID (e.g. ltr_...)", except: [ :search, :create ]
+  before_action :set_letter, except: [ :search, :create ]
+  before_action :require_letter_owner!, only: [ :update, :generate_label, :mark_printed, :mark_mailed, :mark_received ]
 
   tool "Search physical letters by query, status, or both. Returns paginated list with address, postage, and state", access: :read do
     param :query, :string, "Full-text search across title, recipient, address", optional: true
@@ -35,7 +35,7 @@ class LettersToolbox < ApplicationToolbox
     param :user_facing_title, :string, "Display title for the letter", optional: true
     param :return_address_id, :integer, "ID of the sender return address (use return_addresses_list to find)"
     param :recipient_email, :string, "Recipient email for tracking notifications", optional: true
-    param :tags, [:string], "Tags for categorization", optional: true
+    param :tags, [ :string ], "Tags for categorization", optional: true
     param :address, :object, "Recipient address" do
       param :first_name, :string, "First name"
       param :last_name, :string, "Last name", optional: true
@@ -74,7 +74,7 @@ class LettersToolbox < ApplicationToolbox
     param :user_facing_title, :string, "Display title for the letter", optional: true
     param :return_address_id, :integer, "ID of the sender return address (use return_addresses_list to find)", optional: true
     param :recipient_email, :string, "Recipient email for tracking notifications", optional: true
-    param :tags, [:string], "Tags for categorization", optional: true
+    param :tags, [ :string ], "Tags for categorization", optional: true
     param :address, :object, "Recipient address (updates existing)", optional: true do
       param :first_name, :string, "First name", optional: true
       param :last_name, :string, "Last name", optional: true
@@ -87,7 +87,6 @@ class LettersToolbox < ApplicationToolbox
     end
   end
   def update
-
     # Auto-set postage type if changing return address to non-US
     if params[:return_address_id].present?
       ra = ReturnAddress.find(params[:return_address_id])
@@ -109,7 +108,7 @@ class LettersToolbox < ApplicationToolbox
       render json: {
         letter_id: @letter.public_id,
         status: "label_generated",
-        label_url: Rails.application.routes.url_helpers.rails_blob_path(@letter.label, only_path: true),
+        label_url: Rails.application.routes.url_helpers.rails_blob_path(@letter.label, only_path: true)
       }
     else
       render_error "Failed to generate label"
@@ -122,7 +121,7 @@ class LettersToolbox < ApplicationToolbox
     render json: {
       letter_id: @letter.public_id,
       state: @letter.aasm_state,
-      printed_at: @letter.printed_at&.iso8601,
+      printed_at: @letter.printed_at&.iso8601
     }
   end
 
@@ -133,7 +132,7 @@ class LettersToolbox < ApplicationToolbox
     render json: {
       letter_id: @letter.public_id,
       state: @letter.aasm_state,
-      mailed_at: @letter.mailed_at&.iso8601,
+      mailed_at: @letter.mailed_at&.iso8601
     }
   end
 
@@ -143,7 +142,7 @@ class LettersToolbox < ApplicationToolbox
     render json: {
       letter_id: @letter.public_id,
       state: @letter.aasm_state,
-      received_at: @letter.received_at&.iso8601,
+      received_at: @letter.received_at&.iso8601
     }
   end
 

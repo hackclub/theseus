@@ -189,9 +189,9 @@ class Views::Letter::Queues::ShowBase < Views::Base
         is_active = status == state
         href = if is_active
                  queue_show_path(search: search)
-               else
+        else
                  queue_show_path(search: search, status: state)
-               end
+        end
 
         if is_active
           a(href: href, style: "text-decoration: none;") do
@@ -257,7 +257,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
         a(href: letter_path(letter), style: "text-decoration: none;") { letter.public_id }
       end
       td do
-        name = [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ")
+        name = [ letter.address&.first_name, letter.address&.last_name ].compact_blank.join(" ")
         plain name.presence || "—"
       end
       td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }

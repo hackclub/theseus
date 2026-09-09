@@ -21,10 +21,9 @@ module SnailMail
 
 
         def view_template
-
           image(
             image_path("som/explorers.png"),
-            at: [189-30, 115+30],
+            at: [ 189-30, 115+30 ],
             width: 300,
             )
           # Render return address
@@ -46,7 +45,7 @@ module SnailMail
           render_qr_code(5, 45, 40)
           render_letter_id(10, 19, 10)
 
-            bounding_box [10, 235 ],
+            bounding_box [ 10, 235 ],
                          width: 100,
                          height: 168,
                          valign: :bottom do
@@ -54,15 +53,14 @@ module SnailMail
               font_size(7) { font("comic") { text "it's here!" } }
               text "contents:", style: :bold
               font_size 6.2
-              text letter.rubber_stamps.gsub(", ","\n") || ""
+              text letter.rubber_stamps.gsub(", ", "\n") || ""
             end
-          
+
 
 
 
           render_postage
         end
-
       end
     end
   end

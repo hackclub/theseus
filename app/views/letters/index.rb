@@ -69,7 +69,7 @@ class Views::Letters::Index < Views::Base
         { label: "Pending", count: counts[:pending], color: "yellow", param: "pending" },
         { label: "Printed", count: counts[:printed], param: "printed" },
         { label: "Mailed", count: counts[:mailed], color: "blue", param: "mailed" },
-        { label: "Received", count: counts[:received], color: "green", param: "received" },
+        { label: "Received", count: counts[:received], color: "green", param: "received" }
       ],
       active: status,
       base_path: ->(params = {}) { letters_path(origin: origin, search: search, user_id: user_id, **params) },

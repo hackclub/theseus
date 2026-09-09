@@ -39,7 +39,7 @@ class Views::ReturnAddresses::Index < Views::Base
                 render_badges(address)
               end
               td(class: "text-muted") do
-                parts = [address.line_1]
+                parts = [ address.line_1 ]
                 parts << address.line_2 if address.line_2.present?
                 plain parts.join(", ")
               end

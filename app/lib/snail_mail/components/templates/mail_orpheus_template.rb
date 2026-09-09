@@ -9,7 +9,7 @@ module SnailMail
         def view_template
           image(
             image_path("eleeza-mail-orpheus.png"),
-            at: [320, 113],
+            at: [ 320, 113 ],
             width: 106.4,
           )
 

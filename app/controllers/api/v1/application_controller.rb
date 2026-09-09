@@ -26,11 +26,11 @@ module API
       end
 
       rescue_from ActiveRecord::RecordNotUnique do |e|
-        render json: { error: "idempotency_error", messages: ["a record by that idempotency key already exists!"] }, status: :bad_request
+        render json: { error: "idempotency_error", messages: [ "a record by that idempotency key already exists!" ] }, status: :bad_request
       end
 
       rescue_from ActionController::ParameterMissing do |e|
-        render json: { error: "missing_parameter", messages: [e.message] }, status: :bad_request
+        render json: { error: "missing_parameter", messages: [ e.message ] }, status: :bad_request
       end
 
       private
@@ -66,9 +66,9 @@ module API
             rescue ActiveRecord::RecordNotFound
               render json: { error: "impersonate_error", message: "couldn't find that user" }, status: :bad_request
             end
-          else
+        else
             current_token&.user
-          end
+        end
       end
 
       attr_reader :current_token

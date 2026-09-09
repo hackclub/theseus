@@ -96,7 +96,7 @@ class Components::StaticPages::Home < Components::Base
 
       tools_links = [
         { label: "ID Lookup", href: public_ids_path, icon: "⌕", check: -> { true } },
-        *(policy(:customs_receipt).index? ? [{ label: "Customs Receipts", href: customs_receipts_path, icon: "⎘", check: -> { true } }] : []),
+        *(policy(:customs_receipt).index? ? [ { label: "Customs Receipts", href: customs_receipts_path, icon: "⎘", check: -> { true } } ] : []),
         { label: "Public Site", href: public_root_path, icon: "🌐", check: -> { true } }
       ]
       div(style: "min-width:10rem") { link_panel("Tools", tools_links) }

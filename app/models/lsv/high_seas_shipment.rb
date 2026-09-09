@@ -5,11 +5,11 @@ module LSV
     self.email_column = "recipient:email"
 
     has_subtypes "shop_item:fulfillment_type", {
-      ["minuteman"] => "LSV::HsMinutemanShipment",
-      ["hq_mail"] => "LSV::HsHqMailShipment",
-      ["third_party_physical"] => "LSV::HsThirdPartyPhysicalShipment",
-      ["agh"] => "LSV::HsRawPendingAghShipment",
-      ["agh_random_stickers"] => "LSV::HsRawPendingAghShipment",
+      [ "minuteman" ] => "LSV::HsMinutemanShipment",
+      [ "hq_mail" ] => "LSV::HsHqMailShipment",
+      [ "third_party_physical" ] => "LSV::HsThirdPartyPhysicalShipment",
+      [ "agh" ] => "LSV::HsRawPendingAghShipment",
+      [ "agh_random_stickers" ] => "LSV::HsRawPendingAghShipment"
     }
 
     def type_text = "High Seas order"
@@ -27,7 +27,7 @@ module LSV
       when "pending_nightly"
         "we'll send it out when we can!"
       when "fulfilled"
-        ["sent!", "mailed!", "on its way!"].sample
+        [ "sent!", "mailed!", "on its way!" ].sample
       else
         super
       end

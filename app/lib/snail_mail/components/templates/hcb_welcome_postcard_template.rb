@@ -7,7 +7,7 @@ module SnailMail
         def self.abstract?
           false
         end
-        
+
         ADDRESS_FONT = "arial"
 
         def self.template_name
@@ -28,12 +28,12 @@ module SnailMail
         The HCB Team"
 
         def render_front
-          bounding_box([10, bounds.top - 10], width: bounds.width - 20, height: bounds.height - 20) do
+          bounding_box([ 10, bounds.top - 10 ], width: bounds.width - 20, height: bounds.height - 20) do
             image(image_path("hcb/hcb-icon.png"), width: 60)
-            text_box("Welcome to HCB!", size: 30, at: [70, bounds.top - 18])
+            text_box("Welcome to HCB!", size: 30, at: [ 70, bounds.top - 18 ])
           end
 
-          bounding_box([20, bounds.top - 90], width: bounds.width - 40, height: bounds.height - 100) do
+          bounding_box([ 20, bounds.top - 90 ], width: bounds.width - 40, height: bounds.height - 100) do
             text(letter.rubber_stamps || "", size: 15, align: :justify, overflow: :shrink_to_fit)
           end
         end

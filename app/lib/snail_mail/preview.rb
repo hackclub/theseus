@@ -13,7 +13,7 @@ module SnailMail
       def us_format
         <<~EOA
           #{name_line}
-          #{[line_1, line_2].compact_blank.join("\n")}
+          #{[ line_1, line_2 ].compact_blank.join("\n")}
           #{city}, #{state} #{postal_code}
           #{country}
         EOA
@@ -64,7 +64,7 @@ module SnailMail
         "Heidi Hakkuun",
         "Dinobox",
         "Arcadius",
-        "Cap'n Trashbeard",
+        "Cap'n Trashbeard"
       ]
 
       usps_mailer_id = OpenStruct.new(mid: "111111")

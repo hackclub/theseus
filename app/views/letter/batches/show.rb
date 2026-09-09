@@ -69,10 +69,10 @@ class Views::Letter::Batches::Show < Views::Base
     @batch.letters.select(:id, :public_id, :indicia_state).map do |letter|
       state = letter.indicia_state || "pending"
       icon = case state
-             when "purchased" then "✓"
-             when "failed" then "✗"
-             else ""
-             end
+      when "purchased" then "✓"
+      when "failed" then "✗"
+      else ""
+      end
       { id: letter.id, state: state, title: letter.public_id, icon: icon }
     end
   end
@@ -152,7 +152,7 @@ class Views::Letter::Batches::Show < Views::Base
         # Print next N
         if unprinted > 0
           div(style: "display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.75rem;") do
-            [100, 500].each do |n|
+            [ 100, 500 ].each do |n|
               next if n > unprinted
               form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
                 input(type: "hidden", name: "count", value: n)
@@ -285,7 +285,7 @@ class Views::Letter::Batches::Show < Views::Base
               td do
                 a(href: letter_path(letter), style: "text-decoration: none;") { letter.public_id }
               end
-              td { plain [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ").presence || "—" }
+              td { plain [ letter.address&.first_name, letter.address&.last_name ].compact_blank.join(" ").presence || "—" }
               td(class: "text-muted") { plain letter.postage_type&.humanize || "—" }
               td { render Components::Shared::StatusBadge.new(status: letter.aasm_state, type: :letter) }
             end
@@ -306,8 +306,8 @@ class Views::Letter::Batches::Show < Views::Base
              "addresses.first_name", "addresses.last_name", "addresses.city", "addresses.state")
 
     cells = rows.map do |id, pub_id, printed_at, istate, fname, lname, city, state|
-      name = [fname, lname].compact_blank.join(" ")
-      loc = [city, state].compact_blank.join(", ")
+      name = [ fname, lname ].compact_blank.join(" ")
+      loc = [ city, state ].compact_blank.join(", ")
       state_class = printed_at ? "purchased" : "pending"
       state_class = "failed" if istate == "failed"
       { id: "pick-#{id}", letter_id: id, state: state_class, title: "#{name} — #{loc} (#{pub_id})" }

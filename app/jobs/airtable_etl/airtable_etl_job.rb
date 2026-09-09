@@ -2,7 +2,7 @@ module AirtableETL
   class AirtableETLJob < ApplicationJob
     def perform
       type = self.class::TYPE
-      raise "type must be one of: :letters, :warehouse_orders" unless [:letters, :warehouse_orders].include?(type)
+      raise "type must be one of: :letters, :warehouse_orders" unless [ :letters, :warehouse_orders ].include?(type)
       base_key = self.class::BASE_KEY
       table_name = self.class::TABLE_NAME
       field_map = self.class::FIELD_MAP

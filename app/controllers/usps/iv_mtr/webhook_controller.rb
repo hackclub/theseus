@@ -1,8 +1,8 @@
 # frozen_string_literal: true
+
 module USPS
   module IVMTR
     class WebhookController < ActionController::Base
-
       skip_before_action :verify_authenticity_token
 
       before_action do
@@ -22,10 +22,8 @@ module USPS
           processed: false
         )
         USPS::IVMTR::ImportEventsJob.perform_later(batch)
-        render json: {message: "hey, thanks!"}
+        render json: { message: "hey, thanks!" }
       end
-
     end
-
   end
 end

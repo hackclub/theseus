@@ -8,12 +8,12 @@ module SnailMail
 
       def view_template
         self.line_width = 3
-        stroke { rounded_rectangle([111, 189], 306, 122, 10) }
+        stroke { rounded_rectangle([ 111, 189 ], 306, 122, 10) }
 
 
         image(
           image_path("acon-joyous-cat.png"),
-          at: [208, 74],
+          at: [ 208, 74 ],
           width: 106.4,
         )
 

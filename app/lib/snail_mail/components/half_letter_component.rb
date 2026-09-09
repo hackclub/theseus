@@ -6,7 +6,7 @@ module SnailMail
       def self.abstract?
         true
       end
-      
+
       def self.template_size
         :half_letter
       end
@@ -35,7 +35,7 @@ module SnailMail
         )
         render_qr_code(15, 200, 65)
         font(address_font, size: 8) do
-          text_box(letter.public_id, at: [15, bounds.top - 110], width: 100, overflow: :shrink_to_fit)
+          text_box(letter.public_id, at: [ 15, bounds.top - 110 ], width: 100, overflow: :shrink_to_fit)
         end
       end
     end

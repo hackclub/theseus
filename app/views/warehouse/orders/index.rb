@@ -67,7 +67,7 @@ class Views::Warehouse::Orders::Index < Views::Base
         { label: "Draft", count: counts[:draft], color: "yellow", param: "draft" },
         { label: "At Warehouse", count: counts[:dispatched], color: "blue", param: "dispatched" },
         { label: "Shipped", count: counts[:mailed], color: "green", param: "mailed" },
-        { label: "Canceled", count: counts[:canceled], param: "canceled" },
+        { label: "Canceled", count: counts[:canceled], param: "canceled" }
       ],
       active: state,
       filter_key: :state,
@@ -120,13 +120,13 @@ class Views::Warehouse::Orders::Index < Views::Base
 
   def status_badge(order)
     badge_class = case order.aasm_state.to_sym
-                  when :draft then "badge"
-                  when :dispatched then "badge badge-info"
-                  when :mailed then "badge badge-success"
-                  when :errored then "badge badge-danger"
-                  when :canceled then "badge badge-warning"
-                  else "badge"
-                  end
+    when :draft then "badge"
+    when :dispatched then "badge badge-info"
+    when :mailed then "badge badge-success"
+    when :errored then "badge badge-danger"
+    when :canceled then "badge badge-warning"
+    else "badge"
+    end
 
     span(class: badge_class) { order.humanized_state }
   end

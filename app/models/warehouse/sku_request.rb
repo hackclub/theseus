@@ -117,7 +117,7 @@ class Warehouse::SKURequest < ApplicationRecord
 
   def suggested_code
     prefix = CATEGORY_PREFIXES[category] || category&.first(3)&.capitalize
-    parts = [prefix]
+    parts = [ prefix ]
     parts << program&.first(3)&.capitalize if program.present?
     parts << name&.split&.first&.first(3)&.capitalize if name.present?
     parts.compact.join("/")

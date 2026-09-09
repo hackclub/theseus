@@ -55,7 +55,6 @@ class USPS::APIService
   ENVIRONMENT = Rails.env.production? ? :prod : :tem
 
   class << self
-
     # buys a piece of domestic first-class postage!
     #
     # @param [String] payment_token USPS payment token
@@ -83,7 +82,7 @@ class USPS::APIService
         hasLooseItems: false,
         isRigid: false,
         isSelfMailer: false,
-        isBooklet: false,
+        isBooklet: false
       },
       receipt_option: "NONE",
       image_type: "TIFF",
@@ -99,17 +98,17 @@ class USPS::APIService
             length: length,
             height: height,
             thickness: thickness,
-            nonMachinableIndicators: non_machinable_indicators,
+            nonMachinableIndicators: non_machinable_indicators
           },
           imageInfo: {
             receiptOption: receipt_option,
             imageType: image_type,
-            labelType: label_type,
-          },
+            labelType: label_type
+          }
         },
         {
           "X-Payment-Authorization-Token" => payment_token,
-          "Accept" => "application/vnd.usps.labels+json",
+          "Accept" => "application/vnd.usps.labels+json"
         },
       ).body
     end
@@ -140,7 +139,7 @@ class USPS::APIService
         thickness: thickness,
         processingCategory: processing_category,
         mailingDate: Date.today.to_s,
-        nonMachinableIndicators: non_machinable_indicators.presence,
+        nonMachinableIndicators: non_machinable_indicators.presence
       }.compact_blank).body
     end
 
@@ -160,7 +159,7 @@ class USPS::APIService
         processingCategory: processing_category,
         destinationCountryCode: destination_country_code,
         mailingDate: Date.today.to_s,
-        nonMachinableIndicators: non_machinable_indicators.presence,
+        nonMachinableIndicators: non_machinable_indicators.presence
       }.compact_blank).body
     end
 
@@ -190,17 +189,17 @@ class USPS::APIService
             length: length,
             height: height,
             thickness: thickness,
-            nonMachinableIndicators: non_machinable_indicators,
+            nonMachinableIndicators: non_machinable_indicators
           }.compact,
           imageInfo: {
             receiptOption: receipt_option,
             imageType: image_type,
-            labelType: label_type,
-          },
+            labelType: label_type
+          }
         },
         {
           "X-Payment-Authorization-Token" => payment_token,
-          "Accept" => "application/vnd.usps.labels+json",
+          "Accept" => "application/vnd.usps.labels+json"
         },
       ).body
     end
@@ -212,7 +211,7 @@ class USPS::APIService
         prod: "apis",
         cat: "api-cat",
         cat_no_s: "api-cat",
-        tem: "apis-tem",
+        tem: "apis-tem"
       }[ENVIRONMENT]
       "https://#{host}.usps.com"
     end

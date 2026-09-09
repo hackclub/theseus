@@ -9,7 +9,7 @@ module SnailMail
         end
 
         def view_template
-          render_return_address(10, 278, 190, 90, size: 12, font: 'comic')
+          render_return_address(10, 278, 190, 90, size: 12, font: "comic")
 
           if letter.rubber_stamps.present?
             font("gohu") do
@@ -32,14 +32,14 @@ module SnailMail
             90,
             size: 16, valign: :center, align: :left
           )
-          
+
           stroke do
             self.line_width = 1
             line([ 137 - 25, 167 ], [ 392 + 25, 167 ])
           end
 
           render_speech_bubble(
-            bubble_position: [111, 189],
+            bubble_position: [ 111, 189 ],
             bubble_width: 306,
             bubble_height: 122,
             bubble_radius: 10,

@@ -90,5 +90,4 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
       admin_usps_payment_accounts_path
     end
   end
-
 end

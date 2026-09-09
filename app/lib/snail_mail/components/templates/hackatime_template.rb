@@ -11,7 +11,7 @@ module SnailMail
         def view_template
           image(
             image_path("hackatime/its_about_time.png"),
-            at: [13, 219],
+            at: [ 13, 219 ],
             width: 409,
           )
 

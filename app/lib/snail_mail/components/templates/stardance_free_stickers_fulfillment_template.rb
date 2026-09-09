@@ -44,7 +44,6 @@ module SnailMail
           stroke_preview_bounds(10, 65, 10, 60, label: "letter ID")
           stroke_preview_bounds(bounds.right - 200, bounds.top, 200, 50, label: "postage + FIM-D")
         end
-
       end
     end
   end

@@ -1,6 +1,6 @@
 class HCB::PaymentAccountsController < ApplicationController
-  before_action :require_hcb_connection, except: [:index]
-  before_action :set_payment_account, only: [:show]
+  before_action :require_hcb_connection, except: [ :index ]
+  before_action :set_payment_account, only: [ :show ]
 
   rescue_from HCBV4::APIError do |e|
     event_id = Sentry.capture_exception(e, extra: { user_id: current_user.id })&.event_id

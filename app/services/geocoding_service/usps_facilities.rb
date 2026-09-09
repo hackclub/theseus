@@ -4,8 +4,8 @@ module GeocodingService
       SPECIAL_CASES = {
         "001376" => {
           lat: "40.6532171",
-          lon: "-73.7712486",
-        },
+          lon: "-73.7712486"
+        }
       }
 
       def coords_for_locale_key(locale_key, event = nil)
@@ -22,7 +22,7 @@ module GeocodingService
                 city: facility[:city],
                 state: facility[:state],
                 postalcode: facility[:zip],
-                country: "US",
+                country: "US"
               }
               Rails.logger.warn "USPS facility not found for locale_key #{locale_key}, falling back to scan facility data: #{fallback_address}"
               GeocodingService.first_hit(fallback_address)
@@ -41,7 +41,7 @@ module GeocodingService
           city: facility["FACILITY CITY"],
           state: facility["FACILITY STATE"],
           postalcode: facility["ZIP"][0...5],
-          country: "US",
+          country: "US"
         }
       end
 
@@ -59,7 +59,7 @@ module GeocodingService
         Rails.logger.info "Loading USPS facilities"
         facilities_file = File.join(File.dirname(__FILE__), "FACILITY.xlsx")
         xsv = Xsv.open(facilities_file, parse_headers: true).first
-        return xsv.to_a.index_by { |row| row["LOCALE KEY"] }
+        xsv.to_a.index_by { |row| row["LOCALE KEY"] }
       end
     end
   end

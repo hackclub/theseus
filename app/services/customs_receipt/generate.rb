@@ -4,8 +4,8 @@ module CustomsReceipt
       options = {
         process_timeout: 30,
         browser_options: {
-          "no-sandbox" => nil,
-        },
+          "no-sandbox" => nil
+        }
       }
 
       options = options.merge(browser_path: "/usr/bin/chromium") if Rails.env.production?
@@ -15,7 +15,7 @@ module CustomsReceipt
       FerrumPdf.render_pdf(
         html: CustomsReceiptTemplate.new(receiptable).call,
         pdf_options: {
-          print_background: true,
+          print_background: true
         },
       )
     end

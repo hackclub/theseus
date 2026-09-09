@@ -25,7 +25,7 @@ module SnailMail
 
           image(
             image_path("som/banner.png"),
-            at: [-2.5, 288 - 56],
+            at: [ -2.5, 288 - 56 ],
             width: 443,
           )
 

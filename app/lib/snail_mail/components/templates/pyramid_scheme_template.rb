@@ -9,7 +9,7 @@ module SnailMail
         def view_template
           image(
             image_path("pyramids.png"),
-            at: [0, 288],
+            at: [ 0, 288 ],
             width: 432,
             )
 

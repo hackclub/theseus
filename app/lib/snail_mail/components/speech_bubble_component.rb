@@ -23,7 +23,7 @@ module SnailMail
         # Draw the speech tail
         image(
           image_path("speech-tail.png"),
-          at: [@tail_x, @tail_y],
+          at: [ @tail_x, @tail_y ],
           width: @tail_width
         )
       end

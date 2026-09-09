@@ -77,6 +77,4 @@ class Views::Billing::Show < Views::Base
       end
     end
   end
-
-
 end

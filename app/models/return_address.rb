@@ -53,6 +53,6 @@ class ReturnAddress < ApplicationRecord
 
   # Return true if any fields have been filled out, indicating user's intent to create a return address
   def partially_filled_out?
-    [name, line_1, city, state, postal_code].any?(&:present?)
+    [ name, line_1, city, state, postal_code ].any?(&:present?)
   end
 end

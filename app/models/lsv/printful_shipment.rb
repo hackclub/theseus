@@ -7,7 +7,7 @@ module LSV
     def to_partial_path = "lsv/type/printful_shipment"
 
     has_subtypes "subtype", {
-      "mystic_tavern" => "LSV::MysticTavernShipment",
+      "mystic_tavern" => "LSV::MysticTavernShipment"
     }
 
     def date = fields["created"] || Date.parse(fields["%order:created"]).iso8601

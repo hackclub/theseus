@@ -10,7 +10,7 @@ json = {
   title: base.title_text,
   status: base.status_text,
   tracking_number: base.tracking_number,
-  tracking_link: base.tracking_link,
+  tracking_link: base.tracking_link
 }
 
 if base.description.is_a?(Array)

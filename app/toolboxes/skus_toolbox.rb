@@ -1,8 +1,8 @@
 class SKUsToolbox < ApplicationToolbox
   before_action :require_warehouse!
-  before_action :require_admin!, only: [:update]
+  before_action :require_admin!, only: [ :update ]
 
-  default_param :sku_id, :integer, "SKU ID", except: [:search, :inventory, :backordered]
+  default_param :sku_id, :integer, "SKU ID", except: [ :search, :inventory, :backordered ]
 
   tool "Search warehouse inventory items (SKUs) by name, code, or description. Returns paginated list with stock levels", access: :read do
     param :query, :string, "Search term", optional: true

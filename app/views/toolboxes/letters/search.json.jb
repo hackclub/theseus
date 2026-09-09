@@ -11,10 +11,10 @@
       processing_category: letter.processing_category,
       tags: letter.tags,
       created_at: letter.created_at.iso8601,
-      mailed_at: letter.mailed_at&.iso8601,
+      mailed_at: letter.mailed_at&.iso8601
     }
   },
   page: @letters.current_page,
   total_pages: @letters.total_pages,
-  total_count: @letters.total_count,
+  total_count: @letters.total_count
 }

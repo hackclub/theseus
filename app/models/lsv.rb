@@ -4,7 +4,7 @@ module LSV
     hs: HighSeasShipment,
     boba: BobaDropsShipment,
     oo: OneOffShipment,
-    pf: PrintfulShipment,
+    pf: PrintfulShipment
   }
 
   INVERSE = SLUGS.invert.freeze

@@ -1,5 +1,5 @@
 class LetterQueuesToolbox < ApplicationToolbox
-  default_param :queue_id, :string, "Queue slug", except: [:list, :create]
+  default_param :queue_id, :string, "Queue slug", except: [ :list, :create ]
 
   tool "List your letter queues — templates for bulk letter creation where external systems push addresses in and letters are held until batched", access: :read do
     param :page, :integer, "Page number", optional: true
@@ -27,7 +27,7 @@ class LetterQueuesToolbox < ApplicationToolbox
     param :letter_processing_category, :string, "Mail class: letter (standard envelope) or flat (large envelope)", enum: %w[letter flat]
     param :letter_mailer_id_id, :integer, "USPS Mailer ID for letters in this queue (use postage_mailer_ids to find)"
     param :letter_return_address_id, :integer, "Return address for letters in this queue (use return_addresses_list to find)"
-    param :tags, [:string], "Tags for letters in this queue"
+    param :tags, [ :string ], "Tags for letters in this queue"
     param :postage_type, :string, "Postage method: stamps (physical), indicia (USPS electronic postage), or international_origin", optional: true
     param :user_facing_title, :string, "User-facing title", optional: true
     param :include_qr_code, :boolean, "Include QR code on letters", optional: true

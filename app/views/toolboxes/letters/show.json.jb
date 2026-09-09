@@ -26,7 +26,7 @@
     city: @letter.address.city,
     state: @letter.address.state,
     postal_code: @letter.address.postal_code,
-    country: @letter.address.country,
+    country: @letter.address.country
   },
   return_address: @letter.return_address && {
     id: @letter.return_address.id,
@@ -36,12 +36,12 @@
     city: @letter.return_address.city,
     state: @letter.return_address.state,
     postal_code: @letter.return_address.postal_code,
-    country: @letter.return_address.country,
+    country: @letter.return_address.country
   },
   return_address_name: @letter.return_address_name_line,
   printed_at: @letter.printed_at&.iso8601,
   mailed_at: @letter.mailed_at&.iso8601,
   received_at: @letter.received_at&.iso8601,
   created_at: @letter.created_at.iso8601,
-  updated_at: @letter.updated_at.iso8601,
+  updated_at: @letter.updated_at.iso8601
 }

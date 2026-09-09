@@ -54,7 +54,7 @@ class Views::Warehouse::Batches::Index < Views::Base
       stats: [
         { label: "Awaiting Mapping", count: counts[:awaiting_field_mapping], color: "yellow", param: "awaiting_field_mapping" },
         { label: "Fields Mapped", count: counts[:fields_mapped], color: "blue", param: "fields_mapped" },
-        { label: "Processed", count: counts[:processed], color: "green", param: "processed" },
+        { label: "Processed", count: counts[:processed], color: "green", param: "processed" }
       ],
       active: nil,
       base_path: ->(**_params) { warehouse_batches_path(search: search, user_id: user_id) },

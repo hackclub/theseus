@@ -23,8 +23,8 @@ module FakeHCB
       @hcb_disbursements << { direction: :credit, from_organization_id: from_organization_id, organization_id: organization_id, amount_cents: amount_cents, name: name, id: id }
       RemoteTransfer.new(id: id, transaction_id: "txn_#{id}", amount_cents: amount_cents)
     end
-    allow_any_instance_of(BillingProfile).to receive(:set_transaction_memo!) { |_p, tid, memo| @hcb_memos << [tid, memo] }
-    allow(BillingProfile).to receive(:set_hq_transaction_memo!) { |_hq, tid, memo| @hcb_memos << [tid, memo] }
+    allow_any_instance_of(BillingProfile).to receive(:set_transaction_memo!) { |_p, tid, memo| @hcb_memos << [ tid, memo ] }
+    allow(BillingProfile).to receive(:set_hq_transaction_memo!) { |_hq, tid, memo| @hcb_memos << [ tid, memo ] }
     allow_any_instance_of(BillingProfile).to receive(:organization).and_return(double(balance_cents: 10_000_000, name: "Test Org"))
   end
 
@@ -50,7 +50,7 @@ module FakeHCB
   end
 
   def api_error(klass, message, status:, error_code: nil)
-    klass.new(message, status: status, error_code: error_code, messages: [message])
+    klass.new(message, status: status, error_code: error_code, messages: [ message ])
   end
 end
 

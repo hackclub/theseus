@@ -68,7 +68,7 @@ routes.each do |route|
     next
   end
   # Test the base path, plus common query param variations for index routes
-  paths_to_test = [path]
+  paths_to_test = [ path ]
   if action == "index"
     user_id = User.first&.id
     paths_to_test << "#{path}?user_id=#{user_id}" if user_id

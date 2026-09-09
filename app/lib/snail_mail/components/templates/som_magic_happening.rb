@@ -4,7 +4,7 @@ module SnailMail
   module Components
     module Templates
       class SoMMagicHappening < HalfLetterComponent
-        IMAGES = %w(wizard.png hotdogcat.jpg magic_smoke.png)
+        IMAGES = %w[wizard.png hotdogcat.jpg magic_smoke.png]
 
         def self.abstract? = false
 
@@ -19,7 +19,7 @@ module SnailMail
         def render_front
           image(
             image_path(IMAGES.sample),
-            at: [410, bounds.bottom + 200],
+            at: [ 410, bounds.bottom + 200 ],
             valign: :top,
             width: 150
           )
@@ -45,7 +45,7 @@ module SnailMail
             tl;dr: TS cool!
           EOM
 
-          font "gohu" do text_box text, at: [15, bounds.top-15], width: bounds.right - 200 - 20, size: 14 end
+          font "gohu" do text_box text, at: [ 15, bounds.top-15 ], width: bounds.right - 200 - 20, size: 14 end
         end
 
         def render_back

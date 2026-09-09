@@ -3,5 +3,5 @@
   name: user.username,
   email: user.email,
   avatar: user.icon_url,
-  admin: user.admin?,
+  admin: user.admin?
 }

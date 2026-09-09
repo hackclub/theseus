@@ -59,7 +59,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       select_field(
         name: "letter_queue[letter_mailer_id_id]",
         label: "USPS Mailer ID",
-        options: USPS::MailerId.all.map { |m| [m.display_name, m.id] },
+        options: USPS::MailerId.all.map { |m| [ m.display_name, m.id ] },
         selected: queue.letter_mailer_id_id || current_user.home_mid_id
       )
 
@@ -68,7 +68,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       select_field(
         name: "letter_queue[letter_return_address_id]",
         label: "Return Address",
-        options: addresses.map { |a| [a.display_name, a.id] },
+        options: addresses.map { |a| [ a.display_name, a.id ] },
         selected: queue.letter_return_address_id || current_user.home_return_address_id,
         link: { text: "(manage)", href: return_addresses_path }
       )

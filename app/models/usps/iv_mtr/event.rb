@@ -53,7 +53,7 @@ class USPS::IVMTR::Event < ApplicationRecord
       name: hydrated.scan_facility_name,
       city: hydrated.scan_facility_city,
       state: hydrated.scan_facility_state,
-      zip: hydrated.scan_facility_zip,
+      zip: hydrated.scan_facility_zip
     }
   end
 

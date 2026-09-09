@@ -1,5 +1,5 @@
 class ReturnAddressesToolbox < ApplicationToolbox
-  default_param :return_address_id, :integer, "Return address ID", except: [:list, :create]
+  default_param :return_address_id, :integer, "Return address ID", except: [ :list, :create ]
 
   tool "List sender return addresses visible to you (shared + your own). These are printed as the from-address on envelopes", access: :read do
     param :page, :integer, "Page number", optional: true

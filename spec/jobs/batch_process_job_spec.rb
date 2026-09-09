@@ -24,7 +24,7 @@ RSpec.describe BatchProcessJob, type: :job do
       us_postage_type: "indicia",
       intl_postage_type: "international_origin",
       usps_payment_account_id: usps_account.id,
-      hcb_payment_account_id: hcb_account.id,
+      hcb_payment_account_id: hcb_account.id
     }
   end
 
@@ -129,7 +129,7 @@ RSpec.describe BatchProcessJob, type: :job do
 
         perform_job
 
-        expect(states).to eq([:purchasing, :generating_labels, :processed])
+        expect(states).to eq([ :purchasing, :generating_labels, :processed ])
       end
     end
 
@@ -495,7 +495,7 @@ RSpec.describe BatchProcessJob, type: :job do
 
       letters.each do |l|
         expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
-          [batch, :progress],
+          [ batch, :progress ],
           hash_including(target: "cell-#{l.id}"),
         ).at_least(:once)
       end
@@ -509,7 +509,7 @@ RSpec.describe BatchProcessJob, type: :job do
 
       # purchasing phase summary
       expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
-        [batch, :progress],
+        [ batch, :progress ],
         hash_including(target: "batch-summary", partial: "letter/batches/progress_summary"),
       ).at_least(2).times # purchasing start + per-letter update
     end

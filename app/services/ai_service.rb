@@ -14,7 +14,7 @@ class AIService
         "city" => row[field_mapping["city"]],
         "state" => row[field_mapping["state"]],
         "postal_code" => row[field_mapping["postal_code"]],
-        "country" => row[field_mapping["country"]],
+        "country" => row[field_mapping["country"]]
       }
 
       # Get translated address
@@ -31,7 +31,7 @@ class AIService
         postal_code: translated["postal_code"]&.presence,
         country: translated["country"]&.presence,
         phone_number: row[field_mapping["phone_number"]]&.presence,
-        email: row[field_mapping["email"]]&.presence,
+        email: row[field_mapping["email"]]&.presence
       }
     end
 
@@ -39,7 +39,7 @@ class AIService
 
     def gptize_address(fields, order)
       # Filter out email and phone from fields to translate
-      address_fields = fields - ["email", "phone_number"]
+      address_fields = fields - [ "email", "phone_number" ]
 
       retried = false
       response = begin
@@ -59,15 +59,15 @@ class AIService
                   city: { type: "string", description: "City name only, no state/zip" },
                   state: { type: "string", description: "State/province/region code only" },
                   postal_code: { type: "string", description: "Postal code only" },
-                  country: { type: "string", description: "ISO 3166-1 alpha-2 country code" },
+                  country: { type: "string", description: "ISO 3166-1 alpha-2 country code" }
                 },
-                required: ["line_1", "city", "state", "postal_code", "country"],
-              },
-            },
+                required: [ "line_1", "city", "state", "postal_code", "country" ]
+              }
+            }
           },
-          messages: [{
+          messages: [ {
             role: "user",
-            content: <<~PROMPT,
+            content: <<~PROMPT
               Please translate and format this address for international mail delivery:
               1. Translate to English using Latin characters
               2. Handle location information:
@@ -83,8 +83,8 @@ class AIService
               Address to format:
               #{address_fields.map { |field| order[field] && "#{field}: #{order[field]}" }.compact.join("\n")}
             PROMPT
-          }],
-          temperature: 0.8,
+          } ],
+          temperature: 0.8
         })
       rescue Faraday::TooManyRequestsError, Faraday::ServerError => e
         raise if retried

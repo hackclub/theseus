@@ -36,7 +36,7 @@ class Views::Billing::Index < Views::Base
                 span(class: "text-muted") { "$0.00" }
               end
 
-              stuck = profile.hcb_transfers.where(state: [:unknown, :failed]).count
+              stuck = profile.hcb_transfers.where(state: [ :unknown, :failed ]).count
               if stuck > 0
                 span(class: "detail-label") { "Transfers needing attention" }
                 span(class: "badge badge-danger") { stuck.to_s }

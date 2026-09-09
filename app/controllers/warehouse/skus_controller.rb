@@ -6,7 +6,7 @@ class Warehouse::SKUsController < ApplicationController
     authorize Warehouse::SKU
     include_non_inventory = params[:include_non_inventory].present?
     warehouse_skus = include_non_inventory ? Warehouse::SKU.all : Warehouse::SKU.in_inventory
-    view = params[:view] == 'flat' ? 'flat' : 'grouped'
+    view = params[:view] == "flat" ? "flat" : "grouped"
     render Views::Warehouse::SKUs::Index.new(warehouse_skus:, include_non_inventory:, view:)
   end
 

@@ -129,7 +129,7 @@ class Warehouse::Order < ApplicationRecord
                    service: :service,
                    mailed_at: :mailed_at,
                    labor_cost: :labor_cost,
-                   postage_cost: :postage_cost,
+                   postage_cost: :postage_cost
                  }
 
   has_zenventory_url "https://app.zenventory.com/orders/edit-order/%s", :zenventory_id
@@ -143,7 +143,7 @@ class Warehouse::Order < ApplicationRecord
       state: address.state,
       zip: address.postal_code,
       countryCode: address.country,
-      phone: address.phone_number,
+      phone: address.phone_number
     }.compact_blank
   end
 
@@ -151,7 +151,7 @@ class Warehouse::Order < ApplicationRecord
     {
       name: address.first_name,
       surname: address.last_name || "​",
-      email: recipient_email,
+      email: recipient_email
     }.compact_blank
   end
 
@@ -180,7 +180,7 @@ class Warehouse::Order < ApplicationRecord
       customer: customer_attributes,
       shippingAddress: shipping_address_attributes,
       billingAddress: { sameAsShipping: true },
-      items: generate_order_items,
+      items: generate_order_items
     }
     zenventory_order = Zenventory.create_customer_order(payload)
 
@@ -285,7 +285,7 @@ class Warehouse::Order < ApplicationRecord
         customer: customer_attributes,
         shippingAddress: shipping_address_attributes,
         billingAddress: { sameAsShipping: true },
-        items: generate_order_items_for_update,
+        items: generate_order_items_for_update
       }.compact_blank
       Zenventory.update_customer_order(zenventory_id, update_hash) unless update_hash.empty?
     rescue Zenventory::ZenventoryError => e
@@ -320,7 +320,7 @@ class Warehouse::Order < ApplicationRecord
     dispatched: "Sent to warehouse",
     mailed: "Shipped!",
     errored: "Errored?",
-    canceled: "Canceled",
+    canceled: "Canceled"
   }
 
   def humanized_state
@@ -377,7 +377,7 @@ class Warehouse::Order < ApplicationRecord
       {
         sku: line_item.sku.sku,
         price: line_item.sku.declared_unit_cost,
-        quantity: line_item.quantity,
+        quantity: line_item.quantity
       }
     end
   end
@@ -431,7 +431,7 @@ class Warehouse::Order < ApplicationRecord
     item_hash = {
       sku: line_item.sku.sku,
       price: line_item.sku.declared_unit_cost,
-      quantity: quantity || line_item.quantity,
+      quantity: quantity || line_item.quantity
     }
 
     # Only include ID if one was provided
@@ -440,14 +440,14 @@ class Warehouse::Order < ApplicationRecord
     item_hash
   end
 
-  def total_cost = [contents_cost, labor_cost, postage_cost].compact_blank.sum
+  def total_cost = [ contents_cost, labor_cost, postage_cost ].compact_blank.sum
 
   def to_param = hc_id
 
   def origin_label
     return "Manual" if manual?
     return "API" if api?
-    return origin_batch&.origin || "Bulk upload" if bulk_upload?
+    origin_batch&.origin || "Bulk upload" if bulk_upload?
   end
 
   private

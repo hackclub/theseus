@@ -15,10 +15,10 @@
       owner: o.user_id == current_user.id ? "you" : o.user&.email,
       created_at: o.created_at.iso8601,
       dispatched_at: o.dispatched_at&.iso8601,
-      mailed_at: o.mailed_at&.iso8601,
+      mailed_at: o.mailed_at&.iso8601
     }
   },
   page: @orders.current_page,
   total_pages: @orders.total_pages,
-  total_count: @orders.total_count,
+  total_count: @orders.total_count
 }

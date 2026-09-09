@@ -16,15 +16,15 @@ RSpec.describe Billing do
   describe ".charge!" do
     it "creates the transfer before the request, then settles the entries" do
       a, b = entry(300), entry(200)
-      transfer = Billing.charge!([a, b], name: "Postage")
+      transfer = Billing.charge!([ a, b ], name: "Postage")
 
       expect(transfer).to be_completed
       expect(transfer).to be_debit
       expect(transfer.amount_cents).to eq(500)
       expect(transfer.remote_id).to eq("xfr_fake1")
       expect(transfer.attempts).to eq(1)
-      expect([a, b].map { |e| e.reload.state }).to all(eq("settled"))
-      expect([a, b].map { |e| e.hcb_transfer_id }).to all(eq(transfer.id))
+      expect([ a, b ].map { |e| e.reload.state }).to all(eq("settled"))
+      expect([ a, b ].map { |e| e.hcb_transfer_id }).to all(eq(transfer.id))
 
       sent = hcb_disbursements.first
       expect(sent[:amount_cents]).to eq(500)
@@ -36,15 +36,15 @@ RSpec.describe Billing do
 
     it "returns nil with nothing to claim" do
       expect(Billing.charge!([], name: "x")).to be_nil
-      settled = entry.tap { |e| Billing.charge!([e], name: "x") }
-      expect(Billing.charge!([settled], name: "again")).to be_nil
+      settled = entry.tap { |e| Billing.charge!([ e ], name: "x") }
+      expect(Billing.charge!([ settled ], name: "again")).to be_nil
       expect(hcb_disbursements.size).to eq(1)
     end
 
     it "refuses to mix USPS and warehouse work in one transfer, and charge_pending! splits them" do
       indicia = entry(500, category: :indicia)
       labor = entry(200, category: :labor)
-      expect { Billing.charge!([indicia, labor], name: "x") }.to raise_error(ArgumentError, /destinations/)
+      expect { Billing.charge!([ indicia, labor ], name: "x") }.to raise_error(ArgumentError, /destinations/)
       expect(HCB::Transfer.count).to eq(0)
 
       transfers = Billing.charge_pending!(profile)
@@ -57,14 +57,14 @@ RSpec.describe Billing do
       a = entry(500)
       other = create(:billing_profile, user: user, organization_id: "org_b")
       b = batch.ledger_entries.create!(billing_profile: other, category: :indicia, amount_cents: 100)
-      expect { Billing.charge!([a, b], name: "x") }.to raise_error(ArgumentError, /multiple billing profiles/)
+      expect { Billing.charge!([ a, b ], name: "x") }.to raise_error(ArgumentError, /multiple billing profiles/)
       expect(HCB::Transfer.count).to eq(0)
     end
 
     it "does not double-claim under concurrency" do
       e = entry(500)
       results = 4.times.map do
-        Thread.new { ActiveRecord::Base.connection_pool.with_connection { Billing.charge!([e], name: "race") } }
+        Thread.new { ActiveRecord::Base.connection_pool.with_connection { Billing.charge!([ e ], name: "race") } }
       end.map(&:value)
       expect(results.compact.size).to eq(1)
       expect(hcb_disbursements.size).to eq(1)
@@ -73,27 +73,27 @@ RSpec.describe Billing do
     context "when a transfer is already in flight for the profile" do
       before do
         stuck = entry(100)
-        t = Billing.charge!([stuck], name: "first", execute: false)
+        t = Billing.charge!([ stuck ], name: "first", execute: false)
         t.update!(state: :unknown, last_attempted_at: 1.minute.ago)
       end
 
       it "leaves entries unclaimed (non-strict)" do
         e = entry(200)
-        expect(Billing.charge!([e], name: "second")).to be_nil
+        expect(Billing.charge!([ e ], name: "second")).to be_nil
         expect(e.reload.hcb_transfer_id).to be_nil
         expect(hcb_disbursements).to be_empty
       end
 
       it "raises InFlight (strict)" do
         e = entry(200)
-        expect { Billing.charge!([e], name: "second", strict: true) }.to raise_error(Billing::InFlight)
+        expect { Billing.charge!([ e ], name: "second", strict: true) }.to raise_error(Billing::InFlight)
         expect(e.reload.hcb_transfer_id).to be_nil
       end
     end
 
     it "honours MOCK_HCB without touching HCB" do
       allow(Billing).to receive(:mock?).and_return(true)
-      t = Billing.charge!([entry], name: "x")
+      t = Billing.charge!([ entry ], name: "x")
       expect(t).to be_completed
       expect(t.remote_id).to start_with("mock_")
       expect(hcb_disbursements).to be_empty
@@ -102,7 +102,7 @@ RSpec.describe Billing do
     it "never loses the remote id if settling entries blows up" do
       e = entry(500)
       allow_any_instance_of(HCB::Transfer).to receive(:settle_entries!).and_raise("db hiccup")
-      expect { Billing.charge!([e], name: "x") }.to raise_error("db hiccup")
+      expect { Billing.charge!([ e ], name: "x") }.to raise_error("db hiccup")
       transfer = HCB::Transfer.sole
       expect(transfer).to be_completed
       expect(transfer.remote_id).to eq("xfr_fake1")
@@ -159,7 +159,7 @@ RSpec.describe Billing do
     it "marks a 422 as failed + retryable and keeps the claim" do
       mails = capture_billing_mail
       hcb_raises(api_error(HCBV4::UnprocessableEntityError, "You don't have enough money to make this disbursement.", status: 422, error_code: "invalid_operation"))
-      transfer = Billing.charge!([e], name: "x")
+      transfer = Billing.charge!([ e ], name: "x")
 
       expect(transfer).to be_failed
       expect(transfer).to be_retryable
@@ -177,7 +177,7 @@ RSpec.describe Billing do
 
     it "marks oauth/credential failures as failed + not retryable and invalidates the connection" do
       hcb_raises(OAuth2::Error.new(double(parsed: { "error" => "invalid_grant" }, body: "", status: 400, response: nil)))
-      transfer = Billing.charge!([e], name: "x")
+      transfer = Billing.charge!([ e ], name: "x")
       expect(transfer).to be_failed
       expect(transfer).not_to be_retryable
       expect(profile.oauth_connection.reload).to be_invalidated
@@ -261,13 +261,12 @@ RSpec.describe Billing do
       Billing.charge!([ e ], name: "x")
       expect { e.reload.void! }.to raise_error(ArgumentError, /claimed by transfer/)
       expect(e.reload.destroy).to be(false)
-
     end
 
     it "marks timeouts as unknown and never retries them" do
       mails = capture_billing_mail
       hcb_raises(Faraday::TimeoutError.new("Net::ReadTimeout"))
-      transfer = Billing.charge!([e], name: "x")
+      transfer = Billing.charge!([ e ], name: "x")
       expect(transfer).to be_unknown
       expect(transfer.next_attempt_at).to be_nil
       expect(HCB::Transfer.due_for_retry).to be_empty
@@ -282,13 +281,13 @@ RSpec.describe Billing do
 
     it "marks 5xx as unknown" do
       hcb_raises(api_error(HCBV4::ServerError, "Internal Server Error", status: 500))
-      expect(Billing.charge!([e], name: "x")).to be_unknown
+      expect(Billing.charge!([ e ], name: "x")).to be_unknown
     end
 
     it "treats a missing ENV var as definite, not unknown" do
       mails = capture_billing_mail
       hcb_raises(KeyError.new("key not found: \"HCB_WAREHOUSE_ORG_ID\""))
-      transfer = Billing.charge!([e], name: "x")
+      transfer = Billing.charge!([ e ], name: "x")
 
       expect(transfer).to be_failed
       expect(transfer).not_to be_retryable
@@ -300,14 +299,14 @@ RSpec.describe Billing do
 
     it "raises typed errors in strict mode" do
       hcb_raises(Faraday::TimeoutError.new("boom"))
-      expect { Billing.charge!([e], name: "x", strict: true) }.to raise_error(Billing::Unconfirmed)
+      expect { Billing.charge!([ e ], name: "x", strict: true) }.to raise_error(Billing::Unconfirmed)
       hcb_raises(api_error(HCBV4::BadRequestError, "nope", status: 400))
-      expect { Billing.charge!([entry], name: "x", strict: true) }.to raise_error(Billing::InFlight) # first one is still unknown
+      expect { Billing.charge!([ entry ], name: "x", strict: true) }.to raise_error(Billing::InFlight) # first one is still unknown
     end
 
     it "retries a failed transfer with the same key and gives up after MAX_ATTEMPTS" do
       hcb_raises(api_error(HCBV4::RateLimitError, "slow down", status: 429))
-      transfer = Billing.charge!([e], name: "x")
+      transfer = Billing.charge!([ e ], name: "x")
       key = transfer.idempotency_key
 
       (HCB::Transfer::MAX_ATTEMPTS - 1).times do
@@ -328,7 +327,7 @@ RSpec.describe Billing do
 
     it "does not fail the transfer when only the memo write fails" do
       allow_any_instance_of(BillingProfile).to receive(:set_transaction_memo!).and_raise(Faraday::TimeoutError.new("memo"))
-      transfer = Billing.charge!([e], name: "x")
+      transfer = Billing.charge!([ e ], name: "x")
       expect(transfer).to be_completed
       expect(transfer.metadata["memo_pending"]).to be(true)
       expect(e.reload).to be_settled
@@ -336,7 +335,7 @@ RSpec.describe Billing do
   end
 
   describe ".credit!" do
-    let(:original) { entry(1000).tap { |x| Billing.charge!([x], name: "charge") }.reload }
+    let(:original) { entry(1000).tap { |x| Billing.charge!([ x ], name: "charge") }.reload }
 
     it "creates a negative entry and a credit transfer to the org" do
       transfer = Billing.credit!(reverses: original, amount_cents: 300, name: "Refund")

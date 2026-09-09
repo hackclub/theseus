@@ -17,7 +17,7 @@ module SnailMail
           valign: :center,
           overflow: :shrink_to_fit,
           min_font_size: 4,
-          disable_wrap_by_char: letter.address.us?,
+          disable_wrap_by_char: letter.address.us?
         }
 
         opts = default_options.merge(options)
@@ -27,7 +27,7 @@ module SnailMail
         font(font_name) do
           text_box(
             letter.address.snailify(letter.return_address.country),
-            at: [@x, @y],
+            at: [ @x, @y ],
             width: @width,
             height: @height,
             **opts,
@@ -35,7 +35,7 @@ module SnailMail
         end
 
         if stroke_box
-          stroke { rectangle([@x, @y], @width, @height) }
+          stroke { rectangle([ @x, @y ], @width, @height) }
         end
 
         stroke_preview_bounds(@x, @y, @width, @height, label: "destination address")

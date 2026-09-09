@@ -23,7 +23,7 @@ class Billing::Backfill
     remote = remote_transfers_by_id
     say "found #{remote.size} transfers on HQ's ledger"
 
-    Batch.where.not(hcb_transfer_id: [nil, ""]).where.not(billing_profile: nil).find_each do |batch|
+    Batch.where.not(hcb_transfer_id: [ nil, "" ]).where.not(billing_profile: nil).find_each do |batch|
       next if batch.hcb_transfer_id.start_with?("mock")
       next if batch.ledger_entries.indicia.charges.exists?
       estimate = batch.letters.joins(:usps_indicium).sum("COALESCE(usps_indicia.postage,0) + COALESCE(usps_indicia.fees,0)")
@@ -31,7 +31,7 @@ class Billing::Backfill
       backfill!(batch, batch.billing_profile, batch.hcb_transfer_id, remote, (estimate * 100).ceil, "Postage for #{batch.public_id}")
     end
 
-    USPS::Indicium.where.not(hcb_transfer_id: [nil, ""]).where.not(billing_profile: nil).includes(:letter).find_each do |indicium|
+    USPS::Indicium.where.not(hcb_transfer_id: [ nil, "" ]).where.not(billing_profile: nil).includes(:letter).find_each do |indicium|
       next if indicium.ledger_entries.indicia.charges.exists?
       estimate = ((indicium.letter&.postage || indicium.cost || 0) * 100).ceil
       backfill!(indicium, indicium.billing_profile, indicium.hcb_transfer_id, remote, estimate, "Postage for #{indicium.letter&.public_id || indicium.public_id}")

@@ -5,7 +5,7 @@ module Public
     before_action :set_letter
 
     def show
-      @framed = params[:framed].present? ? params[:framed] == 'true' : request.headers["Sec-Fetch-Dest"] == "iframe"
+      @framed = params[:framed].present? ? params[:framed] == "true" : request.headers["Sec-Fetch-Dest"] == "iframe"
       @from_qr = params[:qr].present?
       render "public/letters/show"
     end
@@ -19,7 +19,7 @@ module Public
         frame_aware_redirect_to public_letter_path(@letter, qr: params[:qr])
       else
         flash[:alert] = "huh?"
-        return frame_aware_redirect_to public_letter_path(@letter, qr: params[:qr])
+        frame_aware_redirect_to public_letter_path(@letter, qr: params[:qr])
       end
     end
 
@@ -29,7 +29,7 @@ module Public
         frame_aware_redirect_to public_letter_path(@letter, qr: params[:qr])
       else
         flash[:alert] = "huh?"
-        return frame_aware_redirect_to public_letter_path(@letter, qr: params[:qr])
+        frame_aware_redirect_to public_letter_path(@letter, qr: params[:qr])
       end
     end
 

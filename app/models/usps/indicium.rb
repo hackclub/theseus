@@ -37,7 +37,7 @@ class USPS::Indicium < ApplicationRecord
 
   enum :processing_category, {
     letter: 0,
-    flat: 1,
+    flat: 1
   }
 
   belongs_to :payment_account, foreign_key: :usps_payment_account_id
@@ -58,7 +58,7 @@ class USPS::Indicium < ApplicationRecord
       height: letter.height.to_f,
       thickness: 0.1,
       non_machinable_indicators: letter.non_machinable? ? { isRigid: true } : nil,
-      image_type: "SVG",
+      image_type: "SVG"
     }.compact
 
     response = if letter.address.us?

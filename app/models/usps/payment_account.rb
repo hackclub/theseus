@@ -27,8 +27,8 @@ class USPS::PaymentAccount < ApplicationRecord
 
   enum :account_type, {
     EPS: 0,
-    PERMIT: 1,
-  # METER: 2 # someday.... someday i will be a PC Postage vendor..,,,..,
+    PERMIT: 1
+    # METER: 2 # someday.... someday i will be a PC Postage vendor..,,,..,
   }
 
   def display_name
@@ -64,20 +64,20 @@ class USPS::PaymentAccount < ApplicationRecord
         accountNumber: account_number,
         permitNumber: permit_number,
         permitZIP: permit_zip,
-        manifestMID: manifest_mid || usps_mailer_id.mid,
+        manifestMID: manifest_mid || usps_mailer_id.mid
       }.compact_blank,
       {
         roleName: "LABEL_OWNER",
         CRID: usps_mailer_id.crid,
         MID: usps_mailer_id.mid,
-        manifestMID: manifest_mid || usps_mailer_id.mid,
+        manifestMID: manifest_mid || usps_mailer_id.mid
       },
       {
         roleName: "MAIL_OWNER",
         CRID: usps_mailer_id.crid,
         MID: usps_mailer_id.mid,
-        manifestMID: manifest_mid || usps_mailer_id.mid,
-      },
+        manifestMID: manifest_mid || usps_mailer_id.mid
+      }
     ]
     USPS::APIService.create_payment_token(roles:)
   end

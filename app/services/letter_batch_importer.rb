@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class LetterBatchImporter
-  GREMLINS = ["‎", "​"].join.freeze
+  GREMLINS = [ "‎", "​" ].join.freeze
 
   def initialize(batch)
     @batch = batch
@@ -60,7 +60,7 @@ class LetterBatchImporter
         row: i,
         status: errs.empty? ? :valid : :error,
         errors: errs,
-        sample: get(row, "first_name").to_s + " " + get(row, "last_name").to_s,
+        sample: get(row, "first_name").to_s + " " + get(row, "last_name").to_s
       }
     end
     results
@@ -107,7 +107,7 @@ class LetterBatchImporter
       postal_code: zip,
       country: country&.alpha2 || raw_country&.upcase || "US",
       phone_number: get(row, "phone_number"),
-      email: get(row, "email"),
+      email: get(row, "email")
     }
   end
 end

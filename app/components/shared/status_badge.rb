@@ -23,15 +23,15 @@ class Components::Shared::StatusBadge < Components::Base
   end
 
   def variant_for_status
-    case [@type, @status.to_s]
-    when [:batch, "awaiting_field_mapping"] then "yellow"
-    when [:batch, "fields_mapped"] then "blue"
-    when [:batch, "processed"] then "green"
-    when [:letter, "queued"] then "background2"
-    when [:letter, "pending"] then "yellow"
-    when [:letter, "printed"] then "blue"
-    when [:letter, "mailed"], [:letter, "received"] then "green"
-    when [:letter, "canceled"], [:letter, "failed"] then "red"
+    case [ @type, @status.to_s ]
+    when [ :batch, "awaiting_field_mapping" ] then "yellow"
+    when [ :batch, "fields_mapped" ] then "blue"
+    when [ :batch, "processed" ] then "green"
+    when [ :letter, "queued" ] then "background2"
+    when [ :letter, "pending" ] then "yellow"
+    when [ :letter, "printed" ] then "blue"
+    when [ :letter, "mailed" ], [ :letter, "received" ] then "green"
+    when [ :letter, "canceled" ], [ :letter, "failed" ] then "red"
     else "background2"
     end
   end

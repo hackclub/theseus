@@ -9,7 +9,7 @@ module Public
       Sentry.set_context("impersonation", {
         real_user_id: current_user&.id,
         real_user_email: current_user&.email,
-        impersonator_user_id: session[:public_impersonator_user_id],
+        impersonator_user_id: session[:public_impersonator_user_id]
       })
     end
 

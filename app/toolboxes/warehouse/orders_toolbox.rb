@@ -3,10 +3,10 @@
 module Warehouse
   class OrdersToolbox < ApplicationToolbox
     before_action :require_warehouse!
-    before_action :set_order, except: [:search, :create, :create_from_template]
-    before_action :require_owner_or_admin!, only: [:update, :send_to_warehouse, :cancel, :destroy]
+    before_action :set_order, except: [ :search, :create, :create_from_template ]
+    before_action :require_owner_or_admin!, only: [ :update, :send_to_warehouse, :cancel, :destroy ]
 
-    default_param :order_id, :string, "Order ID (e.g. pkg_...)", except: [:search, :create, :create_from_template]
+    default_param :order_id, :string, "Order ID (e.g. pkg_...)", except: [ :search, :create, :create_from_template ]
 
     tool "Search warehouse package orders by keyword with optional state filter. Returns paginated list with recipient, status, and tracking", access: :read do
       param :query, :string, "Search term (matches order ID, recipient email, title, tags, address name)", optional: true
@@ -32,8 +32,8 @@ module Warehouse
       param :recipient_email, :string, "Recipient email address"
       param :notify_on_dispatch, :boolean, "Email recipient when order ships", optional: true
       param :billing_profile_id, :string, "Billing profile for charging shipment costs (use postage_billing_profiles to find)", optional: true
-      param :tags, [:string], "Tags for the order", optional: true
-      param :line_items, [:object], "Items to ship, each with a sku_id (integer) and quantity (integer)"
+      param :tags, [ :string ], "Tags for the order", optional: true
+      param :line_items, [ :object ], "Items to ship, each with a sku_id (integer) and quantity (integer)"
       param :address, :object, "Shipping address — {first_name, last_name, line_1, line_2, city, state, postal_code, country, phone_number, email}"
     end
     def create
@@ -55,7 +55,7 @@ module Warehouse
       param :recipient_email, :string, "Recipient email address"
       param :notify_on_dispatch, :boolean, "Email recipient when order ships", optional: true
       param :billing_profile_id, :string, "Billing profile for charging shipment costs (use postage_billing_profiles to find)", optional: true
-      param :tags, [:string], "Tags for the order", optional: true
+      param :tags, [ :string ], "Tags for the order", optional: true
       param :address, :object, "Shipping address — {first_name, last_name, line_1, line_2, city, state, postal_code, country, phone_number, email}"
     end
     def create_from_template
@@ -73,7 +73,7 @@ module Warehouse
         billing_profile: billing_profile,
         address_attributes: params[:address]&.permit(
           :first_name, :last_name, :line_1, :line_2, :city, :state, :postal_code, :country, :phone_number, :email
-        )&.to_h,
+        )&.to_h
       }.compact
 
       @order = Warehouse::Order.from_template(template, attrs)
@@ -89,8 +89,8 @@ module Warehouse
       param :recipient_email, :string, "Recipient email address", optional: true
       param :notify_on_dispatch, :boolean, "Email recipient when order ships", optional: true
       param :billing_profile_id, :string, "Billing profile for charging shipment costs (use postage_billing_profiles to find)", optional: true
-      param :tags, [:string], "Tags for the order", optional: true
-      param :line_items, [:object], "Line items — each: {id: integer (for update), sku_id: integer, quantity: integer, _destroy: boolean}", optional: true
+      param :tags, [ :string ], "Tags for the order", optional: true
+      param :line_items, [ :object ], "Line items — each: {id: integer (for update), sku_id: integer, quantity: integer, _destroy: boolean}", optional: true
       param :address, :object, "Shipping address fields to update", optional: true
     end
     def update
@@ -114,7 +114,7 @@ module Warehouse
         schema: {
           type: "object",
           properties: { confirmed: { type: "boolean", description: "Yes, dispatch this order" } },
-          required: ["confirmed"]
+          required: [ "confirmed" ]
         }
       )
       halt error: "Dispatch cancelled" unless result["action"] == "accept" && result.dig("content", "confirmed")
@@ -132,7 +132,7 @@ module Warehouse
         schema: {
           type: "object",
           properties: { confirmed: { type: "boolean", description: "Yes, cancel this order" } },
-          required: ["confirmed"]
+          required: [ "confirmed" ]
         }
       )
       halt error: "Cancellation aborted" unless result["action"] == "accept" && result.dig("content", "confirmed")

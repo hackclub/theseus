@@ -32,5 +32,4 @@ class Components::Admin::USPS::MailerIds::Form < Components::Base
   def form_url
     @mailer_id.persisted? ? admin_usps_mailer_id_path(@mailer_id) : admin_usps_mailer_ids_path
   end
-
 end

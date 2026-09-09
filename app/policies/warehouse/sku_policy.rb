@@ -2,7 +2,7 @@ class Warehouse::SKUPolicy < ApplicationPolicy
   def index?
     user_can_warehouse
   end
-  
+
   def show?
     user_can_warehouse
   end
@@ -10,7 +10,7 @@ class Warehouse::SKUPolicy < ApplicationPolicy
   def create?
     false
   end
-  
+
   def new?
     false
   end

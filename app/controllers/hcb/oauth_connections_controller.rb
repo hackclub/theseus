@@ -1,5 +1,5 @@
 class HCB::OauthConnectionsController < ApplicationController
-  skip_after_action :verify_authorized, only: [:new, :callback]
+  skip_after_action :verify_authorized, only: [ :new, :callback ]
 
   def new
     session[:hcb_oauth_state] = SecureRandom.urlsafe_base64(32)

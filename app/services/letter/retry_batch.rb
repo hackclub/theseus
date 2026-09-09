@@ -15,7 +15,7 @@ class Letter::RetryBatch
 
       opts = @batch.process_options || {}
       if opts["template_cycle"].blank?
-        opts["template_cycle"] = [SnailMail::PhlexService.templates_for_size(:standard).first].compact
+        opts["template_cycle"] = [ SnailMail::PhlexService.templates_for_size(:standard).first ].compact
         @batch.update!(process_options: opts)
       end
     end

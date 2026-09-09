@@ -10,8 +10,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.bigint "record_id", null: false
       t.bigint "blob_id", null: false
       t.datetime "created_at", null: false
-      t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-      t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+      t.index [ "blob_id" ], name: "index_active_storage_attachments_on_blob_id"
+      t.index [ "record_type", "record_id", "name", "blob_id" ], name: "index_active_storage_attachments_uniqueness", unique: true
     end
     create_table "active_storage_blobs" do |t|
       t.string "key", null: false
@@ -22,12 +22,12 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.bigint "byte_size", null: false
       t.string "checksum"
       t.datetime "created_at", null: false
-      t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+      t.index [ "key" ], name: "index_active_storage_blobs_on_key", unique: true
     end
     create_table "active_storage_variant_records" do |t|
       t.bigint "blob_id", null: false
       t.string "variation_digest", null: false
-      t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+      t.index [ "blob_id", "variation_digest" ], name: "index_active_storage_variant_records_uniqueness", unique: true
     end
     create_table "addresses" do |t|
       t.string "first_name"
@@ -43,7 +43,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.string "phone_number"
       t.bigint "batch_id"
       t.string "email"
-      t.index ["batch_id"], name: "index_addresses_on_batch_id"
+      t.index [ "batch_id" ], name: "index_addresses_on_batch_id"
     end
     create_table "api_keys" do |t|
       t.bigint "user_id", null: false
@@ -55,8 +55,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.boolean "may_impersonate"
-      t.index ["token_bidx"], name: "index_api_keys_on_token_bidx", unique: true
-      t.index ["user_id"], name: "index_api_keys_on_user_id"
+      t.index [ "token_bidx" ], name: "index_api_keys_on_token_bidx", unique: true
+      t.index [ "user_id" ], name: "index_api_keys_on_user_id"
     end
     create_table "batches" do |t|
       t.bigint "user_id", null: false
@@ -78,13 +78,13 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.date "letter_mailing_date"
       t.string "letter_return_address_name"
       t.bigint "letter_queue_id"
-      t.index ["letter_mailer_id_id"], name: "index_batches_on_letter_mailer_id_id"
-      t.index ["letter_queue_id"], name: "index_batches_on_letter_queue_id"
-      t.index ["letter_return_address_id"], name: "index_batches_on_letter_return_address_id"
-      t.index ["tags"], name: "index_batches_on_tags", using: :gin
-      t.index ["type"], name: "index_batches_on_type"
-      t.index ["user_id"], name: "index_batches_on_user_id"
-      t.index ["warehouse_template_id"], name: "index_batches_on_warehouse_template_id"
+      t.index [ "letter_mailer_id_id" ], name: "index_batches_on_letter_mailer_id_id"
+      t.index [ "letter_queue_id" ], name: "index_batches_on_letter_queue_id"
+      t.index [ "letter_return_address_id" ], name: "index_batches_on_letter_return_address_id"
+      t.index [ "tags" ], name: "index_batches_on_tags", using: :gin
+      t.index [ "type" ], name: "index_batches_on_type"
+      t.index [ "user_id" ], name: "index_batches_on_user_id"
+      t.index [ "warehouse_template_id" ], name: "index_batches_on_warehouse_template_id"
     end
     create_table "blazer_audits" do |t|
       t.bigint "user_id"
@@ -92,8 +92,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.text "statement"
       t.string "data_source"
       t.datetime "created_at"
-      t.index ["query_id"], name: "index_blazer_audits_on_query_id"
-      t.index ["user_id"], name: "index_blazer_audits_on_user_id"
+      t.index [ "query_id" ], name: "index_blazer_audits_on_query_id"
+      t.index [ "user_id" ], name: "index_blazer_audits_on_user_id"
     end
     create_table "blazer_checks" do |t|
       t.bigint "creator_id"
@@ -107,8 +107,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "last_run_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["creator_id"], name: "index_blazer_checks_on_creator_id"
-      t.index ["query_id"], name: "index_blazer_checks_on_query_id"
+      t.index [ "creator_id" ], name: "index_blazer_checks_on_creator_id"
+      t.index [ "query_id" ], name: "index_blazer_checks_on_query_id"
     end
     create_table "blazer_dashboard_queries" do |t|
       t.bigint "dashboard_id"
@@ -116,15 +116,15 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.integer "position"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["dashboard_id"], name: "index_blazer_dashboard_queries_on_dashboard_id"
-      t.index ["query_id"], name: "index_blazer_dashboard_queries_on_query_id"
+      t.index [ "dashboard_id" ], name: "index_blazer_dashboard_queries_on_dashboard_id"
+      t.index [ "query_id" ], name: "index_blazer_dashboard_queries_on_query_id"
     end
     create_table "blazer_dashboards" do |t|
       t.bigint "creator_id"
       t.string "name"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["creator_id"], name: "index_blazer_dashboards_on_creator_id"
+      t.index [ "creator_id" ], name: "index_blazer_dashboards_on_creator_id"
     end
     create_table "blazer_queries" do |t|
       t.bigint "creator_id"
@@ -135,7 +135,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.string "status"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["creator_id"], name: "index_blazer_queries_on_creator_id"
+      t.index [ "creator_id" ], name: "index_blazer_queries_on_creator_id"
     end
     create_table "common_tags" do |t|
       t.string "tag"
@@ -172,8 +172,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.text "error_backtrace", array: true
       t.uuid "process_id"
       t.interval "duration"
-      t.index ["active_job_id", "created_at"], name: "index_good_job_executions_on_active_job_id_and_created_at"
-      t.index ["process_id", "created_at"], name: "index_good_job_executions_on_process_id_and_created_at"
+      t.index [ "active_job_id", "created_at" ], name: "index_good_job_executions_on_active_job_id_and_created_at"
+      t.index [ "process_id", "created_at" ], name: "index_good_job_executions_on_process_id_and_created_at"
     end
     create_table "good_job_processes", id: :uuid, default: -> { "gen_random_uuid()" } do |t|
       t.datetime "created_at", null: false
@@ -186,7 +186,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "updated_at", null: false
       t.text "key"
       t.jsonb "value"
-      t.index ["key"], name: "index_good_job_settings_on_key", unique: true
+      t.index [ "key" ], name: "index_good_job_settings_on_key", unique: true
     end
     create_table "good_jobs", id: :uuid, default: -> { "gen_random_uuid()" } do |t|
       t.text "queue_name"
@@ -212,21 +212,21 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.text "labels", array: true
       t.uuid "locked_by_id"
       t.datetime "locked_at"
-      t.index ["active_job_id", "created_at"], name: "index_good_jobs_on_active_job_id_and_created_at"
-      t.index ["batch_callback_id"], name: "index_good_jobs_on_batch_callback_id", where: "(batch_callback_id IS NOT NULL)"
-      t.index ["batch_id"], name: "index_good_jobs_on_batch_id", where: "(batch_id IS NOT NULL)"
-      t.index ["concurrency_key", "created_at"], name: "index_good_jobs_on_concurrency_key_and_created_at"
-      t.index ["concurrency_key"], name: "index_good_jobs_on_concurrency_key_when_unfinished", where: "(finished_at IS NULL)"
-      t.index ["cron_key", "created_at"], name: "index_good_jobs_on_cron_key_and_created_at_cond", where: "(cron_key IS NOT NULL)"
-      t.index ["cron_key", "cron_at"], name: "index_good_jobs_on_cron_key_and_cron_at_cond", unique: true, where: "(cron_key IS NOT NULL)"
-      t.index ["finished_at"], name: "index_good_jobs_jobs_on_finished_at", where: "((retried_good_job_id IS NULL) AND (finished_at IS NOT NULL))"
-      t.index ["labels"], name: "index_good_jobs_on_labels", where: "(labels IS NOT NULL)", using: :gin
-      t.index ["locked_by_id"], name: "index_good_jobs_on_locked_by_id", where: "(locked_by_id IS NOT NULL)"
-      t.index ["priority", "created_at"], name: "index_good_job_jobs_for_candidate_lookup", where: "(finished_at IS NULL)"
-      t.index ["priority", "created_at"], name: "index_good_jobs_jobs_on_priority_created_at_when_unfinished", order: { priority: "DESC NULLS LAST" }, where: "(finished_at IS NULL)"
-      t.index ["priority", "scheduled_at"], name: "index_good_jobs_on_priority_scheduled_at_unfinished_unlocked", where: "((finished_at IS NULL) AND (locked_by_id IS NULL))"
-      t.index ["queue_name", "scheduled_at"], name: "index_good_jobs_on_queue_name_and_scheduled_at", where: "(finished_at IS NULL)"
-      t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
+      t.index [ "active_job_id", "created_at" ], name: "index_good_jobs_on_active_job_id_and_created_at"
+      t.index [ "batch_callback_id" ], name: "index_good_jobs_on_batch_callback_id", where: "(batch_callback_id IS NOT NULL)"
+      t.index [ "batch_id" ], name: "index_good_jobs_on_batch_id", where: "(batch_id IS NOT NULL)"
+      t.index [ "concurrency_key", "created_at" ], name: "index_good_jobs_on_concurrency_key_and_created_at"
+      t.index [ "concurrency_key" ], name: "index_good_jobs_on_concurrency_key_when_unfinished", where: "(finished_at IS NULL)"
+      t.index [ "cron_key", "created_at" ], name: "index_good_jobs_on_cron_key_and_created_at_cond", where: "(cron_key IS NOT NULL)"
+      t.index [ "cron_key", "cron_at" ], name: "index_good_jobs_on_cron_key_and_cron_at_cond", unique: true, where: "(cron_key IS NOT NULL)"
+      t.index [ "finished_at" ], name: "index_good_jobs_jobs_on_finished_at", where: "((retried_good_job_id IS NULL) AND (finished_at IS NOT NULL))"
+      t.index [ "labels" ], name: "index_good_jobs_on_labels", where: "(labels IS NOT NULL)", using: :gin
+      t.index [ "locked_by_id" ], name: "index_good_jobs_on_locked_by_id", where: "(locked_by_id IS NOT NULL)"
+      t.index [ "priority", "created_at" ], name: "index_good_job_jobs_for_candidate_lookup", where: "(finished_at IS NULL)"
+      t.index [ "priority", "created_at" ], name: "index_good_jobs_jobs_on_priority_created_at_when_unfinished", order: { priority: "DESC NULLS LAST" }, where: "(finished_at IS NULL)"
+      t.index [ "priority", "scheduled_at" ], name: "index_good_jobs_on_priority_scheduled_at_unfinished_unlocked", where: "((finished_at IS NULL) AND (locked_by_id IS NULL))"
+      t.index [ "queue_name", "scheduled_at" ], name: "index_good_jobs_on_queue_name_and_scheduled_at", where: "(finished_at IS NULL)"
+      t.index [ "scheduled_at" ], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
     end
     create_table "letter_queues" do |t|
       t.string "name"
@@ -249,10 +249,10 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.string "postage_type"
       t.bigint "usps_payment_account_id"
       t.boolean "include_qr_code", default: true
-      t.index ["letter_mailer_id_id"], name: "index_letter_queues_on_letter_mailer_id_id"
-      t.index ["letter_return_address_id"], name: "index_letter_queues_on_letter_return_address_id"
-      t.index ["type"], name: "index_letter_queues_on_type"
-      t.index ["user_id"], name: "index_letter_queues_on_user_id"
+      t.index [ "letter_mailer_id_id" ], name: "index_letter_queues_on_letter_mailer_id_id"
+      t.index [ "letter_return_address_id" ], name: "index_letter_queues_on_letter_return_address_id"
+      t.index [ "type" ], name: "index_letter_queues_on_type"
+      t.index [ "user_id" ], name: "index_letter_queues_on_user_id"
     end
     create_table "letters" do |t|
       t.integer "processing_category"
@@ -285,15 +285,15 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.string "return_address_name"
       t.bigint "letter_queue_id"
       t.string "idempotency_key"
-      t.index ["address_id"], name: "index_letters_on_address_id"
-      t.index ["batch_id"], name: "index_letters_on_batch_id"
-      t.index ["idempotency_key"], name: "index_letters_on_idempotency_key", unique: true
-      t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
-      t.index ["letter_queue_id"], name: "index_letters_on_letter_queue_id"
-      t.index ["return_address_id"], name: "index_letters_on_return_address_id"
-      t.index ["tags"], name: "index_letters_on_tags", using: :gin
-      t.index ["user_id"], name: "index_letters_on_user_id"
-      t.index ["usps_mailer_id_id"], name: "index_letters_on_usps_mailer_id_id"
+      t.index [ "address_id" ], name: "index_letters_on_address_id"
+      t.index [ "batch_id" ], name: "index_letters_on_batch_id"
+      t.index [ "idempotency_key" ], name: "index_letters_on_idempotency_key", unique: true
+      t.index [ "imb_serial_number" ], name: "index_letters_on_imb_serial_number"
+      t.index [ "letter_queue_id" ], name: "index_letters_on_letter_queue_id"
+      t.index [ "return_address_id" ], name: "index_letters_on_return_address_id"
+      t.index [ "tags" ], name: "index_letters_on_tags", using: :gin
+      t.index [ "user_id" ], name: "index_letters_on_user_id"
+      t.index [ "usps_mailer_id_id" ], name: "index_letters_on_usps_mailer_id_id"
     end
     create_table "public_api_keys" do |t|
       t.bigint "public_user_id", null: false
@@ -303,8 +303,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "updated_at", null: false
       t.string "name"
       t.string "token_bidx"
-      t.index ["public_user_id"], name: "index_public_api_keys_on_public_user_id"
-      t.index ["token_bidx"], name: "index_public_api_keys_on_token_bidx", unique: true
+      t.index [ "public_user_id" ], name: "index_public_api_keys_on_public_user_id"
+      t.index [ "token_bidx" ], name: "index_public_api_keys_on_token_bidx", unique: true
     end
     create_table "public_impersonations" do |t|
       t.bigint "user_id", null: false
@@ -312,7 +312,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.string "target_email"
-      t.index ["user_id"], name: "index_public_impersonations_on_user_id"
+      t.index [ "user_id" ], name: "index_public_impersonations_on_user_id"
     end
     create_table "public_login_codes" do |t|
       t.string "token"
@@ -321,7 +321,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "updated_at", null: false
       t.bigint "user_id", null: false
       t.datetime "used_at"
-      t.index ["user_id"], name: "index_public_login_codes_on_user_id"
+      t.index [ "user_id" ], name: "index_public_login_codes_on_user_id"
     end
     create_table "public_users" do |t|
       t.string "email"
@@ -340,7 +340,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.bigint "user_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["user_id"], name: "index_return_addresses_on_user_id"
+      t.index [ "user_id" ], name: "index_return_addresses_on_user_id"
     end
     create_table "source_tags" do |t|
       t.string "slug"
@@ -361,8 +361,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.boolean "can_impersonate_public"
       t.bigint "home_mid_id", default: 1, null: false
       t.bigint "home_return_address_id", default: 1, null: false
-      t.index ["home_mid_id"], name: "index_users_on_home_mid_id"
-      t.index ["home_return_address_id"], name: "index_users_on_home_return_address_id"
+      t.index [ "home_mid_id" ], name: "index_users_on_home_mid_id"
+      t.index [ "home_return_address_id" ], name: "index_users_on_home_return_address_id"
     end
     create_table "usps_indicia" do |t|
       t.integer "processing_category"
@@ -378,8 +378,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.jsonb "raw_json_response"
       t.boolean "flirted"
       t.decimal "fees"
-      t.index ["letter_id"], name: "index_usps_indicia_on_letter_id"
-      t.index ["usps_payment_account_id"], name: "index_usps_indicia_on_usps_payment_account_id"
+      t.index [ "letter_id" ], name: "index_usps_indicia_on_letter_id"
+      t.index [ "usps_payment_account_id" ], name: "index_usps_indicia_on_usps_payment_account_id"
     end
     create_table "usps_iv_mtr_events" do |t|
       t.datetime "happened_at"
@@ -391,11 +391,11 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.bigint "mailer_id_id", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["batch_id"], name: "index_usps_iv_mtr_events_on_batch_id"
-      t.index ["letter_id"], name: "index_usps_iv_mtr_events_on_letter_id"
-      t.index ["mailer_id_id", "happened_at"], name: "index_usps_iv_mtr_events_on_mailer_id_id_and_happened_at"
-      t.index ["mailer_id_id", "opcode"], name: "index_usps_iv_mtr_events_on_mailer_id_id_and_opcode"
-      t.index ["mailer_id_id"], name: "index_usps_iv_mtr_events_on_mailer_id_id"
+      t.index [ "batch_id" ], name: "index_usps_iv_mtr_events_on_batch_id"
+      t.index [ "letter_id" ], name: "index_usps_iv_mtr_events_on_letter_id"
+      t.index [ "mailer_id_id", "happened_at" ], name: "index_usps_iv_mtr_events_on_mailer_id_id_and_happened_at"
+      t.index [ "mailer_id_id", "opcode" ], name: "index_usps_iv_mtr_events_on_mailer_id_id_and_opcode"
+      t.index [ "mailer_id_id" ], name: "index_usps_iv_mtr_events_on_mailer_id_id"
     end
     create_table "usps_iv_mtr_raw_json_batches" do |t|
       t.jsonb "events"
@@ -424,7 +424,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.string "name"
       t.string "manifest_mid"
       t.boolean "ach"
-      t.index ["usps_mailer_id_id"], name: "index_usps_payment_accounts_on_usps_mailer_id_id"
+      t.index [ "usps_mailer_id_id" ], name: "index_usps_payment_accounts_on_usps_mailer_id_id"
     end
     create_table "warehouse_line_items" do |t|
       t.integer "quantity"
@@ -433,9 +433,9 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "updated_at", null: false
       t.bigint "order_id"
       t.bigint "template_id"
-      t.index ["order_id"], name: "index_warehouse_line_items_on_order_id"
-      t.index ["sku_id"], name: "index_warehouse_line_items_on_sku_id"
-      t.index ["template_id"], name: "index_warehouse_line_items_on_template_id"
+      t.index [ "order_id" ], name: "index_warehouse_line_items_on_order_id"
+      t.index [ "sku_id" ], name: "index_warehouse_line_items_on_sku_id"
+      t.index [ "template_id" ], name: "index_warehouse_line_items_on_template_id"
     end
     create_table "warehouse_orders" do |t|
       t.string "hc_id"
@@ -467,14 +467,14 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.citext "tags", default: [], array: true
       t.decimal "labor_cost", precision: 10, scale: 2
       t.decimal "contents_cost", precision: 10, scale: 2
-      t.index ["address_id"], name: "index_warehouse_orders_on_address_id"
-      t.index ["batch_id"], name: "index_warehouse_orders_on_batch_id"
-      t.index ["hc_id"], name: "index_warehouse_orders_on_hc_id"
-      t.index ["idempotency_key"], name: "index_warehouse_orders_on_idempotency_key", unique: true
-      t.index ["source_tag_id"], name: "index_warehouse_orders_on_source_tag_id"
-      t.index ["tags"], name: "index_warehouse_orders_on_tags", using: :gin
-      t.index ["template_id"], name: "index_warehouse_orders_on_template_id"
-      t.index ["user_id"], name: "index_warehouse_orders_on_user_id"
+      t.index [ "address_id" ], name: "index_warehouse_orders_on_address_id"
+      t.index [ "batch_id" ], name: "index_warehouse_orders_on_batch_id"
+      t.index [ "hc_id" ], name: "index_warehouse_orders_on_hc_id"
+      t.index [ "idempotency_key" ], name: "index_warehouse_orders_on_idempotency_key", unique: true
+      t.index [ "source_tag_id" ], name: "index_warehouse_orders_on_source_tag_id"
+      t.index [ "tags" ], name: "index_warehouse_orders_on_tags", using: :gin
+      t.index [ "template_id" ], name: "index_warehouse_orders_on_template_id"
+      t.index [ "user_id" ], name: "index_warehouse_orders_on_user_id"
     end
     create_table "warehouse_skus" do |t|
       t.string "sku"
@@ -494,7 +494,7 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.decimal "declared_unit_cost_override"
       t.string "zenventory_id"
       t.integer "inbound"
-      t.index ["sku"], name: "index_warehouse_skus_on_sku", unique: true
+      t.index [ "sku" ], name: "index_warehouse_skus_on_sku", unique: true
     end
     create_table "warehouse_templates" do |t|
       t.bigint "user_id", null: false
@@ -503,8 +503,8 @@ class InitSchema < ActiveRecord::Migration[8.0]
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.boolean "public"
-      t.index ["source_tag_id"], name: "index_warehouse_templates_on_source_tag_id"
-      t.index ["user_id"], name: "index_warehouse_templates_on_user_id"
+      t.index [ "source_tag_id" ], name: "index_warehouse_templates_on_source_tag_id"
+      t.index [ "user_id" ], name: "index_warehouse_templates_on_user_id"
     end
     add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
     add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"

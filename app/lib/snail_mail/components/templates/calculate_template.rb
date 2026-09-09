@@ -18,7 +18,7 @@ module SnailMail
 
         def view_template
           # full-bleed background design (2100x1500, ~1.4:1 aspect vs 432x288 canvas)
-          image(image_path("calculate/main.png"), at: [0, 288], width: 432, height: 288)
+          image(image_path("calculate/main.png"), at: [ 0, 288 ], width: 432, height: 288)
 
           render_return_address(10, 280, 160, 70, size: 8)
           render_postage

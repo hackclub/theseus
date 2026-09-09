@@ -11,7 +11,7 @@ module SnailMail
         def view_template
           image(
             image_path("dino-waving.png"),
-            at: [333, 163],
+            at: [ 333, 163 ],
             width: 87,
           )
 

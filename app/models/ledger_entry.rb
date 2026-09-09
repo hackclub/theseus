@@ -56,13 +56,13 @@ class LedgerEntry < ApplicationRecord
     labor: 0,
     postage: 1,
     contents: 2,
-    indicia: 3,
+    indicia: 3
   }
 
   enum :state, {
     pending: 0,
     settled: 1,
-    voided: 2,
+    voided: 2
   }
 
   validates :amount_cents, presence: true, numericality: { other_than: 0, only_integer: true }

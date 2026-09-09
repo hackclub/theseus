@@ -5,9 +5,9 @@ module SnailMail
 
       # Template sizes in points [width, height]
       SIZES = {
-        standard: [6 * 72, 4 * 72], # 4x6 inches (432 x 288 points)
-        envelope: [9.5 * 72, 4.125 * 72], # #10 envelope (684 x 297 points)
-        half_letter: [8.27 * 72, 5.83 * 72], # A5 (595.44 x 419.76 points)
+        standard: [ 6 * 72, 4 * 72 ], # 4x6 inches (432 x 288 points)
+        envelope: [ 9.5 * 72, 4.125 * 72 ], # #10 envelope (684 x 297 points)
+        half_letter: [ 8.27 * 72, 5.83 * 72 ] # A5 (595.44 x 419.76 points)
       }.freeze
 
       # Template configuration methods - can be overridden in subclasses
@@ -45,12 +45,12 @@ module SnailMail
         save_graphics_state do
           stroke_color "FF1493" # deeppink
           line_width 1
-          stroke_rectangle [x, y], width, height
+          stroke_rectangle [ x, y ], width, height
 
           if label
             fill_color "FF1493"
             font("arial", size: 6) do
-              draw_text label, at: [x + 2, y - 8]
+              draw_text label, at: [ x + 2, y - 8 ]
             end
           end
         end

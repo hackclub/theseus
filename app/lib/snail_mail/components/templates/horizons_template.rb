@@ -19,7 +19,7 @@ module SnailMail
         def view_template
           image(
             image_path("horizons/stripes.png"),
-            at: [ -10, 345],
+            at: [ -10, 345 ],
             width: 443,
           )
           image(
@@ -40,7 +40,7 @@ module SnailMail
           render_qr_code(5, 115, 50)
           render_letter_id(10, 65, 10, rotate: 90)
           render_postage
-          bounding_box [8, 165],
+          bounding_box [ 8, 165 ],
                         width: 220,
                         height: 120,
                         valign: :bottom do
@@ -48,7 +48,6 @@ module SnailMail
             text "contents:", style: :bold
             text letter.rubber_stamps || ""
           end
-
         end
 
         private
@@ -61,7 +60,6 @@ module SnailMail
           stroke_preview_bounds(10, 65, 10, 60, label: "letter ID")
           stroke_preview_bounds(bounds.right - 200, bounds.top, 200, 50, label: "postage + FIM-D")
         end
-
       end
     end
   end

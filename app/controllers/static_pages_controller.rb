@@ -1,7 +1,7 @@
 class StaticPagesController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:login, :api_docs]
+  skip_before_action :authenticate_user!, only: [ :login, :api_docs ]
   skip_after_action :verify_authorized
-  before_action :require_admin!, only: [:problems]
+  before_action :require_admin!, only: [ :problems ]
 
   def index
     @stats = DashboardStats.new(user: current_user)
@@ -27,7 +27,7 @@ class StaticPagesController < ApplicationController
   def problems
     enabled = Warehouse::SKU.where(enabled: true)
     @blocking = enabled.select { |s| !s.declared_unit_cost.positive? && (s.in_stock.present? || s.inbound.present?) }
-    @no_po_cost = enabled.where(average_po_cost: [nil, 0]).reject { |s| @blocking.include?(s) }
+    @no_po_cost = enabled.where(average_po_cost: [ nil, 0 ]).reject { |s| @blocking.include?(s) }
     @backordered = enabled.where("in_stock < 0").where("inbound IS NULL OR inbound < ABS(in_stock)")
     @stuck_orders = Warehouse::Order.where(aasm_state: "dispatched")
                       .where("dispatched_at < ?", 14.days.ago)

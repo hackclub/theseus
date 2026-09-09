@@ -17,10 +17,9 @@ module SnailMail
         end
 
         def view_template
-
           image(
             image_path("flavortown/chefs.png"),
-            at: [46, 260],
+            at: [ 46, 260 ],
             width: 340,
           )
 
@@ -45,7 +44,6 @@ module SnailMail
 
           render_postage
         end
-
       end
     end
   end

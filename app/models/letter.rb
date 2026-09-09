@@ -104,7 +104,7 @@ class Letter < ApplicationRecord
     end
 
     event :mark_mailed do
-      transitions from: [:pending, :printed], to: :mailed
+      transitions from: [ :pending, :printed ], to: :mailed
     end
 
     event :mark_received do
@@ -126,7 +126,7 @@ class Letter < ApplicationRecord
     return "Manual" if manual?
     return "Bulk upload" if bulk_upload?
     return queue&.name || "Queue" if queue?
-    return "API" if api?
+    "API" if api?
   end
 
   belongs_to :usps_mailer_id, class_name: "USPS::MailerId"
@@ -165,13 +165,13 @@ class Letter < ApplicationRecord
 
   enum :processing_category, {
     letter: 0,
-    flat: 1,
+    flat: 1
   }, instance_methods: false, prefix: true, suffix: true
 
   enum :postage_type, {
     stamps: 0,
     indicia: 1,
-    international_origin: 2,
+    international_origin: 2
   }, instance_methods: false
 
   has_one :usps_indicium, class_name: "USPS::Indicium"
@@ -234,7 +234,7 @@ class Letter < ApplicationRecord
         location: "#{e.scan_facility_city}, #{e.scan_facility_state} #{e.scan_facility_zip}",
         facility: "#{e.scan_facility_name} (#{e.scan_locale_key})",
         description: "[OP#{e.opcode.code}] #{e.opcode.process_description}",
-        extra_info: "#{e.handling_event_type_description} – #{e.mail_phase} – #{e.machine_name} (#{event.payload.dig("machineId") || "no ID"})",
+        extra_info: "#{e.handling_event_type_description} – #{e.mail_phase} – #{e.machine_name} (#{event.payload.dig("machineId") || "no ID"})"
       }
     end
     timestamps = []
@@ -244,21 +244,21 @@ class Letter < ApplicationRecord
       source: "Hack Club",
       facility: "Mailer",
       description: "Letter printed.",
-      location:,
+      location:
     } if printed_at
     timestamps << {
       happened_at: mailed_at.in_time_zone("America/New_York"),
       source: "Hack Club",
       facility: "Mailer",
       description: "Letter mailed!",
-      location:,
+      location:
     } if mailed_at
     timestamps << {
       happened_at: received_at.in_time_zone("America/New_York"),
       source: "You!",
       facility: "Your mailbox",
       description: "You received this letter!",
-      location: "wherever you live",
+      location: "wherever you live"
     } if received_at
     (iv + timestamps).sort_by { |event| event[:happened_at] }
   end
@@ -311,7 +311,6 @@ class Letter < ApplicationRecord
     else
       postage_for(postage_type: postage_type)
     end
-
   end
 
   def set_imb_sequence

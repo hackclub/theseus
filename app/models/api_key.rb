@@ -27,7 +27,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class APIKey < ApplicationRecord
-  has_paper_trail ignore: [:token_ciphertext, :token_bidx]
+  has_paper_trail ignore: [ :token_ciphertext, :token_bidx ]
 
   belongs_to :user
   belongs_to :billing_profile, class_name: "BillingProfile", foreign_key: :billing_profile_id, optional: true

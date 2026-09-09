@@ -40,5 +40,4 @@ class Components::Admin::CommonTags::Form < Components::Base
   def form_url
     @common_tag.persisted? ? admin_common_tag_path(@common_tag) : admin_common_tags_path
   end
-
 end

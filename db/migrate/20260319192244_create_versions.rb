@@ -1,7 +1,6 @@
 # This migration creates the `versions` table, the only schema PT requires.
 # All other migrations PT provides are optional.
 class CreateVersions < ActiveRecord::Migration[8.0]
-
   def change
     create_table :versions do |t|
       t.string   :whodunnit

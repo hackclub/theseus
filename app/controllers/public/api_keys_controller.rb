@@ -1,6 +1,6 @@
 module Public
   class APIKeysController < ApplicationController
-    before_action :set_api_key, except: [:index, :new, :create]
+    before_action :set_api_key, except: [ :index, :new, :create ]
     before_action :authenticate_public_user!
 
     def index

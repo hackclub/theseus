@@ -33,7 +33,7 @@ class Address < ApplicationRecord
 
   GREMLINS = [
     "\u200E", # LEFT-TO-RIGHT MARK
-    "\u200B", # ZERO WIDTH SPACE
+    "\u200B" # ZERO WIDTH SPACE
   ].join
 
   def self.strip_gremlins(str) = str&.delete(GREMLINS)&.presence
@@ -43,12 +43,12 @@ class Address < ApplicationRecord
 
   before_validation :strip_gremlins_from_fields
 
-  def name_line = [first_name, last_name].join(" ")
+  def name_line = [ first_name, last_name ].join(" ")
 
   def us_format
     <<~EOA
       #{name_line}
-      #{[line_1, line_2].compact_blank.join("\n")}
+      #{[ line_1, line_2 ].compact_blank.join("\n")}
       #{city}, #{state} #{postal_code}
       #{country}
     EOA

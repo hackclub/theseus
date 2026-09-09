@@ -20,7 +20,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class HCB::OauthConnection < ApplicationRecord
-  has_paper_trail ignore: [:access_token_ciphertext, :refresh_token_ciphertext]
+  has_paper_trail ignore: [ :access_token_ciphertext, :refresh_token_ciphertext ]
 
   belongs_to :user
   has_many :payment_accounts, dependent: :destroy

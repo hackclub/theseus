@@ -35,7 +35,7 @@ module SnailMail
           )
 
           render_speech_bubble(
-            bubble_position: [90 + 20, 189 - 5],
+            bubble_position: [ 90 + 20, 189 - 5 ],
             bubble_width: 306,
             bubble_height: 122,
             bubble_radius: 10,
@@ -47,7 +47,7 @@ module SnailMail
 
           image(
             image_path("msw-heidi-cant-readme.png"),
-            at: [6 + 20, 75],
+            at: [ 6 + 20, 75 ],
             width: 111,
           )
 

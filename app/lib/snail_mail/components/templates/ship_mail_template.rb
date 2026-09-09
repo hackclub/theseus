@@ -15,7 +15,7 @@ module SnailMail
         def view_template
           image(
             image_path("ship_mail.png"),
-            at: [-2.5, 288],
+            at: [ -2.5, 288 ],
             width: 443,
           )
 

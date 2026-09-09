@@ -1,6 +1,6 @@
 module Public
   class LeaderboardsController < ApplicationController
-    layout 'public/frameable'
+    layout "public/frameable"
 
     before_action :set_framed
 
@@ -34,14 +34,14 @@ module Public
 
       Rails.cache.fetch(cache_key, expires_in: 10.minutes) do
         query = ::User.joins(:letters)
-                     .where(letters: { aasm_state: ['mailed', 'received'] })
-                     .group('users.id')
-                     .select('users.*, COUNT(letters.id) as letter_count')
-                     .having('COUNT(letters.id) > 0')
-                     .order('letter_count DESC')
+                     .where(letters: { aasm_state: [ "mailed", "received" ] })
+                     .group("users.id")
+                     .select("users.*, COUNT(letters.id) as letter_count")
+                     .having("COUNT(letters.id) > 0")
+                     .order("letter_count DESC")
                      .limit(100)
 
-        query = query.where('letters.mailed_at >= ?', start_time) if start_time
+        query = query.where("letters.mailed_at >= ?", start_time) if start_time
         query
       end
     end

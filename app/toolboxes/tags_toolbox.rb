@@ -24,8 +24,8 @@ class TagsToolbox < ApplicationToolbox
   def show
     tag = params[:tag]
 
-    letters = Letter.with_any_tags([tag])
-    warehouse_orders = Warehouse::Order.with_any_tags([tag])
+    letters = Letter.with_any_tags([ tag ])
+    warehouse_orders = Warehouse::Order.with_any_tags([ tag ])
 
     @tag = tag
     @letter_total = letters.count

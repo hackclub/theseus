@@ -189,5 +189,4 @@ class Warehouse::Batch < Batch
   def total_cost = contents_cost + labor_cost + postage_cost
 
   def update_associated_tags = orders.update_all(tags:)
-
 end

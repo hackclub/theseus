@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:omniauth_failure, :hackclub_callback, :dev_login]
+  skip_before_action :authenticate_user!, only: [ :omniauth_failure, :hackclub_callback, :dev_login ]
 
   skip_after_action :verify_authorized
 

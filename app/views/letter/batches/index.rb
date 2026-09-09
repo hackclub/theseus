@@ -65,9 +65,9 @@ class Views::Letter::Batches::Index < Views::Base
   def batches_table
     filtered = if state.present?
                  batches.where(aasm_state: state)
-               else
+    else
                  batches
-               end
+    end
 
     table do
       thead do

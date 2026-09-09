@@ -30,7 +30,7 @@ module CustomsReceipt
             order.dig(:shippingAddress, :line1),
             order.dig(:shippingAddress, :line2),
             "#{order.dig(:shippingAddress, :city)}, #{order.dig(:shippingAddress, :state)} #{order.dig(:shippingAddress, :zip)}",
-            order.dig(:shippingAddress, :country),
+            order.dig(:shippingAddress, :country)
           ].compact_blank.join("\n"),
         )
       end

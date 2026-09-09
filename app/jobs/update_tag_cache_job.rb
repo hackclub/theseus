@@ -5,4 +5,4 @@ class UpdateTagCacheJob < ApplicationJob
     Rails.cache.delete("available_tags")
     ApplicationController.helpers.available_tags
   end
-end 
+end

@@ -124,8 +124,8 @@ class Views::Warehouse::SKUs::Index < Views::Base
           end
         end
         tbody do
-          skus.sort_by { |s| [s.in_stock.to_i > 0 ? 0 : 1, s.sku] }.each do |sku|
-            search_text = [sku.sku, sku.name, sku.description].compact.join(" ").downcase
+          skus.sort_by { |s| [ s.in_stock.to_i > 0 ? 0 : 1, s.sku ] }.each do |sku|
+            search_text = [ sku.sku, sku.name, sku.description ].compact.join(" ").downcase
             tr(
               class: "sku-row",
               data: { search: search_text, status: stock_status(sku) }
@@ -174,7 +174,7 @@ class Views::Warehouse::SKUs::Index < Views::Base
       end
       tbody(id: "flat-table-body") do
         warehouse_skus.each do |sku|
-          search_text = [sku.sku, sku.name, sku.description].compact.join(" ").downcase
+          search_text = [ sku.sku, sku.name, sku.description ].compact.join(" ").downcase
           tr(
             class: "sku-row flat-view-row",
             data: {

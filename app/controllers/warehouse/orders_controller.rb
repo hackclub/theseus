@@ -1,5 +1,5 @@
 class Warehouse::OrdersController < ApplicationController
-  before_action :set_warehouse_order, except: [:new, :create, :index]
+  before_action :set_warehouse_order, except: [ :new, :create, :index ]
   # GET /warehouse/orders or /warehouse/orders.json
   def index
     authorize Warehouse::Order
@@ -10,9 +10,9 @@ class Warehouse::OrdersController < ApplicationController
     # Filter by origin (how the order was created)
     orders = if params[:origin].present? && %w[manual bulk_upload api].include?(params[:origin])
                @all_orders.where(created_via: params[:origin])
-             else
+    else
                @all_orders
-             end
+    end
 
     # Filter by state
     orders = orders.where(aasm_state: params[:state]) if params[:state].present?
@@ -160,7 +160,7 @@ class Warehouse::OrdersController < ApplicationController
       :notify_on_dispatch,
       :billing_profile_id,
       tags: [],
-      line_items_attributes: [:id, :sku_id, :quantity, :_destroy],
+      line_items_attributes: [ :id, :sku_id, :quantity, :_destroy ],
       address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email],
     ).compact_blank
   end

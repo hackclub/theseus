@@ -71,7 +71,7 @@ class Batch < ApplicationRecord
     end
 
     event :mark_purchasing do
-      transitions from: [:fields_mapped, :failed], to: :purchasing
+      transitions from: [ :fields_mapped, :failed ], to: :purchasing
     end
 
     # `failed` is a retryable state, not a terminal one: a stamps-only batch
@@ -79,18 +79,18 @@ class Batch < ApplicationRecord
     # the retry hits `if may_mark_generating_labels?`, no-ops, and the batch
     # stays failed forever with its labels regenerated but never recorded.
     event :mark_generating_labels do
-      transitions from: [:fields_mapped, :purchasing, :failed], to: :generating_labels
+      transitions from: [ :fields_mapped, :purchasing, :failed ], to: :generating_labels
     end
 
     event :mark_processed do
-      transitions from: [:fields_mapped, :purchasing, :generating_labels, :failed], to: :processed
+      transitions from: [ :fields_mapped, :purchasing, :generating_labels, :failed ], to: :processed
       after do
         User::UpdateTasksJob.perform_later(user)
       end
     end
 
     event :mark_failed do
-      transitions from: [:purchasing, :generating_labels], to: :failed
+      transitions from: [ :purchasing, :generating_labels ], to: :failed
     end
   end
 
@@ -136,7 +136,7 @@ class Batch < ApplicationRecord
 
   GREMLINS = [
     "‎",
-    "​",
+    "​"
   ].join
 
   def csv_headers
@@ -145,7 +145,7 @@ class Batch < ApplicationRecord
   end
 
   def run_map!
-    rows = CSV.parse(csv_data, headers: true, converters: [->(s) { s&.strip&.delete(GREMLINS).presence }])
+    rows = CSV.parse(csv_data, headers: true, converters: [ ->(s) { s&.strip&.delete(GREMLINS).presence } ])
 
     restricted_countries = Concurrent::Set.new
 
@@ -240,9 +240,9 @@ class Batch < ApplicationRecord
     # Normalize state name to abbreviation if country is found
     normalized_state = if country
         FrickinCountryNames.normalize_state(country, state)
-      else
+    else
         state
-      end
+    end
 
     resolved_country = country&.alpha2 || csv_country&.upcase
 
@@ -256,7 +256,7 @@ class Batch < ApplicationRecord
       postal_code: postal_code,
       country: resolved_country,
       phone_number: row[field_mapping["phone_number"]],
-      email: row[field_mapping["email"]],
+      email: row[field_mapping["email"]]
     }
   end
 

@@ -16,7 +16,7 @@ module SnailMail
           align: :left,
           valign: :top,
           overflow: :shrink_to_fit,
-          min_font_size: 6,
+          min_font_size: 6
         }
 
         opts = default_options.merge(options)
@@ -25,7 +25,7 @@ module SnailMail
         font(font_name) do
           text_box(
             format_return_address(letter, opts[:no_name_line]),
-            at: [@x, @y],
+            at: [ @x, @y ],
             width: @width,
             height: @height,
             **opts,
@@ -43,7 +43,7 @@ module SnailMail
 
         <<~EOA
           #{letter.return_address_name_line unless no_name_line}
-          #{[return_address.line_1, return_address.line_2].compact_blank.join("\n")}
+          #{[ return_address.line_1, return_address.line_2 ].compact_blank.join("\n")}
           #{return_address.city}, #{return_address.state} #{return_address.postal_code}
           #{return_address.country if return_address.country != letter.address.country}
         EOA

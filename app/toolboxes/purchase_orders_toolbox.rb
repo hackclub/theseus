@@ -34,7 +34,7 @@ class PurchaseOrdersToolbox < ApplicationToolbox
     param :supplier_id, :integer, "Vendor ID in the fulfillment warehouse system", optional: true
     param :notes, :string, "Notes for the order", optional: true
     param :required_by_date, :string, "Required by date (YYYY-MM-DD)", optional: true
-    param :line_items, [:object], "Line items for the order" do
+    param :line_items, [ :object ], "Line items for the order" do
       param :sku_id, :integer, "SKU ID (provide this or sku_request_id)", optional: true
       param :sku_request_id, :integer, "SKU request ID (for unresolved SKUs)", optional: true
       param :quantity, :integer, "Quantity to order"
@@ -63,7 +63,7 @@ class PurchaseOrdersToolbox < ApplicationToolbox
     param :supplier_id, :integer, "Vendor ID in the fulfillment warehouse system", optional: true
     param :notes, :string, "Notes for the order", optional: true
     param :required_by_date, :string, "Required by date (YYYY-MM-DD)", optional: true
-    param :line_items, [:object], "Replacement line items (replaces all existing)", optional: true do
+    param :line_items, [ :object ], "Replacement line items (replaces all existing)", optional: true do
       param :sku_id, :integer, "SKU ID (provide this or sku_request_id)", optional: true
       param :sku_request_id, :integer, "SKU request ID (for unresolved SKUs)", optional: true
       param :quantity, :integer, "Quantity to order"
@@ -140,7 +140,7 @@ class PurchaseOrdersToolbox < ApplicationToolbox
       schema: {
         type: "object",
         properties: { confirmed: { type: "boolean", description: "Yes, send to Zenventory" } },
-        required: ["confirmed"]
+        required: [ "confirmed" ]
       }
     )
     halt error: "Dispatch cancelled" unless result["action"] == "accept" && result.dig("content", "confirmed")

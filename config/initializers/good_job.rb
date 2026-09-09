@@ -8,55 +8,55 @@ Rails.application.configure do
   config.good_job.cron = {
     update_mailing_info: {
       cron: "*/5 * * * *",
-      class: "Warehouse::UpdateMailingInfoJob",
+      class: "Warehouse::UpdateMailingInfoJob"
     },
     update_inventory_levels: {
       cron: "*/5 * * * *",
-      class: "Warehouse::UpdateInventoryLevelsJob",
+      class: "Warehouse::UpdateInventoryLevelsJob"
     },
     update_cancellations: {
       cron: "*/10 * * * *",
-      class: "Warehouse::UpdateCancellationsJob",
+      class: "Warehouse::UpdateCancellationsJob"
     },
     update_map_data: {
       cron: "*/30 * * * *",
-      class: "Public::UpdateMapDataJob",
+      class: "Public::UpdateMapDataJob"
     },
     sync_skus: {
       cron: "*/7 * * * *",
-      class: "TableSync::SKUSyncJob",
+      class: "TableSync::SKUSyncJob"
     },
     sync_orders: {
       cron: "*/8 * * * *",
-      class: "TableSync::OrderSyncJob",
+      class: "TableSync::OrderSyncJob"
     },
     usps_pocketwatch: {
       cron: "0 5 * * *",  # 5:00 UTC = midnight EST
-      class: "USPS::PaymentAccount::PocketWatchJob",
+      class: "USPS::PaymentAccount::PocketWatchJob"
     },
     airtable_athena_stickers_etl: {
       cron: "*/22 * * * *",
-      class: "AirtableETL::AthenaStickersETLJob",
+      class: "AirtableETL::AthenaStickersETLJob"
     },
     hcb_welcome_etl: {
       cron: "*/23 * * * *",
-      class: "AirtableETL::HCBWelcomeETLJob",
+      class: "AirtableETL::HCBWelcomeETLJob"
     },
     sync_purchase_orders: {
       cron: "*/15 * * * *",
-      class: "Warehouse::SyncPurchaseOrdersJob",
+      class: "Warehouse::SyncPurchaseOrdersJob"
     },
     czar_digest: {
       cron: "0 14 * * 1-5",  # 14:00 UTC = 9am EST, weekdays only
-      class: "Warehouse::CzarDigestJob",
+      class: "Warehouse::CzarDigestJob"
     },
     billing_settlement_sweep: {
       cron: "*/15 * * * *",  # charge unclaimed entries, retry failed transfers
-      class: "BillingSettlementSweepJob",
+      class: "BillingSettlementSweepJob"
     },
     billing_reconcile: {
       cron: "*/10 * * * *",  # resolve unknown / stale-pending transfers against HCB
-      class: "BillingReconcileJob",
-    },
+      class: "BillingReconcileJob"
+    }
   }
 end

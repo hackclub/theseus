@@ -59,7 +59,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       select_field(
         name: "letter_instant_queue[letter_mailer_id_id]",
         label: "USPS Mailer ID",
-        options: USPS::MailerId.all.map { |m| [m.display_name, m.id] },
+        options: USPS::MailerId.all.map { |m| [ m.display_name, m.id ] },
         selected: queue.letter_mailer_id_id || current_user.home_mid_id
       )
 
@@ -68,7 +68,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       select_field(
         name: "letter_instant_queue[letter_return_address_id]",
         label: "Return Address",
-        options: addresses.map { |a| [a.display_name, a.id] },
+        options: addresses.map { |a| [ a.display_name, a.id ] },
         selected: queue.letter_return_address_id || current_user.home_return_address_id,
         link: { text: "(manage)", href: return_addresses_path }
       )
@@ -85,7 +85,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       select_field(
         name: "letter_instant_queue[postage_type]",
         label: "Postage Type",
-        options: [["Indicia", "indicia"], ["Stamps", "stamps"], ["International Origin", "international_origin"]],
+        options: [ [ "Indicia", "indicia" ], [ "Stamps", "stamps" ], [ "International Origin", "international_origin" ] ],
         selected: queue.postage_type || "indicia"
       )
 
@@ -93,7 +93,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       select_field(
         name: "letter_instant_queue[usps_payment_account_id]",
         label: "USPS Payment Account",
-        options: USPS::PaymentAccount.all.map { |a| [a.display_name, a.id] },
+        options: USPS::PaymentAccount.all.map { |a| [ a.display_name, a.id ] },
         selected: queue.usps_payment_account_id
       )
 
@@ -102,7 +102,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
         select_field(
           name: "letter_instant_queue[hcb_payment_account_id]",
           label: "Pay with HCB Organization",
-          options: current_user.billing_profiles.map { |a| [a.organization_name, a.id] },
+          options: current_user.billing_profiles.map { |a| [ a.organization_name, a.id ] },
           selected: queue.hcb_payment_account_id
         )
       else

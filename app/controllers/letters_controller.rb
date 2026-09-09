@@ -149,7 +149,7 @@ class LettersController < ApplicationController
         format.json {
           render json: {
             success: false,
-            error: 'already_mailed',
+            error: "already_mailed",
             letter: letter_json(@letter)
           }, status: :unprocessable_entity
         }
@@ -174,7 +174,7 @@ class LettersController < ApplicationController
         format.json {
           render json: {
             success: false,
-            error: 'validation_failed',
+            error: "validation_failed",
             errors: @letter.errors.full_messages
           }, status: :unprocessable_entity
         }
@@ -203,7 +203,7 @@ class LettersController < ApplicationController
   rescue AASM::InvalidTransition => e
     respond_to do |format|
       format.html { redirect_to @letter, alert: "Letter not marked as mailed." }
-      format.json { render json: { success: false, error: 'not_mailed' }, status: :unprocessable_entity }
+      format.json { render json: { success: false, error: "not_mailed" }, status: :unprocessable_entity }
     end
   end
 
@@ -325,7 +325,7 @@ class LettersController < ApplicationController
         :city,
         :state,
         :postal_code,
-        :country,
+        :country
       ],
       return_address_attributes: [
         :id,
@@ -335,7 +335,7 @@ class LettersController < ApplicationController
         :city,
         :state,
         :postal_code,
-        :country,
+        :country
       ],
       tags: [],
     )

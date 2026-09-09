@@ -46,7 +46,7 @@ class Components::Shared::Pagination < Components::Base
 
   def window(current, total, size: 2)
     pages = []
-    ([1, current - size].max..[current + size, total].min).each { |p| pages << p }
+    ([ 1, current - size ].max..[ current + size, total ].min).each { |p| pages << p }
     pages.unshift(1) unless pages.include?(1)
     pages.push(total) unless pages.include?(total)
     result = []

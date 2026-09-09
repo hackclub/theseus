@@ -29,7 +29,7 @@ class KbarController < ApplicationController
     record = policy_scope(record.class).find_by(id: record.id)
     return [] unless record
 
-    [{ label: record_label(record), sublabel: record.respond_to?(:public_id) ? record.public_id : record.id.to_s, path: url_for(record) }]
+    [ { label: record_label(record), sublabel: record.respond_to?(:public_id) ? record.public_id : record.id.to_s, path: url_for(record) } ]
   rescue => e
     Rails.logger.warn("kbar public_id lookup failed: #{e.message}")
     []
@@ -56,10 +56,10 @@ class KbarController < ApplicationController
 
     letters.includes(:address, :user).map do |l|
       addr = l.address
-      name = addr ? [addr.first_name, addr.last_name].compact_blank.join(" ") : nil
+      name = addr ? [ addr.first_name, addr.last_name ].compact_blank.join(" ") : nil
       title = l.user_facing_title.presence
 
-      sublabel = [name, title, l.aasm_state&.humanize].compact_blank.join(" · ")
+      sublabel = [ name, title, l.aasm_state&.humanize ].compact_blank.join(" · ")
 
       { label: "Letter ##{l.id}", sublabel:, path: letter_path(l) }
     end
@@ -77,10 +77,10 @@ class KbarController < ApplicationController
 
     orders.includes(:address, :user).map do |o|
       addr = o.address
-      name = addr ? [addr.first_name, addr.last_name].compact_blank.join(" ") : nil
+      name = addr ? [ addr.first_name, addr.last_name ].compact_blank.join(" ") : nil
       tracking = o.tracking_number.presence
 
-      sublabel = [name, tracking, o.aasm_state&.humanize].compact_blank.join(" · ")
+      sublabel = [ name, tracking, o.aasm_state&.humanize ].compact_blank.join(" · ")
 
       { label: "Order ##{o.hc_id || o.id}", sublabel:, path: warehouse_order_path(o) }
     end
@@ -94,7 +94,7 @@ class KbarController < ApplicationController
     users.map do |u|
       {
         label: u.username.presence || u.email,
-        sublabel: [u.email, u.is_admin? ? "Admin" : nil].compact_blank.join(" · "),
+        sublabel: [ u.email, u.is_admin? ? "Admin" : nil ].compact_blank.join(" · "),
         path: admin_user_path(u)
       }
     end
