@@ -35,3 +35,8 @@
 
 // addresses
 .flex-2 { flex: 2; }
+
+// tags
+.tag-flex-wrap { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag-stat-box { text-align: center; padding: 1rem 0.5rem; }
+.tag-stat-value { font-size: 1.5em; font-weight: bold; }

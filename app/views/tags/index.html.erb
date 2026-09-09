@@ -1,7 +1,7 @@
 <% content_for :title, "Tags" %>
 
 <div class="toolbar">
-  <strong style="font-size: 1.15em;">Tags</strong>
+  <strong class="text-title">Tags</strong>
   <%= render Components::Shared::Jumpcode.new(path: tags_path) %>
   <span class="spacer"></span>
   <%= form_with url: refresh_tags_path, method: :post, class: "form-inline" do %>
@@ -16,9 +16,9 @@
 <section class="mb-1">
   <strong>Common Tags</strong>
   <hr>
-  <div class="mt-half" style="display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem">
+  <div class="mt-half tag-flex-wrap">
     <% @common_tags.each do |tag| %>
-      <a href="<%= tag_stats_path(tag.tag) %>" style="text-decoration: none;"><span class="badge badge-info"><%= tag.tag %></span></a>
+      <a href="<%= tag_stats_path(tag.tag) %>" class="no-underline"><span class="badge badge-info"><%= tag.tag %></span></a>
     <% end %>
   </div>
 </section>
@@ -26,9 +26,9 @@
 <section>
   <strong>All Tags</strong>
   <hr>
-  <div class="mt-half" style="display: flex; flex-wrap: wrap; gap: 0.5rem 0.5rem">
+  <div class="mt-half tag-flex-wrap">
     <% @tags.each do |tag| %>
-      <a href="<%= tag_stats_path(tag) %>" style="text-decoration: none;"><span class="badge"><%= tag %></span></a>
+      <a href="<%= tag_stats_path(tag) %>" class="no-underline"><span class="badge"><%= tag %></span></a>
     <% end %>
   </div>
 </section>

@@ -1,14 +1,14 @@
 <% content_for :title, "Tag: #{@tag}" %>
 
-<div class="toolbar mb-0" style="border-bottom: none">
+<div class="toolbar mb-0 no-border-bottom">
   <div class="flex-row">
-    <a href="<%= tags_path %>" class="text-muted" style="text-decoration: none;">← Tags</a>
-    <strong style="font-size: 1.15em;"><%= @tag %></strong>
+    <a href="<%= tags_path %>" class="text-muted no-underline">← Tags</a>
+    <strong class="text-title"><%= @tag %></strong>
     <span class="badge badge-info">Tag</span>
   </div>
   <span class="spacer"></span>
   <div class="flex-row">
-    <select name="time_period" id="time_period" style="margin: 0;">
+    <select name="time_period" id="time_period" class="m-0">
       <option value="all_time" <%= "selected" if @time_period == "all_time" %>>All-time</option>
       <option value="ytd" <%= "selected" if @time_period == "ytd" %>>Year-to-date</option>
       <option value="month" <%= "selected" if @time_period == "month" %>>Specific month</option>
@@ -36,19 +36,19 @@
 
 <div class="show-layout">
   <div class="show-main">
-    <div class="mb-1" style="display:flex; gap:1rem">
-      <section style="flex: 1; text-align: center; padding: 1rem 0.5rem;">
-        <div style="font-size: 1.5em; font-weight: bold;"><%= number_with_delimiter(@warehouse_order_count) %></div>
+    <div class="mb-1 flex-gap-1">
+      <section class="flex-1 tag-stat-box">
+        <div class="tag-stat-value"><%= number_with_delimiter(@warehouse_order_count) %></div>
         <div class="text-muted">Warehouse Orders</div>
       </section>
-      <section style="flex: 1; text-align: center; padding: 1rem 0.5rem;">
-        <div style="font-size: 1.5em; font-weight: bold;"><%= number_with_delimiter(@letter_count) %></div>
+      <section class="flex-1 tag-stat-box">
+        <div class="tag-stat-value"><%= number_with_delimiter(@letter_count) %></div>
         <div class="text-muted">Letters</div>
       </section>
     </div>
 
-    <div class="mb-1" style="display:flex; gap:1rem">
-      <section style="flex: 1;">
+    <div class="mb-1 flex-gap-1">
+      <section class="flex-1">
         <strong>Letter Costs</strong>
         <hr>
         <div class="detail-grid mt-half">
@@ -57,7 +57,7 @@
         </div>
       </section>
 
-      <section style="flex: 1;">
+      <section class="flex-1">
         <strong>Warehouse Costs</strong>
         <hr>
         <div class="detail-grid mt-half">
