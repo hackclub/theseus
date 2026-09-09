@@ -87,3 +87,6 @@
 
 // Centered "connect to HCB" call-to-action card.
 .hcb-connect-card { text-align: center; padding: 2rem; max-width: 30rem; margin: 2rem auto; }
+
+// Standalone task-count badge iframe body (no default browser margin).
+.badge-frame-body { margin: 0 !important; }

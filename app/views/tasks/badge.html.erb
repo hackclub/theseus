@@ -4,7 +4,7 @@
     <%= vite_client_tag %>
     <%= vite_stylesheet_tag 'app_style.scss' %>
   </head>
-  <body style="margin: 0 !important;">
+  <body class="badge-frame-body">
     <% if @count && @count > 0 %>
       <%= link_to tasks_path, target: "_top" do %>
         <span class="badge badge-info"><%= @count %></span>
