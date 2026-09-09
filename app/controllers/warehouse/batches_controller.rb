@@ -94,8 +94,12 @@ class Warehouse::BatchesController < BaseBatchesController
 
   def destroy
     authorize @batch
-    @batch.destroy
-    redirect_to warehouse_batches_path, notice: "Batch was successfully destroyed."
+
+    if @batch.destroy
+      redirect_to warehouse_batches_path, status: :see_other, notice: "Batch was successfully destroyed."
+    else
+      redirect_to warehouse_batch_path(@batch), status: :see_other, alert: @batch.errors.full_messages.to_sentence.presence || "Batch could not be destroyed."
+    end
   end
 
   def process_form
