@@ -1,3 +1,6 @@
+# Columns, the FK and the backfill only — this migration stays transactional.
+# The indexes are built concurrently in 20260123084629, which cannot run
+# inside a transaction.
 class AddCreatedViaToWarehouseOrders < ActiveRecord::Migration[8.0]
   def change
     # These columns were added to db/schema.rb without a migration file, so a
@@ -13,31 +16,29 @@ class AddCreatedViaToWarehouseOrders < ActiveRecord::Migration[8.0]
     end
 
     unless column_exists?(:warehouse_orders, :origin_batch_id)
-      add_reference :warehouse_orders, :origin_batch, foreign_key: { to_table: :batches }, null: true
+      add_column :warehouse_orders, :origin_batch_id, :bigint
       origin_batch_added = true
     end
 
-    unless index_exists?(:warehouse_orders, :created_via)
-      add_index :warehouse_orders, :created_via
-    end
-
-    unless index_exists?(:warehouse_orders, :origin_batch_id)
-      add_index :warehouse_orders, :origin_batch_id
-    end
-
+    # NOT VALID first: warehouse_orders is large, and validating the
+    # constraint while holding the lock from ADD CONSTRAINT would block writes
+    # for the length of a full scan. VALIDATE takes a weaker lock.
     unless foreign_key_exists?(:warehouse_orders, :batches, column: :origin_batch_id)
-      add_foreign_key :warehouse_orders, :batches, column: :origin_batch_id
+      add_foreign_key :warehouse_orders, :batches, column: :origin_batch_id, validate: false
     end
 
     reversible do |dir|
       dir.up do
-        next unless created_via_added || origin_batch_added
+        if created_via_added || origin_batch_added
+          set = []
+          set << "created_via = CASE WHEN batch_id IS NOT NULL THEN 1 ELSE 0 END" if created_via_added
+          set << "origin_batch_id = batch_id" if origin_batch_added
 
-        set = []
-        set << "created_via = CASE WHEN batch_id IS NOT NULL THEN 1 ELSE 0 END" if created_via_added
-        set << "origin_batch_id = batch_id" if origin_batch_added
+          execute "UPDATE warehouse_orders SET #{set.join(', ')}"
+        end
 
-        execute "UPDATE warehouse_orders SET #{set.join(', ')}"
+        # No-op if it is already validated.
+        validate_foreign_key :warehouse_orders, :batches, column: :origin_batch_id
       end
     end
   end
