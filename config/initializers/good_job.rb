@@ -8,10 +8,6 @@ Rails.application.configure do
       cron: "*/5 * * * *",
       class: "Warehouse::UpdateMailingInfoJob",
     },
-    update_median_postage_costs: {
-      cron: "*/30 * * * *",
-      class: "Warehouse::UpdateMedianPostageCostsJob",
-    },
     update_inventory_levels: {
       cron: "*/5 * * * *",
       class: "Warehouse::UpdateInventoryLevelsJob",

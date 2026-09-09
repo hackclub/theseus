@@ -1,6 +1,8 @@
 class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
   queue_as :default
 
+  good_job_control_concurrency_with(perform_limit: 1, key: "update_inventory_levels")
+
   def perform(*args)
     Rails.logger.info("haiii!! it's ya girl cronjob coming to you with a hot new inventory update!")
     Rails.logger.info("taking zenventory...")

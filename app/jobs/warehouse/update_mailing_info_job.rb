@@ -1,6 +1,8 @@
 class Warehouse::UpdateMailingInfoJob < ApplicationJob
   queue_as :default
 
+  good_job_control_concurrency_with(perform_limit: 1, key: "update_mailing_info")
+
   FUDGE_FACTOR = 2.weeks
 
   def perform(*args)

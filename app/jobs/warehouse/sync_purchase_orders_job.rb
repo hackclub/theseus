@@ -3,6 +3,8 @@
 class Warehouse::SyncPurchaseOrdersJob < ApplicationJob
   queue_as :default
 
+  good_job_control_concurrency_with(perform_limit: 1, key: "sync_purchase_orders")
+
   def perform
     Rails.logger.info("syncing purchase orders from zenventory...")
 
