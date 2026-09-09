@@ -31,3 +31,6 @@
 .legend-color--traveled { background: #00e12c; }
 .legend-color--projected { background: #0f95ef; }
 .map-frame { position: relative; }
+
+// layouts/public/frameable
+.public-window { min-width: calc(min(516px, 100vw - 40px)); max-width: fit-content; }
