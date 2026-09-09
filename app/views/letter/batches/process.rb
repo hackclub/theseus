@@ -180,7 +180,10 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def payment_box
-    default_usps_id = ENV["DEFAULT_USPS_PACC_ID"] || USPS::PaymentAccount.first&.id
+    # Fall back to the oldest account, not whatever Postgres hands back first, so
+    # the pre-selected payer is the same on every render — including when
+    # DEFAULT_USPS_PACC_ID points at an account that no longer exists.
+    default_usps_id = USPS::PaymentAccount.where(id: ENV["DEFAULT_USPS_PACC_ID"]).pick(:id) || USPS::PaymentAccount.order(:id).pick(:id)
 
     section(id: "payment-section", class: "mb-1") do
       strong { "Payment" }

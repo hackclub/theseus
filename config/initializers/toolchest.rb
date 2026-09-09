@@ -96,5 +96,6 @@ Toolchest.configure do |config|
   end
 
   config.dns_rebinding_protection = true
-  config.allowed_origins = ["https://theseus.hackclub.com"]
+  config.allowed_hosts = ENV.fetch("MCP_ALLOWED_HOSTS", "mail.hackclub.com,theseus.hackclub.com").split(",").map(&:strip)
+  config.allowed_origins = config.allowed_hosts.map { |host| "https://#{host}" }
 end

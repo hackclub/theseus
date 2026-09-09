@@ -115,8 +115,12 @@ class Letter::BatchesController < BaseBatchesController
   # DELETE /letter/batches/:id
   def destroy
     authorize @batch, policy_class: Letter::BatchPolicy
-    @batch.destroy
-    redirect_to letter_batches_path, notice: "Batch was successfully destroyed."
+
+    if @batch.destroy
+      redirect_to letter_batches_path, status: :see_other, notice: "Batch was successfully destroyed."
+    else
+      redirect_to letter_batch_path(@batch), status: :see_other, alert: @batch.errors.full_messages.to_sentence.presence || "Batch could not be destroyed."
+    end
   end
 
   def process_form
@@ -207,7 +211,7 @@ class Letter::BatchesController < BaseBatchesController
       User::UpdateTasksJob.perform_later(current_user)
       redirect_to letter_batch_path(@batch), notice: "All letters have been marked as mailed."
     else
-      redirect_to letter_batch_path(@batch), alert: "Cannot mark letters as mailed. Batch must be processed."
+      redirect_to letter_batch_path(@batch), status: :see_other, alert: "Cannot mark letters as mailed. Batch must be processed."
     end
   end
 
@@ -220,7 +224,7 @@ class Letter::BatchesController < BaseBatchesController
       type: "application/pdf",
       disposition: params[:download] ? "attachment" : "inline"
   rescue ArgumentError => e
-    redirect_to letter_batch_path(@batch), alert: e.message
+    redirect_to letter_batch_path(@batch), status: :see_other, alert: e.message
   end
 
   def confirm_printed
@@ -250,7 +254,7 @@ class Letter::BatchesController < BaseBatchesController
   end
 
   def refund_overpayment
-    authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    authorize @batch, :refund_overpayment?, policy_class: Letter::BatchPolicy
 
     # Phase 1: compute and reserve under the batch lock. The credit entry is
     # created here (pending), so a second click sees a smaller net and bails.

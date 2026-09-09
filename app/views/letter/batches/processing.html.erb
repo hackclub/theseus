@@ -80,7 +80,7 @@
       <strong class="detail-label text-warning">⚠ Overpaid</strong>
       <span>
         <strong class="text-warning"><%= number_to_currency(overpaid / 100.0) %></strong>
-        <% if current_user&.admin? %>
+        <% if policy(@batch).refund_overpayment? %>
           <%= form_with url: refund_overpayment_letter_batch_path(@batch), method: :post do %>
             <%= render Components::MoneyNotice.new(
               lines: [Billing::Quote::Line.new(category: :indicia, label: "overpaid postage on #{@batch.public_id}", when: :now, amount_cents: [overpaid, refund_from.net_cents].min, count: 1)],

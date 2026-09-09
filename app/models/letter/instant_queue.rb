@@ -47,6 +47,7 @@ class Letter::InstantQueue < Letter::Queue
   validates :postage_type, presence: true, inclusion: { in: %w[indicia stamps international_origin] }
   validates :usps_payment_account_id, presence: true, if: :indicia?
   validates :hcb_payment_account_id, presence: true, if: :indicia?
+  validate :billing_profile_belongs_to_user
 
   # Associations
   belongs_to :usps_payment_account, class_name: "USPS::PaymentAccount", optional: true
@@ -57,6 +58,12 @@ class Letter::InstantQueue < Letter::Queue
 
   # Methods
   def indicia? = postage_type == "indicia"
+
+  def billing_profile_belongs_to_user
+    if billing_profile.present? && billing_profile.user != user
+      errors.add(:billing_profile, "must belong to the queue's user")
+    end
+  end
 
   # What each submitted letter bills the queue's owner (US rate; international varies).
   def billing_lines

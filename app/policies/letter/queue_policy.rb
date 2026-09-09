@@ -7,6 +7,18 @@ class Letter::QueuePolicy < ApplicationPolicy
 
   def index? = true
 
+  def show? = record_belongs_to_user || user_is_admin
+
+  def new? = user.present?
+
+  def create? = user.present?
+
+  def edit? = record_belongs_to_user || user_is_admin
+
+  alias_method :update?, :edit?
+
+  def destroy? = user_is_admin
+
   def create_letter?
     user.present?
   end
