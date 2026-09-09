@@ -1,0 +1,38 @@
+// ── Page scaffolding ───────────────────────────────────
+//
+// Recovered from the pre-Primer views.scss (see _forms.scss for the token map).
+
+// Centered page body. #theseus-content already supplies the outer padding, so
+// this only caps the measure and centers it.
+.page-container {
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+// Muted line under a page or field title.
+.page-subtitle {
+  color: var(--foreground2);
+  margin: 0;
+  font-size: 0.9em;
+}
+
+// Explanatory line under a section heading.
+.section-desc {
+  color: var(--foreground2);
+  font-size: 0.85em;
+  margin: 0.25rem 0 0 0;
+}
+
+
+// ── Footer ─────────────────────────────────────────────
+
+.app-footer {
+  padding: 1rem 1.5rem;
+  text-align: center;
+}
+
+.footer-rev {
+  color: var(--foreground2);
+  font-size: 0.75em;
+}

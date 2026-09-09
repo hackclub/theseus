@@ -1,0 +1,81 @@
+// ── Rendered markdown (API docs) ───────────────────────
+//
+// `.markdown-body` used to come from Primer's markdown stylesheet, which went
+// away with the rest of Primer. This is a plain replacement built on the
+// theseus tokens: readable measure, no gradients, tables inherit the app's
+// table styling.
+
+.api-docs-container {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.markdown-body {
+  line-height: 1.6;
+  overflow-wrap: break-word;
+
+  > *:first-child { margin-top: 0; }
+  > *:last-child { margin-bottom: 0; }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 1.5rem 0 0.75rem;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+
+  h1 { font-size: 1.75em; }
+  h2 {
+    font-size: 1.35em;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--background2);
+  }
+  h3 { font-size: 1.15em; }
+  h4, h5, h6 { font-size: 1em; }
+
+  p, ul, ol, blockquote, pre, table { margin: 0 0 1rem; }
+
+  ul, ol { padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+
+  a { color: var(--blue); }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.875em;
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    background: var(--background1);
+  }
+
+  pre {
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--background2);
+    border-radius: 4px;
+    background: var(--background1);
+
+    code {
+      padding: 0;
+      background: none;
+      font-size: 0.85em;
+    }
+  }
+
+  blockquote {
+    margin-left: 0;
+    padding: 0 1rem;
+    border-left: 4px solid var(--background2);
+    color: var(--foreground2);
+  }
+
+  hr { margin: 1.5rem 0; }
+
+  img { max-width: 100%; }
+}
+
+// Label inside .api-docs-copy-btn. The copy handler swaps its text, so the
+// class is a JS hook as well — keep the name.
+.copy-label {
+  white-space: nowrap;
+}

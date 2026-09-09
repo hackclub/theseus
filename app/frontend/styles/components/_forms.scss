@@ -1,0 +1,201 @@
+// ── Form layout ────────────────────────────────────────
+//
+// Recovered from the pre-Primer views.scss (nuked in bba1b95 "nuke webtui, go
+// plain"). The old rules referenced Primer's design tokens, which no longer
+// exist; they are mapped onto the theseus palette here:
+//
+//   --fgColor-muted        → --foreground2
+//   --fgColor-default      → inherit
+//   --fgColor-danger       → --red
+//   --fgColor-accent       → --blue
+//   --borderColor-default  → --background2
+//   --bgColor-default      → --background0
+//   --bgColor-muted        → --background1
+//
+// Pixel spacing is preserved 1:1 as rem (16px = 1rem).
+
+
+// ── Structure ──────────────────────────────────────────
+
+// Vertical form layout.
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// Two equal columns.
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+// Responsive column grids. `--sm` is used standalone, so it repeats the base
+// declarations rather than nesting under .form-grid-auto.
+.form-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+  gap: 1rem;
+}
+
+.form-grid-auto--sm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.75rem, 1fr));
+  gap: 1rem;
+}
+
+// Roomier sibling of theseus's .form-field.
+.form-field-lg {
+  margin-bottom: 1rem;
+}
+
+// Label with a trailing link ("Tags  manage tags").
+.form-label-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+// Heading between form sections.
+.form-section-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+}
+
+// A fieldset with the browser chrome removed.
+.fieldset-reset {
+  border: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+.fieldset-legend {
+  font-size: 0.9em;
+  color: var(--foreground2);
+  margin-bottom: 0.5rem;
+}
+
+
+// ── Labels & hints ─────────────────────────────────────
+
+// Block label above a field. Matches theseus's .form-field-label so labels set
+// with this class sit flush with the ones set inline elsewhere in the forms.
+.date-field-label {
+  display: block;
+  color: var(--foreground2);
+  margin-bottom: 0.25rem;
+  font-size: 0.9em;
+}
+
+// Checkbox/radio and its label on one line.
+.form-check-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+// Help text under a field. `--indented` lines it up under the label of a
+// preceding .form-check-label instead of the checkbox.
+.form-hint {
+  color: var(--foreground2);
+  font-size: 0.8em;
+  margin-top: 0.25rem;
+}
+
+.form-hint--indented {
+  margin-left: 1.75rem;
+}
+
+
+// ── Native controls ────────────────────────────────────
+
+@mixin field-chrome {
+  border: 1px solid var(--background2);
+  border-radius: 4px;
+  background: var(--background0);
+  color: inherit;
+}
+
+.select-field {
+  @include field-chrome;
+  width: 100%;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.9em;
+}
+
+.form-select {
+  @include field-chrome;
+  width: 100%;
+  padding: 0.3rem 0.75rem;
+}
+
+.form-select--lg {
+  @include field-chrome;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9em;
+}
+
+// Taller multi-select (template pickers).
+.multi-select-field {
+  @include field-chrome;
+  width: 100%;
+  min-height: 7.5rem;
+  padding: 0.3rem 0.75rem;
+}
+
+.file-input {
+  @include field-chrome;
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 0.9em;
+}
+
+// Selectize turns these into tag inputs (see entrypoints/taggable.js); the
+// class name is a JS hook, so keep it.
+.selectize-tags {
+  width: 100%;
+}
+
+// Postage type radios. Also a JS hook in letter/batches/process.rb.
+.postage-radio {
+  accent-color: var(--blue);
+}
+
+// A checkbox sitting in its own muted box.
+.checkbox-card {
+  padding: 0.75rem;
+  background: var(--background1);
+  border: 1px solid var(--background2);
+  border-radius: 4px;
+}
+
+
+// ── Validation errors ──────────────────────────────────
+
+.error-box {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.error-box-title {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--error-fg);
+  margin: 0 0 0.5rem 0;
+}
+
+.error-box-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--error-fg);
+  font-size: 0.85em;
+}

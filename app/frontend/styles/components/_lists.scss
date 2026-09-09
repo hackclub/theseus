@@ -1,0 +1,65 @@
+// ── Inline lists, tags and table rows ──────────────────
+//
+// Recovered from the pre-Primer views.scss and the 80-line views.scss that
+// replaced it (see _forms.scss for the token map).
+
+// Wrapping row of tag badges.
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+// Tag appended after an ID inside a table cell.
+.row-tag {
+  color: var(--foreground2);
+  font-size: 0.85em;
+
+  &::before {
+    content: '·';
+    margin: 0 0.5ch;
+  }
+}
+
+// Link that inherits its surroundings (row links, badge links).
+.link-reset {
+  text-decoration: none;
+  color: inherit;
+}
+
+// Copyable public identifier.
+.public-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.fw-medium {
+  font-weight: 500;
+}
+
+// Jumpcode chip + help toggle. The wrapper carries an equivalent inline style
+// today; this keeps the rendering identical once that inline style is dropped.
+.jumpcode {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+// ── Warehouse SKU table ────────────────────────────────
+//
+// Both classes are query hooks for the search/sort script in
+// warehouse/skus/index.rb, so the names have to stay. The rows are <tr>s inside
+// the standard table styling; these rules carry the numeric/monospace
+// treatment the cells apply inline today.
+
+.sku-row {
+  font-variant-numeric: tabular-nums;
+}
+
+// Rows in the ungrouped ("flat") view, which is sorted client-side on the SKU
+// code — hence the monospace first column.
+.flat-view-row td:first-child {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
