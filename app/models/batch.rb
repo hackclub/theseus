@@ -74,12 +74,16 @@ class Batch < ApplicationRecord
       transitions from: [:fields_mapped, :failed], to: :purchasing
     end
 
+    # `failed` is a retryable state, not a terminal one: a stamps-only batch
+    # that dies in label generation never enters `purchasing`, so without this
+    # the retry hits `if may_mark_generating_labels?`, no-ops, and the batch
+    # stays failed forever with its labels regenerated but never recorded.
     event :mark_generating_labels do
-      transitions from: [:fields_mapped, :purchasing], to: :generating_labels
+      transitions from: [:fields_mapped, :purchasing, :failed], to: :generating_labels
     end
 
     event :mark_processed do
-      transitions from: [:fields_mapped, :purchasing, :generating_labels], to: :processed
+      transitions from: [:fields_mapped, :purchasing, :generating_labels, :failed], to: :processed
       after do
         User::UpdateTasksJob.perform_later(user)
       end

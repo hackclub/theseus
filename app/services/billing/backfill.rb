@@ -27,6 +27,7 @@ class Billing::Backfill
       next if batch.hcb_transfer_id.start_with?("mock")
       next if batch.ledger_entries.indicia.charges.exists?
       estimate = batch.letters.joins(:usps_indicium).sum("COALESCE(usps_indicia.postage,0) + COALESCE(usps_indicia.fees,0)")
+      estimate = legacy_estimate(batch) if estimate.zero?
       backfill!(batch, batch.billing_profile, batch.hcb_transfer_id, remote, (estimate * 100).ceil, "Postage for #{batch.public_id}")
     end
 
@@ -41,6 +42,23 @@ class Billing::Backfill
   end
 
   private
+
+  # A main-era batch that died partway through purchase_batch_indicia kept its
+  # hcb_transfer_id but rolled the indicia back, so there is nothing left to
+  # price the charge from. Main charged the sum of the letters' own quoted
+  # postage, which is still sitting on the letter rows; only fall back to a
+  # live quote (which talks to USPS) if even that is gone.
+  def legacy_estimate(batch)
+    return 0 unless batch.respond_to?(:letters)
+
+    stored = batch.letters.where(postage_type: "indicia").sum(:postage)
+    return stored if stored.positive?
+
+    batch.postage_cost
+  rescue => e
+    say "could not estimate #{batch.class}##{batch.id}: #{e.message}"
+    0
+  end
 
   def backfill!(ledgerable, profile, remote_id, remote, estimate_cents, name)
     found = remote[remote_id]

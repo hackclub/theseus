@@ -119,13 +119,34 @@ class Letter::Batch < Batch
 
   alias_method :total_cost, :postage_cost
 
+  # What USPS actually took, read off the indicia rather than the letter's
+  # `indicia_state`. `postage` is only ever persisted by the trailing `save!`
+  # in USPS::Indicium#buy!, i.e. after USPS sold us postage, so a non-null
+  # postage IS the purchase. `indicia_state` is written afterwards and only by
+  # BatchProcessJob, so it's a strict subset: main-era letters (and anything
+  # bought through USPS::IndiciumPurchase) have a real indicium and a nil
+  # state. Filtering on the state made those read as $0 spent, which showed up
+  # as a full-batch "Overpaid" the moment the charge was backfilled.
   def actual_spent_cents
-    (letters.where(indicia_state: "purchased")
-      .joins(:usps_indicium)
+    (letters.joins(:usps_indicium)
+      .where.not(usps_indicia: { postage: nil })
       .sum("COALESCE(usps_indicia.postage, 0) + COALESCE(usps_indicia.fees, 0)") * 100).ceil
   end
 
   def indicia_charges = ledger_entries.indicia.charges.live
+
+  LEGACY_CHARGE_NOT_BACKFILLED = "legacy HCB charge not backfilled; run billing:backfill first"
+
+  # main recorded a batch's HCB charge in `hcb_transfer_id` and nothing else.
+  # A batch that died mid-purchase back then kept that column but rolled its
+  # indicia back, so the ledger reads "never charged" and re-processing would
+  # buy the whole batch a second time. Billing::Backfill turns the column into
+  # a settled entry; until it has, refuse to charge.
+  # (Backfill skips `mock` ids, so those must not latch here or they'd never
+  # be processable again.)
+  def unbackfilled_legacy_charge?
+    hcb_transfer_id.present? && !hcb_transfer_id.start_with?("mock") && indicia_charges.none?
+  end
 
   # Settled postage money, net of refunds, that USPS hasn't consumed yet.
   # Positive after processing means we overcharged; the job treats it as
@@ -229,7 +250,10 @@ class Letter::Batch < Batch
   # Propagate batch attributes to letters after update.
   # Only propagates sizing/mailing attrs if the batch hasn't been processed yet.
   def propagate_to_letters!
-    if may_mark_processed?
+    # Was `may_mark_processed?` standing in for "not yet processed"; say it
+    # outright so the aasm transition list can change without silently
+    # changing which batches get their sizing overwritten.
+    unless processed?
       letters.update_all(
         height: letter_height,
         width: letter_width,

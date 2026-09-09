@@ -230,6 +230,52 @@ RSpec.describe BatchProcessJob, type: :job do
         expect(batch.hcb_payment_account_id).to eq(hcb_account.id)
       end
 
+      # main stored the batch's HCB charge in hcb_transfer_id and nothing else.
+      # Until billing:backfill turns that into a ledger entry the ledger reads
+      # as "never charged", and a re-run would buy the whole batch twice.
+      it "refuses to charge a legacy batch whose HCB transfer isn't in the ledger yet" do
+        create_letters(2)
+        batch.update_columns(hcb_transfer_id: "xfr_legacy")
+        allow(Sentry).to receive(:capture_exception)
+        expect_any_instance_of(USPS::Indicium).not_to receive(:buy!)
+
+        perform_job
+
+        expect(batch.reload).to be_failed
+        expect(batch.process_error).to eq(Letter::Batch::LEGACY_CHARGE_NOT_BACKFILLED)
+        expect(hcb_disbursements).to be_empty
+        expect(batch.ledger_entries).to be_empty
+      end
+
+      it "rides on the legacy charge once it has been backfilled" do
+        letter = create_letters(1).first
+        estimate = (letter.postage * 100).ceil
+        batch.update_columns(hcb_transfer_id: "xfr_legacy")
+        transfer = HCB::Transfer.create!(billing_profile: hcb_account, direction: :debit,
+          hq_organization_id: Billing.destination_for(:indicia), amount_cents: estimate, state: :completed,
+          remote_id: "xfr_legacy", idempotency_key: "backfill_batch_#{batch.id}", name: "legacy", attempts: 1)
+        batch.ledger_entries.create!(billing_profile: hcb_account, category: :indicia, amount_cents: estimate,
+          state: :settled, settled_at: Time.current, hcb_transfer: transfer)
+        stub_buy_success
+
+        perform_job
+
+        expect(batch.reload).to be_processed
+        # the backfilled charge already covers this letter, so no new money moves
+        expect(hcb_disbursements).to be_empty
+      end
+
+      it "ignores a mock transfer id, which billing:backfill would never touch" do
+        create_letters(1)
+        batch.update_columns(hcb_transfer_id: "mock_xfr_1")
+        stub_buy_success
+
+        perform_job
+
+        expect(batch.reload).to be_processed
+        expect(hcb_disbursements.size).to eq(1)
+      end
+
       it "refuses to run while a previous charge is unconfirmed" do
         create_letters(1)
         hcb_raises(Faraday::TimeoutError.new("boom"))
@@ -292,6 +338,56 @@ RSpec.describe BatchProcessJob, type: :job do
 
         failed_letter = letters.find { |l| l.reload; l.indicia_state == "failed" }
         expect(failed_letter.indicia_error).to include("USPS service unavailable")
+      end
+
+      # A partially-purchased batch used to be marked `processed`, which was a
+      # dead end: Letter::RetryBatch refuses anything that isn't failed, and
+      # re-processing returns early on `processed?`.
+      it "fails the batch when some letters couldn't buy postage, and does not generate labels" do
+        create_letters(3)
+        bought = 0
+        allow_any_instance_of(USPS::Indicium).to receive(:buy!) do |indicium, _token|
+          bought += 1
+          raise "USPS service unavailable" if bought > 1
+          indicium.update!(postage: 0.68, fees: 0.0, raw_json_response: { "indiciaMetadata" => { "postage" => 0.68, "fees" => [], "SKU" => "FAKE" } })
+        end
+        allow(Sentry).to receive(:capture_exception)
+
+        perform_job
+
+        expect(batch.reload).to be_failed
+        expect(batch.process_error).to eq("2 letters failed to buy postage; retry to finish the batch")
+        expect(batch).not_to have_received(:generate_labels)
+        expect(batch.letters.where(indicia_state: "failed").count).to eq(2)
+      end
+
+      it "finishes the batch on retry, buying only the letters that failed" do
+        letters = create_letters(3)
+        bought = 0
+        allow_any_instance_of(USPS::Indicium).to receive(:buy!) do |indicium, _token|
+          bought += 1
+          raise "USPS service unavailable" if bought > 1
+          indicium.update!(postage: 0.68, fees: 0.0, raw_json_response: { "indiciaMetadata" => { "postage" => 0.68, "fees" => [], "SKU" => "FAKE" } })
+        end
+        allow(Sentry).to receive(:capture_exception)
+        perform_job
+        expect(batch.reload).to be_failed
+
+        buys = 0
+        allow_any_instance_of(USPS::Indicium).to receive(:buy!) do |indicium, _token|
+          buys += 1
+          indicium.update!(postage: 0.68, fees: 0.0, raw_json_response: { "indiciaMetadata" => { "postage" => 0.68, "fees" => [], "SKU" => "FAKE" } })
+        end
+        Letter::RetryBatch.new(batch: batch).call
+        perform_job
+
+        expect(buys).to eq(2) # only the two that failed
+        expect(batch.reload).to be_processed
+        expect(batch.process_error).to be_nil
+        expect(batch).to have_received(:generate_labels)
+        expect(letters.map { |l| l.reload.indicia_state }).to all(eq("purchased"))
+        # one charge for the whole batch; the retry rides on what it overpaid
+        expect(hcb_disbursements.size).to eq(1)
       end
 
       it "does NOT wrap purchases in a transaction (failures are per-letter)" do
@@ -429,6 +525,49 @@ RSpec.describe BatchProcessJob, type: :job do
 
       expect(batch).to have_received(:generate_labels)
       expect(batch.reload.aasm_state).to eq("processed")
+    end
+  end
+
+  describe "phase 3 failure is retryable" do
+    # A stamps-only batch never enters `purchasing`, so `failed` was a dead end
+    # for both mark_generating_labels and mark_processed — the retry ran, the
+    # labels were regenerated, and the batch sat in `failed` anyway.
+    it "recovers a stamps-only batch that died generating labels" do
+      create_letters(1)
+      batch.update!(process_options: process_options.merge(us_postage_type: "stamps"))
+      allow(batch).to receive(:generate_labels).and_raise("PDF renderer exploded")
+      allow(Sentry).to receive(:capture_exception)
+
+      perform_job
+
+      expect(batch.reload).to be_failed
+      expect(batch.process_error).to include("PDF renderer exploded")
+
+      allow(batch).to receive(:generate_labels)
+      Letter::RetryBatch.new(batch: batch).call
+      perform_job
+
+      expect(batch).to have_received(:generate_labels).twice # the failed run and the retry
+      expect(batch.reload).to be_processed
+      expect(batch.process_error).to be_nil
+      expect(hcb_disbursements).to be_empty
+    end
+
+    it "recovers an indicia batch that died generating labels without buying again" do
+      create_letters(1)
+      stub_buy_success
+      allow(batch).to receive(:generate_labels).and_raise("PDF renderer exploded")
+      allow(Sentry).to receive(:capture_exception)
+
+      perform_job
+      expect(batch.reload).to be_failed
+
+      allow(batch).to receive(:generate_labels)
+      Letter::RetryBatch.new(batch: batch).call
+      perform_job
+
+      expect(batch.reload).to be_processed
+      expect(hcb_disbursements.size).to eq(1)
     end
   end
 
