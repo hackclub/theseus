@@ -133,3 +133,12 @@
 .sidebar-approvals-link { display: flex; justify-content: space-between; align-items: center; }
 .page-header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
 .page-header-main { display: flex; flex-direction: column; }
+
+// ── Home page ──────────────────────────────────────────
+
+.home-section-header { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.025rem; color: var(--foreground2); }
+.home-stat-filters { margin-top: 0.25rem; }
+.quick-links-row { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1rem; }
+.quick-links-panel { min-width: 10rem; }
+.quick-links-title { margin: 0 0 0.25rem; }
+.quick-links-list { list-style: none; padding: 0; margin: 0; }
