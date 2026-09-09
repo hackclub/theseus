@@ -16,7 +16,7 @@ class Components::Admin::CommonTags::Form < Components::Base
 
     form_with model: @common_tag, url: form_url, local: true do |f|
       div(class: "form-stack") do
-        form_field("Tag", "common_tag[tag]", @common_tag.tag, required: true)
+        render Components::Shared::FormField.new(label: "Tag", name: "common_tag[tag]", value: @common_tag.tag, required: true)
 
         div(style: "margin-bottom:1rem;") do
           label(style: "display:flex;align-items:center;gap:0.5rem;cursor:pointer;") do
@@ -41,13 +41,4 @@ class Components::Admin::CommonTags::Form < Components::Base
     @common_tag.persisted? ? admin_common_tag_path(@common_tag) : admin_common_tags_path
   end
 
-  def form_field(label_text, name, value, required: false, type: "text")
-    div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
-        plain label_text
-        plain " *" if required
-      end
-      input(type: type, name: name, value: value, required: required, style: "width:100%;")
-    end
-  end
 end

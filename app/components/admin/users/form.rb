@@ -17,11 +17,11 @@ class Components::Admin::Users::Form < Components::Base
     form_with model: @user, url: form_url, method: form_method, local: true do |f|
       div(class: "form-stack") do
         # Identity
-        form_field("Username", "user[username]", @user.username)
-        form_field("Email", "user[email]", @user.email, type: "email")
-        form_field("Slack ID", "user[slack_id]", @user.slack_id, hint: "Slack member ID")
-        form_field("HCA ID", "user[hca_id]", @user.hca_id, hint: "Hack Club Airtable ID")
-        form_field("Icon URL", "user[icon_url]", @user.icon_url, hint: "Avatar image URL")
+        render Components::Shared::FormField.new(label: "Username", name: "user[username]", value: @user.username)
+        render Components::Shared::FormField.new(label: "Email", name: "user[email]", value: @user.email, type: "email")
+        render Components::Shared::FormField.new(label: "Slack ID", name: "user[slack_id]", value: @user.slack_id, hint: "Slack member ID")
+        render Components::Shared::FormField.new(label: "HCA ID", name: "user[hca_id]", value: @user.hca_id, hint: "Hack Club Airtable ID")
+        render Components::Shared::FormField.new(label: "Icon URL", name: "user[icon_url]", value: @user.icon_url, hint: "Avatar image URL")
 
         # Permissions section
         div(style: "margin-top:1.5rem;margin-bottom:1rem;") do
@@ -59,19 +59,6 @@ class Components::Admin::Users::Form < Components::Base
 
   private
 
-  def form_field(label_text, name, value, required: false, type: "text", hint: nil)
-    div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
-        plain label_text
-        plain " *" if required
-      end
-      input(type: type, name: name, value: value, required: required, style: "width:100%;")
-      if hint
-        small(class: "text-muted") { hint }
-      end
-    end
-  end
-
   def checkbox_field(label_text, name, value)
     div(style: "margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;") do
       input(type: "hidden", name: name, value: "0")
@@ -81,15 +68,14 @@ class Components::Admin::Users::Form < Components::Base
   end
 
   def select_field(label_text, name, options, selected_value)
-    div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { label_text }
-      select(name: name, style: "width:100%;") do
+    render Components::Shared::FormField.new(label: label_text, input: false) do
+      select(name: name, class: "form-field-input") do
         option(value: "") { "— None —" }
-        options.each do |label, id|
+        options.each do |opt_label, id|
           if id.to_s == selected_value.to_s
-            option(value: id, selected: true) { label }
+            option(value: id, selected: true) { opt_label }
           else
-            option(value: id) { label }
+            option(value: id) { opt_label }
           end
         end
       end

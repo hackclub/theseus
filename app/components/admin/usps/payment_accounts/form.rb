@@ -16,14 +16,11 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
 
     form_with model: @payment_account, url: form_url, local: true do |f|
       div(class: "form-stack") do
-        form_field("Name", "usps_payment_account[name]", @payment_account.name)
+        render Components::Shared::FormField.new(label: "Name", name: "usps_payment_account[name]", value: @payment_account.name)
 
         # Account type select
-        div(style: "margin-bottom:1rem;") do
-          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
-            plain "Account Type *"
-          end
-          select(name: "usps_payment_account[account_type]", required: true, style: "width:100%;") do
+        render Components::Shared::FormField.new(label: "Account Type", required: true, input: false) do
+          select(name: "usps_payment_account[account_type]", required: true, class: "form-field-input") do
             option(value: "") { "Select type…" }
             ::USPS::PaymentAccount.account_types.each_key do |type|
               if @payment_account.account_type == type
@@ -35,24 +32,21 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
           end
         end
 
-        form_field("Account Number", "usps_payment_account[account_number]", @payment_account.account_number,
+        render Components::Shared::FormField.new(label: "Account Number", name: "usps_payment_account[account_number]", value: @payment_account.account_number,
           hint: "Required for EPS accounts")
 
-        form_field("Permit Number", "usps_payment_account[permit_number]", @payment_account.permit_number,
+        render Components::Shared::FormField.new(label: "Permit Number", name: "usps_payment_account[permit_number]", value: @payment_account.permit_number,
           hint: "Required for PERMIT accounts")
 
-        form_field("Permit ZIP", "usps_payment_account[permit_zip]", @payment_account.permit_zip,
+        render Components::Shared::FormField.new(label: "Permit ZIP", name: "usps_payment_account[permit_zip]", value: @payment_account.permit_zip,
           hint: "Required for PERMIT accounts")
 
-        form_field("Manifest MID", "usps_payment_account[manifest_mid]", @payment_account.manifest_mid,
+        render Components::Shared::FormField.new(label: "Manifest MID", name: "usps_payment_account[manifest_mid]", value: @payment_account.manifest_mid,
           hint: "Falls back to Mailer ID's MID if blank")
 
         # Mailer ID select
-        div(style: "margin-bottom:1rem;") do
-          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
-            plain "Mailer ID *"
-          end
-          select(name: "usps_payment_account[usps_mailer_id_id]", required: true, style: "width:100%;") do
+        render Components::Shared::FormField.new(label: "Mailer ID", required: true, input: false) do
+          select(name: "usps_payment_account[usps_mailer_id_id]", required: true, class: "form-field-input") do
             option(value: "") { "Select mailer ID…" }
             ::USPS::MailerId.all.each do |mid|
               label_text = mid.name.present? ? "#{mid.name} (#{mid.mid})" : mid.mid
@@ -66,8 +60,7 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
         end
 
         # ACH checkbox
-        div(style: "margin-bottom:1rem;") do
-          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "ACH" }
+        render Components::Shared::FormField.new(label: "ACH", input: false) do
           input(type: "hidden", name: "usps_payment_account[ach]", value: "0")
           label(style: "display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;") do
             if @payment_account.ach?
@@ -98,16 +91,4 @@ class Components::Admin::USPS::PaymentAccounts::Form < Components::Base
     end
   end
 
-  def form_field(label_text, name, value, required: false, type: "text", hint: nil)
-    div(style: "margin-bottom:1rem;") do
-      label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") do
-        plain label_text
-        plain " *" if required
-      end
-      input(type: type, name: name, value: value, required: required, style: "width:100%;")
-      if hint
-        small(class: "text-muted") { hint }
-      end
-    end
-  end
 end

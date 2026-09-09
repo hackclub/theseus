@@ -194,6 +194,28 @@ a.btn-success, a.btn-danger, a.btn-warning, a.btn-info { text-decoration: none; 
 }
 
 
+// ── Form fields ───────────────────────────────────────
+
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.form-field-label {
+  display: block;
+  color: var(--foreground2);
+  margin-bottom: 0.25rem;
+  font-size: 0.9em;
+}
+
+.form-field-input {
+  width: 100%;
+}
+
+.form-field-hint {
+  display: block;
+}
+
+
 // ── Badges ─────────────────────────────────────────────
 
 .badge {
