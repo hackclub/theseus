@@ -2,21 +2,21 @@
   <%= vite_javascript_tag "map" %>
 <% end %>
 <% content_for :window_title, "Letter Tracking Map" %>
-<div id="map-legend" style="padding: 4px; font-size: 12px; display: flex; align-items: center; gap: 20px; justify-content: center; margin: 0;">
-  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
-    <span class="legend-color" style="background: #ff6b6b;"></span>
+<div id="map-legend" class="map-legend">
+  <span class="legend-item">
+    <span class="legend-color legend-color--current"></span>
     Current Location
   </span>
-  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
-    <span class="legend-color" style="background: #00e12c;"></span>
+  <span class="legend-item">
+    <span class="legend-color legend-color--traveled"></span>
     Traveled Path
   </span>
-  <span class="legend-item" style="display: flex; align-items: center; gap: 6px;">
-    <span class="legend-color" style="background: #0f95ef;"></span>
+  <span class="legend-item">
+    <span class="legend-color legend-color--projected"></span>
     Projected Path
   </span>
 </div>
-<div id="map" style="width: <%= @framed ? '300px' : '100%' %>; height: <%= @framed ? '200px' : '250px' %>; position: relative;"></div>
+<div id="map" class="map-frame" style="width: <%= @framed ? '300px' : '100%' %>; height: <%= @framed ? '200px' : '250px' %>;"></div>
 <p>(coords not exact for obvious reasons)</p>
 <style>
   .legend-color {

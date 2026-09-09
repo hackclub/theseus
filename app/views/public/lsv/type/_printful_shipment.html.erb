@@ -17,19 +17,19 @@
   <% end %>
   <div class="window-body">
     <div class="field-row mb-1">
-      <b style="margin: 0;"><%= printful_shipment.title_text %></b>
+      <b class="m-0"><%= printful_shipment.title_text %></b>
     </div>
     <div class="field-row mb-half">
-      <label style="width: 80px;">Type:</label>
+      <label class="w-80">Type:</label>
       <span><%= printful_shipment.type_text %></span>
     </div>
     <div class="field-row mb-half">
-      <label style="width: 80px;">Status:</label>
+      <label class="w-80">Status:</label>
       <span><%= printful_shipment.status_text %></span>
     </div>
     <% if printful_shipment.tracking_number %>
       <div class="field-row mb-half">
-        <label style="width: 80px;">Tracking:</label>
+        <label class="w-80">Tracking:</label>
         <% if printful_shipment.tracking_link %>
           <%= link_to(printful_shipment.tracking_number, printful_shipment.tracking_link, target: "_blank", class: "link") %>
         <% else %>
@@ -39,9 +39,9 @@
     <% end %>
     <% if printful_shipment.description %>
       <div class="field-row mb-half">
-        <label style="width: 80px;">Contents:</label>
+        <label class="w-80">Contents:</label>
         <% if printful_shipment.description.is_a? Array %>
-          <ul class="tree-view" style="margin: 0;">
+          <ul class="tree-view m-0">
             <% printful_shipment.description.each do |item| %>
               <li><%= item %></li>
             <% end %>
@@ -52,13 +52,13 @@
       </div>
     <% end %>
     <div class="field-row mb-half">
-      <label style="width: 80px;">Created:</label>
+      <label class="w-80">Created:</label>
       <span><%= printful_shipment.created_at %></span>
     </div>
     <% back_office_tool do %>
       <% if printful_shipment.fields["%order:pretty_id"] %>
         <div class="field-row mb-half">
-          <label style="width: 80px;">Order:</label>
+          <label class="w-80">Order:</label>
           <span>
             <%= link_to printful_shipment.fields["%order:pretty_id"], printful_shipment.fields["%order:dashboard_url"], target: "_blank", class: "link" %>
           </span>
@@ -66,14 +66,14 @@
       <% end %>
       <% if printful_shipment.fields["packing_slip_url"] %>
         <div class="field-row mb-half">
-          <label style="width: 80px;">Packing:</label>
+          <label class="w-80">Packing:</label>
           <span>
             <%= link_to "View Packing Slip", printful_shipment.fields["packing_slip_url"], target: "_blank", class: "link" %>
           </span>
         </div>
       <% end %>
       <div class="field-row mb-half">
-        <label style="width: 80px;">Airtable:</label>
+        <label class="w-80">Airtable:</label>
         <span class="internal"><%= link_to(printful_shipment.source_id, printful_shipment.source_url, target: "_blank") %></span>
       </div>
     <% end %>

@@ -1,4 +1,4 @@
-<div class="window" style="width: 320px">
+<div class="window w-320">
   <div class="title-bar">
     <div class="title-bar-text">Log in</div>
     <div class="title-bar-controls">
@@ -12,7 +12,7 @@
         <%= form.text_field :email %>
       </div>
       <% if @error %>
-        <br/><a style="color: #ac0808"><%= @error %></a> <br/><br/>
+        <br/><a class="text-error-red"><%= @error %></a> <br/><br/>
       <% end %>
       <%= form.submit "log in!" %>
     <% end %>

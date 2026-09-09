@@ -37,7 +37,7 @@
         <% @package.line_items.includes(:sku).each do |item| %>
           <tr>
             <td><%= item.sku.name %></td>
-            <td style="text-align: right;">× <%= item.quantity %></td>
+            <td class="text-right">× <%= item.quantity %></td>
           </tr>
         <% end %>
       </table>
@@ -53,21 +53,21 @@
         <table>
           <tr>
             <td>Contents:</td>
-            <td style="text-align: right;"><%= number_to_currency(@package.contents_actual_cost_to_hc) %></td>
+            <td class="text-right"><%= number_to_currency(@package.contents_actual_cost_to_hc) %></td>
           </tr>
           <tr>
             <td>Labor:</td>
-            <td style="text-align: right;"><%= number_to_currency(@package.labor_cost) %></td>
+            <td class="text-right"><%= number_to_currency(@package.labor_cost) %></td>
           </tr>
           <% if @package.postage_cost %>
             <tr>
               <td>Postage:</td>
-              <td style="text-align: right;"><%= number_to_currency(@package.postage_cost) %></td>
+              <td class="text-right"><%= number_to_currency(@package.postage_cost) %></td>
             </tr>
           <% end %>
           <tr>
             <td>Total:</td>
-            <td style="text-align: right;"><%= number_to_currency(@package.total_cost) %></td>
+            <td class="text-right"><%= number_to_currency(@package.total_cost) %></td>
           </tr>
         </table>
       </div>
@@ -83,7 +83,7 @@
   </div>
 <% end %>
 <% if current_public_user&.email == @package.recipient_email && !@package.address.us? && @package.mailed?  %>
-  <div class="mt-1" style="display: flex; justify-content: flex-end">
+  <div class="mt-1 flex-end-row">
     <%= button_to "generate customs receipt", package_customs_receipt_path(@package), method: :get %>
   </div>
 <% end %>

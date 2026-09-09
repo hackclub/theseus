@@ -1,4 +1,4 @@
-<div class="window" style="width: 320px">
+<div class="window w-320">
   <div class="title-bar">
     <div class="title-bar-text">API Keys</div>
     <div class="title-bar-controls">
@@ -7,7 +7,7 @@
   </div>
   <div class="window-body">
     <% if @api_keys&.any? %>
-      <div class="sunken-panel" style="height: 80px">
+      <div class="sunken-panel h-80">
         <table class="interactive">
           <thead>
             <tr>
@@ -26,7 +26,7 @@
       You don't have any API keys yet. <br/>
       Would you like to change that?
     <% end %>
-    <div class="field-row" style="justify-content: flex-end">
+    <div class="field-row justify-end">
       <%= button_to "Create API Key", new_public_api_key_path, method: :get, class: "default" %>
     </div>
   </div>

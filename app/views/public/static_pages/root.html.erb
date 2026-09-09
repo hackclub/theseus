@@ -1,4 +1,4 @@
-<div class="window" style="width: 320px">
+<div class="window w-320">
   <div class="title-bar">
     <div class="title-bar-text">Hack Club Mail!</div>
   </div>
@@ -20,33 +20,33 @@
       <%= link_to public_login_path do %>
         <button>log in with email</button>
       <% end %>
-      <form action="/auth/public_hackclub" method="post" style="display: inline">
+      <form action="/auth/public_hackclub" method="post" class="d-inline">
         <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
         <button type="submit">log in with hack club auth</button>
       </form>
     <% end %>
   </div>
 </div>
-<div class="window" style="width: 320px;">
+<div class="window w-320">
   <div class="title-bar">
     <div class="title-bar-text">Letterboard</div>
   </div>
-  <div class="window-body" style="padding: 0">
+  <div class="window-body p-0">
     <iframe src="<%= this_week_leaderboards_path %>" title="Letterboard"></iframe>
   </div>
 </div>
-<div class="window" style="width: 320px;">
+<div class="window w-320">
   <div class="title-bar">
     <div class="title-bar-text">Map</div>
     <div class="title-bar-controls">
       <%= w95_title_button_to("Maximize", map_path) %>
     </div>
   </div>
-  <div class="window-body" style="padding: 0; text-align: center;">
-    <div id="map-placeholder" style="padding: 16px;">
+  <div class="window-body p-0 text-center">
+    <div id="map-placeholder" class="p-16">
       <button id="load-map-btn" onclick="loadMap('<%= map_path %>')">load me!!</button>
     </div>
-    <iframe id="map-iframe" style="width: 320px; height: 200px; border: none; display: none;" title="Letter Tracking Map"></iframe>
+    <iframe id="map-iframe" class="map-iframe" style="display: none;" title="Letter Tracking Map"></iframe>
   </div>
 </div>
 <script>

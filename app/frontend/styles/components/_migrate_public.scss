@@ -1,0 +1,33 @@
+// inline-style migration shard: public
+// area-specific classes only; shared utilities live in utils.scss
+
+// sizing helpers
+.w-fit { width: fit-content; }
+.w-300 { width: 300px; }
+.w-320 { width: 320px; }
+.h-80 { height: 80px; }
+.h-200 { height: 200px; }
+.p-0 { padding: 0; }
+.p-16 { padding: 16px; }
+.d-inline { display: inline; }
+.justify-end { justify-content: flex-end; }
+.flex-end-row { display: flex; justify-content: flex-end; }
+
+// leaderboards
+.icon-baseline-fix { position: relative; top: 50%; transform: translateY(15%); }
+
+// sessions / static_pages
+.text-lime { color: lime !important; }
+.text-error-red { color: #ac0808; }
+
+// mail
+.mail-empty-window { width: 300px; background-color: blue; color: white; }
+.border-blue { border-color: blue; }
+
+// maps
+.map-legend { padding: 4px; font-size: 12px; display: flex; align-items: center; gap: 20px; justify-content: center; margin: 0; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-color--current { background: #ff6b6b; }
+.legend-color--traveled { background: #00e12c; }
+.legend-color--projected { background: #0f95ef; }
+.map-frame { position: relative; }
