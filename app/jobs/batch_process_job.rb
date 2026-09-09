@@ -24,7 +24,7 @@ class BatchProcessJob < ApplicationJob
       total = batch.letters.where(postage_type: "indicia").count
       broadcast_summary(batch, purchased: 0, total: total, failed: 0)
 
-      begin
+      failed_letters = begin
         purchase_indicia(batch, options)
       rescue => e
         batch.update!(process_error: e.message)
@@ -32,6 +32,19 @@ class BatchProcessJob < ApplicationJob
         broadcast_error_banner(batch, e.message)
         auto_refund_if_nothing_spent(batch, options)
         Sentry.capture_exception(e, tags: { money: true }, extra: { batch_id: batch.id })
+        return
+      end
+
+      # Per-letter failures are swallowed so one bad address can't cost the
+      # rest of the batch its postage — but the batch is not done. Marking it
+      # processed here stranded it: Letter::RetryBatch only runs on a failed
+      # batch, and a re-process returns early on `processed?`. Fail it instead
+      # so the retry path can finish the letters that didn't buy.
+      if failed_letters.positive?
+        message = "#{failed_letters} #{"letter".pluralize(failed_letters)} failed to buy postage; retry to finish the batch"
+        batch.update!(process_error: message)
+        batch.mark_failed! if batch.may_mark_failed?
+        broadcast_error_banner(batch, message)
         return
       end
     end
@@ -77,7 +90,7 @@ class BatchProcessJob < ApplicationJob
                           .where(postage_type: "indicia")
                           .where(indicia_state: [nil, "failed"])
     total = letters_to_buy.count
-    return if total == 0
+    return 0 if total == 0
 
     estimated_cents = Billing::Quote.new(batch.billing_lines(letters: letters_to_buy)).now_cents
     charge_batch!(batch, hcb_account, estimated_cents)
@@ -140,6 +153,7 @@ class BatchProcessJob < ApplicationJob
     pool.wait_for_termination
 
     # overpayment refunds are manual via the refund_overpayment controller action.
+    failed_count.value
   end
 
   # A batch is paid for by one organization. Re-runs (retrying failed

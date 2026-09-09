@@ -340,6 +340,56 @@ RSpec.describe BatchProcessJob, type: :job do
         expect(failed_letter.indicia_error).to include("USPS service unavailable")
       end
 
+      # A partially-purchased batch used to be marked `processed`, which was a
+      # dead end: Letter::RetryBatch refuses anything that isn't failed, and
+      # re-processing returns early on `processed?`.
+      it "fails the batch when some letters couldn't buy postage, and does not generate labels" do
+        create_letters(3)
+        bought = 0
+        allow_any_instance_of(USPS::Indicium).to receive(:buy!) do |indicium, _token|
+          bought += 1
+          raise "USPS service unavailable" if bought > 1
+          indicium.update!(postage: 0.68, fees: 0.0, raw_json_response: { "indiciaMetadata" => { "postage" => 0.68, "fees" => [], "SKU" => "FAKE" } })
+        end
+        allow(Sentry).to receive(:capture_exception)
+
+        perform_job
+
+        expect(batch.reload).to be_failed
+        expect(batch.process_error).to eq("2 letters failed to buy postage; retry to finish the batch")
+        expect(batch).not_to have_received(:generate_labels)
+        expect(batch.letters.where(indicia_state: "failed").count).to eq(2)
+      end
+
+      it "finishes the batch on retry, buying only the letters that failed" do
+        letters = create_letters(3)
+        bought = 0
+        allow_any_instance_of(USPS::Indicium).to receive(:buy!) do |indicium, _token|
+          bought += 1
+          raise "USPS service unavailable" if bought > 1
+          indicium.update!(postage: 0.68, fees: 0.0, raw_json_response: { "indiciaMetadata" => { "postage" => 0.68, "fees" => [], "SKU" => "FAKE" } })
+        end
+        allow(Sentry).to receive(:capture_exception)
+        perform_job
+        expect(batch.reload).to be_failed
+
+        buys = 0
+        allow_any_instance_of(USPS::Indicium).to receive(:buy!) do |indicium, _token|
+          buys += 1
+          indicium.update!(postage: 0.68, fees: 0.0, raw_json_response: { "indiciaMetadata" => { "postage" => 0.68, "fees" => [], "SKU" => "FAKE" } })
+        end
+        Letter::RetryBatch.new(batch: batch).call
+        perform_job
+
+        expect(buys).to eq(2) # only the two that failed
+        expect(batch.reload).to be_processed
+        expect(batch.process_error).to be_nil
+        expect(batch).to have_received(:generate_labels)
+        expect(letters.map { |l| l.reload.indicia_state }).to all(eq("purchased"))
+        # one charge for the whole batch; the retry rides on what it overpaid
+        expect(hcb_disbursements.size).to eq(1)
+      end
+
       it "does NOT wrap purchases in a transaction (failures are per-letter)" do
         letters = create_letters(3)
         purchase_order = []
