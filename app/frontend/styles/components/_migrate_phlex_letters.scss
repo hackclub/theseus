@@ -119,6 +119,11 @@
 
 // Selection-preview text; `display` is toggled from JS (grid-picklist.js) via
 // the style attribute, so it stays inline — this only carries the static look.
+// ── Batches::Show (generic Batch, not Letter::Batch) ─────
+
+// Danger-zone section outlined in red instead of the default border.
+.danger-zone-border { border-color: var(--red); }
+
 .picklist-preview {
   margin: 0.5rem 0;
   font-size: 0.85em;
