@@ -3,6 +3,7 @@
 class Views::Letter::Batches::Process < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::NumberToCurrency
+  register_element :turbo_frame, tag: "turbo-frame"
 
   def initialize(batch:)
     @batch = batch
@@ -25,7 +26,7 @@ class Views::Letter::Batches::Process < Views::Base
           templates_box
           options_box
 
-          div(style: "display:flex;gap:0.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--background2);") do
+          div(id: "stamps-only-actions", style: "display:none;gap:0.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--background2);") do
             button(type: "submit", class: "btn-success", data: { disable_with: "Processing…" }) { "▶ Start Processing" }
             a(href: letter_batch_path(@batch), style: "color:var(--foreground2);align-self:center;") { "Cancel" }
           end
@@ -201,18 +202,17 @@ class Views::Letter::Batches::Process < Views::Base
         input(type: "hidden", name: "batch[usps_payment_account_id]", value: default_usps_id)
       end
 
-      # HCB account
-      if current_user.billing_profiles.any?
-        div(style: "margin-top:0.75rem;") do
-          label(style: "display:block;color:var(--foreground2);margin-bottom:0.25rem;") { "HCB Payment Account" }
-          select(name: "batch[hcb_payment_account_id]", class: "w-100") do
-            current_user.billing_profiles.each do |hcb|
-              option(value: hcb.id) { hcb.display_name }
-            end
-          end
-        end
-      end
+      turbo_frame(id: "billing-consent-frame") { consent }
     end
+  end
+
+  def consent
+    render Components::MoneyNotice.new(
+      lines: @batch.billing_lines(us_postage_type: "indicia", intl_postage_type: "indicia", non_machinable: false),
+      profiles: current_user.billing_profiles,
+      field: "batch[hcb_payment_account_id]",
+      proceed: "Start Processing",
+    )
   end
 
   def summary_card
@@ -244,6 +244,10 @@ class Views::Letter::Batches::Process < Views::Base
         (function() {
           var radios = document.querySelectorAll('.postage-radio');
           var paymentSection = document.getElementById('payment-section');
+          var stampsActions = document.getElementById('stamps-only-actions');
+          var frame = document.getElementById('billing-consent-frame');
+          var nm = document.getElementById('batch_non_machinable');
+          var consentUrl = '#{billing_consent_letter_batch_path(@batch)}';
 
           function needsIndicia() {
             var us = document.querySelector('input[name="batch[us_postage_type]"]:checked');
@@ -252,12 +256,26 @@ class Views::Letter::Batches::Process < Views::Base
           }
 
           function toggle() {
-            if (paymentSection) {
-              paymentSection.style.display = needsIndicia() ? '' : 'none';
-            }
+            var indicia = needsIndicia();
+            if (paymentSection) paymentSection.style.display = indicia ? '' : 'none';
+            if (stampsActions) stampsActions.style.display = indicia ? 'none' : 'flex';
           }
 
-          radios.forEach(function(r) { r.addEventListener('change', toggle); });
+          function refreshConsent() {
+            if (!frame || !needsIndicia()) return;
+            var us = document.querySelector('input[name="batch[us_postage_type]"]:checked');
+            var intl = document.querySelector('input[name="batch[intl_postage_type]"]:checked');
+            var sel = frame.querySelector('[data-money-select]');
+            frame.src = consentUrl + '?' + new URLSearchParams({
+              us_postage_type: us ? us.value : '',
+              intl_postage_type: intl ? intl.value : '',
+              non_machinable: nm && nm.checked ? '1' : '0',
+              hcb_payment_account_id: sel ? sel.value : ''
+            });
+          }
+
+          radios.forEach(function(r) { r.addEventListener('change', function() { toggle(); refreshConsent(); }); });
+          if (nm) nm.addEventListener('change', refreshConsent);
           toggle();
         })();
       JS

@@ -479,6 +479,7 @@ Rails.application.routes.draw do
         member do
           get "/process", to: "batches#process_form", as: :process_confirm
           post "/process", to: "batches#process_batch", as: :process
+          get "/billing_consent", to: "batches#billing_consent", as: :billing_consent
           get "/map", to: "batches#map_fields", as: :map_fields
           post "/set_mapping", to: "batches#set_mapping", as: :set_mapping
           post :import_with_skip

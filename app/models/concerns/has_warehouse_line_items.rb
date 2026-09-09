@@ -8,8 +8,8 @@ module HasWarehouseLineItems
   end
 
   def labor_cost
-    # $1.80 base * 20¢/SKU
-    1.80 + (0.20 * skus.distinct.count)
+    # $1.80 base + 20¢/SKU; counts built line items too so unsaved orders quote correctly
+    1.80 + (0.20 * line_items.reject(&:marked_for_destruction?).map(&:sku_id).compact.uniq.size)
   end
 
   def contents_actual_cost_to_hc

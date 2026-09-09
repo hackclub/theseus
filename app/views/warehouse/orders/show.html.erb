@@ -181,7 +181,14 @@
         <% if policy(@warehouse_order).send_to_warehouse? && @warehouse_order.may_mark_dispatched? %>
           <% has_action = true %>
           <%= form_with url: send_to_warehouse_warehouse_order_path(@warehouse_order), method: :post do %>
-            <button type="submit" class="btn-success w-100">✓ Send to Warehouse</button>
+            <%= render Components::MoneyNotice.new(
+              lines: @warehouse_order.billing_lines,
+              profiles: [@warehouse_order.billing_profile].compact,
+              field: nil,
+              locked: true,
+              unbilled: @warehouse_order.billing_profile.nil?,
+              proceed: "Send to Warehouse",
+            ) %>
           <% end %>
         <% end %>
 

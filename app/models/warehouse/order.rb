@@ -178,11 +178,12 @@ class Warehouse::Order < ApplicationRecord
       raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
       mark_dispatched!(zenventory_order[:id])
 
-      if billing_profile.present? && labor_cost.present? && labor_cost.positive?
+      labor_cents = Billing::Quote.new(billing_lines).now_cents
+      if billing_profile.present? && labor_cents.positive?
         ledger_entries.create!(
           billing_profile: billing_profile,
           category: :labor,
-          amount_cents: (labor_cost * 100).ceil,
+          amount_cents: labor_cents,
         )
       end
     end
@@ -195,6 +196,14 @@ class Warehouse::Order < ApplicationRecord
     if notify_on_dispatch?
       Warehouse::OrderMailer.with(order: self).order_created.deliver_later
     end
+  end
+
+  def billing_lines
+    labor = (labor_cost.to_d * 100).ceil
+    [
+      (Billing::Quote::Line.new(category: :labor, label: "labor for #{hc_id || "this order"}", when: :now, amount_cents: labor, count: 1) if labor.positive?),
+      Billing::Quote::Line.new(category: :postage, label: "postage, at cost, when it ships", when: :later, count: 1)
+    ].compact
   end
 
   # Non-strict: if a transfer is already in flight for this profile the entry

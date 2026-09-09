@@ -32,6 +32,7 @@ class Billing::Reconciler
 
   def call
     return Result.new(transfer, :skipped, "mock") if Billing.mock?
+    return Result.new(transfer, :ambiguous, transfer.metadata["reconcile_ambiguous"]) if transfer.metadata["reconcile_ambiguous"].present?
 
     candidates = matching_remote_transfers
     case candidates.size
@@ -51,7 +52,7 @@ class Billing::Reconciler
       end
     else
       transfer.update!(metadata: transfer.metadata.merge("reconcile_ambiguous" => candidates.map(&:id)))
-      BillingMailer.with(transfer: transfer).reconcile_ambiguous.deliver_later
+      Billing::Alert.reconcile_ambiguous(transfer)
       Result.new(transfer, :ambiguous, candidates.map(&:id))
     end
   rescue => e

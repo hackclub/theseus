@@ -48,7 +48,17 @@ class Views::Billing::Index < Views::Base
     end
 
     if helpers.current_user&.admin?
-      attention = HCB::Transfer.where(state: [:failed, :unknown]).includes(:billing_profile).order(:created_at)
+      nsf = HCB::Transfer.where("metadata->>'nsf' = 'true'").where(state: [ :failed, :unknown ]).where("metadata->>'abandoned_at' IS NULL").where(id: LedgerEntry.pending.select(:hcb_transfer_id)).includes(:billing_profile).order(:created_at)
+      if nsf.any?
+        div(class: "banner banner-error mb-1h") do
+          strong { "⚠ #{helpers.pluralize(nsf.map(&:billing_profile_id).uniq.size, "organization")} can't pay: " }
+          plain nsf.map { |t| "#{t.billing_profile.organization_name} owes #{money(t.amount_cents)} (#{t.attempts}/#{HCB::Transfer::MAX_ATTEMPTS} attempts#{t.gave_up? ? ", gave up" : ""})" }.join("; ")
+          plain ". Linked by: #{nsf.map { |t| t.billing_profile.user&.email }.compact.uniq.join(", ")}."
+        end
+      end
+
+      attention = HCB::Transfer.where(state: [ :failed, :unknown ]).where("metadata->>'abandoned_at' IS NULL").includes(:billing_profile).order(:created_at)
+
       if attention.any?
         section(class: "mb-1h") do
           h3(class: "mt-0") { "Transfers needing attention" }
@@ -63,9 +73,10 @@ class Views::Billing::Index < Views::Base
                   td { code { t.hq_organization_id } }
                   td { money(t.amount_cents) }
                   td { transfer_cell(t) }
-                  td { "#{t.attempts}#{t.next_attempt_at ? " (next #{t.next_attempt_at.strftime("%H:%M")})" : ""}" }
+                  td { "#{t.attempts}#{t.next_attempt_at ? " (next #{t.next_attempt_at.strftime("%H:%M")})" : ""}#{t.metadata["nsf"] ? " · NSF" : ""}" }
                   td(class: "text-muted") { t.last_error }
                   td do
+                    next span(class: "text-muted") { "no pending entries" } if t.ledger_entries.pending.none?
                     form(action: retry_transfer_billing_index_path(transfer_id: t.id), method: "post", class: "form-inline",
                          onsubmit: (t.unknown? ? "return confirm('This transfer is UNKNOWN. Only retry if you have checked HCB and it is NOT there. Continue?')" : nil)) do
                       input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)

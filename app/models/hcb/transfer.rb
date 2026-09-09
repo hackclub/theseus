@@ -74,6 +74,7 @@ class HCB::Transfer < ApplicationRecord
 
   scope :due_for_retry, -> { failed.where(next_attempt_at: ..Time.current) }
   scope :stale_pending, -> { pending.where(last_attempted_at: ..STALE_PENDING_AFTER.ago) }
+  scope :never_sent, -> { pending.where(last_attempted_at: nil).where(created_at: ..5.minutes.ago) }
   scope :needs_reconciliation, -> { unknown.or(stale_pending) }
 
   def amount = amount_cents / 100.0
@@ -93,7 +94,7 @@ class HCB::Transfer < ApplicationRecord
   # never lose. If settling the entries fails, the transfer is still
   # completed and BillingSettlementSweepJob#repair_settlements! finishes it.
   def complete!(remote_id)
-    update!(state: :completed, remote_id: remote_id, next_attempt_at: nil, last_error: nil)
+    update!(state: :completed, remote_id: remote_id, next_attempt_at: nil, last_error: nil, metadata: metadata.except("nsf", "nsf_last_at"))
     settle_entries!
   end
 
@@ -115,10 +116,23 @@ class HCB::Transfer < ApplicationRecord
     update!(state: :unknown, last_error: message.to_s.truncate(255), next_attempt_at: nil)
   end
 
-  # Manual retry from admin: reset the clock, keep the key.
+  def abandon!
+    raise "can only abandon a failed transfer" unless failed?
+    update!(next_attempt_at: nil, metadata: metadata.merge("abandoned_at" => Time.current.iso8601))
+  end
+
+  def abandoned? = metadata["abandoned_at"].present?
+
+  def holds_entries? = pending? || unknown? || completed? || retryable?
+
+  # Manual retry from admin: reset the clock, keep the key. Also forget any
+  # reconciliation verdict; the next attempt is a fresh question for HCB.
+  RETRY_CLEARS = %w[abandoned_at reconcile_ambiguous reconciled_at reconciled_by nsf nsf_last_at].freeze
+
   def retry!
     raise "can only retry failed or unknown transfers" unless failed? || unknown?
-    update!(state: :failed, attempts: 0, next_attempt_at: Time.current, last_error: nil)
+    raise "nothing to charge: this transfer has no pending ledger entries" if ledger_entries.pending.none?
+    update!(state: :failed, attempts: 0, next_attempt_at: Time.current, last_error: nil, metadata: metadata.except(*RETRY_CLEARS))
   end
 
   private

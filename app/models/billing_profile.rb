@@ -81,7 +81,7 @@ class BillingProfile < ApplicationRecord
   end
 
   def organization
-    client.organization!(organization_id)
+    client.organization(organization_id, expand: [ :balance_cents ])
   end
 
   # Debit: this organization → an HQ org. Uses the linking user's OAuth token.

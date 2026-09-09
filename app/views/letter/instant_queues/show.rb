@@ -34,6 +34,13 @@ class Views::Letter::InstantQueues::Show < Views::Letter::Queues::ShowBase
     if queue.billing_profile.present?
       span(class: "detail-label") { "HCB Payment" }
       span { queue.billing_profile.organization_name }
+      if (line = queue.billing_lines.first)
+        span(class: "detail-label") { "" }
+        span(class: "money-note") do
+          span(class: "money-notice__glyph") { "$" }
+          span { "#{queue.billing_profile.organization_name} is billed #{line.known? ? number_to_currency(line.amount_cents / 100.0) : "at cost"} for every letter submitted through this queue (US rate; international varies)." }
+        end
+      end
     end
 
     span(class: "detail-label") { "QR Code" }

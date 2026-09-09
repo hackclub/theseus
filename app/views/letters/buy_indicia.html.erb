@@ -43,27 +43,13 @@
             </select>
           </div>
 
-          <% if current_user.billing_profiles.any? %>
-            <div class="mb-half">
-              <label class="text-muted" style="display: block; margin-bottom: 0.25rem">HCB Organization</label>
-              <select name="hcb_payment_account_id" required class="w-100">
-                <option value="">Select organization…</option>
-                <% current_user.billing_profiles.each do |account| %>
-                  <option value="<%= account.id %>"><%= account.organization_name %></option>
-                <% end %>
-              </select>
-            </div>
-          <% else %>
-            <div class="mb-half text-muted">
-              <%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to pay for postage.
-            </div>
-          <% end %>
-
-          <div class="mt-1" style="display:flex; align-items:center; gap:0.5rem">
-            <span class="spacer"></span>
-            <a href="<%= letter_path(@letter) %>" class="text-muted">Cancel</a>
-            <button type="submit" class="btn-success" <%= "disabled" if current_user.billing_profiles.empty? %>>✓ Buy Indicia</button>
-          </div>
+          <%= render Components::MoneyNotice.new(
+            lines: @letter.billing_lines,
+            profiles: current_user.billing_profiles,
+            field: "hcb_payment_account_id",
+            proceed: "Buy Indicia",
+            cancel_href: letter_path(@letter),
+          ) %>
         <% end %>
       </div>
     </section>
@@ -74,7 +60,7 @@
       <strong>Info</strong>
       <hr>
       <div class="mt-half text-muted">
-        Purchasing indicia buys USPS postage for this letter. The cost is charged to the selected HCB organization.
+        Purchasing indicia buys USPS postage for this letter. The estimate above is charged to the selected HCB organization before the purchase; if USPS sells us nothing, it is refunded.
       </div>
     </section>
   </div>

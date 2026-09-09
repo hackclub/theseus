@@ -1,0 +1,20 @@
+<ul>
+  <li>organization: <%= transfer.billing_profile.organization_name %> (linked by <%= transfer.billing_profile.user&.email %>)</li>
+  <li>direction: <%= transfer.direction %> via <%= transfer.hq_organization_id %></li>
+  <li>amount: <%= number_to_currency(transfer.amount) %></li>
+  <li>key: <code><%= transfer.idempotency_key %></code></li>
+  <li>attempts: <%= transfer.attempts %> of <%= HCB::Transfer::MAX_ATTEMPTS %><% if transfer.next_attempt_at.present? %>, next at <%= transfer.next_attempt_at.in_time_zone("America/New_York").strftime("%b %d %H:%M %Z") %><% end %></li>
+<% if transfer.last_error.present? -%>
+  <li>error: <%= transfer.last_error %></li>
+<% end -%>
+  <li>memo: <%= transfer.memo %></li>
+</ul>
+
+entries:
+<ul>
+<% transfer.ledger_entries.each do |entry| -%>
+  <li>T#<%= entry.id %> · <%= entry.category %> · <%= Billing::Memo.ref(entry.ledgerable) %> · <%= number_to_currency(entry.amount) %> · <%= entry.state %></li>
+<% end -%>
+</ul>
+
+<%= link_to "open billing", billing_index_url %>

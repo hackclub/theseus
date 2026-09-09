@@ -31,16 +31,16 @@ module Billing
   # strict: raise InFlight instead of returning nil; raise Unconfirmed /
   # Rejected instead of returning a non-completed transfer. Interactive
   # callers want strict; the sweep does not.
-  def self.charge!(entries, name:, memo: nil, execute: true, strict: false)
-    Charge.new(entries, name: name, memo: memo, execute: execute, strict: strict).call
+  def self.charge!(entries, name:, note: nil, execute: true, strict: false)
+    Charge.new(entries, name: name, note: note, execute: execute, strict: strict).call
   end
 
   # One transfer per destination org (USPS postage and warehouse work are
   # paid into different HQ organizations). Returns the transfers created.
-  def self.charge_pending!(billing_profile, name: "Theseus billing", memo: nil)
+  def self.charge_pending!(billing_profile, name: "Theseus billing", note: nil)
     billing_profile.ledger_entries.unclaimed.charges
       .group_by { |e| destination_for(e.category) }
-      .filter_map { |_, entries| charge!(entries, name: name, memo: memo) }
+      .filter_map { |_, entries| charge!(entries, name: name, note: note) }
   end
 
   # Which HQ organization gets paid for a given kind of work.
@@ -55,14 +55,21 @@ module Billing
   # Create a credit entry against `reverses` and send the money back.
   # Always strict: a refund the caller asked for either happens, is
   # unconfirmed, or is rejected — never silently skipped.
-  def self.credit!(reverses:, amount_cents:, name:, memo: nil, execute: true)
-    Credit.new(reverses: reverses, amount_cents: amount_cents, name: name, memo: memo, execute: execute).call
+  def self.credit!(reverses:, amount_cents:, name:, note: nil, execute: true)
+    Credit.new(reverses: reverses, amount_cents: amount_cents, name: name, note: note, execute: execute).call
   end
 
   def self.execute!(transfer, strict: false)
     Executor.new(transfer).call
     raise Unconfirmed.new(transfer) if strict && (transfer.unknown? || transfer.pending?)
-    raise Rejected.new(transfer) if strict && transfer.failed?
+    if strict && transfer.failed?
+      transfer.abandon!
+      # Credits auto-void here; charge entries are the caller's responsibility
+      # (they may re-bill). Both current strict-charge callers void/destroy on
+      # rescue Rejected — if you add a new one, don't forget.
+      transfer.ledger_entries.pending.each { |e| e.void!(reason: transfer.last_error) } if transfer.credit?
+      raise Rejected.new(transfer)
+    end
     transfer
   end
 

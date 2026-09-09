@@ -130,6 +130,11 @@ RSpec.describe Billing do
       expect(e.reload).to be_pending
       expect(e.hcb_transfer_id).to eq(transfer.id)
       expect(mails).to have_received(:insufficient_funds).once
+
+      transfer.update!(next_attempt_at: 1.minute.ago)
+      Billing.execute!(transfer)
+      expect(transfer.reload.attempts).to eq(2)
+      expect(mails).to have_received(:insufficient_funds).once  # retries are quiet
     end
 
     it "marks oauth/credential failures as failed + not retryable and invalidates the connection" do
@@ -140,9 +145,85 @@ RSpec.describe Billing do
       expect(profile.oauth_connection.reload).to be_invalidated
     end
 
-    it "treats a connection failure as definite (nothing sent)" do
-      hcb_raises(Faraday::ConnectionFailed.new("ECONNREFUSED"))
-      expect(Billing.charge!([e], name: "x")).to be_failed
+    it "treats a refused connection as definite but a reset as unknown" do
+      hcb_raises(Faraday::ConnectionFailed.new(Errno::ECONNREFUSED.new))
+      expect(Billing.charge!([ e ], name: "x")).to be_failed
+
+      hcb_raises(Faraday::ConnectionFailed.new(Errno::ECONNRESET.new))
+      expect(Billing.charge!([ entry ], name: "x")).to be_unknown
+    end
+
+    it "stays quiet while a failure is being retried and emails once it gives up" do
+      mails = capture_billing_mail
+      hcb_raises(api_error(HCBV4::RateLimitError, "slow down", status: 429))
+      transfer = Billing.charge!([ e ], name: "x")
+      expect(mails).not_to have_received(:transfer_failed)
+
+      (HCB::Transfer::MAX_ATTEMPTS - 1).times do
+        transfer.update!(next_attempt_at: 1.minute.ago)
+        Billing.execute!(transfer)
+      end
+      expect(transfer.reload).to be_gave_up
+      expect(mails).to have_received(:transfer_failed).once
+    end
+
+    it "classifies a refused connection during token refresh as definite" do
+      inner = Faraday::ConnectionFailed.new(Errno::ECONNREFUSED.new)
+      hcb_raises(OAuth2::ConnectionError.new(inner))
+      transfer = Billing.charge!([ e ], name: "x")
+      expect(transfer).to be_failed
+      expect(transfer).to be_retryable
+      expect(profile.oauth_connection.reload).not_to be_invalidated
+    end
+
+    it "lets only one runner take an attempt" do
+      hcb_raises(api_error(HCBV4::RateLimitError, "slow down", status: 429))
+      transfer = Billing.charge!([ e ], name: "x")
+      transfer.update!(next_attempt_at: 1.minute.ago)
+      fake_hcb!
+
+      allow_any_instance_of(HCB::Transfer).to receive(:begin_attempt!).and_wrap_original do |m, *args|
+        m.call(*args)
+        # a second runner arrives after the first has claimed the attempt
+        expect(Billing::Executor.new(HCB::Transfer.find(transfer.id)).call).to be_pending
+      end
+      Billing.execute!(transfer)
+      expect(hcb_disbursements.size).to eq(1)
+    end
+
+    it "abandons a strict rejection so the sweep can't ghost-charge a voided entry" do
+      hcb_raises(api_error(HCBV4::UnprocessableEntityError, "You don't have enough money", status: 422))
+      expect { Billing.charge!([ e ], name: "x", strict: true) }.to raise_error(Billing::Rejected)
+      transfer = HCB::Transfer.sole
+      expect(transfer).to be_abandoned
+      expect(transfer).not_to be_retryable
+      e.reload.void!(reason: "rejected")
+
+      fake_hcb!
+      transfer.update!(next_attempt_at: 1.minute.ago)
+      BillingSettlementSweepJob.new.perform
+      expect(hcb_disbursements).to be_empty
+      expect(transfer.reload).to be_failed
+      expect { transfer.retry! }.to raise_error(/no pending ledger entries/)
+    end
+
+    it "refuses to send a transfer whose entries no longer add up" do
+      mails = capture_billing_mail
+      transfer = Billing.charge!([ e ], name: "x", execute: false)
+      e.update_columns(state: LedgerEntry.states[:voided])
+      Billing.execute!(transfer)
+      expect(transfer.reload).to be_failed
+      expect(transfer.last_error).to include("ledger mismatch")
+      expect(hcb_disbursements).to be_empty
+      expect(mails).to have_received(:transfer_failed)
+    end
+
+    it "won't void or destroy an entry claimed by a live transfer" do
+      hcb_raises(Faraday::TimeoutError.new("boom"))
+      Billing.charge!([ e ], name: "x")
+      expect { e.reload.void! }.to raise_error(ArgumentError, /claimed by transfer/)
+      expect(e.reload.destroy).to be(false)
+
     end
 
     it "marks timeouts as unknown and never retries them" do
@@ -234,13 +315,29 @@ RSpec.describe Billing do
       expect { Billing.credit!(reverses: original, amount_cents: 100, name: "y") }.to raise_error(Billing::InFlight)
     end
 
-    it "is strict: a rejected refund raises and leaves the credit pending" do
+    it "is strict: a rejected refund raises, abandons the transfer, and voids the credit" do
       hcb_raises(api_error(HCBV4::BadRequestError, "nope", status: 400), direction: :credit)
       expect { Billing.credit!(reverses: original, amount_cents: 300, name: "x") }.to raise_error(Billing::Rejected)
       credit = LedgerEntry.credits.sole
-      expect(credit).to be_pending
+      expect(credit).to be_voided
       expect(credit.hcb_transfer).to be_failed
-      expect(original.reload.net_cents).to eq(700) # pending credit still counts against the charge
+      expect(credit.hcb_transfer).to be_abandoned
+      expect(original.reload.net_cents).to eq(1000)
+    end
+
+    it "releases the credit when a two-phase refund is rejected" do
+      transfer = Billing.credit!(reverses: original, amount_cents: 300, name: "x", execute: false)
+      hcb_raises(api_error(HCBV4::BadRequestError, "nope", status: 400), direction: :credit)
+      expect { Billing.execute!(transfer, strict: true) }.to raise_error(Billing::Rejected)
+      expect(transfer.ledger_entries.sole.reload).to be_voided
+      expect(original.reload.net_cents).to eq(1000)
+    end
+
+    it "writes memos with public ids and entry ids" do
+      transfer = Billing.credit!(reverses: original, amount_cents: 300, name: "Refund", note: "overpaid")
+      credit = transfer.ledger_entries.sole
+      expect(original.hcb_transfer.memo).to eq("[theseus] indicia #{batch.public_id} $10.00 (T##{original.id})")
+      expect(transfer.memo).to eq("[theseus] refund indicia #{batch.public_id} $3.00 (T##{credit.id} reverses T##{original.id}) · overpaid")
     end
   end
 end

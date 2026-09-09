@@ -263,6 +263,32 @@ class Letter < ApplicationRecord
     (iv + timestamps).sort_by { |event| event[:happened_at] }
   end
 
+  # The rate this letter would pay with the given postage type. A pure
+  # lookup: no record state, nothing saved. nil non_machinable means "as is".
+  def postage_for(postage_type:, non_machinable: nil)
+    non_machinable = self.non_machinable if non_machinable.nil?
+    case postage_type
+    when "indicia"
+      if address.us?
+        USPS::PricingEngine.metered_price(processing_category, weight, non_machinable)
+      else
+        USPS::PricingEngine.fcmi_price(processing_category, weight, address.country, non_machinable)
+      end
+    when "stamps"
+      if address.us?
+        USPS::PricingEngine.domestic_stamp_price(processing_category, weight, non_machinable)
+      else
+        USPS::PricingEngine.fcmi_price(processing_category, weight, address.country, non_machinable)
+      end
+    when "international_origin"
+      0
+    end
+  end
+
+  def billing_lines
+    [ Billing::Quote::Line.new(category: :indicia, label: "postage for #{public_id}", when: :now, amount_cents: (postage.to_d * 100).ceil, count: 1) ]
+  end
+
   def undo_mailed!
     raise AASM::InvalidTransition, "letter is not mailed or received" unless mailed? || received?
     previous_state = printed_at.present? ? "printed" : "pending"
@@ -275,37 +301,17 @@ class Letter < ApplicationRecord
     new_record? || postage_type_changed? || weight_changed? || non_machinable_changed?
   end
 
+  # What this letter actually owes right now: the real indicium if one has
+  # been bought, nothing for stamps while it's still queued, else the rate.
   def set_postage
-    self.postage = case postage_type
-      when "indicia"
-        if usps_indicium.present?
-          usps_indicium.cost
-        elsif address.us?
-          USPS::PricingEngine.metered_price(processing_category, weight, non_machinable)
-        else
-          USPS::PricingEngine.fcmi_price(processing_category, weight, address.country, non_machinable)
+    self.postage = if postage_type == "indicia" && usps_indicium.present?
+      usps_indicium.cost
+    elsif postage_type == "stamps" && queued?
+      0
+    else
+      postage_for(postage_type: postage_type)
+    end
 
-        end
-      when "stamps"
-        if %i(queued).include?(aasm.current_state)
-          0
-        elsif address.us?
-          USPS::PricingEngine.domestic_stamp_price(
-            processing_category,
-            weight,
-            non_machinable
-          )
-        else
-          USPS::PricingEngine.fcmi_price(
-            processing_category,
-            weight,
-            address.country,
-            non_machinable
-          )
-        end
-      when "international_origin"
-        0
-      end
   end
 
   def set_imb_sequence

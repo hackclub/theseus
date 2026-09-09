@@ -67,11 +67,16 @@ class USPS::IndiciumPurchase
     entry = existing || indicium.ledger_entries.create!(
       billing_profile: billing_profile,
       category: :indicia,
-      amount_cents: (letter.postage * 100).ceil,
+      amount_cents: Billing::Quote.new(letter.billing_lines).now_cents,
     )
 
     begin
-      Billing.charge!([entry], name: charge_name, memo: "[theseus] postage for a #{letter.processing_category}#{@name_suffix}", strict: true)
+      transfer = Billing.charge!([ entry ], name: charge_name, note: "#{letter.processing_category}#{@name_suffix}", strict: true)
+      # nil: the entry is already claimed by an earlier attempt (failed and
+      # waiting for backoff, or still in flight). Settle that one now rather
+      # than buying postage against money that never moved.
+      Billing.execute!(entry.reload.hcb_transfer, strict: true) if transfer.nil?
+
     rescue Billing::Rejected, Billing::InFlight
       # Nothing moved. Don't leave a half-built indicium on the letter; the
       # failed HCB::Transfer row is the record that we tried.
@@ -94,7 +99,7 @@ class USPS::IndiciumPurchase
 
     credit = begin
       Billing.credit!(reverses: charge, amount_cents: charge.net_cents, name: "Refund for #{letter.public_id} #{indicium.public_id}",
-        memo: "[theseus] postage refund for a #{letter.processing_category}: #{e.message.truncate(120)}")
+        note: "USPS purchase failed: #{e.message.truncate(120)}")
     rescue Billing::Error => credit_error
       Sentry.capture_exception(credit_error, tags: { money: true }, extra: { indicium_id: indicium.id }) if defined?(Sentry)
       credit_error.try(:transfer)

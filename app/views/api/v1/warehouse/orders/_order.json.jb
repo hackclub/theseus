@@ -15,4 +15,15 @@
   labor_cost: order.labor_cost,
   postage_cost: order.postage_cost,
   idempotency_key: order.idempotency_key,
+  billing: (if order.billing_profile
+    quote = Billing::Quote.new(order.billing_lines)
+    {
+      profile: order.billing_profile.public_id,
+      organization: order.billing_profile.organization_name,
+      lines: quote.lines.map { |l| { category: l.category, when: l.when, amount_cents: l.amount_cents, label: l.label }.compact },
+      due_now_cents: quote.now_cents,
+      billed_cents: order.total_billed_cents
+    }
+  end)
+
 }.compact_blank

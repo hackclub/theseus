@@ -56,37 +56,47 @@
 </div>
 
 <%# ── Money summary ── %>
-<% indicia_charge = @batch.ledger_entries.indicia.charges.live.order(:id).last %>
-<% if indicia_charge %>
-  <% charged = indicia_charge.amount_cents %>
-  <% credited = -indicia_charge.reversals.live.sum(:amount_cents) %>
+<% charges = @batch.indicia_charges.order(:id).to_a %>
+<% if charges.any? %>
+  <% charged = charges.sum(&:amount_cents) %>
+  <% credited = -LedgerEntry.live.where(reverses: charges).sum(:amount_cents) %>
   <% spent_cents = @batch.actual_spent_cents %>
-  <% overpaid = indicia_charge.net_cents - spent_cents %>
+  <% overpaid = @batch.prepaid_cents %>
+  <% pending_charge = charges.find(&:pending?) %>
+  <% refund_from = @batch.refundable_charge %>
   <div class="detail-grid batch-money">
     <span class="detail-label">Charged HCB</span>
     <span>
-      $<%= '%.2f' % (charged / 100.0) %>
-      <% if indicia_charge.pending? %><span class="badge badge-warning"><%= indicia_charge.hcb_transfer&.state || "pending" %></span><% end %>
+      <%= number_to_currency(charged / 100.0) %>
+      <% if pending_charge %><span class="badge badge-warning"><%= pending_charge.hcb_transfer&.state || "pending" %></span><% end %>
     </span>
     <% if credited > 0 %>
       <span class="detail-label">Refunded</span>
-      <span>$<%= '%.2f' % (credited / 100.0) %></span>
+      <span><%= number_to_currency(credited / 100.0) %></span>
     <% end %>
     <span class="detail-label">USPS spent</span>
-    <span>$<%= '%.2f' % (spent_cents / 100.0) %></span>
-    <% if overpaid > 0 && @batch.processed? && indicia_charge.settled? %>
+    <span><%= number_to_currency(spent_cents / 100.0) %></span>
+    <% if overpaid > 0 && @batch.processed? && refund_from %>
       <strong class="detail-label text-warning">⚠ Overpaid</strong>
       <span>
-        <strong class="text-warning">$<%= '%.2f' % (overpaid / 100.0) %></strong>
+        <strong class="text-warning"><%= number_to_currency(overpaid / 100.0) %></strong>
         <% if current_user&.admin? %>
-          <%= form_with url: refund_overpayment_letter_batch_path(@batch), method: :post, class: "form-inline" do %>
-            <button type="submit" class="btn-sm btn-warning">Refund $<%= '%.2f' % (overpaid / 100.0) %></button>
+          <%= form_with url: refund_overpayment_letter_batch_path(@batch), method: :post do %>
+            <%= render Components::MoneyNotice.new(
+              lines: [Billing::Quote::Line.new(category: :indicia, label: "overpaid postage on #{@batch.public_id}", when: :now, amount_cents: [overpaid, refund_from.net_cents].min, count: 1)],
+              profiles: [refund_from.billing_profile],
+              field: nil,
+              locked: true,
+              refund: true,
+              proceed: "Refund",
+              id: "billing-consent-refund",
+            ) %>
           <% end %>
         <% end %>
       </span>
     <% elsif overpaid > 0 %>
       <span class="detail-label">Overpaid (so far)</span>
-      <span class="text-muted">$<%= '%.2f' % (overpaid / 100.0) %></span>
+      <span class="text-muted"><%= number_to_currency(overpaid / 100.0) %></span>
     <% end %>
   </div>
 <% end %>

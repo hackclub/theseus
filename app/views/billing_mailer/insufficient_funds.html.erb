@@ -1,3 +1,0 @@
-<h2 style="color: red;">⚠️ INSUFFICIENT FUNDS</h2>
-<p><strong><%= @profile.organization_name %></strong> can't cover this transfer. It will be retried with backoff up to <%= HCB::Transfer::MAX_ATTEMPTS %> times; this is the only email you'll get about it unless it gives up.</p>
-<%= render "transfer", transfer: @transfer %>

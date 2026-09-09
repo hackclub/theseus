@@ -167,6 +167,23 @@ class Letter::BatchesController < BaseBatchesController
     redirect_to processing_letter_batch_path(@batch)
   end
 
+  # GET /letter/batches/:id/billing_consent — turbo frame, re-loaded when postage options change
+  def billing_consent
+    authorize @batch, :process_form?, policy_class: Letter::BatchPolicy
+    component = Components::MoneyNotice.new(
+      lines: @batch.billing_lines(
+        us_postage_type: params[:us_postage_type].presence,
+        intl_postage_type: params[:intl_postage_type].presence,
+        non_machinable: ActiveModel::Type::Boolean.new.cast(params[:non_machinable]),
+      ),
+      profiles: current_user.billing_profiles,
+      field: "batch[hcb_payment_account_id]",
+      selected: current_user.billing_profiles.find_by(id: params[:hcb_payment_account_id]),
+      proceed: "Start Processing",
+    )
+    render html: helpers.turbo_frame_tag("billing-consent-frame") { render_to_string(component) }, layout: false
+  end
+
   def mark_printed
     authorize @batch, :mark_printed?, policy_class: Letter::BatchPolicy
     if @batch.processed?
@@ -239,25 +256,25 @@ class Letter::BatchesController < BaseBatchesController
     # created here (pending), so a second click sees a smaller net and bails.
     transfer = nil
     @batch.with_lock do
-      charge = @batch.ledger_entries.indicia.charges.settled.order(:id).last
-      overpaid = charge ? charge.net_cents - @batch.actual_spent_cents : 0
-      if overpaid <= 0
+      charge = @batch.refundable_charge
+      overpaid = @batch.prepaid_cents
+      if charge.nil? || overpaid <= 0
         redirect_to processing_letter_batch_path(@batch), alert: "Nothing to refund."
         return
       end
 
       transfer = Billing.credit!(
         reverses: charge,
-        amount_cents: overpaid,
+        amount_cents: [ overpaid, charge.net_cents ].min,
         name: "Refund for #{@batch.public_id}",
-        memo: "[theseus] overpayment refund by #{current_user.email}",
+        note: "overpayment refund by #{current_user.email}",
         execute: false,
       )
     end
 
     # Phase 2: HCB call outside the lock
     Billing.execute!(transfer, strict: true)
-    redirect_to processing_letter_batch_path(@batch), notice: "Refunded $#{'%.2f' % transfer.amount}"
+    redirect_to processing_letter_batch_path(@batch), notice: "Refunded #{Billing::Memo.money(transfer.amount_cents)}"
   rescue Billing::InFlight => e
     redirect_to processing_letter_batch_path(@batch), alert: "#{e.message}. Try again once it resolves."
   rescue Billing::Unconfirmed => e

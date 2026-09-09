@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Billing::Credit
-  def initialize(reverses:, amount_cents:, name:, memo:, execute:)
+  def initialize(reverses:, amount_cents:, name:, note:, execute:)
     @reverses = reverses
     @amount_cents = amount_cents.to_i
     @name = name
-    @memo = memo
+    @note = note
     @execute = execute
   end
 
@@ -34,8 +34,9 @@ class Billing::Credit
         hq_organization_id: original.hcb_transfer&.hq_organization_id || Billing.destination_for(original.category),
         amount_cents: @amount_cents,
         name: @name,
-        memo: @memo || "[theseus] credit against #{original.category} #{original.ledgerable_type.demodulize.downcase}##{original.ledgerable_id}",
-        metadata: { "ledger_entry_ids" => [entry.id] },
+        memo: Billing::Memo.credit(entry, original, note: @note),
+        metadata: { "ledger_entry_ids" => [ entry.id ] },
+
       ).tap { |t| entry.update!(hcb_transfer: t) }
     end
 

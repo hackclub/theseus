@@ -3,6 +3,7 @@
       email: @recipient,
       dataVariables: {
         subject: @subject,
-        body: yield.html_safe
-      }
+        body: yield.html_safe,
+        cc: @cc,
+      }.compact
     }.to_json %>

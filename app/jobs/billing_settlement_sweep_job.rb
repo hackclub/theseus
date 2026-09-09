@@ -1,7 +1,8 @@
 # Every 15 minutes:
 #  1. anything left unclaimed (batch postage, orders whose immediate charge
 #     was skipped because a transfer was in flight) gets charged per profile
-#  2. failed transfers whose backoff has elapsed are re-executed
+#  2. failed transfers whose backoff has elapsed are re-executed, as are
+#     pending transfers that were never sent
 #  3. completed transfers whose entries were never settled get repaired
 class BillingSettlementSweepJob < ApplicationJob
   queue_as :default
@@ -18,7 +19,7 @@ class BillingSettlementSweepJob < ApplicationJob
     end
 
     retried = 0
-    HCB::Transfer.due_for_retry.find_each do |transfer|
+    HCB::Transfer.due_for_retry.or(HCB::Transfer.never_sent).find_each do |transfer|
       Billing.execute!(transfer)
       retried += 1
     rescue => e

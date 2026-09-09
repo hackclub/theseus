@@ -112,38 +112,8 @@ class Letter::Batch < Batch
   # Use: BatchProcessJob.perform_later(batch.id) after setting process_options.
 
   def postage_cost(non_machinable: nil)
-    # Preload associations to avoid N+1 queries
-    letters.includes(:address, :usps_indicium).sum do |letter|
-      effective_non_machinable = non_machinable.nil? ? letter.non_machinable : non_machinable
-
-      if letter.postage_type == "indicia"
-        if letter.usps_indicium.present?
-          # Use actual indicia price if indicia are bought
-          letter.usps_indicium.cost
-        elsif letter.address.us?
-          USPS::PricingEngine.metered_price(letter.processing_category, letter.weight, effective_non_machinable)
-        else
-          USPS::PricingEngine.fcmi_price(letter.processing_category, letter.weight, letter.address.country, effective_non_machinable)
-        end
-      else
-        # For stamps, use stamp price for US and desired price for international
-        if letter.address.us?
-          USPS::PricingEngine.domestic_stamp_price(
-            letter.processing_category,
-            letter.weight,
-            effective_non_machinable
-          )
-        else
-          USPS::PricingEngine.fcmi_price(
-            letter.processing_category,
-            letter.weight,
-            letter.address.country
-          )
-        end
-      end
-    rescue USPS::USPSError => e
-      Rails.logger.warn("Skipping letter #{letter.id} (#{letter.address.country}) in postage_cost: #{e.message}")
-      0
+    priced_letters.sum do |letter|
+      priced(letter) { letter.postage_type == "indicia" ? indicia_price(letter, non_machinable) : letter.postage_for(postage_type: letter.postage_type || "stamps", non_machinable: non_machinable) } || 0
     end
   end
 
@@ -155,63 +125,55 @@ class Letter::Batch < Batch
       .sum("COALESCE(usps_indicia.postage, 0) + COALESCE(usps_indicia.fees, 0)") * 100).ceil
   end
 
+  def indicia_charges = ledger_entries.indicia.charges.live
+
+  # Settled postage money, net of refunds, that USPS hasn't consumed yet.
+  # Positive after processing means we overcharged; the job treats it as
+  # prepaid when re-running.
+  def prepaid_cents = indicia_charges.settled.sum(&:net_cents) - actual_spent_cents
+
+  # The newest settled charge with money left on it: where a refund comes from.
+  def refundable_charge = indicia_charges.settled.order(id: :desc).detect { |c| c.net_cents.positive? }
+
+  # Savings (negative) or cost (positive) of indicia vs. retail stamps, per region.
   def postage_cost_difference(us_postage_type: nil, intl_postage_type: nil, non_machinable: nil)
-    # Preload associations to avoid N+1 queries
-    letters.includes(:address, :usps_indicium).each_with_object({ us: 0, intl: 0 }) do |letter, differences|
-      effective_non_machinable = non_machinable.nil? ? letter.non_machinable : non_machinable
+    priced_letters.each_with_object({ us: 0, intl: 0 }) do |letter, diff|
+      region = letter.address.us? ? :us : :intl
+      type = (region == :us ? us_postage_type : intl_postage_type) || letter.postage_type
+      next unless type == "indicia"
+      diff[region] += priced(letter) { indicia_price(letter, non_machinable) - letter.postage_for(postage_type: "stamps", non_machinable: non_machinable) } || 0
 
-      # Determine what postage type this letter would use
-      effective_postage_type = if letter.address.us?
-          us_postage_type || letter.postage_type
-        else
-          intl_postage_type || letter.postage_type
-        end
-
-      # Skip if not switching to indicia
-      next unless effective_postage_type == "indicia"
-
-      if letter.address.us?
-        # For US mail:
-        # Retail price is stamp_price
-        retail_price = USPS::PricingEngine.domestic_stamp_price(
-          letter.processing_category,
-          letter.weight,
-          effective_non_machinable
-        )
-
-        # Indicia price is metered_price
-        indicia_price = if letter.usps_indicium.present?
-            letter.usps_indicium.cost
-          else
-            USPS::PricingEngine.metered_price(
-              letter.processing_category,
-              letter.weight,
-              effective_non_machinable
-            )
-          end
-
-        # Difference should be negative (savings)
-        differences[:us] += indicia_price - retail_price
-      else
-        # For international mail:
-        # Retail price is desired_price
-        retail_price = USPS::PricingEngine.fcmi_price(
-          letter.processing_category,
-          letter.weight,
-          letter.address.country
-        )
-
-        indicia_price = if letter.usps_indicium.present?
-            letter.usps_indicium.cost
-          else
-            USPS::PricingEngine.fcmi_price(letter.processing_category, letter.weight, letter.address.country)
-          end
-
-        differences[:intl] += indicia_price - retail_price
-      end
-    rescue USPS::USPSError => e
-      Rails.logger.warn("Skipping letter #{letter.id} (#{letter.address.country}) in postage_cost_difference: #{e.message}")
     end
+  end
+
+  # What processing will charge. Pass `letters:` once they're configured
+  # (BatchProcessJob), or the form's options beforehand.
+  def billing_lines(letters: nil, us_postage_type: nil, intl_postage_type: nil, non_machinable: nil)
+    cents = 0
+    n = 0
+    (letters || priced_letters).each do |letter|
+      type = letters ? letter.postage_type : (letter.address&.us? ? us_postage_type : (intl_postage_type || "international_origin"))
+      next unless type == "indicia" && letter.usps_indicium&.postage.blank?
+      price = letters ? letter.postage : priced(letter) { letter.postage_for(postage_type: "indicia", non_machinable: non_machinable) }
+      next if price.nil?
+      n += 1
+      cents += (price.to_d * 100).ceil
+    end
+    return [] if n.zero?
+    [ Billing::Quote::Line.new(category: :indicia, label: "estimated postage for #{n} #{"letter".pluralize(n)} in #{public_id}", when: :now, amount_cents: cents, count: n) ]
+  end
+
+  private def priced_letters = letters.includes(:address, :usps_indicium)
+
+  private def indicia_price(letter, non_machinable)
+    letter.usps_indicium&.postage.present? ? letter.usps_indicium.cost : letter.postage_for(postage_type: "indicia", non_machinable: non_machinable)
+  end
+
+  private def priced(letter)
+    yield
+  rescue USPS::USPSError => e
+    Rails.logger.warn("Skipping letter #{letter.id} (#{letter.address&.country}) in pricing: #{e.message}")
+    nil
   end
 
   def mailing_date_not_in_past

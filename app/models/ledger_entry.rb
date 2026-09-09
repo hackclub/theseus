@@ -94,6 +94,7 @@ class LedgerEntry < ApplicationRecord
 
   def void!(reason: nil)
     raise ArgumentError, "can only void a pending entry" unless pending?
+    raise ArgumentError, "entry is claimed by transfer #{hcb_transfer.idempotency_key} (#{hcb_transfer.state}); abandon it first" if hcb_transfer&.holds_entries?
     update!(state: :voided, metadata: metadata.merge("voided_reason" => reason).compact)
   end
 
@@ -102,9 +103,13 @@ class LedgerEntry < ApplicationRecord
   # A pending entry never moved money, so deleting it loses nothing. Anything
   # else is history.
   def only_pending_can_be_destroyed
-    return if pending?
-    errors.add(:base, "only pending entries can be deleted")
-    throw(:abort)
+    if !pending?
+      errors.add(:base, "only pending entries can be deleted")
+      throw(:abort)
+    elsif hcb_transfer&.holds_entries?
+      errors.add(:base, "entry is claimed by transfer #{hcb_transfer.idempotency_key} (#{hcb_transfer.state})")
+      throw(:abort)
+    end
   end
 
   def credit_reverses_a_charge

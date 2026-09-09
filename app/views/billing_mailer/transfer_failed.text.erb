@@ -1,0 +1,12 @@
+<% if @transfer.last_error.to_s.start_with?("ledger mismatch") -%>
+this transfer was NOT sent: its ledger entries no longer add up to its amount, which should be impossible. look at it before doing anything else.
+<% elsif @transfer.retryable? -%>
+HCB rejected this transfer (<%= @attempt %>). it'll be retried at <%= @transfer.next_attempt_at.in_time_zone("America/New_York").strftime("%b %d %H:%M %Z") %>; you'll hear again only if it gives up.
+<% elsif @transfer.gave_up? -%>
+HCB rejected this transfer <%= @transfer.attempts %> times and it won't be retried automatically. fix the cause, then retry it from the billing page.
+<% else -%>
+HCB rejected this transfer and it won't be retried automatically. fix the cause, then retry it from the billing page.
+<% end -%>
+
+<%= render "transfer", transfer: @transfer %>
+- theseus billing

@@ -58,6 +58,17 @@ class Letter::InstantQueue < Letter::Queue
   # Methods
   def indicia? = postage_type == "indicia"
 
+  # What each submitted letter bills the queue's owner (US rate; international varies).
+  def billing_lines
+    return [] unless indicia?
+    category = Letter.processing_categories.key(letter_processing_category) || letter_processing_category
+    cents = (USPS::PricingEngine.metered_price(category, letter_weight, false).to_d * 100).ceil
+    [ Billing::Quote::Line.new(category: :indicia, label: "postage per US letter submitted", when: :later, amount_cents: cents, count: 1) ]
+  rescue USPS::USPSError, Faraday::Error, OAuth2::Error, RuntimeError => e
+    Rails.logger.warn("[Letter::InstantQueue] could not price #{public_id}: #{e.class}: #{e.message}")
+    [ Billing::Quote::Line.new(category: :indicia, label: "postage per letter submitted, at cost", when: :later, count: 1) ]
+  end
+
   def process_letter_instantly!(address, params = {})
     Rails.logger.info("Starting process_letter_instantly! with postage_type: #{postage_type}")
 

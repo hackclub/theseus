@@ -1,16 +1,6 @@
 <%= form_with(url: buy_indicia_letter_path(letter), method: :post) do |form| %>
   <% if current_user.billing_profiles.any? %>
     <div class="mb-half">
-      <label class="text-muted" style="display: block; margin-bottom: 0.25rem">HCB Organization</label>
-      <select name="hcb_payment_account_id" required class="w-100">
-        <option value="">Select organization…</option>
-        <% current_user.billing_profiles.each do |account| %>
-          <option value="<%= account.id %>"><%= account.organization_name %></option>
-        <% end %>
-      </select>
-    </div>
-
-    <div class="mb-half">
       <label class="text-muted" style="display: block; margin-bottom: 0.25rem">USPS Account</label>
       <select name="usps_payment_account_id" required class="w-100">
         <% USPS::PaymentAccount.all.each do |account| %>
@@ -18,9 +8,13 @@
         <% end %>
       </select>
     </div>
-
-    <button type="submit" class="btn-success w-100">✓ Buy Indicia</button>
-  <% else %>
-    <span class="text-muted"><%= link_to "Connect your HCB account", new_hcb_oauth_connection_path %> to purchase postage.</span>
   <% end %>
+
+  <%= render Components::MoneyNotice.new(
+    lines: letter.billing_lines,
+    profiles: current_user.billing_profiles,
+    field: "hcb_payment_account_id",
+    proceed: "Buy Indicia",
+    id: "billing-consent-sidebar",
+  ) %>
 <% end %>

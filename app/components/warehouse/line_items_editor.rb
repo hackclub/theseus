@@ -183,7 +183,7 @@ class Components::Warehouse::LineItemsEditor < Components::Base
 
   def sku_cost_display(sku)
     cost = sku.actual_cost_to_hc.presence || sku.declared_unit_cost || 0
-    cost_text = cost > 0 ? helpers.number_to_currency(cost) : nil
+    cost_text = cost > 0 ? number_to_currency(cost) : nil
     "Cost: #{cost_text}"
   end
 

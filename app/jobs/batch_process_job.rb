@@ -79,9 +79,9 @@ class BatchProcessJob < ApplicationJob
     total = letters_to_buy.count
     return if total == 0
 
-    estimated_cents = (letters_to_buy.sum(:postage) * 100).ceil
-    batch.update_columns(hcb_payment_account_id: hcb_account.id) if batch.hcb_payment_account_id != hcb_account.id
+    estimated_cents = Billing::Quote.new(batch.billing_lines(letters: letters_to_buy)).now_cents
     charge_batch!(batch, hcb_account, estimated_cents)
+    batch.update_columns(hcb_payment_account_id: hcb_account.id) if batch.hcb_payment_account_id != hcb_account.id
 
     actual_cents = Concurrent::AtomicFixnum.new(0)
     purchased_count = Concurrent::AtomicFixnum.new(0)
@@ -142,25 +142,31 @@ class BatchProcessJob < ApplicationJob
     # overpayment refunds are manual via the refund_overpayment controller action.
   end
 
-  # One indicia charge per batch, for the estimated postage. Re-runs (retry
-  # failed letters) find the settled charge and skip straight to buying.
+  # A batch is paid for by one organization. Re-runs (retrying failed
+  # letters, or a batch that was auto-refunded) charge only what the money
+  # already on hand doesn't cover, never more than was just consented to.
   def charge_batch!(batch, hcb_account, estimated_cents)
-    existing = batch.ledger_entries.indicia.charges.live.order(:id).last
-    if existing&.settled?
-      Rails.logger.info("[BatchProcessJob] batch #{batch.id} already charged (entry #{existing.id}); skipping")
-      return existing
+    pending = batch.indicia_charges.pending.order(:id).last
+    if pending
+      raise "A previous HCB charge for this batch is still awaiting confirmation (#{pending.hcb_transfer&.idempotency_key}). Wait for it to resolve before retrying."
     end
-    if existing&.pending?
-      raise "A previous HCB charge for this batch is still awaiting confirmation (#{existing.hcb_transfer&.idempotency_key}). Wait for it to resolve before retrying."
+
+    paid_by = batch.indicia_charges.settled.detect { |c| c.net_cents.positive? }&.billing_profile
+    if paid_by && paid_by != hcb_account
+      raise "#{batch.public_id} was already charged to #{paid_by.organization_name}; process it with that organization, or refund the overpayment first"
     end
-    return nil unless estimated_cents.positive?
+
+    shortfall = estimated_cents - [ batch.prepaid_cents, 0 ].max
+    unless shortfall.positive?
+      Rails.logger.info("[BatchProcessJob] batch #{batch.id} has #{batch.prepaid_cents}c prepaid against #{estimated_cents}c of postage; not charging")
+      return nil
+    end
 
     unless Billing.mock?
       begin
         org = hcb_account.organization
-        if org.balance_cents < estimated_cents
-          raise "Insufficient HCB balance: #{org.name} has $#{'%.2f' % (org.balance_cents / 100.0)} " \
-                "but postage costs $#{'%.2f' % (estimated_cents / 100.0)}"
+        if org.balance_cents < shortfall
+          raise "Insufficient HCB balance: #{org.name} has #{Billing::Memo.money(org.balance_cents)} but postage costs #{Billing::Memo.money(shortfall)}"
         end
       rescue => e
         raise if e.message.include?("Insufficient HCB balance")
@@ -171,10 +177,10 @@ class BatchProcessJob < ApplicationJob
     entry = batch.ledger_entries.create!(
       billing_profile: hcb_account,
       category: :indicia,
-      amount_cents: estimated_cents,
+      amount_cents: shortfall,
     )
     begin
-      Billing.charge!([entry], name: "Postage for #{batch.public_id}", memo: "[theseus] batch postage", strict: true)
+      Billing.charge!([ entry ], name: "Postage for #{batch.public_id}", note: "batch postage", strict: true)
     rescue Billing::Rejected, Billing::InFlight => e
       entry.reload.void!(reason: e.message.truncate(200)) if entry.pending?
       raise "HCB transfer failed: #{e.message}"
@@ -188,14 +194,14 @@ class BatchProcessJob < ApplicationJob
   # charge back. Anything else is a manual overpayment refund.
   def auto_refund_if_nothing_spent(batch, options)
     return if batch.letters.where(indicia_state: "purchased").exists?
-    charge = batch.ledger_entries.indicia.charges.settled.order(:id).last
-    return unless charge && charge.net_cents.positive?
+    charge = batch.refundable_charge
+    return unless charge
 
     Billing.credit!(
       reverses: charge,
       amount_cents: charge.net_cents,
       name: "Auto-refund for #{batch.public_id} (failed before purchasing)",
-      memo: "[theseus] auto-refund, zero postage purchased",
+      note: "auto-refund, nothing was purchased",
     )
   rescue => e
     Sentry.capture_exception(e, tags: { money: true }, extra: { batch_id: batch.id })

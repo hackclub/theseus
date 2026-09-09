@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Billing::Charge
-  def initialize(entries, name:, memo:, execute:, strict:)
+  def initialize(entries, name:, note:, execute:, strict:)
     @entries = entries
     @name = name
-    @memo = memo
+    @note = note
     @execute = execute
     @strict = strict
   end
@@ -48,16 +48,11 @@ class Billing::Charge
         hq_organization_id: destinations.first,
         amount_cents: entries.sum(&:amount_cents),
         name: @name,
-        memo: @memo || default_memo(entries),
+        memo: Billing::Memo.charge(entries, note: @note),
         metadata: { "ledger_entry_ids" => entries.map(&:id) },
       )
       LedgerEntry.where(id: entries.map(&:id)).update_all(hcb_transfer_id: transfer.id)
       transfer
     end
-  end
-
-  def default_memo(entries)
-    lines = entries.map { |e| "#{e.category} #{e.ledgerable_type.demodulize.downcase}##{e.ledgerable_id} $#{"%.2f" % e.amount}" }
-    "[theseus] #{lines.join(", ")}"
   end
 end

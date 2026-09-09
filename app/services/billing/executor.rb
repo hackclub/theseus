@@ -24,9 +24,22 @@ class Billing::Executor
     HCBV4::AuthenticationError,
     HCB::OauthConnectionInvalidatedError,
     OAuth2::Error,               # token refresh happens before the request is sent
-    Faraday::ConnectionFailed,   # could not connect: nothing was sent
-    Faraday::SSLError,
+    OAuth2::ConnectionError,     # oauth2 re-wraps transport errors during refresh; still pre-request
+    OAuth2::TimeoutError,
+    Faraday::SSLError            # handshake failed: nothing was sent
+
   ].freeze
+
+  # Faraday::ConnectionFailed also wraps ECONNRESET/EPIPE, which can happen
+  # after HCB has processed the request. Only these prove it never left.
+  NEVER_SENT = [
+    Errno::ECONNREFUSED,
+    Errno::EHOSTUNREACH,
+    Errno::ENETUNREACH,
+    Errno::EADDRNOTAVAIL,
+    SocketError,
+    (Net::OpenTimeout if defined?(Net::OpenTimeout))
+  ].compact.freeze
 
   # These need a human (relink, fix config) rather than a backoff.
   NOT_RETRYABLE = [
@@ -47,10 +60,7 @@ class Billing::Executor
   end
 
   def call
-    return transfer unless transfer.pending? || transfer.retryable?
-    return transfer if transfer.pending? && transfer.last_attempted_at.present?  # in flight or stale; reconciler's job
-
-    transfer.begin_attempt!
+    return transfer unless claim!
 
     if Billing.mock?
       transfer.complete!("mock_#{SecureRandom.hex(6)}")
@@ -66,6 +76,29 @@ class Billing::Executor
   end
 
   private
+
+  # Take the attempt atomically. Two runners (admin retry and the sweep, say)
+  # can both load a retryable transfer; only the one whose UPDATE lands
+  # gets to send it. The HTTP call stays outside the lock.
+  def claim!
+    transfer.with_lock do
+      next false unless transfer.pending? || transfer.retryable?
+      next false if transfer.pending? && transfer.last_attempted_at.present?  # in flight or stale; reconciler's job
+      next false unless ledger_matches?
+
+      transfer.begin_attempt!
+      true
+    end
+  end
+
+  def ledger_matches?
+    pending = transfer.ledger_entries.pending.sum(:amount_cents).abs
+    return true if pending == transfer.amount_cents
+
+    transfer.fail!("ledger mismatch: transfer is #{transfer.amount_cents}c but pending entries sum to #{pending}c; not sent", retryable: false)
+    Billing::Alert.ledger_mismatch(transfer, pending)
+    false
+  end
 
   # Only the HTTP call is inside the classifying rescue. Anything that goes
   # wrong *after* HCB answered is a bug on our side and must not be
@@ -88,13 +121,24 @@ class Billing::Executor
   rescue *DEFINITE => e
     reject(e)
     nil
+  rescue Faraday::ConnectionFailed => e
+    if NEVER_SENT.any? { |k| e.wrapped_exception.is_a?(k) }
+      reject(e)
+    else
+      unknown(e)
+    end
+    nil
   rescue => e
     # Faraday::TimeoutError, HCBV4::ServerError, HCBV4::APIError, anything we
     # didn't anticipate: the request may have gone through.
-    transfer.mark_unknown!(describe(e))
-    Sentry.capture_exception(e, level: :error, tags: { money: true, billing_unknown: true }, extra: { transfer_id: transfer.id }) if defined?(Sentry)
-    BillingMailer.with(transfer: transfer).transfer_unknown.deliver_later
+    unknown(e)
     nil
+  end
+
+  def unknown(error)
+    transfer.mark_unknown!(describe(error))
+    Sentry.capture_exception(error, level: :error, tags: { money: true, billing_unknown: true }, extra: { transfer_id: transfer.id }) if defined?(Sentry)
+    Billing::Alert.transfer_unknown(transfer)
   end
 
   # remote_id first, on its own; then the entries. If the second step raises
@@ -134,10 +178,11 @@ class Billing::Executor
     transfer.fail!(message, retryable: retryable)
 
     if message.match?(INSUFFICIENT)
-      # Once, on the first attempt; the backoff will keep trying quietly.
-      BillingMailer.with(transfer: transfer).insufficient_funds.deliver_later if transfer.attempts == 1
-    elsif !retryable || transfer.gave_up?
-      BillingMailer.with(transfer: transfer).transfer_failed.deliver_later
+      first = transfer.metadata["nsf"].blank?
+      transfer.update!(metadata: transfer.metadata.merge("nsf" => true, "nsf_last_at" => Time.current.iso8601))
+      Billing::Alert.insufficient_funds(transfer, first: first)
+    else
+      Billing::Alert.transfer_failed(transfer)
     end
   end
 
@@ -147,6 +192,8 @@ class Billing::Executor
       "HCB connection expired — please relink your account"
     when HCBV4::APIError
       "HCB #{error.status}: #{error.message}"
+    when Faraday::ConnectionFailed
+      "#{error.class}: #{error.wrapped_exception&.class}: #{error.message}"
     else
       "#{error.class}: #{error.message}"
     end

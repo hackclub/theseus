@@ -134,6 +134,15 @@ class Warehouse::Batch < Batch
     address
   end
 
+  def billing_lines
+    n = addresses.count
+    return [] if n.zero?
+    [
+      Billing::Quote::Line.new(category: :labor, label: "labor for #{n} #{"order".pluralize(n)} in #{public_id}", when: :now, amount_cents: (warehouse_template.labor_cost.to_d * 100).ceil * n, count: n),
+      Billing::Quote::Line.new(category: :postage, label: "postage for #{n} #{"order".pluralize(n)}, at cost, as they ship", when: :later, count: n)
+    ]
+  end
+
   def contents_cost = warehouse_template.contents_actual_cost_to_hc * addresses.count
 
   def labor_cost = warehouse_template.labor_cost * addresses.count

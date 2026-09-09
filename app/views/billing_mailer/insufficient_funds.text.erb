@@ -1,0 +1,16 @@
+<%= @profile.organization_name %> does not have enough money on HCB to cover a <%= number_to_currency(@transfer.amount) %> charge from Theseus.
+
+What it's for: <%= @transfer.memo.presence || @transfer.name %>
+
+<% if @transfer.next_attempt_at.present? -%>
+What happens next: we will try again at <%= @transfer.next_attempt_at.in_time_zone("America/New_York").strftime("%b %-d at %-I:%M %p %Z") %>. Add funds to <%= @profile.organization_name %> on HCB before then and the charge will go through on its own. You will only hear from us again if it still cannot be completed after <%= HCB::Transfer::MAX_ATTEMPTS %> attempts.
+<% else -%>
+What happens next: this was the last automatic attempt (<%= @attempt %>) and it will not be retried on its own. Once <%= @profile.organization_name %> is funded, reply to this email and we will run the charge again.
+<% end -%>
+<% if @cc.present? -%>
+
+<%= @cc %> linked this organization to Theseus and is copied on this email.
+<% end -%>
+
+<%= render "transfer", transfer: @transfer %>
+Theseus billing

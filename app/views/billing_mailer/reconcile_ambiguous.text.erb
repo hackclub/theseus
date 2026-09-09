@@ -1,0 +1,6 @@
+more than one transfer on HCB matches this unconfirmed transfer. a human needs to look at the HQ ledger and either complete it with the right xfr_ id or mark it failed.
+
+candidates: <%= Array(@transfer.metadata["reconcile_ambiguous"]).join(", ") %>
+
+<%= render "transfer", transfer: @transfer %>
+- theseus billing

@@ -72,6 +72,7 @@ class Warehouse::BatchesController < BaseBatchesController
             recipient_email: address.email,
             address: address,
             user: @batch.user,
+            billing_profile: @batch.billing_profile,
             idempotency_key: "batch_#{@batch.id}_address_#{address.id}",
             user_facing_title: @batch.warehouse_user_facing_title,
             tags: @batch.tags,
@@ -105,6 +106,15 @@ class Warehouse::BatchesController < BaseBatchesController
 
   def process_batch
     authorize @batch, :process_batch?
+    profile_id = params.dig(:batch, :hcb_payment_account_id)
+    if profile_id.present?
+      profile = @batch.user.billing_profiles.find_by(id: profile_id)
+      unless profile
+        redirect_to process_confirm_warehouse_batch_path(@batch), alert: "Billing profile not found or doesn't belong to the batch owner."
+        return
+      end
+      @batch.update!(billing_profile: profile)
+    end
     if @batch.process!
       redirect_to warehouse_batch_path(@batch), notice: "Batch was successfully processed."
     else

@@ -193,6 +193,43 @@ RSpec.describe BatchProcessJob, type: :job do
         expect(batch.total_billed_cents).to eq(0)
       end
 
+      it "charges again after an auto-refund instead of riding on the refunded charge" do
+        create_letters(1)
+        allow(usps_account).to receive(:create_payment_token).and_raise("USPS token service down")
+        allow(Sentry).to receive(:capture_exception)
+        perform_job
+        expect(batch.reload).to be_failed
+        expect(batch.prepaid_cents).to eq(0)
+
+        allow(usps_account).to receive(:create_payment_token).and_return(fake_payment_token)
+        stub_buy_success
+        batch.update_columns(aasm_state: "fields_mapped")
+        perform_job
+
+        expect(hcb_disbursements.map { |d| d[:direction] }).to eq(%i[debit credit debit])
+        expect(batch.letters.first.reload.indicia_state).to eq("purchased")
+        expect(batch.reload).to be_processed
+      end
+
+      it "refuses to bill a different organization than the one already charged" do
+        create_letters(2)
+        stub_buy_success
+        perform_job
+
+        other = create(:billing_profile, user: user, oauth_connection: hcb_oauth, organization_id: "org_other", organization_name: "Other Org")
+        allow(BillingProfile).to receive(:find).with(other.id).and_return(other)
+        batch.letters.first.update_columns(indicia_state: "failed")
+        batch.update!(process_options: process_options.merge(hcb_payment_account_id: other.id))
+        batch.update_columns(aasm_state: "fields_mapped")
+        allow(Sentry).to receive(:capture_exception)
+        perform_job
+
+        expect(batch.reload).to be_failed
+        expect(batch.process_error).to include("already charged to Test Organization")
+        expect(hcb_disbursements.size).to eq(1)
+        expect(batch.hcb_payment_account_id).to eq(hcb_account.id)
+      end
+
       it "refuses to run while a previous charge is unconfirmed" do
         create_letters(1)
         hcb_raises(Faraday::TimeoutError.new("boom"))

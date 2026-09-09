@@ -40,28 +40,30 @@ class Views::Warehouse::Batches::Process < Views::Base
             span(class: "detail-label") { "Labor" }
             span { number_to_currency(@batch.labor_cost) }
             span(class: "detail-label") { "Postage" }
-            span(class: "text-muted") { "TBD" }
+            span(class: "text-muted") { "at cost, as orders ship" }
           end
-          hr(style: "margin:0.5rem 0")
-          div(class: "detail-grid") do
-            span(class: "detail-label") { "Total (est.)" }
-            strong { "~#{number_to_currency(@batch.total_cost)}" }
-          end
+        end
+
+        form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
+          input(type: :hidden, name: :authenticity_token, value: helpers.form_authenticity_token)
+          render Components::MoneyNotice.new(
+            lines: @batch.billing_lines,
+            profiles: @batch.user.billing_profiles,
+            field: "batch[hcb_payment_account_id]",
+            selected: @batch.billing_profile,
+            unbilled: @batch.user.billing_profiles.none?,
+            proceed: "Process Batch",
+            cancel_href: warehouse_batch_path(@batch),
+          )
         end
       end
 
       div(class: "show-sidebar") do
         section do
-          strong { "Confirm" }
+          strong { "What happens" }
           hr
-          div(class: "mt-half") do
-            form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
-              input(type: :hidden, name: :authenticity_token, value: form_authenticity_token)
-              button(type: "submit", class: "btn-success w-100") { "▶ Process Batch" }
-            end
-            div(class: "mt-half") do
-              a(href: warehouse_batch_path(@batch), class: "text-muted") { "Cancel" }
-            end
+          div(class: "mt-half text-muted") do
+            plain "Every address becomes a warehouse order and is sent to Zenventory. Labor is charged to the HCB organization you pick, once, for the whole batch. Postage is charged per order, at cost, when it ships."
           end
         end
       end

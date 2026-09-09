@@ -17,6 +17,7 @@ RSpec.describe BillingSettlementSweepJob do
 
     hq = Billing.destination_for(:labor)
     due = HCB::Transfer.create!(billing_profile: profile, hq_organization_id: hq, amount_cents: 999, name: "old", state: :failed, attempts: 1, next_attempt_at: 1.minute.ago)
+    batch.ledger_entries.create!(billing_profile: profile, category: :labor, amount_cents: 999, hcb_transfer: due)
     not_due = HCB::Transfer.create!(billing_profile: profile, hq_organization_id: hq, amount_cents: 998, name: "later", state: :failed, attempts: 1, next_attempt_at: 1.hour.from_now)
     stuck = HCB::Transfer.create!(billing_profile: profile, hq_organization_id: hq, amount_cents: 997, name: "stuck", state: :unknown, attempts: 1)
 
@@ -34,5 +35,17 @@ RSpec.describe BillingSettlementSweepJob do
     described_class.new.perform
     expect(hcb_disbursements.last[:amount_cents]).to eq(350)
     expect(LedgerEntry.unclaimed).to be_empty
+  end
+
+  it "sends a pending transfer that was created but never executed" do
+    entry = batch.ledger_entries.create!(billing_profile: profile, category: :indicia, amount_cents: 250)
+    transfer = Billing.charge!([ entry ], name: "x", execute: false)
+    described_class.new.perform
+    expect(transfer.reload).to be_pending
+
+    transfer.update!(created_at: 10.minutes.ago)
+    described_class.new.perform
+    expect(transfer.reload).to be_completed
+    expect(entry.reload).to be_settled
   end
 end
