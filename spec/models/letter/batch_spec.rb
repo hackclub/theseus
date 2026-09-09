@@ -53,6 +53,39 @@ RSpec.describe Letter::Batch do
     end
   end
 
+  describe "#propagate_to_letters!" do
+    # This used to read `may_mark_processed?`, which meant "not processed"
+    # only by accident of the transition list; adding `failed` to that list
+    # would have changed who gets their sizing rewritten.
+    def sized_letter
+      create(:letter, batch: batch, user: user, usps_mailer_id: mailer_id,
+        return_address: return_address, address: create(:address), weight: 1)
+    end
+
+    it "rewrites sizing on a batch that hasn't been processed, including a failed one" do
+      letter = sized_letter
+      batch.mark_fields_mapped!
+      batch.mark_purchasing!
+      batch.mark_failed!
+      batch.update!(letter_weight: 2)
+
+      batch.propagate_to_letters!
+
+      expect(letter.reload.weight).to eq(2)
+    end
+
+    it "leaves a processed batch's letters alone" do
+      letter = sized_letter
+      batch.mark_fields_mapped!
+      batch.mark_processed!
+      batch.update!(letter_weight: 2)
+
+      batch.propagate_to_letters!
+
+      expect(letter.reload.weight).to eq(1)
+    end
+  end
+
   describe "#prepaid_cents" do
     # The phantom overpayment: billing:backfill records the main-era charge,
     # actual_spent_cents used to read 0 because indicia_state was nil, and the

@@ -250,7 +250,10 @@ class Letter::Batch < Batch
   # Propagate batch attributes to letters after update.
   # Only propagates sizing/mailing attrs if the batch hasn't been processed yet.
   def propagate_to_letters!
-    if may_mark_processed?
+    # Was `may_mark_processed?` standing in for "not yet processed"; say it
+    # outright so the aasm transition list can change without silently
+    # changing which batches get their sizing overwritten.
+    unless processed?
       letters.update_all(
         height: letter_height,
         width: letter_width,

@@ -528,6 +528,49 @@ RSpec.describe BatchProcessJob, type: :job do
     end
   end
 
+  describe "phase 3 failure is retryable" do
+    # A stamps-only batch never enters `purchasing`, so `failed` was a dead end
+    # for both mark_generating_labels and mark_processed — the retry ran, the
+    # labels were regenerated, and the batch sat in `failed` anyway.
+    it "recovers a stamps-only batch that died generating labels" do
+      create_letters(1)
+      batch.update!(process_options: process_options.merge(us_postage_type: "stamps"))
+      allow(batch).to receive(:generate_labels).and_raise("PDF renderer exploded")
+      allow(Sentry).to receive(:capture_exception)
+
+      perform_job
+
+      expect(batch.reload).to be_failed
+      expect(batch.process_error).to include("PDF renderer exploded")
+
+      allow(batch).to receive(:generate_labels)
+      Letter::RetryBatch.new(batch: batch).call
+      perform_job
+
+      expect(batch).to have_received(:generate_labels).twice # the failed run and the retry
+      expect(batch.reload).to be_processed
+      expect(batch.process_error).to be_nil
+      expect(hcb_disbursements).to be_empty
+    end
+
+    it "recovers an indicia batch that died generating labels without buying again" do
+      create_letters(1)
+      stub_buy_success
+      allow(batch).to receive(:generate_labels).and_raise("PDF renderer exploded")
+      allow(Sentry).to receive(:capture_exception)
+
+      perform_job
+      expect(batch.reload).to be_failed
+
+      allow(batch).to receive(:generate_labels)
+      Letter::RetryBatch.new(batch: batch).call
+      perform_job
+
+      expect(batch.reload).to be_processed
+      expect(hcb_disbursements.size).to eq(1)
+    end
+  end
+
   describe "skips indicia phase when postage is stamps-only" do
     it "goes directly to generating_labels without purchasing" do
       create_letters(1)
