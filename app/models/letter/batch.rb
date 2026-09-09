@@ -135,6 +135,19 @@ class Letter::Batch < Batch
 
   def indicia_charges = ledger_entries.indicia.charges.live
 
+  LEGACY_CHARGE_NOT_BACKFILLED = "legacy HCB charge not backfilled; run billing:backfill first"
+
+  # main recorded a batch's HCB charge in `hcb_transfer_id` and nothing else.
+  # A batch that died mid-purchase back then kept that column but rolled its
+  # indicia back, so the ledger reads "never charged" and re-processing would
+  # buy the whole batch a second time. Billing::Backfill turns the column into
+  # a settled entry; until it has, refuse to charge.
+  # (Backfill skips `mock` ids, so those must not latch here or they'd never
+  # be processable again.)
+  def unbackfilled_legacy_charge?
+    hcb_transfer_id.present? && !hcb_transfer_id.start_with?("mock") && indicia_charges.none?
+  end
+
   # Settled postage money, net of refunds, that USPS hasn't consumed yet.
   # Positive after processing means we overcharged; the job treats it as
   # prepaid when re-running.

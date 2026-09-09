@@ -145,6 +145,12 @@ class Letter::BatchesController < BaseBatchesController
         redirect_to process_confirm_letter_batch_path(@batch), alert: "Please select a billing profile"
         return
       end
+
+      # Don't let anyone start a job that we know will refuse to charge.
+      if @batch.unbackfilled_legacy_charge?
+        redirect_to process_confirm_letter_batch_path(@batch), alert: Letter::Batch::LEGACY_CHARGE_NOT_BACKFILLED
+        return
+      end
     end
 
     # Save options and mailing date, then enqueue

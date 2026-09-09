@@ -230,6 +230,52 @@ RSpec.describe BatchProcessJob, type: :job do
         expect(batch.hcb_payment_account_id).to eq(hcb_account.id)
       end
 
+      # main stored the batch's HCB charge in hcb_transfer_id and nothing else.
+      # Until billing:backfill turns that into a ledger entry the ledger reads
+      # as "never charged", and a re-run would buy the whole batch twice.
+      it "refuses to charge a legacy batch whose HCB transfer isn't in the ledger yet" do
+        create_letters(2)
+        batch.update_columns(hcb_transfer_id: "xfr_legacy")
+        allow(Sentry).to receive(:capture_exception)
+        expect_any_instance_of(USPS::Indicium).not_to receive(:buy!)
+
+        perform_job
+
+        expect(batch.reload).to be_failed
+        expect(batch.process_error).to eq(Letter::Batch::LEGACY_CHARGE_NOT_BACKFILLED)
+        expect(hcb_disbursements).to be_empty
+        expect(batch.ledger_entries).to be_empty
+      end
+
+      it "rides on the legacy charge once it has been backfilled" do
+        letter = create_letters(1).first
+        estimate = (letter.postage * 100).ceil
+        batch.update_columns(hcb_transfer_id: "xfr_legacy")
+        transfer = HCB::Transfer.create!(billing_profile: hcb_account, direction: :debit,
+          hq_organization_id: Billing.destination_for(:indicia), amount_cents: estimate, state: :completed,
+          remote_id: "xfr_legacy", idempotency_key: "backfill_batch_#{batch.id}", name: "legacy", attempts: 1)
+        batch.ledger_entries.create!(billing_profile: hcb_account, category: :indicia, amount_cents: estimate,
+          state: :settled, settled_at: Time.current, hcb_transfer: transfer)
+        stub_buy_success
+
+        perform_job
+
+        expect(batch.reload).to be_processed
+        # the backfilled charge already covers this letter, so no new money moves
+        expect(hcb_disbursements).to be_empty
+      end
+
+      it "ignores a mock transfer id, which billing:backfill would never touch" do
+        create_letters(1)
+        batch.update_columns(hcb_transfer_id: "mock_xfr_1")
+        stub_buy_success
+
+        perform_job
+
+        expect(batch.reload).to be_processed
+        expect(hcb_disbursements.size).to eq(1)
+      end
+
       it "refuses to run while a previous charge is unconfirmed" do
         create_letters(1)
         hcb_raises(Faraday::TimeoutError.new("boom"))

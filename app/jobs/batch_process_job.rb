@@ -146,6 +146,8 @@ class BatchProcessJob < ApplicationJob
   # letters, or a batch that was auto-refunded) charge only what the money
   # already on hand doesn't cover, never more than was just consented to.
   def charge_batch!(batch, hcb_account, estimated_cents)
+    raise Letter::Batch::LEGACY_CHARGE_NOT_BACKFILLED if batch.unbackfilled_legacy_charge?
+
     pending = batch.indicia_charges.pending.order(:id).last
     if pending
       raise "A previous HCB charge for this batch is still awaiting confirmation (#{pending.hcb_transfer&.idempotency_key}). Wait for it to resolve before retrying."
