@@ -86,6 +86,13 @@
           <span class="detail-label">Indicium</span>
           <code><%= @letter.usps_indicium.public_id %></code>
         </div>
+        <% if @letter.usps_indicium.raw_json_response.nil? %>
+          <% admin_tool(class_name: "mt-half") do %>
+            <%= form_with url: clear_indicium_letter_path(@letter), method: :post, class: "form-inline" do %>
+              <button type="submit" class="btn-sm text-danger" data-turbo-confirm="This destroys the orphaned indicium. Are you sure?">Clear orphaned indicium</button>
+            <% end %>
+          <% end %>
+        <% end %>
         <%= render 'admin_inspector', record: @letter.usps_indicium %>
       <% elsif @letter.postage_type == "indicia" %>
         <div class="letter-postage-row">
@@ -103,6 +110,13 @@
           <code class="text-muted">[ ]</code>
           <span>stamps</span>
           <span class="text-muted text-sm"><%= number_to_currency(@letter.postage) %></span>
+          <% if @letter.batch_id.nil? %>
+            <span class="spacer"></span>
+            <%= form_with url: letter_path(@letter), method: :patch, class: "form-inline" do %>
+              <input type="hidden" name="letter[postage_type]" value="indicia">
+              <button type="submit" class="btn-sm">Switch to Indicia</button>
+            <% end %>
+          <% end %>
         </div>
       <% else %>
         <code class="text-muted">[ ] no postage</code>
@@ -151,7 +165,7 @@
 
     <div class="letter-sidebar-actions">
       <%# Primary action — the NEXT thing to do %>
-      <% if @letter.pending? && @letter.label.attached? %>
+      <% if @letter.pending? && (@letter.label.attached? || @letter.batch_id.present?) %>
         <%= form_with url: mark_printed_letter_path(@letter), method: :post, class: "form-inline" do %>
           <button type="submit" class="btn-success w-100">Mark Printed</button>
         <% end %>
@@ -166,6 +180,10 @@
       <% elsif @letter.pending? && !@letter.label.attached? && @letter.batch_id.nil? %>
         <%= form_with(url: generate_label_letter_path(@letter), method: :post) do |f| %>
           <%= render Components::Shared::TemplatePicker.new(form: f, name: :template) %>
+          <label class="form-check-label">
+            <input type="checkbox" name="qr" value="1" checked>
+            <span>Include QR code</span>
+          </label>
           <button type="submit" class="btn-success w-100 mt-quarter">Generate Label</button>
         <% end %>
       <% end %>
