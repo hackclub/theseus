@@ -7,12 +7,6 @@ module API
         authorize @letter
       end
 
-      def by_tag
-        @letters = Letter.where("? = ANY(tags)", params[:tag])
-        authorize @letters
-        render :letters_collection
-      end
-
       def mark_printed
         authorize @letter
         @letter.mark_printed!

@@ -541,10 +541,6 @@ Rails.application.routes.draw do
         post "transfers/:transfer_id/retry", action: :retry_transfer, as: :retry_transfer
       end
     end
-    namespace :usps do
-      resources :indicia
-    end
-
     namespace :hcb do
       resource :oauth_connection, only: [ :new ] do
         get :callback, on: :collection
