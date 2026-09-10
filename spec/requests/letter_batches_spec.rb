@@ -49,6 +49,13 @@ RSpec.describe "letter batches", type: :request do
     expect(batch.reload.process_options["template_cycle"]).to eq(templates)
   end
 
+  it "points the template picker's select-one guard at its own form" do
+    get regenerate_form_letter_batch_path(batch)
+
+    expect(response.body).to include('class="template-picker"')
+    expect(response.body).to include("picker.closest('form')")
+  end
+
   it "regenerates labels when the skip-failed button posts no batch params" do
     post regenerate_labels_letter_batch_path(batch)
 
