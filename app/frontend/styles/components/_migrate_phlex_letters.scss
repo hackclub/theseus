@@ -125,6 +125,17 @@
   padding: 0;
 }
 
+// "Set as default" button_to styled to match the icon links beside it.
+.btn-link-icon {
+  background: none;
+  border: none;
+  color: var(--foreground2);
+  cursor: pointer;
+  font: inherit;
+  margin-right: 0.5rem;
+  padding: 0;
+}
+
 // Trailing "Actions" table cell that holds the icon links above.
 .actions-cell { text-align: right; white-space: nowrap; }
 

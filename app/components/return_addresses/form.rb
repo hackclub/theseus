@@ -83,6 +83,7 @@ class Components::ReturnAddresses::Form < Components::Base
 
         div(class: "checkbox-card") do
           label do
+            input(type: "hidden", name: "return_address[shared]", value: "0")
             input(type: "checkbox", name: "return_address[shared]", value: "1", checked: return_address.shared)
             plain " Make this address shared"
           end

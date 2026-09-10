@@ -32,8 +32,12 @@ class Views::ReturnAddresses::Index < Views::Base
           return_addresses.each do |address|
             tr do
               td do
-                a(href: edit_return_address_path(address), class: "link-strong") do
-                  plain address.name
+                if policy(address).edit?
+                  a(href: edit_return_address_path(address), class: "link-strong") do
+                    plain address.name
+                  end
+                else
+                  span(class: "fw-600") { plain address.name }
                 end
                 whitespace
                 render_badges(address)
@@ -87,11 +91,7 @@ class Views::ReturnAddresses::Index < Views::Base
     a(href: edit_return_address_path(address), class: "icon-link") { "✎" }
 
     unless address == current_user&.home_return_address
-      a(
-        href: set_as_home_return_address_path(address),
-        data: { turbo_method: :post },
-        class: "icon-link"
-      ) { "⌂" }
+      button_to "⌂", set_as_home_return_address_path(address), method: :post, form: { class: "form-inline" }, class: "btn-link-icon"
     end
 
     button_to "✕", return_address_path(address), method: :delete, form: { class: "form-inline" }, class: "btn-link-danger", onclick: "return confirm('Are you sure you want to delete this return address?')"
