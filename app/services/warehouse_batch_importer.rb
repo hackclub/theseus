@@ -19,7 +19,7 @@ class WarehouseBatchImporter < BatchImporter
     errs << "Email blank" if get(row, "email").blank?
 
     cc = country_code(row)
-    if cc != "US" && !cc.in?(restricted_countries) && get(row, "phone_number").blank?
+    if resolved_country(row) && cc != "US" && !cc.in?(restricted_countries) && get(row, "phone_number").blank?
       errs << "Customs needs a phone number for #{country_name(cc)}"
     end
 

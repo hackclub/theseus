@@ -63,6 +63,34 @@ RSpec.describe WarehouseBatchImporter do
         expect(results[1][:errors]).to include("We can't ship to North Korea from the warehouse")
       end
     end
+
+    context "with a country nothing can parse" do
+      let(:csv_rows) { [ "Alice,Smith,123 Main St,Burlington,VT,05401,U.S.,alice@example.com," ] }
+
+      it "flags the row instead of blowing up at import time" do
+        expect(importer.validate.first[:errors]).to include("Unrecognized country (U.S.)")
+      end
+
+      it "skips the row rather than raising" do
+        expect { importer.call(skip_invalid: true) }.to raise_error(BatchImporter::NothingToImport)
+        expect(batch.reload.addresses).to be_empty
+      end
+    end
+
+    context "with a non-US postal code" do
+      let(:csv_rows) do
+        [
+          "Bea,Jones,10 Downing St,London,England,SW1A 2AA,United Kingdom,bea@example.com,+44 20 7925 0918",
+          "Cal,Ng,1 Main St,Burlington,VT,12,US,cal@example.com,"
+        ]
+      end
+
+      it "only shape-checks US ZIPs" do
+        results = importer.validate
+        expect(results[0][:status]).to eq(:valid)
+        expect(results[1][:errors]).to include("ZIP looks invalid (12)")
+      end
+    end
   end
 
   describe "#call" do
@@ -91,6 +119,19 @@ RSpec.describe WarehouseBatchImporter do
         expect(importer.call(skip_invalid: true)).to eq(2)
         expect(batch.addresses.pluck(:first_name)).to contain_exactly("Alice", "Cal")
       end
+    end
+
+    it "refuses to import a second time" do
+      importer.call
+      expect { described_class.new(batch.reload).call }.to raise_error(BatchImporter::AlreadyImported)
+      expect(batch.reload.addresses.count).to eq(2)
+    end
+
+    it "refuses to mark a batch mapped when nothing imported" do
+      batch.addresses.destroy_all
+      allow(batch).to receive(:csv_data).and_return("first_name,last_name,address,city,state,zip,country,email,phone\n")
+      expect { importer.call }.to raise_error(BatchImporter::NothingToImport)
+      expect(batch.reload).to be_awaiting_field_mapping
     end
   end
 end

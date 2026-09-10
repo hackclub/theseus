@@ -72,6 +72,92 @@ RSpec.describe "warehouse batches", type: :request do
     end
   end
 
+  describe "the index" do
+    it "filters by the status the stat chips link to" do
+      mapped = create(:warehouse_batch, user: user, warehouse_template: template)
+      mapped.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      mapped.mark_fields_mapped!
+      awaiting = create(:warehouse_batch, user: user, warehouse_template: template)
+
+      get warehouse_batches_path(status: "fields_mapped")
+      expect(response.body).to include("##{mapped.id}")
+      expect(response.body).not_to include("##{awaiting.id}")
+
+      get warehouse_batches_path
+      expect(response.body).to include("##{mapped.id}").and include("##{awaiting.id}")
+    end
+  end
+
+  describe "a CSV we can't even read" do
+    it "sends latin-1 bytes back to the upload page" do
+      batch = create(:warehouse_batch, user: user, warehouse_template: template, csv_content: "na\xEFve,city\nx,y\n".b)
+
+      get map_fields_warehouse_batch_path(batch)
+      expect(response).to redirect_to(new_warehouse_batch_path)
+      expect(flash[:alert]).to include("Couldn't read that CSV")
+    end
+
+    it "sends an unclosed quote back to the upload page" do
+      batch = create(:warehouse_batch, user: user, warehouse_template: template, csv_content: %(first_name,city\n"Alice,Burlington\n))
+
+      get map_fields_warehouse_batch_path(batch)
+      expect(response).to redirect_to(new_warehouse_batch_path)
+      expect(flash[:alert]).to include("Couldn't read that CSV")
+    end
+  end
+
+  describe "headers with brackets in them" do
+    it "maps them back onto the real CSV header" do
+      csv = Rack::Test::UploadedFile.new(
+        StringIO.new("first_name,last_name,Address[1],city,state,zip,email\nAlice,Smith,123 Main St,Burlington,VT,05401,alice@example.com\n"),
+        "text/csv", original_filename: "addresses.csv"
+      )
+      post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: csv } }
+      batch = Warehouse::Batch.last
+
+      get map_fields_warehouse_batch_path(batch)
+      expect(response.body).to include(%(name="field_mapping[Address1]"))
+
+      post set_mapping_warehouse_batch_path(batch), params: { field_mapping: {
+        "first_name" => "first_name", "last_name" => "last_name", "Address1" => "line_1",
+        "city" => "city", "state" => "state", "zip" => "postal_code", "email" => "email"
+      } }
+      expect(response).to redirect_to(process_confirm_warehouse_batch_path(batch))
+      expect(batch.reload.addresses.pluck(:line_1)).to eq([ "123 Main St" ])
+    end
+  end
+
+  describe "import_with_skip" do
+    it "redirects back to the map page instead of 500ing when the import refuses" do
+      post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: upload([ good_row ]) } }
+      batch = Warehouse::Batch.last
+
+      post import_with_skip_warehouse_batch_path(batch)
+      expect(response).to redirect_to(map_fields_warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("no field mapping")
+    end
+  end
+
+  describe "re-importing" do
+    it "refuses a second set_mapping or import_with_skip once the batch is imported" do
+      post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: upload([ good_row ]) } }
+      batch = Warehouse::Batch.last
+
+      post set_mapping_warehouse_batch_path(batch), params: { field_mapping: mapping }
+      expect(batch.reload.addresses.count).to eq(1)
+
+      post set_mapping_warehouse_batch_path(batch), params: { field_mapping: mapping }
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been imported")
+
+      post import_with_skip_warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been imported")
+
+      expect(batch.reload.addresses.count).to eq(1)
+    end
+  end
+
   describe "the process page" do
     let(:batch) { create(:warehouse_batch, user: user, warehouse_template: template, billing_profile: profile, mapping: mapping) }
 
@@ -83,6 +169,38 @@ RSpec.describe "warehouse batches", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("shipped yet").and include("Russian Federation")
       expect(response.body).not_to include("batch[hcb_payment_account_id]")
+    end
+
+    it "shows the billing profile form when the profile is still required" do
+      Flipper.enable(:require_billing_profile_2026_09_08)
+      batch.update!(billing_profile: nil)
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.mark_fields_mapped!
+
+      get process_confirm_warehouse_batch_path(batch)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("Billing profile is required")
+      expect(response.body).to include("batch[hcb_payment_account_id]")
+
+      post process_batch_warehouse_batch_path(batch)
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("Pick a billing profile")
+      expect(batch.reload).to be_fields_mapped
+    ensure
+      Flipper.disable(:require_billing_profile_2026_09_08)
+    end
+
+    it "sends an already-processed batch back to the batch with a message" do
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.update!(aasm_state: "processed")
+
+      get process_confirm_warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been processed")
+
+      post process_batch_warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been processed")
     end
 
     it "re-renders the page instead of raising when process! fails" do
@@ -98,12 +216,89 @@ RSpec.describe "warehouse batches", type: :request do
   describe "editing" do
     let(:batch) { create(:warehouse_batch, user: user, warehouse_template: template) }
 
+    it "keeps the batch's own template in the list and selected" do
+      other = Warehouse::Template.create!(name: "Private pack", user: create(:user), public: false)
+      batch.update!(warehouse_template: other)
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.mark_fields_mapped!
+
+      get edit_warehouse_batch_path(batch)
+      expect(response.body).to include(%(<option value="#{other.id}" selected>Private pack</option>))
+    end
+
+    it "hides the template picker and ignores a template change once processed" do
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.update!(aasm_state: "processed")
+      other = Warehouse::Template.create!(name: "Other pack", user: user, public: true)
+
+      get edit_warehouse_batch_path(batch)
+      expect(response.body).not_to include("batch[warehouse_template_id]")
+
+      patch warehouse_batch_path(batch), params: { batch: { warehouse_template_id: other.id, warehouse_user_facing_title: "x" } }
+      expect(batch.reload.warehouse_template).to eq(template)
+      expect(batch.warehouse_user_facing_title).to eq("x")
+    end
+
     it "re-renders the edit form with the template list when the update fails" do
       allow_any_instance_of(Warehouse::Batch).to receive(:update) { |b, *| b.errors.add(:base, "nope"); false }
 
       patch warehouse_batch_path(batch), params: { batch: { warehouse_user_facing_title: "x" } }
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("nope").and include("Sticker pack")
+    end
+  end
+
+  describe "authorization" do
+    let(:batch) { create(:warehouse_batch, user: user, warehouse_template: template) }
+
+    it "does not let a non-admin owner delete their own batch" do
+      delete warehouse_batch_path(batch)
+      expect(response).to redirect_to(root_path)
+      expect(Warehouse::Batch.exists?(batch.id)).to be(true)
+    end
+
+    it "lets an admin delete a batch" do
+      sign_in_as(create_admin)
+      delete warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batches_path)
+      expect(Warehouse::Batch.exists?(batch.id)).to be(false)
+    end
+
+    it "keeps every warehouse batch action working for an admin" do
+      admin = create_admin
+      sign_in_as(admin)
+      admin_profile = create(:billing_profile, user: admin)
+      admin_batch = create(:warehouse_batch, user: admin, warehouse_template: template, billing_profile: admin_profile)
+      allow(Zenventory).to receive(:create_customer_order).and_return({ id: 42 })
+
+      get warehouse_batches_path
+      expect(response).to have_http_status(:ok)
+
+      get new_warehouse_batch_path
+      expect(response).to have_http_status(:ok)
+
+      get warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      get edit_warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      get map_fields_warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      post set_mapping_warehouse_batch_path(admin_batch), params: { field_mapping: { "first_name" => "first_name", "last_name" => "last_name", "address" => "line_1", "city" => "city", "state" => "state", "zip" => "postal_code", "email" => "email" } }
+      expect(response).to redirect_to(process_confirm_warehouse_batch_path(admin_batch))
+      expect(admin_batch.reload).to be_fields_mapped
+
+      patch warehouse_batch_path(admin_batch), params: { batch: { warehouse_user_facing_title: "stickers" } }
+      expect(response).to redirect_to(warehouse_batch_path(admin_batch))
+
+      get process_confirm_warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      post process_batch_warehouse_batch_path(admin_batch), params: { batch: { hcb_payment_account_id: admin_profile.id } }
+      expect(response).to redirect_to(warehouse_batch_path(admin_batch))
+      expect(admin_batch.reload).to be_processed
     end
   end
 end

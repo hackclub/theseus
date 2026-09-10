@@ -268,6 +268,43 @@ RSpec.describe LetterBatchImporter do
     end
   end
 
+  describe "rubber stamps" do
+    let(:mapping) do
+      {
+        "first_name" => "first_name", "last_name" => "last_name", "address" => "line_1",
+        "city" => "city", "state" => "state", "zip" => "postal_code",
+        "Rubber Stamps" => "rubber_stamps"
+      }
+    end
+
+    let(:csv_rows) do
+      [
+        "first_name,last_name,address,city,state,zip,Rubber Stamps",
+        "Alice,Smith,123 Main St,Burlington,VT,05401,fragile"
+      ]
+    end
+
+    it "carries the mapped column onto the letter" do
+      importer.call
+      expect(batch.letters.first.rubber_stamps).to eq("fragile")
+    end
+  end
+
+  describe "importing twice" do
+    let(:csv_rows) do
+      [
+        "first_name,last_name,address,city,state,zip",
+        "Alice,Smith,123 Main St,Burlington,VT,05401"
+      ]
+    end
+
+    it "refuses to append a second copy of every letter" do
+      importer.call
+      expect { described_class.new(batch.reload).call }.to raise_error(BatchImporter::AlreadyImported)
+      expect(batch.reload.letters.count).to eq(1)
+    end
+  end
+
   # ── Edge cases ─────────────────────────────────────────────────────
 
   describe "edge cases" do

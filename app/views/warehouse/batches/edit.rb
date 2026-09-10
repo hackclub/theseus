@@ -31,7 +31,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
             strong { "Batch Details" }
             hr
             div(class: "mt-half") do
-              if @allowed_templates.any?
+              if @batch.may_mark_processed?
                 div(class: "mb-1") do
                   label(class: "label-block text-muted", for: "batch_warehouse_template_id") { "Template" }
                   select(
@@ -39,10 +39,15 @@ render Components::Shared::ErrorMessages.new(record: @batch)
                     id: "batch_warehouse_template_id",
                     class: "w-100"
                   ) do
-                    @allowed_templates.each do |template|
+                    selectable_templates.each do |template|
                       option(value: template.id, selected: template.id == @batch.warehouse_template_id) { template.name }
                     end
                   end
+                end
+              else
+                div(class: "mb-1") do
+                  span(class: "detail-label") { "Template" }
+                  span { @batch.warehouse_template&.name || "—" }
                 end
               end
 
@@ -83,6 +88,11 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
   private
 
+  # The batch's own template may be private to someone else by now; leaving it
+  # out of the list would quietly swap it on the next save.
+  def selectable_templates
+    (@allowed_templates.to_a + [ @batch.warehouse_template ]).compact.uniq
+  end
 
   def tag_picker(f)
     section(class: "mb-1") do

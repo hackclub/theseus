@@ -1,10 +1,11 @@
 class Warehouse::BatchesController < BaseBatchesController
   before_action :set_allowed_templates, only: %i[ new create edit update ]
+  before_action :ensure_processable, only: %i[ process_form process_batch ]
 
   # GET /warehouse/batches
   def index
-    authorize Warehouse::Batch
-    all_batches = policy_scope(Warehouse::Batch).order(created_at: :desc)
+    authorize Warehouse::Batch, policy_class: Warehouse::BatchPolicy
+    all_batches = policy_scope(Warehouse::Batch, policy_scope_class: Warehouse::BatchPolicy::Scope).order(created_at: :desc)
     batches = all_batches
     batches = batches.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
     batches = batches.search(params[:search]) if params[:search].present?
@@ -12,6 +13,7 @@ class Warehouse::BatchesController < BaseBatchesController
     render Views::Warehouse::Batches::Index.new(
       batches: batches,
       search: params[:search],
+      status: params[:status],
       user_id: params[:user_id],
       users: users
     )
@@ -19,26 +21,26 @@ class Warehouse::BatchesController < BaseBatchesController
 
   # GET /warehouse/batches/1
   def show
-    authorize @batch
+    authorize @batch, policy_class: Warehouse::BatchPolicy
     render Views::Warehouse::Batches::Show.new(batch: @batch)
   end
 
   # GET /warehouse/batches/new
   def new
-    authorize Warehouse::Batch
+    authorize Warehouse::Batch, policy_class: Warehouse::BatchPolicy
     @batch = Warehouse::Batch.new
     render Views::Warehouse::Batches::New.new(batch: @batch, allowed_templates: @allowed_templates)
   end
 
   # GET /warehouse/batches/1/edit
   def edit
-    authorize @batch
+    authorize @batch, policy_class: Warehouse::BatchPolicy
     render Views::Warehouse::Batches::Edit.new(batch: @batch, allowed_templates: @allowed_templates)
   end
 
   # POST /warehouse/batches
   def create
-    authorize Warehouse::Batch
+    authorize Warehouse::Batch, policy_class: Warehouse::BatchPolicy
     @batch = Warehouse::Batch.new(batch_params.merge(user: current_user))
 
     if @batch.save
@@ -50,13 +52,13 @@ class Warehouse::BatchesController < BaseBatchesController
 
   # GET /warehouse/batches/:id/map
   def map_fields
-    authorize @batch
+    authorize @batch, policy_class: Warehouse::BatchPolicy
     render Views::Warehouse::Batches::Map.new(batch: @batch, csv_headers: @batch.csv_headers, sample_row: @batch.csv_sample_row)
   end
 
   # POST /warehouse/batches/:id/set_mapping
   def set_mapping
-    authorize @batch
+    authorize @batch, policy_class: Warehouse::BatchPolicy
     fields = Views::Batches::Map::ADDRESS_FIELDS.map(&:first)
     mapping = @batch.csv_headers.index_with { |header| params.dig(:field_mapping, header).to_s }
                     .select { |_, field| field.present? && field.in?(fields) }
@@ -70,20 +72,22 @@ class Warehouse::BatchesController < BaseBatchesController
       count = importer.call
       redirect_to process_confirm_warehouse_batch_path(@batch), notice: "Imported #{count} addresses."
     end
-  rescue CSV::MalformedCSVError, ArgumentError, ActiveRecord::RecordInvalid => e
+  rescue ArgumentError, ActiveRecord::RecordInvalid => e
     redirect_to map_fields_warehouse_batch_path(@batch), alert: "Mapping failed: #{e.message}"
   end
 
   # POST /warehouse/batches/:id/import_with_skip
   def import_with_skip
-    authorize @batch, :update?
+    authorize @batch, :update?, policy_class: Warehouse::BatchPolicy
     count = WarehouseBatchImporter.new(@batch).call(skip_invalid: true)
     redirect_to process_confirm_warehouse_batch_path(@batch), notice: "Imported #{count} addresses (skipped invalid rows)."
+  rescue ArgumentError, ActiveRecord::RecordInvalid => e
+    redirect_to map_fields_warehouse_batch_path(@batch), alert: "Import failed: #{e.message}"
   end
 
   # PATCH/PUT /warehouse/batches/1 or /warehouse/batches/1.json
   def update
-    authorize @batch
+    authorize @batch, policy_class: Warehouse::BatchPolicy
     if @batch.update(batch_params)
       # If template changed and batch hasn't been processed, recreate orders
       if @batch.may_mark_processed? && @batch.saved_change_to_warehouse_template_id?
@@ -119,7 +123,7 @@ class Warehouse::BatchesController < BaseBatchesController
   end
 
   def destroy
-    authorize @batch
+    authorize @batch, policy_class: Warehouse::BatchPolicy
 
     if @batch.destroy
       redirect_to warehouse_batches_path, status: :see_other, notice: "Batch was successfully destroyed."
@@ -129,13 +133,13 @@ class Warehouse::BatchesController < BaseBatchesController
   end
 
   def process_form
-    authorize @batch, :process_form?
+    authorize @batch, :process_form?, policy_class: Warehouse::BatchPolicy
     @batch.preflight
     render Views::Warehouse::Batches::Process.new(batch: @batch)
   end
 
   def process_batch
-    authorize @batch, :process_batch?
+    authorize @batch, :process_batch?, policy_class: Warehouse::BatchPolicy
     profile_id = params.dig(:batch, :hcb_payment_account_id)
     if profile_id.present?
       profile = @batch.user.billing_profiles.find_by(id: profile_id)
@@ -155,12 +159,27 @@ class Warehouse::BatchesController < BaseBatchesController
   private
 
   def batch_params
-    params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
+    permitted = params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
+    permitted.delete(:warehouse_template_id) if @batch && !@batch.may_mark_processed?
+    permitted
+  end
+
+  def ensure_processable
+    return if @batch.fields_mapped?
+
+    alert = if @batch.processed?
+      "This batch has already been processed."
+    elsif @batch.awaiting_field_mapping?
+      "Map this batch's CSV fields before processing it."
+    else
+      "This batch is already being processed."
+    end
+    redirect_to warehouse_batch_path(@batch), alert: alert
   end
 
   def set_allowed_templates
     @allowed_templates = Warehouse::Template.where(public: true).or(Warehouse::Template.where(user: current_user))
   end
 
-  def batch_scope = policy_scope(Warehouse::Batch)
+  def batch_scope = policy_scope(Warehouse::Batch, policy_scope_class: Warehouse::BatchPolicy::Scope)
 end
