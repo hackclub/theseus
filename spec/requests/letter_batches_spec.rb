@@ -80,6 +80,13 @@ RSpec.describe "letter batches", type: :request do
       expect(letters.map { |l| l.reload.aasm_state }).to all(eq("printed"))
     end
 
+    it "renders the picklist for a processed batch" do
+      get letter_batch_path(processed)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("data-letter-id=\"#{letters.first.id}\"")
+    end
+
     it "prints every picked letter, not just the first" do
       post print_subset_letter_batch_path(processed), params: { letter_ids: letters.map(&:id).join(",") }
 

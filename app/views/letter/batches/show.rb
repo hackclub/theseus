@@ -66,7 +66,7 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def purchasing_grid_cells
-    @batch.letters.select(:id, :public_id, :indicia_state).map do |letter|
+    @batch.letters.select(:id, :indicia_state).map do |letter|
       state = letter.indicia_state || "pending"
       icon = case state
       when "purchased" then "✓"
@@ -301,16 +301,17 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def picklist_section
-    rows = @batch.letters.joins(:address).order("letters.id")
-      .pluck("letters.id", "letters.public_id", "letters.printed_at", "letters.indicia_state",
-             "addresses.first_name", "addresses.last_name", "addresses.city", "addresses.state")
+    rows = @batch.letters.joins(:address).order("letters.id").select(
+      "letters.id, letters.printed_at, letters.indicia_state",
+      "addresses.first_name, addresses.last_name, addresses.city, addresses.state"
+    )
 
-    cells = rows.map do |id, pub_id, printed_at, istate, fname, lname, city, state|
-      name = [ fname, lname ].compact_blank.join(" ")
-      loc = [ city, state ].compact_blank.join(", ")
-      state_class = printed_at ? "purchased" : "pending"
-      state_class = "failed" if istate == "failed"
-      { id: "pick-#{id}", letter_id: id, state: state_class, title: "#{name} — #{loc} (#{pub_id})" }
+    cells = rows.map do |letter|
+      name = [ letter.first_name, letter.last_name ].compact_blank.join(" ")
+      loc = [ letter.city, letter.state ].compact_blank.join(", ")
+      state_class = letter.printed_at ? "purchased" : "pending"
+      state_class = "failed" if letter.indicia_state == "failed"
+      { id: "pick-#{letter.id}", letter_id: letter.id, state: state_class, title: "#{name} — #{loc} (#{letter.public_id})" }
     end
 
     div("data-picklist-container": true, class: "mb-1h") do
