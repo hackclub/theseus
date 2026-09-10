@@ -25,7 +25,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
     div(class: "show-layout") do
       div(class: "show-main") do
-        form_with(model: @batch, url: warehouse_batches_path, scope: :batch) do |f|
+        form_with(model: @batch, url: warehouse_batches_path, scope: :batch, multipart: true) do |f|
           section(class: "mb-1") do
             strong { "Batch Details" }
             hr
@@ -53,15 +53,13 @@ render Components::Shared::ErrorMessages.new(record: @batch)
           end
 
           section(class: "mb-1") do
-            strong { "Addresses" }
+            strong { "CSV File" }
             hr
             div(class: "mt-half") do
-              address_fields = Address.column_names - %w[id created_at updated_at batch_id]
-              div(
-                data_svelte_component: "batch-csv-mapper",
-                data_address_fields: address_fields.to_json,
-                data_form_field_name: "batch[addresses_data]"
-              )
+              input(type: "file", name: "batch[csv]", accept: ".csv", required: true)
+              p(class: "text-muted csv-hint") do
+                plain "Upload a CSV with address columns. You'll map them on the next page."
+              end
             end
           end
 
@@ -69,7 +67,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
           div(class: "batch-new-actions") do
             a(href: warehouse_batches_path) { "Cancel" }
-            button(type: "submit", class: "btn-success") { "✓ Create Batch" }
+            button(type: "submit", class: "btn-success") { "Upload & Map →" }
           end
         end
       end
@@ -80,7 +78,8 @@ render Components::Shared::ErrorMessages.new(record: @batch)
           hr
           div(class: "mt-half text-muted") do
             p(class: "batch-new-info-p") { "Upload a CSV of addresses, map the columns, and create orders in bulk." }
-            p(class: "m-0") { "Each address becomes one warehouse order using the selected template." }
+            p(class: "batch-new-info-p") { "Each address becomes one warehouse order using the selected template, so every row needs an email. Shipments outside the US also need a phone number for customs." }
+            p(class: "m-0") { "Rows with problems are shown before anything is imported." }
           end
         end
       end

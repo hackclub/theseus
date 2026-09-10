@@ -66,7 +66,7 @@ RSpec.describe "billing consent pages" do
   end
 
   it "warehouse batch process form picks the payer" do
-    batch = Warehouse::Batch.create!(user: user, warehouse_template: template)
+    batch = create(:warehouse_batch, user: user, warehouse_template: template)
     batch.addresses.create!(create(:address).attributes.except("id", "created_at", "updated_at"))
     html = render_view(Warehouse::BatchesController, Views::Warehouse::Batches::Process.new(batch: batch))
     expect(html).to include("Charge").and include("Process Batch").and include("batch[hcb_payment_account_id]").and include("labor for 1 order")

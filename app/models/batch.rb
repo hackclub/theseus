@@ -134,142 +134,15 @@ class Batch < ApplicationRecord
     raise NotImplementedError, "Subclasses must implement total_cost"
   end
 
-  GREMLINS = [
-    "‎",
-    "​"
-  ].join
-
   def csv_headers
-    rows = CSV.parse(csv_data, headers: true)
-    rows.headers
-  end
-
-  def run_map!
-    rows = CSV.parse(csv_data, headers: true, converters: [ ->(s) { s&.strip&.delete(GREMLINS).presence } ])
-
-    restricted_countries = Concurrent::Set.new
-
-    # Phase 1: Build address attributes in parallel with correlation tokens
-    items = Parallel.map(rows.each_with_index, in_threads: 8) do |row, i|
-      begin
-        next if row[field_mapping["first_name"]].blank?
-
-        address_attrs = build_address_attributes(row)
-        next unless address_attrs
-
-        cc = address_attrs[:country]
-        if usps_restricted?(cc)
-          restricted_countries << cc
-          next
-        end
-
-        { token: SecureRandom.uuid, row: row, attrs: address_attrs }
-      rescue => e
-        Rails.logger.error("Error processing row #{i} in batch #{id}: #{e.message}")
-        raise
-      end
-    end.compact
-
-    return mark_fields_mapped && save! if items.empty?
-
-    now = Time.current
-    address_attributes = items.map do |item|
-      item[:attrs].merge(batch_id: id, import_token: item[:token], created_at: now, updated_at: now)
-    end
-
-    Address.insert_all!(address_attributes)
-
-    tokens = items.map { |item| item[:token] }
-    addresses_by_token = Address.where(import_token: tokens).index_by(&:import_token)
-
-    items.each do |item|
-      address = addresses_by_token.fetch(item[:token])
-      ActiveRecord::Base.transaction do
-        build_mapping(item[:row], address)
-      end
-    end
-
-    Address.where(import_token: tokens).update_all(import_token: nil)
-
-    mark_fields_mapped
-    save!
-
-    restricted_countries.to_a
+    CSV.parse(csv_data, headers: true).headers
   end
 
   def csv_sample_row
-    rows = CSV.parse(csv_data, headers: true)
-    rows.first
+    CSV.parse(csv_data, headers: true).first
   end
 
   private
-
-  def build_address_attributes(row)
-    csv_country = row[field_mapping["country"]]
-    country = FrickinCountryNames.find_country(csv_country)
-    postal_code = row[field_mapping["postal_code"]]
-    state = row[field_mapping["state"]]
-
-    # Try AI translation if:
-    # 1. Country couldn't be found by FrickinCountryNames, or
-    # 2. Country is not US
-    if country.nil? || country.alpha2 != "US"
-      begin
-        translated = AIService.fix_address(row, field_mapping)
-        if translated
-          # If AI translation succeeded, try to find the country again
-          translated_country = FrickinCountryNames.find_country(translated[:country])
-          if translated_country
-            # Preserve original first_name and last_name
-            translated[:first_name] = row[field_mapping["first_name"]]
-            translated[:last_name] = row[field_mapping["last_name"]]
-            translated[:country] = translated_country.alpha2
-            return translated
-          end
-        end
-      rescue => e
-        Rails.logger.error("AI translation failed for batch #{id}: #{e.message}")
-      end
-    end
-
-    # Process US addresses or fallback for failed translations
-    if country&.alpha2 == "US" && postal_code.present? && postal_code.length < 5
-      postal_code = postal_code.rjust(5, "0")
-    end
-
-    # Normalize state name to abbreviation if country is found
-    normalized_state = if country
-        FrickinCountryNames.normalize_state(country, state)
-    else
-        state
-    end
-
-    resolved_country = country&.alpha2 || csv_country&.upcase
-
-    {
-      first_name: row[field_mapping["first_name"]],
-      last_name: row[field_mapping["last_name"]],
-      line_1: row[field_mapping["line_1"]],
-      line_2: row[field_mapping["line_2"]],
-      city: row[field_mapping["city"]],
-      state: normalized_state,
-      postal_code: postal_code,
-      country: resolved_country,
-      phone_number: row[field_mapping["phone_number"]],
-      email: row[field_mapping["email"]]
-    }
-  end
-
-  def build_mapping(row, address)
-    # Base class just returns the address
-    address
-  end
-
-  def usps_restricted?(country_code)
-    return false if country_code.blank?
-    restricted = Rails.configuration.country_restrictions.usps_restricted
-    country_code.to_s.in?(restricted)
-  end
 
   def update_associated_tags
     case type

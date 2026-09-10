@@ -7,6 +7,9 @@ class Views::Warehouse::Batches::Process < Views::Base
     @batch = batch
   end
 
+  # The controller runs preflight before rendering, so errors mean unmailable rows.
+  def blocked? = @batch.errors.any?
+
   def view_template
     div(class: "toolbar toolbar--flush") do
       div(class: "flex-row") do
@@ -17,8 +20,17 @@ class Views::Warehouse::Batches::Process < Views::Base
 
     div(class: "show-layout") do
       div(class: "show-main") do
-        div(class: "banner mb-1") do
-          plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
+        if blocked?
+          div(class: "banner banner-error mb-1") do
+            strong { "These rows can't be shipped yet:" }
+            ul(class: "mt-half") do
+              @batch.errors.each { |error| li { error.message } }
+            end
+          end
+        else
+          div(class: "banner mb-1") do
+            plain "This will create #{helpers.pluralize(@batch.addresses.count, 'warehouse order')}."
+          end
         end
 
         section(class: "mb-1") do
@@ -44,17 +56,24 @@ class Views::Warehouse::Batches::Process < Views::Base
           end
         end
 
-        form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
-          input(type: :hidden, name: :authenticity_token, value: helpers.form_authenticity_token)
-          render Components::MoneyNotice.new(
-            lines: @batch.billing_lines,
-            profiles: @batch.user.billing_profiles,
-            field: "batch[hcb_payment_account_id]",
-            selected: @batch.billing_profile,
-            unbilled: @batch.user.billing_profiles.none?,
-            proceed: "Process Batch",
-            cancel_href: warehouse_batch_path(@batch),
-          )
+        if blocked?
+          div(class: "flex-row") do
+            a(href: warehouse_batch_path(@batch)) { "← Back to batch" }
+            span(class: "text-muted") { "Fix the addresses above, then come back." }
+          end
+        else
+          form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
+            input(type: :hidden, name: :authenticity_token, value: helpers.form_authenticity_token)
+            render Components::MoneyNotice.new(
+              lines: @batch.billing_lines,
+              profiles: @batch.user.billing_profiles,
+              field: "batch[hcb_payment_account_id]",
+              selected: @batch.billing_profile,
+              unbilled: @batch.user.billing_profiles.none?,
+              proceed: "Process Batch",
+              cancel_href: warehouse_batch_path(@batch),
+            )
+          end
         end
       end
 

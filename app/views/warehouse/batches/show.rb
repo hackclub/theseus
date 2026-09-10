@@ -27,6 +27,10 @@ class Views::Warehouse::Batches::Show < Views::Base
           a(href: process_confirm_warehouse_batch_path(@batch)) do
             button(class: "btn-success btn-sm") { "▶ Process" }
           end
+        elsif @batch.awaiting_field_mapping?
+          a(href: map_fields_warehouse_batch_path(@batch)) do
+            button(class: "btn-success btn-sm") { "⇉ Map Fields" }
+          end
         end
         form(method: :post, action: warehouse_batch_path(@batch)) do
           input(type: :hidden, name: :_method, value: :delete)
@@ -136,6 +140,10 @@ class Views::Warehouse::Batches::Show < Views::Base
           div(class: "batch-processed-icon-box") do
             span(class: "batch-processed-check") { "✓" }
             div(class: "mt-half") { strong { "Processed" } }
+          end
+        elsif @batch.awaiting_field_mapping?
+          a(href: map_fields_warehouse_batch_path(@batch)) do
+            button(class: "btn-success w-100") { "⇉ Map Fields" }
           end
         else
           span(class: "text-muted") { "Map fields before processing" }

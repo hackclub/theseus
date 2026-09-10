@@ -88,4 +88,22 @@ FactoryBot.define do
       batch.update!(field_mapping: ctx.mapping)
     end
   end
+
+  factory :warehouse_batch, class: "Warehouse::Batch" do
+    association :user
+    warehouse_template { Warehouse::Template.create!(name: "Sticker pack", user: user, public: true) }
+
+    transient do
+      csv_content { "first_name,last_name,address,city,state,zip,email\nAlice,Smith,123 Main St,Burlington,VT,05401,alice@example.com\n" }
+      mapping { nil }
+    end
+
+    after(:build) do |batch, ctx|
+      batch.csv.attach(io: StringIO.new(ctx.csv_content), filename: "test.csv", content_type: "text/csv")
+    end
+
+    after(:create) do |batch, ctx|
+      batch.update!(field_mapping: ctx.mapping) if ctx.mapping
+    end
+  end
 end

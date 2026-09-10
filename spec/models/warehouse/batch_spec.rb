@@ -63,7 +63,7 @@ RSpec.describe Warehouse::Batch do
   end
 
   let(:batch) do
-    Warehouse::Batch.create!(user: user, warehouse_template: template, billing_profile: profile).tap do |b|
+    create(:warehouse_batch, user: user, warehouse_template: template, billing_profile: profile).tap do |b|
       3.times do |i|
         b.addresses.create!(first_name: "Person", last_name: i.to_s, line_1: "#{i} Main St",
                             city: "Burlington", state: "VT", postal_code: "05401", country: "US",

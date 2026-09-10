@@ -72,6 +72,11 @@ class Warehouse::Batch < Batch
 
   def self.model_name = Batch.model_name
 
+  # Warehouse batches only ever come from a CSV; there's no queue to feed them.
+  validate on: :create do
+    errors.add(:csv, "must be uploaded") unless csv.attached?
+  end
+
   # how many bad rows we'll name before giving up and just counting them
   PREFLIGHT_ERROR_LIMIT = 25
 
@@ -163,12 +168,6 @@ class Warehouse::Batch < Batch
       user_facing_title: warehouse_user_facing_title,
       tags: tags,
     )
-  end
-
-  def build_mapping(row, address)
-    # For warehouse batches, we just return the address
-    # Orders will be created during processing
-    address
   end
 
   def billing_lines

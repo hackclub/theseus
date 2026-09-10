@@ -576,6 +576,9 @@ Rails.application.routes.draw do
       resources :approvals, only: [ :index ]
       resources :batches do
         member do
+          get "/map", to: "batches#map_fields", as: :map_fields
+          post "/set_mapping", to: "batches#set_mapping", as: :set_mapping
+          post :import_with_skip
           get "/process", to: "batches#process_form", as: :process_confirm
           post "/process", to: "batches#process_batch", as: :process_batch
         end

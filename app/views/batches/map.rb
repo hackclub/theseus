@@ -1,0 +1,102 @@
+# frozen_string_literal: true
+
+# CSV column → address field picker. Subclasses supply the routes and copy for
+# their batch type.
+class Views::Batches::Map < Views::Base
+  include Phlex::Rails::Helpers::FormWith
+
+  ADDRESS_FIELDS = [
+    [ "", "— skip —" ],
+    [ "first_name", "First Name *" ],
+    [ "last_name", "Last Name *" ],
+    [ "line_1", "Address Line 1 *" ],
+    [ "line_2", "Address Line 2" ],
+    [ "city", "City *" ],
+    [ "state", "State / Province *" ],
+    [ "postal_code", "ZIP / Postal Code *" ],
+    [ "country", "Country" ],
+    [ "email", "Email" ],
+    [ "phone_number", "Phone" ]
+  ].freeze
+
+  AUTO_MAP = {
+    "first_name" => "first_name", "first" => "first_name", "fname" => "first_name",
+    "last_name" => "last_name", "last" => "last_name", "lname" => "last_name", "surname" => "last_name",
+    "address" => "line_1", "address_1" => "line_1", "line_1" => "line_1", "street" => "line_1", "address_line_1" => "line_1", "street_address" => "line_1",
+    "address_2" => "line_2", "line_2" => "line_2", "apt" => "line_2", "suite" => "line_2", "address_line_2" => "line_2",
+    "city" => "city", "town" => "city",
+    "state" => "state", "province" => "state", "region" => "state", "state_province" => "state",
+    "zip" => "postal_code", "postal_code" => "postal_code", "zipcode" => "postal_code", "zip_code" => "postal_code", "postcode" => "postal_code",
+    "country" => "country", "country_code" => "country",
+    "email" => "email", "e_mail" => "email", "email_address" => "email",
+    "phone" => "phone_number", "phone_number" => "phone_number", "tel" => "phone_number"
+  }.freeze
+
+  def initialize(batch:, csv_headers:, sample_row:)
+    @batch = batch
+    @csv_headers = csv_headers
+    @sample_row = sample_row
+  end
+
+  def view_template
+    div(class: "flex-row mb-1") do
+      a(href: batch_path, class: "link-muted") { "← Batch ##{@batch.public_id}" }
+      strong(class: "text-title") { "Map CSV Fields" }
+    end
+
+    p(class: "text-muted") do
+      plain "Your CSV has #{@csv_headers.length} columns. Map each one to an address field."
+    end
+    hint
+
+    form_with(url: set_mapping_path, method: :post) do
+      table do
+        thead do
+          tr do
+            th { "CSV Column" }
+            th { "Sample" }
+            th { "Maps to" }
+          end
+        end
+        tbody do
+          @csv_headers.each do |header|
+            guess = guess_field(header)
+            tr do
+              td { strong { header } }
+              td(class: "text-muted truncate-20ch") do
+                plain @sample_row[header].to_s
+              end
+              td do
+                select(name: "field_mapping[#{header}]", class: "w-100") do
+                  address_fields.each do |value, label|
+                    option(value: value, selected: value == guess) { label }
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+
+      hr
+
+      div(class: "flex-row") do
+        button(type: "submit", class: "btn-success") { submit_label }
+        a(href: batch_path) { "Cancel" }
+      end
+    end
+  end
+
+  private
+
+  def batch_path = raise(NotImplementedError)
+  def set_mapping_path = raise(NotImplementedError)
+  def submit_label = raise(NotImplementedError)
+  def address_fields = ADDRESS_FIELDS
+  def hint; end
+
+  def guess_field(header)
+    normalized = header.to_s.strip.downcase.gsub(/[\s\-]+/, "_")
+    AUTO_MAP[normalized]
+  end
+end
