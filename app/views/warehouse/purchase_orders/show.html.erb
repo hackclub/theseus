@@ -28,9 +28,9 @@
       <%= button_to "Submit for Approval", submit_for_approval_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-success", data: { confirm: "Submit this purchase order for approval?" } %>
     <% end %>
 
-    <%# Returned + owner: Submit for Review again %>
-    <% if @purchase_order.returned? && policy(@purchase_order).edit? %>
-      <%= button_to "Submit for Approval", submit_for_approval_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-success", data: { confirm: "Re-submit this purchase order for approval?" } %>
+    <%# Returned + owner: Revise, which puts it back in draft so it can be re-submitted %>
+    <% if policy(@purchase_order).revise? %>
+      <%= button_to "↩ Revise", revise_warehouse_purchase_order_path(@purchase_order), method: :post, class: "btn-success", data: { confirm: "Reopen this purchase order for revision?" } %>
     <% end %>
 
     <%# Submitted + czar: Approve / Return for Revision %>
