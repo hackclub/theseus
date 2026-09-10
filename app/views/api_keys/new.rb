@@ -39,6 +39,12 @@ class Views::APIKeys::New < Views::Base
 
                 admin_tool do
                   label do
+                    input(type: "checkbox", name: "api_key[qz_only]", value: "1")
+                    plain " QZ Tray Only"
+                  end
+                  p(class: "checkbox-hint") { "Restrict this key to QZ Tray endpoints? (for printer auth)" }
+
+                  label do
                     input(type: "checkbox", name: "api_key[may_impersonate]", value: "1")
                     plain " Can Impersonate"
                   end
