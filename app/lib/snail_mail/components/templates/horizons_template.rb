@@ -39,6 +39,7 @@ module SnailMail
           render_imb(240, 24, 183)
           render_qr_code(5, 115, 50)
           render_letter_id(10, 65, 10, rotate: 90)
+          render_indicia_backdrop
           render_postage
           bounding_box [8, 165],
                         width: 220,
@@ -52,6 +53,15 @@ module SnailMail
         end
 
         private
+
+        def render_indicia_backdrop
+          return unless letter.postage_type == "indicia"
+
+          save_graphics_state do
+            fill_color "FFFFFF"
+            fill_rectangle [ bounds.right - 205, bounds.top ], 205, 52
+          end
+        end
 
         def render_preview_bounds
           stroke_preview_bounds(10, 278, 260, 70, label: "return address")
