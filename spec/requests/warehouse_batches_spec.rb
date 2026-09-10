@@ -106,4 +106,58 @@ RSpec.describe "warehouse batches", type: :request do
       expect(response.body).to include("nope").and include("Sticker pack")
     end
   end
+
+  describe "authorization" do
+    let(:batch) { create(:warehouse_batch, user: user, warehouse_template: template) }
+
+    it "does not let a non-admin owner delete their own batch" do
+      delete warehouse_batch_path(batch)
+      expect(response).to redirect_to(root_path)
+      expect(Warehouse::Batch.exists?(batch.id)).to be(true)
+    end
+
+    it "lets an admin delete a batch" do
+      sign_in_as(create_admin)
+      delete warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batches_path)
+      expect(Warehouse::Batch.exists?(batch.id)).to be(false)
+    end
+
+    it "keeps every warehouse batch action working for an admin" do
+      admin = create_admin
+      sign_in_as(admin)
+      admin_profile = create(:billing_profile, user: admin)
+      admin_batch = create(:warehouse_batch, user: admin, warehouse_template: template, billing_profile: admin_profile)
+      allow(Zenventory).to receive(:create_customer_order).and_return({ id: 42 })
+
+      get warehouse_batches_path
+      expect(response).to have_http_status(:ok)
+
+      get new_warehouse_batch_path
+      expect(response).to have_http_status(:ok)
+
+      get warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      get edit_warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      get map_fields_warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      post set_mapping_warehouse_batch_path(admin_batch), params: { field_mapping: { "first_name" => "first_name", "last_name" => "last_name", "address" => "line_1", "city" => "city", "state" => "state", "zip" => "postal_code", "email" => "email" } }
+      expect(response).to redirect_to(process_confirm_warehouse_batch_path(admin_batch))
+      expect(admin_batch.reload).to be_fields_mapped
+
+      patch warehouse_batch_path(admin_batch), params: { batch: { warehouse_user_facing_title: "stickers" } }
+      expect(response).to redirect_to(warehouse_batch_path(admin_batch))
+
+      get process_confirm_warehouse_batch_path(admin_batch)
+      expect(response).to have_http_status(:ok)
+
+      post process_batch_warehouse_batch_path(admin_batch), params: { batch: { hcb_payment_account_id: admin_profile.id } }
+      expect(response).to redirect_to(warehouse_batch_path(admin_batch))
+      expect(admin_batch.reload).to be_processed
+    end
+  end
 end
