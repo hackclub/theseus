@@ -71,7 +71,7 @@ class Warehouse::BatchesController < BaseBatchesController
       count = importer.call
       redirect_to process_confirm_warehouse_batch_path(@batch), notice: "Imported #{count} addresses."
     end
-  rescue CSV::MalformedCSVError, ArgumentError, ActiveRecord::RecordInvalid => e
+  rescue ArgumentError, ActiveRecord::RecordInvalid => e
     redirect_to map_fields_warehouse_batch_path(@batch), alert: "Mapping failed: #{e.message}"
   end
 

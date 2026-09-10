@@ -4,6 +4,9 @@ class BaseBatchesController < ApplicationController
   before_action :restore_field_mapping_headers, only: %i[ set_mapping ]
 
   rescue_from BatchImporter::Error, with: :importer_refused
+  # CSV::InvalidEncodingError is one of these too: latin-1 bytes and unclosed
+  # quotes both blow up the moment we read the headers.
+  rescue_from CSV::MalformedCSVError, with: :csv_unreadable
 
   private
 
@@ -34,6 +37,10 @@ class BaseBatchesController < ApplicationController
 
   def importer_refused(error)
     redirect_to batch_map_fields_path, alert: error.message
+  end
+
+  def csv_unreadable(error)
+    redirect_to batch_new_path, alert: "Couldn't read that CSV: #{error.message} Fix it and upload it again."
   end
 
   # Both subclasses live in their own route namespace; the shared guards and

@@ -72,6 +72,24 @@ RSpec.describe "warehouse batches", type: :request do
     end
   end
 
+  describe "a CSV we can't even read" do
+    it "sends latin-1 bytes back to the upload page" do
+      batch = create(:warehouse_batch, user: user, warehouse_template: template, csv_content: "na\xEFve,city\nx,y\n".b)
+
+      get map_fields_warehouse_batch_path(batch)
+      expect(response).to redirect_to(new_warehouse_batch_path)
+      expect(flash[:alert]).to include("Couldn't read that CSV")
+    end
+
+    it "sends an unclosed quote back to the upload page" do
+      batch = create(:warehouse_batch, user: user, warehouse_template: template, csv_content: %(first_name,city\n"Alice,Burlington\n))
+
+      get map_fields_warehouse_batch_path(batch)
+      expect(response).to redirect_to(new_warehouse_batch_path)
+      expect(flash[:alert]).to include("Couldn't read that CSV")
+    end
+  end
+
   describe "headers with brackets in them" do
     it "maps them back onto the real CSV header" do
       csv = Rack::Test::UploadedFile.new(
