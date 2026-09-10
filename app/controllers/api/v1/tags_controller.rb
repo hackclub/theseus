@@ -43,7 +43,7 @@ module API
       end
 
       def letters
-        @letters = Letter.with_any_tags(params[:id])
+        @letters = policy_scope(Letter).with_any_tags(params[:id])
       end
     end
   end

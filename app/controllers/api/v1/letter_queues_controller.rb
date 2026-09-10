@@ -89,8 +89,12 @@ module API
 
       private
 
+      # Batch queues are owner-or-admin: Letter::QueuePolicy#create_letter? only
+      # asks for a logged-in user, so the scoping is what keeps someone else's
+      # queue from taking your letters. (Instant queues are open on purpose and
+      # go through set_instant_letter_queue instead.)
       def set_letter_queue
-        @letter_queue = Letter::Queue.find_by!(slug: params[:id])
+        @letter_queue = policy_scope(Letter::Queue).find_by!(slug: params[:id])
         # grossest hack on the planet, nora why are you like this
         raise ActiveRecord::RecordNotFound if @letter_queue.is_a?(Letter::InstantQueue)
       end
