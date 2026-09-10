@@ -162,7 +162,7 @@ class Views::Warehouse::SKURequests::Show < Views::Base
               required: true,
               value: @sku_request.suggested_code,
               placeholder: "e.g. Sti/Ath/Tes",
-              class: "w-100 mono sku-code-input"
+              class: "w-100 mono sku-request-code-input"
             )
             small(class: "text-muted sku-request-review-hint") do
               plain "Format: Category/Program/Name (3 letters each, but longer is ok)"

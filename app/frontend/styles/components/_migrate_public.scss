@@ -2,15 +2,12 @@
 // area-specific classes only; shared utilities live in utils.scss
 
 // sizing helpers
-.w-fit { width: fit-content; }
 .w-300 { width: 300px; }
 .w-320 { width: 320px; }
 .h-80 { height: 80px; }
 .h-200 { height: 200px; }
-.p-0 { padding: 0; }
 .p-16 { padding: 16px; }
 .d-inline { display: inline; }
-.justify-end { justify-content: flex-end; }
 .flex-end-row { display: flex; justify-content: flex-end; }
 
 // leaderboards

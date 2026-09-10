@@ -12,10 +12,7 @@
 
 // Promotion candidates: generic enough for utils.scss, but that file's off
 // limits for this shard.
-.nowrap { white-space: nowrap; }
-.text-info { color: var(--blue); }
 .ml-half { margin-left: 0.5rem; }
-.d-flex { display: flex; }
 
 // <summary> markers removed for custom disclosure widgets (make-batch dialog).
 .summary-plain { list-style: none; }
@@ -63,7 +60,6 @@
   border-top: 1px solid var(--background2);
 }
 .w-4rem { width: 4rem; }
-.mt-quarter { margin-top: 0.25rem; }
 .color-inherit { color: inherit; }
 
 // ── Letter::Batches new/edit forms ───────────────────────
@@ -76,7 +72,6 @@
 
 // ── Letter::Batches::Process ─────────────────────────────
 
-.mt-075 { margin-top: 0.75rem; }
 .field-hint { color: var(--foreground2); font-size: 0.85em; margin: 0.25rem 0 0; }
 
 // Postage/stamps-vs-indicia toggle row. `display` is set from JS
@@ -95,7 +90,6 @@
 
 // ── Letter::Batches::Show ────────────────────────────────
 
-.mb-075 { margin-bottom: 0.75rem; }
 .retry-actions-row { margin-top: 0.75rem; display: flex; gap: 0.5rem; }
 .print-subset-row { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.75rem; }
 .secondary-actions-col { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9em; }
@@ -112,7 +106,6 @@
 }
 .reprint-warning-title { margin: 0 0 0.5rem; color: var(--error-fg); font-weight: 600; }
 .reprint-warning-text { margin: 0 0 0.5rem; font-size: 0.85em; color: var(--error-fg); }
-.mono { font-family: monospace; }
 .text-unprinted { color: var(--background2); }
 .py-half { padding: 0.5rem 0; }
 .picklist-toolbar { display: flex; gap: 0.5rem; align-items: center; margin: 0.5rem 0; font-size: 0.85em; }
@@ -150,7 +143,6 @@
 
 .col-avatar { width: 2.5rem; }
 .align-middle { vertical-align: middle; }
-.mr-quarter { margin-right: 0.25rem; }
 
 // ── API Keys ─────────────────────────────────────────────
 

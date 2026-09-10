@@ -2,7 +2,6 @@
 // area-specific classes only; shared utilities live in utils.scss
 
 // generic monospace text (repeated across sku codes)
-.mono { font-family: monospace; }
 
 // ── SKU requests ───────────────────────────────────────
 
@@ -15,7 +14,7 @@
 .sku-request-summary-row { display: flex; gap: 2rem; flex-wrap: wrap; }
 .sku-request-review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
 .sku-request-review-grid__full { grid-column: 1 / -1; }
-.sku-code-input { font-size: 1.1em; }
+.sku-request-code-input { font-size: 1.1em; }
 .sku-request-review-hint { display: block; margin-top: 0.25rem; }
 .sku-request-unit-cost-row { display: flex; align-items: center; gap: 0.25rem; }
 .sku-request-approve-actions { margin-top: 1rem; display: flex; gap: 0.5rem; }
@@ -86,7 +85,6 @@
 .mailing-date-input { width: 10rem; }
 .mailing-date-quick-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
 .address-row { display: flex; gap: 1rem; }
-.flex-2 { flex: 2; }
 
 // ── Letter queues / instant queues ──────────────────────
 

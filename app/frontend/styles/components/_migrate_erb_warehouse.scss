@@ -21,7 +21,6 @@
 .notes-pre { margin: 0.5rem 0 0; white-space: pre-wrap; }
 
 // Cancel-order link that wraps a full-width button.
-.block-link { display: block; }
 
 // Centered "no actions available" state (shipped/canceled) in the order
 // sidebar. Pair with .text-muted for the canceled variant.
@@ -46,8 +45,6 @@
 .popover-body { padding: 0.75rem; min-width: 20rem; }
 
 // Small top/left margin nudge, repeated across warehouse detail views.
-.mt-quarter { margin-top: 0.25rem; }
-.ml-quarter { margin-left: 0.25rem; }
 
 // Warning-bordered callout card (PO show: blocked/returned SKU requests).
 .sku-requests-alert { border: 1px solid var(--yellow); padding: 0.75rem; }

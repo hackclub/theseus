@@ -50,3 +50,19 @@
 .empty-state { text-align: center; padding: 2rem; }
 .no-border-bottom { border-bottom: none; }
 .toolbar--flush { border-bottom: none; margin-bottom: 0; }
+
+// Promoted from the inline-style migration shards (each shard reinvented these).
+.mt-quarter { margin-top: 0.25rem; }
+.ml-quarter { margin-left: 0.25rem; }
+.mr-quarter { margin-right: 0.25rem; }
+.mt-075 { margin-top: 0.75rem; }
+.mb-075 { margin-bottom: 0.75rem; }
+.flex-2 { flex: 2; }
+.mono { font-family: monospace; }
+.nowrap { white-space: nowrap; }
+.d-flex { display: flex; }
+.text-info { color: var(--blue); }
+.w-fit { width: fit-content; }
+.justify-end { justify-content: flex-end; }
+.p-0 { padding: 0; }
+.block-link { display: block; }
