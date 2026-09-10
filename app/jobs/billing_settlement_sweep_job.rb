@@ -13,7 +13,7 @@ class BillingSettlementSweepJob < ApplicationJob
     charged = 0
     BillingProfile.where(id: LedgerEntry.unclaimed.charges.select(:billing_profile_id)).find_each do |profile|
       transfer = Billing.charge_pending!(profile)
-      charged += 1 if transfer
+      charged += Array(transfer).count { |t| t&.completed? }
     rescue => e
       Sentry.capture_exception(e, extra: { billing_profile_id: profile.id }) if defined?(Sentry)
     end
