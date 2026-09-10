@@ -14,9 +14,13 @@
   </div>
   <span class="spacer"></span>
   <div class="flex-row">
-    <a href="<%= edit_warehouse_template_path(@warehouse_template) %>">✎ Edit</a>
-    <%= form_with url: warehouse_template_path(@warehouse_template), method: :delete, data: { turbo_confirm: "Delete this template?" }, class: "form-inline" do %>
-      <button type="submit" class="btn-danger btn-sm">✕</button>
+    <% if policy(@warehouse_template).edit? %>
+      <a href="<%= edit_warehouse_template_path(@warehouse_template) %>">✎ Edit</a>
+    <% end %>
+    <% if policy(@warehouse_template).destroy? %>
+      <%= form_with url: warehouse_template_path(@warehouse_template), method: :delete, data: { turbo_confirm: "Delete this template?" }, class: "form-inline" do %>
+        <button type="submit" class="btn-danger btn-sm">✕</button>
+      <% end %>
     <% end %>
   </div>
 </div>
