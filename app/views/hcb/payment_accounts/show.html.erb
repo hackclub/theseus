@@ -6,9 +6,6 @@
     <strong class="text-title"><%= @payment_account.organization_name %></strong>
   </div>
   <span class="spacer"></span>
-  <%= form_with url: hcb_payment_account_path(@payment_account), method: :delete, data: { turbo_confirm: "Remove this organization?" }, class: "form-inline" do %>
-    <button type="submit" class="btn-danger btn-sm">✕ Remove</button>
-  <% end %>
 </div>
 
 <div class="show-layout">
