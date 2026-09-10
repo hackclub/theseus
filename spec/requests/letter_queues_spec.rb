@@ -137,4 +137,57 @@ RSpec.describe "letter queues", type: :request do
       expect(instant.reload.slug).to eq(before_slug)
     end
   end
+
+  describe "the return address" do
+    let(:queue) { build_queue(owner) }
+    let(:someone_else) { create(:user) }
+    let(:private_address) { create(:return_address, user: someone_else, shared: false) }
+    let(:shared_address) { create(:return_address, user: someone_else, shared: true) }
+    let(:own_address) { create(:return_address, user: owner, shared: false) }
+
+    it "refuses another user's private address" do
+      sign_in_as(owner)
+      before_id = queue.letter_return_address_id
+
+      patch letter_queue_path(queue), params: { letter_queue: queue_params(letter_return_address_id: private_address.id) }
+
+      expect(queue.reload.letter_return_address_id).to eq(before_id)
+    end
+
+    it "accepts a shared address" do
+      sign_in_as(owner)
+
+      patch letter_queue_path(queue), params: { letter_queue: queue_params(letter_return_address_id: shared_address.id) }
+
+      expect(queue.reload.letter_return_address_id).to eq(shared_address.id)
+    end
+
+    it "accepts the user's own address" do
+      sign_in_as(owner)
+
+      patch letter_queue_path(queue), params: { letter_queue: queue_params(letter_return_address_id: own_address.id) }
+
+      expect(queue.reload.letter_return_address_id).to eq(own_address.id)
+    end
+
+    it "lets an admin pick anything" do
+      sign_in_as(admin)
+
+      patch letter_queue_path(queue), params: { letter_queue: queue_params(letter_return_address_id: private_address.id) }
+
+      expect(queue.reload.letter_return_address_id).to eq(private_address.id)
+    end
+
+    it "refuses another user's private address on an instant queue" do
+      instant = build_instant_queue(owner)
+      sign_in_as(owner)
+      before_id = instant.letter_return_address_id
+
+      patch letter_instant_queue_path(instant), params: {
+        letter_instant_queue: queue_params(letter_return_address_id: private_address.id, template: "hackatime_template", postage_type: "stamps")
+      }
+
+      expect(instant.reload.letter_return_address_id).to eq(before_id)
+    end
+  end
 end

@@ -183,11 +183,21 @@ class Letter::QueuesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def letter_queue_params
-    params.require(:letter_queue).permit(*admin_scoped(QUEUE_ATTRIBUTES), tags: [])
+    scoped_return_address(params.require(:letter_queue).permit(*admin_scoped(QUEUE_ATTRIBUTES), tags: []))
   end
 
   # The slug field is only rendered inside `admin_tool`.
   def admin_scoped(attributes)
     current_user&.admin? ? attributes + [ :slug ] : attributes
+  end
+
+  def scoped_return_address(attributes)
+    return attributes if current_user&.admin?
+
+    id = attributes[:letter_return_address_id]
+    return attributes if id.blank?
+    return attributes if ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).exists?(id: id)
+
+    attributes.except(:letter_return_address_id)
   end
 end
