@@ -97,6 +97,16 @@ RSpec.describe "letter batches", type: :request do
       expect(response.body).not_to include("<button>Cancel</button>")
     end
 
+    it "can clear every tag" do
+      batch.update!(tags: [ "keep" ])
+
+      get edit_letter_batch_path(batch)
+      expect(response.body).to include('<input type="hidden" name="letter_batch[tags][]" value="">')
+
+      patch letter_batch_path(batch), params: { letter_batch: { tags: [ "" ] } }
+      expect(batch.reload.tags).to eq([])
+    end
+
     it "hides the specs once the batch is processed" do
       batch.update_columns(aasm_state: "processed")
 

@@ -341,6 +341,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
   def tag_picker(f)
     field_group(label: "Tags") do
+      input(type: "hidden", name: "letter[tags][]", value: "")
       select(name: "letter[tags][]", multiple: true, class: "selectize-tags w-100") do
         available_tags.each do |tag|
           option(value: tag, selected: letter.tags&.include?(tag)) { tag }

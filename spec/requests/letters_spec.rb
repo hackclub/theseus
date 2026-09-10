@@ -38,6 +38,16 @@ RSpec.describe "letters", type: :request do
     expect(response.body).not_to include(">Cancel</button>")
   end
 
+  it "can clear every tag on a letter" do
+    letter.update!(tags: [ "keep" ])
+
+    get edit_letter_path(letter)
+    expect(response.body).to include('<input type="hidden" name="letter[tags][]" value="">')
+
+    patch letter_path(letter), params: { letter: { tags: [ "" ] } }
+    expect(letter.reload.tags).to eq([])
+  end
+
   describe "return addresses" do
     let(:someone_else) { create(:return_address, user: create(:user), shared: false) }
     let(:shared) { create(:return_address, shared: true) }

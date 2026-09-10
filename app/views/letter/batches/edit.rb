@@ -130,6 +130,7 @@ render Components::Shared::ErrorMessages.new(record: @batch)
   def tag_picker(f)
     div(class: "form-field-lg") do
       label(class: "date-field-label") { "Tags" }
+      input(type: "hidden", name: "letter_batch[tags][]", value: "")
       select(
         name: "letter_batch[tags][]",
         multiple: true,
