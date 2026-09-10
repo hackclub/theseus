@@ -2,6 +2,7 @@
 
 class Views::Admin::Users::Show < Views::Base
   include Components::Shared::BillingHelpers
+  include Phlex::Rails::Helpers::FormWith
 
   def initialize(user:)
     @user = user

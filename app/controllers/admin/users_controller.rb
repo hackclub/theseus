@@ -5,7 +5,7 @@ module Admin
     skip_after_action :verify_authorized
 
     def index
-      @users = User.includes(:letters, :warehouse_templates).order(:username)
+      @users = User.includes(:letters, :warehouse_orders).order(:username)
       @users = @users.where("username ILIKE :q OR email ILIKE :q", q: "%#{params[:search]}%") if params[:search].present?
       render Views::Admin::Users::Index.new(users: @users)
     end
@@ -40,8 +40,12 @@ module Admin
     end
 
     def flip
-      feature = params[:flag]
+      feature = params[:flag].presence
       state = params[:state] == "true"
+
+      if feature.nil?
+        return redirect_to admin_user_path(resource), alert: "No feature flag given."
+      end
 
       if state
         Flipper.enable_actor(feature, resource)
