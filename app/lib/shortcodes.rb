@@ -81,7 +81,7 @@ module Shortcodes
         Shortcode.new(code: "DOCS", label: "API Docs", icon: "≡", path: "/back_office/api-docs", gate: nil),
         Shortcode.new(code: "FIND", label: "ID Lookup", icon: "⌕", path: public_ids_path, gate: nil),
         Shortcode.new(code: "TASK", label: "My Tasks", icon: "◆", path: tasks_path, gate: nil),
-        Shortcode.new(code: "PROB", label: "Problems", icon: "⊘", path: problems_path, gate: nil),
+        Shortcode.new(code: "PROB", label: "Problems", icon: "⊘", path: problems_path, gate: ADMIN),
         Shortcode.new(code: "SETT", label: "My Settings", icon: "⚙", path: "/back_office/my/settings", gate: nil),
         Shortcode.new(code: "BILL", label: "Billing History", icon: "⊞", path: "/back_office/billing", gate: nil),
 
@@ -105,9 +105,15 @@ module Shortcodes
     def kbar_data_for(user)
       {
         shortcuts: all(user).map(&:to_h),
-        prefixes: public_id_prefixes,
+        prefixes: public_id_prefixes_for(user),
         searchScopes: search_scopes(user)
       }.to_json
+    end
+
+    def public_id_prefixes_for(user)
+      return public_id_prefixes if ADMIN.call(user)
+
+      public_id_prefixes.except("usr")
     end
   end
 end
