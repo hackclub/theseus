@@ -80,6 +80,15 @@ RSpec.describe "letter batches", type: :request do
       expect(letters.map { |l| l.reload.aasm_state }).to all(eq("printed"))
     end
 
+    it "gives QZ a #mark_printed button and an instant print window" do
+      processed.pdf_label.attach(io: StringIO.new("%PDF-1.4"), filename: "labels.pdf", content_type: "application/pdf")
+
+      get letter_batch_path(processed)
+
+      expect(response.body).to include('id="mark_printed"')
+      expect(response.body).to include("instant_print_root")
+    end
+
     it "renders the picklist for a processed batch" do
       get letter_batch_path(processed)
 

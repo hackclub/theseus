@@ -24,6 +24,7 @@ class Views::Letter::Batches::Show < Views::Base
       end
       div(class: "show-sidebar") do
         actions_box
+        instant_print_box
         stats_box
       end
     end
@@ -197,6 +198,13 @@ class Views::Letter::Batches::Show < Views::Base
           end
 
           hr
+          # QZ's print button clicks #mark_printed once the spooler accepts the
+          # job, so this one deliberately has no confirm.
+          if @batch.letters.where(aasm_state: "pending").exists?
+            form_with(url: mark_printed_letter_batch_path(@batch), method: :post, class: "form-inline mb-075") do
+              button(type: "submit", id: "mark_printed", class: "btn-sm w-100") { "✓ Mark all printed" }
+            end
+          end
           form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, data: { turbo_confirm: "Mark every letter in this batch as mailed?" }, class: "form-inline") do
             button(type: "submit", class: "btn-sm w-100") { "✉ Mark all mailed" }
           end
@@ -213,6 +221,16 @@ class Views::Letter::Batches::Show < Views::Base
         end
       end
     end
+  end
+
+  def instant_print_box
+    return unless @batch.processed? && @batch.pdf_label.attached?
+    return unless @batch.letters.where.not(aasm_state: "mailed").exists?
+
+    raw helpers.render(
+      partial: "shared/instant_print_window",
+      locals: { url: rails_blob_path(@batch.pdf_label, disposition: :inline) }
+    )
   end
 
   def reprint_warning
