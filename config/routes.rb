@@ -504,7 +504,7 @@ Rails.application.routes.draw do
       end
       resources :instant_queues, controller: "instant_queues"
     end
-    resources :api_keys do
+    resources :api_keys, only: %i[index new create show] do
       member do
         get "/revoke", to: "api_keys#revoke_confirm", as: :revoke_confirm
         post :revoke
@@ -566,7 +566,7 @@ Rails.application.routes.draw do
           post :sync
         end
       end
-      resources :sku_requests do
+      resources :sku_requests, except: %i[destroy] do
         member do
           post :submit
           post :approve
@@ -583,7 +583,7 @@ Rails.application.routes.draw do
           post "/process", to: "batches#process_batch", as: :process_batch
         end
       end
-      resources :skus, except: %i[new create]
+      resources :skus, except: %i[new create destroy]
     end
     resources :return_addresses do
       member do
