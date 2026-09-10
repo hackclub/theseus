@@ -197,7 +197,7 @@ class Views::Letter::Batches::Show < Views::Base
           end
 
           hr
-          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, data: { turbo_confirm: "Mark every letter in this batch as mailed?" }, class: "form-inline") do
             button(type: "submit", class: "btn-sm w-100") { "✉ Mark all mailed" }
           end
         end

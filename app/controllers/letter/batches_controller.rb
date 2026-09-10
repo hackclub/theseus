@@ -210,20 +210,29 @@ class Letter::BatchesController < BaseBatchesController
 
   def mark_mailed
     authorize @batch, :mark_mailed?, policy_class: Letter::BatchPolicy
-    if @batch.processed?
-      @batch.letters.each do |letter|
-        letter.mark_mailed! if letter.may_mark_mailed?
-      end
-      User::UpdateTasksJob.perform_later(current_user)
-      redirect_to letter_batch_path(@batch), notice: "All letters have been marked as mailed."
-    else
+    unless @batch.processed?
       redirect_to letter_batch_path(@batch), status: :see_other, alert: "Cannot mark letters as mailed. Batch must be processed."
+      return
     end
+
+    ids = selected_letter_ids
+    letters = ids.any? ? @batch.letters.where(id: ids) : @batch.letters
+    count = 0
+
+    letters.find_each do |letter|
+      if letter.may_mark_mailed?
+        letter.mark_mailed!
+        count += 1
+      end
+    end
+
+    User::UpdateTasksJob.perform_later(current_user)
+    redirect_to letter_batch_path(@batch), notice: "Marked #{count} letters as mailed."
   end
 
   def print_subset
     authorize @batch, :show?, policy_class: Letter::BatchPolicy
-    result = Letter::PrintLabels.new(batch: @batch, letter_ids: params[:letter_ids], count: params[:count] || 100).call
+    result = Letter::PrintLabels.new(batch: @batch, letter_ids: selected_letter_ids, count: params[:count] || 100).call
     session[:last_print_letter_ids] = result[:letter_ids]
     send_data result[:pdf_data],
       filename: "batch_#{@batch.public_id}_#{result[:count]}letters.pdf",
@@ -236,7 +245,7 @@ class Letter::BatchesController < BaseBatchesController
   def confirm_printed
     authorize @batch, :mark_printed?, policy_class: Letter::BatchPolicy
 
-    letter_ids = params[:letter_ids] || session.delete(:last_print_letter_ids) || []
+    letter_ids = selected_letter_ids.presence || session.delete(:last_print_letter_ids) || []
     letters = @batch.letters.where(id: letter_ids)
     count = 0
 
@@ -341,6 +350,12 @@ class Letter::BatchesController < BaseBatchesController
   private
 
   def batch_scope = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope)
+
+  # The picklist ships one hidden field holding "12,13,14"; a plain form can
+  # also send letter_ids[]. Accept either.
+  def selected_letter_ids
+    Array(params[:letter_ids]).flat_map { |v| v.to_s.split(",") }.compact_blank
+  end
 
   def batch_params
     permitted = params.require(:letter_batch).permit(
