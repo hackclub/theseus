@@ -26,7 +26,7 @@ module SnailMail
 
       def render_stamps_postage(x_position)
         postage_amount = letter.postage
-        stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount)
+        stamps = USPS::McNuggetEngine.find_stamp_combination(postage_amount, stamps: options[:stamps])
 
         requested_stamps = format_stamps_text(stamps)
         postage_info = "i take #{ActiveSupport::NumberHelper.number_to_currency(postage_amount)} in postage, so #{requested_stamps}"

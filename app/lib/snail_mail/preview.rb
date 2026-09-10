@@ -94,7 +94,7 @@ module SnailMail
       )
 
       Rails.logger.info("generating preview for #{name}...")
-      pdf = SnailMail::PhlexService.generate_label(mock_letter, template: name)
+      pdf = SnailMail::PhlexService.generate_label(mock_letter, template: name, stamps: USPS::McNuggetEngine::PREVIEW_STAMPS)
       pdf_data = pdf.render
 
       png_path = OUTPUT_DIR.join("#{template.name.split("::").last.underscore}.png")
