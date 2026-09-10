@@ -95,10 +95,12 @@ class Warehouse::SKURequestsController < ApplicationController
   def set_sku_request = @sku_request = Warehouse::SKURequest.find(params[:id])
 
   def sku_request_params
-    params.require(:warehouse_sku_request).permit(
+    permitted = params.require(:warehouse_sku_request).permit(
       :name, :description, :category, :unit_cost, :country_of_origin,
       :hs_code, :customs_description, :program, :expected_arrival,
       :expected_quantity, :suggested_sku_code, :image
     )
+    permitted.delete(:image) if permitted[:image].blank?
+    permitted
   end
 end

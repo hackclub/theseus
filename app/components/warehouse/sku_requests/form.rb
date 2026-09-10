@@ -14,7 +14,7 @@ class Components::Warehouse::SKURequests::Form < Components::Base
       end
     end
 
-    form_with model: @sku_request, url: form_url, local: true do |f|
+    form_with model: @sku_request, url: form_url, local: true, multipart: true do |f|
       div(class: "form-stack") do
         render Components::Shared::FormField.new(label: "Name", name: "warehouse_sku_request[name]", value: @sku_request.name,
           required: true, hint: "What is this item?")
