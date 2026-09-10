@@ -56,7 +56,7 @@ class Warehouse::SKUsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def warehouse_sku_params
       params.expect(warehouse_sku: [
-        :sku, :name, :description, :unit_cost, :customs_description,
+        :sku, :name, :description, :customs_description,
         :in_stock, :ai_enabled, :enabled, :category, :country_of_origin,
         :hs_code, :average_po_cost, :declared_unit_cost_override,
         :inbound, :zenventory_id

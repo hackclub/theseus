@@ -43,13 +43,6 @@
     <hr>
     <div class="mt-half">
       <div class="mb-half">
-        <label class="text-muted label-block">Declared unit cost</label>
-        <div class="cost-input-row">
-          <span>$</span>
-          <input type="text" name="warehouse_sku[unit_cost]" value="<%= warehouse_sku.declared_unit_cost %>" class="flex-1">
-        </div>
-      </div>
-      <div class="mb-half">
         <label class="text-muted label-block">Customs description</label>
         <textarea name="warehouse_sku[customs_description]" rows="2" class="w-100"><%= warehouse_sku.customs_description %></textarea>
       </div>
@@ -100,6 +93,7 @@
       <% end %>
       <div class="mb-half">
         <label>
+          <input type="hidden" name="warehouse_sku[ai_enabled]" value="0">
           <input type="checkbox" name="warehouse_sku[ai_enabled]" value="1" <%= "checked" if warehouse_sku.ai_enabled %>>
           AI enabled
         </label>
@@ -107,6 +101,7 @@
       </div>
       <div class="mb-half">
         <label>
+          <input type="hidden" name="warehouse_sku[enabled]" value="0">
           <input type="checkbox" name="warehouse_sku[enabled]" value="1" <%= "checked" if warehouse_sku.enabled %>>
           Enabled
         </label>
