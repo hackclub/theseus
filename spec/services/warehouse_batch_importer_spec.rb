@@ -92,5 +92,18 @@ RSpec.describe WarehouseBatchImporter do
         expect(batch.addresses.pluck(:first_name)).to contain_exactly("Alice", "Cal")
       end
     end
+
+    it "refuses to import a second time" do
+      importer.call
+      expect { described_class.new(batch.reload).call }.to raise_error(BatchImporter::AlreadyImported)
+      expect(batch.reload.addresses.count).to eq(2)
+    end
+
+    it "refuses to mark a batch mapped when nothing imported" do
+      batch.addresses.destroy_all
+      allow(batch).to receive(:csv_data).and_return("first_name,last_name,address,city,state,zip,country,email,phone\n")
+      expect { importer.call }.to raise_error(BatchImporter::NothingToImport)
+      expect(batch.reload).to be_awaiting_field_mapping
+    end
   end
 end

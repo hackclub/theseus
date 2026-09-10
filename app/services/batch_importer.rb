@@ -4,6 +4,11 @@
 # user picked on the Map page. Subclasses decide what else a row becomes (a
 # letter, nothing until process time) and which countries are off limits.
 class BatchImporter
+  # Refusals the batch controllers turn into a flash instead of a 500.
+  class Error < StandardError; end
+  class AlreadyImported < Error; end
+  class NothingToImport < Error; end
+
   GREMLINS = [ "‎", "​" ].join.freeze
 
   def initialize(batch)
@@ -13,6 +18,7 @@ class BatchImporter
 
   def call(skip_invalid: false)
     raise ArgumentError, "no field mapping" if @mapping.blank?
+    raise AlreadyImported, "This batch has already been imported." unless @batch.awaiting_field_mapping?
 
     count = 0
 
@@ -26,7 +32,9 @@ class BatchImporter
         count += 1
       end
 
-      @batch.mark_fields_mapped unless @batch.fields_mapped? || @batch.processed?
+      raise NothingToImport, "None of the rows in this CSV could be imported." if count.zero?
+
+      @batch.mark_fields_mapped
       @batch.save!
     end
 

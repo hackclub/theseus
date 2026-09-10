@@ -72,6 +72,26 @@ RSpec.describe "warehouse batches", type: :request do
     end
   end
 
+  describe "re-importing" do
+    it "refuses a second set_mapping or import_with_skip once the batch is imported" do
+      post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: upload([ good_row ]) } }
+      batch = Warehouse::Batch.last
+
+      post set_mapping_warehouse_batch_path(batch), params: { field_mapping: mapping }
+      expect(batch.reload.addresses.count).to eq(1)
+
+      post set_mapping_warehouse_batch_path(batch), params: { field_mapping: mapping }
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been imported")
+
+      post import_with_skip_warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been imported")
+
+      expect(batch.reload.addresses.count).to eq(1)
+    end
+  end
+
   describe "the process page" do
     let(:batch) { create(:warehouse_batch, user: user, warehouse_template: template, billing_profile: profile, mapping: mapping) }
 
