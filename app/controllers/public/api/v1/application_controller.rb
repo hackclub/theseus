@@ -12,6 +12,14 @@ module Public
         include ActionController::HttpAuthentication::Token::ControllerMethods
         include PaperTrail::Rails::Controller
 
+        # Declared first so everything below wins: Rescuable matches the most
+        # recently declared handler.
+        rescue_from StandardError do |e|
+          Sentry.capture_exception(e)
+          Rails.logger.error("[public api] unhandled #{e.class}: #{e.message}")
+          render json: { error: "internal_error" }, status: :internal_server_error
+        end
+
         rescue_from Pundit::NotAuthorizedError do |e|
           render json: { error: "not_authorized" }, status: :forbidden
         end
