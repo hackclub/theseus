@@ -152,7 +152,7 @@
               <strong>Batch #<%= @warehouse_order.batch.id %></strong>
               <span class="text-muted"><%= @warehouse_order.batch.aasm.current_state.to_s.titleize %></span>
             </span>
-            <a href="<%= letter_batch_path(@warehouse_order.batch) %>">View Batch →</a>
+            <a href="<%= warehouse_batch_path(@warehouse_order.batch) %>">View Batch →</a>
           </div>
         </div>
       </section>

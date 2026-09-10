@@ -127,9 +127,13 @@ class Warehouse::OrdersController < ApplicationController
       @warehouse_order.cancel!(reason)
     rescue Zenventory::ZenventoryError => e
       redirect_to @warehouse_order, alert: "couldn't cancel order! zenventory said: #{e.message}"
-    rescue AASM::InvalidTransition => e
+      return
+    rescue AASM::InvalidTransition
       redirect_to @warehouse_order, alert: "couldn't cancel order! wrong state?"
+      return
     end
+
+    redirect_to @warehouse_order, flash: { success: "order canceled." }
   end
 
   # # DELETE /warehouse/orders/1 or /warehouse/orders/1.json
@@ -162,7 +166,7 @@ class Warehouse::OrdersController < ApplicationController
       tags: [],
       line_items_attributes: [ :id, :sku_id, :quantity, :_destroy ],
       address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email],
-    ).compact_blank
+    )
   end
 
   def resolve_billing_profile(id_or_public_id)

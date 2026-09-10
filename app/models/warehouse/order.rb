@@ -156,8 +156,10 @@ class Warehouse::Order < ApplicationRecord
   end
 
   def cancel!(reason)
-    mark_canceled!
+    raise AASM::InvalidTransition.new(self, :mark_canceled, :default) unless may_mark_canceled?
+
     Zenventory.cancel_customer_order(zenventory_id, reason)
+    mark_canceled!
   end
 
   class MissingCostsError < StandardError; end
