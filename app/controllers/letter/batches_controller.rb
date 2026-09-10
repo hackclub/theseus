@@ -333,9 +333,10 @@ class Letter::BatchesController < BaseBatchesController
 
   def regenerate_labels
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    opts = params.fetch(:batch, {}).permit(:template_cycle, :include_qr_code, template_cycle: [])
     @batch.regenerate_labels!(
-      template_cycle: template_cycle_from(letter_batch_params[:template_cycle]),
-      include_qr_code: letter_batch_params[:include_qr_code],
+      template_cycle: template_cycle_from(opts[:template_cycle]),
+      include_qr_code: opts[:include_qr_code],
     )
     redirect_to letter_batch_path(@batch), notice: "Labels regenerated successfully"
   end

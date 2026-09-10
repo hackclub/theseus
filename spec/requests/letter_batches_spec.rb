@@ -49,6 +49,12 @@ RSpec.describe "letter batches", type: :request do
     expect(batch.reload.process_options["template_cycle"]).to eq(templates)
   end
 
+  it "regenerates labels when the skip-failed button posts no batch params" do
+    post regenerate_labels_letter_batch_path(batch)
+
+    expect(response).to redirect_to(letter_batch_path(batch))
+  end
+
   describe "picklist bulk actions" do
     let(:processed) do
       create(:letter_batch, user: user).tap { |b| b.update_columns(aasm_state: "processed") }
