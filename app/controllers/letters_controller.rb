@@ -69,7 +69,10 @@ class LettersController < ApplicationController
   def update
     authorize @letter
 
-    if @letter.batch_id.present? && params[:letter][:postage_type].present?
+    # The form always posts a checked postage radio, so only a real change is
+    # worth refusing.
+    postage_type = params[:letter][:postage_type]
+    if @letter.batch_id.present? && postage_type.present? && postage_type.to_s != @letter.postage_type.to_s
       redirect_to @letter, alert: "Cannot change postage type for a letter that is part of a batch."
       return
     end

@@ -38,6 +38,24 @@ RSpec.describe "letters", type: :request do
     expect(response.body).not_to include(">Cancel</button>")
   end
 
+  describe "updating a batch letter" do
+    let(:batch_letter) { create(:letter, user: user, postage_type: "stamps") }
+
+    it "accepts an edit that resends the current postage type" do
+      patch letter_path(batch_letter), params: { letter: { user_facing_title: "renamed", postage_type: "stamps" } }
+
+      expect(response).to redirect_to(letter_path(batch_letter))
+      expect(batch_letter.reload.user_facing_title).to eq("renamed")
+    end
+
+    it "still refuses to change the postage type" do
+      patch letter_path(batch_letter), params: { letter: { user_facing_title: "renamed", postage_type: "indicia" } }
+
+      expect(flash[:alert]).to include("Cannot change postage type")
+      expect(batch_letter.reload.user_facing_title).to be_nil
+    end
+  end
+
   describe "the show page" do
     it "names the template select so generate_label can read it, and offers the qr checkbox" do
       get letter_path(letter)
