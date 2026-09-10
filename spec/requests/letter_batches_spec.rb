@@ -68,6 +68,15 @@ RSpec.describe "letter batches", type: :request do
     expect(response).to redirect_to(letter_batch_path(batch))
   end
 
+  it "only offers batch delete to admins" do
+    get letter_batch_path(batch)
+    expect(response.body).not_to include("Delete this batch?")
+
+    sign_in_as(create_admin)
+    get letter_batch_path(batch)
+    expect(response.body).to include("Delete this batch?")
+  end
+
   describe "the edit form" do
     it "offers the title and tags, plus specs while the batch can still be processed" do
       batch.update_columns(aasm_state: "fields_mapped")

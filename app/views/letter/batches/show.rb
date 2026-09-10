@@ -32,6 +32,12 @@ class Views::Letter::Batches::Show < Views::Base
 
   private
 
+  # Letter::Batch#model_name reports "Batch", so Pundit's inference lands on the
+  # warehouse BatchPolicy. Name the policy the controller uses.
+  def may_destroy?
+    ::Letter::BatchPolicy.new(current_user, @batch).destroy?
+  end
+
   def show_progress?
     @batch.purchasing? || @batch.generating_labels? || @batch.processed?
   end
@@ -100,8 +106,10 @@ class Views::Letter::Batches::Show < Views::Base
             button(class: "btn-success btn-sm") { "▶ Process" }
           end
         end
-        form_with(url: letter_batch_path(@batch), method: :delete, data: { turbo_confirm: "Delete this batch?" }, class: "form-inline") do
-          button(type: "submit", class: "btn-danger btn-sm") { "✕" }
+        if may_destroy?
+          form_with(url: letter_batch_path(@batch), method: :delete, data: { turbo_confirm: "Delete this batch?" }, class: "form-inline") do
+            button(type: "submit", class: "btn-danger btn-sm") { "✕" }
+          end
         end
       end
     end

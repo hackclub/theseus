@@ -195,11 +195,13 @@
       <a href="<%= public_letter_path(@letter) %>" target="_blank" class="text-muted letter-action-link">Public page ↗</a>
       <% if @letter.label.attached? %>
         <a href="<%= rails_blob_path(@letter.label, disposition: 'attachment') %>" class="link-inherit letter-action-link">⬇ Download label</a>
-        <a href="<%= preview_template_letter_path(@letter) %>" class="text-muted letter-action-link">Preview template</a>
+        <% if policy(@letter).preview_template? %>
+          <a href="<%= preview_template_letter_path(@letter) %>" class="text-muted letter-action-link">Preview template</a>
+        <% end %>
       <% end %>
 
       <%# Destructive actions %>
-      <% if @letter.pending? && @letter.usps_indicium.nil? && @letter.batch_id.nil? %>
+      <% if policy(@letter).destroy? && @letter.pending? && @letter.usps_indicium.nil? && @letter.batch_id.nil? %>
         <hr class="letter-hr-tight">
         <%= form_with url: letter_path(@letter), method: :delete, class: "form-inline" do %>
           <button type="submit" class="btn-sm w-100 text-danger letter-delete-btn" data-turbo-confirm="Delete this letter?">Delete</button>

@@ -69,6 +69,26 @@ RSpec.describe "letters", type: :request do
       expect(response.body).to include(mark_printed_letter_path(batch_letter))
     end
 
+    # preview_template is only routed in development, so linking to it outside
+    # development raises on the path helper before it can leak.
+    it "hides delete and the dev-only template preview from a non-admin owner" do
+      letter.label.attach(io: StringIO.new("%PDF-1.4"), filename: "label.pdf", content_type: "application/pdf")
+
+      get letter_path(letter)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("Delete this letter?")
+      expect(response.body).not_to include("Preview template")
+    end
+
+    it "shows delete to an admin" do
+      sign_in_as(create_admin)
+
+      get letter_path(letter)
+
+      expect(response.body).to include("Delete this letter?")
+    end
+
     it "shows clear orphaned indicium to admins only" do
       purchase_indicium!
 
