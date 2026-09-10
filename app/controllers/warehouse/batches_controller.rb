@@ -156,7 +156,9 @@ class Warehouse::BatchesController < BaseBatchesController
   private
 
   def batch_params
-    params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
+    permitted = params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
+    permitted.delete(:warehouse_template_id) if @batch && !@batch.may_mark_processed?
+    permitted
   end
 
   def ensure_processable

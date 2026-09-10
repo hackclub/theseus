@@ -131,6 +131,29 @@ RSpec.describe "warehouse batches", type: :request do
   describe "editing" do
     let(:batch) { create(:warehouse_batch, user: user, warehouse_template: template) }
 
+    it "keeps the batch's own template in the list and selected" do
+      other = Warehouse::Template.create!(name: "Private pack", user: create(:user), public: false)
+      batch.update!(warehouse_template: other)
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.mark_fields_mapped!
+
+      get edit_warehouse_batch_path(batch)
+      expect(response.body).to include(%(<option value="#{other.id}" selected>Private pack</option>))
+    end
+
+    it "hides the template picker and ignores a template change once processed" do
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.update!(aasm_state: "processed")
+      other = Warehouse::Template.create!(name: "Other pack", user: user, public: true)
+
+      get edit_warehouse_batch_path(batch)
+      expect(response.body).not_to include("batch[warehouse_template_id]")
+
+      patch warehouse_batch_path(batch), params: { batch: { warehouse_template_id: other.id, warehouse_user_facing_title: "x" } }
+      expect(batch.reload.warehouse_template).to eq(template)
+      expect(batch.warehouse_user_facing_title).to eq("x")
+    end
+
     it "re-renders the edit form with the template list when the update fails" do
       allow_any_instance_of(Warehouse::Batch).to receive(:update) { |b, *| b.errors.add(:base, "nope"); false }
 
