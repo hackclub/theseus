@@ -72,6 +72,17 @@ RSpec.describe "warehouse batches", type: :request do
     end
   end
 
+  describe "import_with_skip" do
+    it "redirects back to the map page instead of 500ing when the import refuses" do
+      post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: upload([ good_row ]) } }
+      batch = Warehouse::Batch.last
+
+      post import_with_skip_warehouse_batch_path(batch)
+      expect(response).to redirect_to(map_fields_warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("no field mapping")
+    end
+  end
+
   describe "re-importing" do
     it "refuses a second set_mapping or import_with_skip once the batch is imported" do
       post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: upload([ good_row ]) } }

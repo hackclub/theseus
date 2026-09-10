@@ -75,10 +75,18 @@ class BatchImporter
     errs << "State blank" if get(row, "state").blank?
     zip = get(row, "postal_code")
     errs << "ZIP blank" if zip.blank?
-    errs << "ZIP looks invalid (#{zip})" if zip.present? && zip.gsub(/\D/, "").length < 3
 
-    cc = country_code(row)
-    errs << restricted_message(country_name(cc)) if cc.in?(restricted_countries)
+    raw_country = get(row, "country")
+    if raw_country.present? && resolved_country(row).nil?
+      # build_address would hand this to the country enum and raise mid-import.
+      errs << "Unrecognized country (#{raw_country})"
+    else
+      cc = country_code(row)
+      # Only the US has a shape we can meaningfully check; "SW1A 2AA" is fine.
+      errs << "ZIP looks invalid (#{zip})" if zip.present? && cc == "US" && zip.gsub(/\D/, "").length < 3
+      errs << restricted_message(country_name(cc)) if cc.in?(restricted_countries)
+    end
+
     errs
   end
 
@@ -90,10 +98,14 @@ class BatchImporter
     val&.strip&.delete(GREMLINS).presence
   end
 
-  def country_code(row)
+  def resolved_country(row)
     raw = get(row, "country")
-    return "US" if raw.blank?
-    FrickinCountryNames.find_country(raw)&.alpha2 || raw.upcase
+    return ISO3166::Country["US"] if raw.blank?
+    FrickinCountryNames.find_country(raw)
+  end
+
+  def country_code(row)
+    resolved_country(row)&.alpha2 || get(row, "country").upcase
   end
 
   def country_name(cc) = ISO3166::Country[cc]&.common_name || cc

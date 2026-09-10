@@ -80,6 +80,8 @@ class Warehouse::BatchesController < BaseBatchesController
     authorize @batch, :update?, policy_class: Warehouse::BatchPolicy
     count = WarehouseBatchImporter.new(@batch).call(skip_invalid: true)
     redirect_to process_confirm_warehouse_batch_path(@batch), notice: "Imported #{count} addresses (skipped invalid rows)."
+  rescue ArgumentError, ActiveRecord::RecordInvalid => e
+    redirect_to map_fields_warehouse_batch_path(@batch), alert: "Import failed: #{e.message}"
   end
 
   # PATCH/PUT /warehouse/batches/1 or /warehouse/batches/1.json
