@@ -498,7 +498,26 @@ $gate-green: #14a314;
 // ── Responsive ─────────────────────────────────────────
 
 @media (max-width: 60rem) {
-  .theseus-sidebar { display: none; }
+  .theseus-sidebar {
+    z-index: 110;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+
+    &.open { transform: translateX(0); }
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 2.5rem; left: 0; right: 0; bottom: 0;
+    z-index: 105;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+
+    &.open { opacity: 1; pointer-events: auto; }
+  }
+
   #theseus-content { margin-left: 0; }
   .sidebar-toggle { display: inline-flex !important; }
   .show-layout { flex-direction: column; }
