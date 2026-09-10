@@ -4,7 +4,7 @@ module API
       include AddressParameterParsing
 
       before_action :set_letter_queue, only: [ :show, :create_letter ]
-      before_action :set_instant_letter_queue, only: [ :create_instant_letter ]
+      before_action :set_instant_letter_queue, only: [ :create_instant_letter, :queued ]
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         render json: { error: "Queue not found" }, status: :not_found
@@ -25,11 +25,6 @@ module API
       # but it's not, so we're just going to poll
       # i'm not braining well enough to do it right anytime soon
       def queued
-        # Pending letters carry recipient names and addresses, so this is
-        # owner-or-admin only. Scoping the lookup means someone else's queue is
-        # a 404 rather than a 403 — the slug doesn't confirm it exists.
-        @letter_queue = policy_scope(Letter::InstantQueue).find_by!(slug: params[:id])
-        authorize @letter_queue, :queued?
         raise Pundit::NotAuthorizedError unless current_token&.pii?
 
         @expand = [ :label ]

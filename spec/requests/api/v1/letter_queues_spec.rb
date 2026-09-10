@@ -64,4 +64,22 @@ RSpec.describe "API v1 letter queues", type: :request do
       expect(queue.letters.count).to eq(1)
     end
   end
+
+  describe "GET /api/v1/letter_queues/instant/:id/queued" do
+    let(:queue) { build_queue(Letter::InstantQueue, owner, "instant", template: "hackatime_template", postage_type: "stamps") }
+
+    it "lets any pii key poll any instant queue, by design" do
+      pii_key = APIKey.create!(user: user, pii: true)
+
+      get "/api/v1/letter_queues/instant/#{queue.slug}/queued", headers: { "Authorization" => "Bearer #{pii_key.token}" }
+
+      expect(response).to have_http_status(:ok), body.to_s
+    end
+
+    it "still needs a pii key" do
+      get "/api/v1/letter_queues/instant/#{queue.slug}/queued", headers: headers
+
+      expect(response).not_to have_http_status(:ok)
+    end
+  end
 end
