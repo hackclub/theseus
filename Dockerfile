@@ -39,7 +39,7 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
 RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
 
 # Install Node.js and Yarn
-ARG NODE_VERSION=23.6.0
+ARG NODE_VERSION=22.18.0
 ARG YARN_VERSION=1.22.22
 ENV PATH=/usr/local/node/bin:$PATH
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
