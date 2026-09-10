@@ -13,6 +13,7 @@ class Warehouse::BatchesController < BaseBatchesController
     render Views::Warehouse::Batches::Index.new(
       batches: batches,
       search: params[:search],
+      status: params[:status],
       user_id: params[:user_id],
       users: users
     )

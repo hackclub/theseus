@@ -72,6 +72,22 @@ RSpec.describe "warehouse batches", type: :request do
     end
   end
 
+  describe "the index" do
+    it "filters by the status the stat chips link to" do
+      mapped = create(:warehouse_batch, user: user, warehouse_template: template)
+      mapped.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      mapped.mark_fields_mapped!
+      awaiting = create(:warehouse_batch, user: user, warehouse_template: template)
+
+      get warehouse_batches_path(status: "fields_mapped")
+      expect(response.body).to include("##{mapped.id}")
+      expect(response.body).not_to include("##{awaiting.id}")
+
+      get warehouse_batches_path
+      expect(response.body).to include("##{mapped.id}").and include("##{awaiting.id}")
+    end
+  end
+
   describe "a CSV we can't even read" do
     it "sends latin-1 bytes back to the upload page" do
       batch = create(:warehouse_batch, user: user, warehouse_template: template, csv_content: "na\xEFve,city\nx,y\n".b)
