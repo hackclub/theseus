@@ -29,8 +29,8 @@ module SnailMail
           )
           image(
             image_path("horizons/label.png"),
-            at: [ 220, 255 ],
-            width: 125,
+            at: [ 220, 245 ],
+            width: 115,
           )
 
           render_return_address(10, 278, 260, 70, size: 8)
