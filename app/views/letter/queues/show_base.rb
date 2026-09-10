@@ -20,6 +20,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
     div(class: "show-layout") do
       div(class: "show-main") do
         queue_details_section
+        api_docs_section
         letters_section
         batches_section
         admin_inspector(queue)
@@ -124,6 +125,60 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   # Hook for subclasses to add extra detail-grid rows
   def extra_queue_details; end
+
+  # --- API docs ---
+
+  def api_docs_section
+    section(class: "mb-1") do
+      details do
+        summary(class: "text-muted pointer") { "API docs" }
+
+        div(class: "mt-half") do
+          p do
+            plain "Send a POST request to "
+            code(class: "pointer", data_copy_to_clipboard: api_endpoint_url) { api_endpoint_path }
+            plain " with JSON like:"
+          end
+
+          example = JSON.pretty_generate(api_example_payload)
+          pre(class: "json-inspector pointer", data_copy_to_clipboard: example) { example }
+          small(class: "text-muted") { "(click that hunk of JSON to copy it)" }
+
+          p do
+            plain "Use an "
+            code { "Authorization" }
+            plain " header of "
+            code { "Bearer <token>" }
+            plain " with one of your "
+            a(href: api_keys_path, target: "_blank") { "API keys" }
+            plain "."
+          end
+        end
+      end
+    end
+  end
+
+  def api_example_payload
+    {
+      recipient_email: current_user.email,
+      address: {
+        first_name: "Bort",
+        last_name: "Fargler",
+        line_1: "8605 Santa Clausica Blvd.",
+        line_2: "PMB 86294 (optional)",
+        city: "West Sillywood",
+        state: "CA",
+        postal_code: "90069",
+        country: "United States"
+      },
+      rubber_stamps: "extra text if the template you're using supports it",
+      idempotency_key: "optional but it'd be a great idea... rec#{SecureRandom.alphanumeric 12}?",
+      metadata: {
+        whatever_you_want: "this gets JSONB'd, you can stash program-specific meta info here",
+        seriously_any_keys_and_values: "as long as postgres can serialize it :3"
+      }
+    }
+  end
 
   # --- Letters Section ---
 
@@ -323,4 +378,6 @@ class Views::Letter::Queues::ShowBase < Views::Base
   def type_label = raise(NotImplementedError)
   def edit_queue_path = raise(NotImplementedError)
   def queue_show_path(**) = raise(NotImplementedError)
+  def api_endpoint_url = raise(NotImplementedError)
+  def api_endpoint_path = raise(NotImplementedError)
 end

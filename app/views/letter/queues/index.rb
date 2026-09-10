@@ -37,9 +37,11 @@ class Views::Letter::Queues::Index < Views::Base
       end
 
       admin_tool do
-        button_to mark_printed_instants_mailed_letter_queues_path, method: :post, class: "form-inline" do
-          button(class: "btn-danger btn-sm") { "Mark printed instants mailed" }
-        end
+        button_to "Mark printed instants mailed",
+                  mark_printed_instants_mailed_letter_queues_path,
+                  method: :post,
+                  form_class: "form-inline",
+                  class: "btn-danger btn-sm"
       end
 
       if user_id.present? || queue_type.present?

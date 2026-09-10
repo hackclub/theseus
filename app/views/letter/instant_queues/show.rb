@@ -17,6 +17,10 @@ class Views::Letter::InstantQueues::Show < Views::Letter::Queues::ShowBase
     letter_instant_queue_path(queue, **params)
   end
 
+  def api_endpoint_url = create_instant_letter_api_v1_letter_queues_url(queue)
+
+  def api_endpoint_path = create_instant_letter_api_v1_letter_queues_path(queue)
+
   # --- Instant-specific detail rows (inside detail-grid) ---
 
   def extra_queue_details

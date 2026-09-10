@@ -17,6 +17,10 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
     letter_queue_path(queue, **params)
   end
 
+  def api_endpoint_url = api_v1_letter_queue_url(queue)
+
+  def api_endpoint_path = api_v1_letter_queue_path(queue)
+
   # --- Sidebar: Make Batch ---
 
   def make_batch_section

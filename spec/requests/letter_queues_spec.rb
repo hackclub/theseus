@@ -190,4 +190,38 @@ RSpec.describe "letter queues", type: :request do
       expect(instant.reload.letter_return_address_id).to eq(before_id)
     end
   end
+
+  describe "the show page" do
+    before { sign_in_as(owner) }
+
+    it "documents the batch queue API endpoint" do
+      queue = build_queue(owner)
+
+      get letter_queue_path(queue)
+
+      expect(response.body).to include("API docs")
+      expect(response.body).to include(api_v1_letter_queue_path(queue))
+      expect(response.body).to include("idempotency_key")
+      expect(response.body).to include(api_keys_path)
+    end
+
+    it "documents the instant queue API endpoint" do
+      instant = build_instant_queue(owner)
+
+      get letter_instant_queue_path(instant)
+
+      expect(response.body).to include(create_instant_letter_api_v1_letter_queues_path(instant))
+    end
+  end
+
+  describe "the index page" do
+    it "does not nest a button inside the bulk-mark button_to" do
+      sign_in_as(admin)
+
+      get letter_queues_path
+
+      expect(response.body).to include("Mark printed instants mailed")
+      expect(response.body).not_to match(/<button[^>]*>\s*<button/)
+    end
+  end
 end
