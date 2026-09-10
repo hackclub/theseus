@@ -83,7 +83,7 @@ class Views::Letter::Batches::Process < Views::Base
       div(class: "mt-half") do
         p(class: "form-hint mb-2") { "Select multiple templates to cycle through them, or just one for all labels." }
         select(
-          name: "batch[template_cycle]",
+          name: "batch[template_cycle][]",
           id: "batch_template_cycle",
           multiple: true,
           size: [ 8, (standard_templates.length + envelope_templates.length + 2) ].min,

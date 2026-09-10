@@ -166,8 +166,7 @@ class Letter::BatchesController < BaseBatchesController
         usps_payment_account_id: letter_batch_params[:usps_payment_account_id],
         hcb_payment_account_id: letter_batch_params[:hcb_payment_account_id],
         non_machinable: letter_batch_params[:non_machinable],
-        template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank.presence ||
-          [ SnailMail::PhlexService.templates_for_size(:standard).first ].compact,
+        template_cycle: template_cycle_from(letter_batch_params[:template_cycle]),
         user_facing_title: letter_batch_params[:user_facing_title],
         include_qr_code: letter_batch_params[:include_qr_code]
       }
@@ -335,7 +334,7 @@ class Letter::BatchesController < BaseBatchesController
   def regenerate_labels
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
     @batch.regenerate_labels!(
-      template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank,
+      template_cycle: template_cycle_from(letter_batch_params[:template_cycle]),
       include_qr_code: letter_batch_params[:include_qr_code],
     )
     redirect_to letter_batch_path(@batch), notice: "Labels regenerated successfully"
@@ -397,8 +396,16 @@ class Letter::BatchesController < BaseBatchesController
       :template_cycle,
       :non_machinable,
       tags: [],
+      template_cycle: [],
     )
     normalize_processing_category(permitted)
+  end
+
+  # The process form posts template_cycle[]; the regenerate form posts a
+  # comma-joined string built by the JS picker.
+  def template_cycle_from(value)
+    Array(value).flat_map { |v| v.to_s.split(",") }.compact_blank.presence ||
+      [ SnailMail::PhlexService.templates_for_size(:standard).first ].compact
   end
 
   def normalize_processing_category(permitted)

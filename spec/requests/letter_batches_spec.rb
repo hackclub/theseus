@@ -34,6 +34,21 @@ RSpec.describe "letter batches", type: :request do
     expect(response.body).to include("USPS doesn&#39;t deliver to North Korea")
   end
 
+  it "keeps every template the process form selected" do
+    templates = SnailMail::PhlexService.templates_for_size(:standard).first(3)
+
+    post process_letter_batch_path(batch), params: {
+      batch: {
+        letter_mailing_date: Date.current.iso8601,
+        us_postage_type: "stamps",
+        intl_postage_type: "stamps",
+        template_cycle: templates
+      }
+    }
+
+    expect(batch.reload.process_options["template_cycle"]).to eq(templates)
+  end
+
   describe "picklist bulk actions" do
     let(:processed) do
       create(:letter_batch, user: user).tap { |b| b.update_columns(aasm_state: "processed") }
