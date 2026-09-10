@@ -1,1 +1,0 @@
-import "@oddcamp/cocoon-vanilla-js";
