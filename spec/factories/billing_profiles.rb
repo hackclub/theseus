@@ -26,7 +26,7 @@
 FactoryBot.define do
   factory :billing_profile, class: "BillingProfile" do
     association :user
-    oauth_connection { association :hcb_oauth_connection, user: user }
+    oauth_connection { HCB::OauthConnection.find_by(user: user) || association(:hcb_oauth_connection, user: user) }
     organization_id { "org_test123" }
     organization_name { "Test Organization" }
   end
