@@ -52,7 +52,10 @@ class LettersToolbox < ApplicationToolbox
     @letter.user = current_user
     @letter.usps_mailer_id = current_user.home_mid
 
-    # Auto-set postage type to international_origin if return address is not US
+    if @letter.return_address_id.present? && !available_return_addresses.exists?(id: @letter.return_address_id)
+      halt error: "Return address not found or not available to you"
+    end
+
     if @letter.return_address&.country != "US"
       @letter.postage_type = "international_origin"
     end
@@ -88,9 +91,9 @@ class LettersToolbox < ApplicationToolbox
     end
   end
   def update
-    # Auto-set postage type if changing return address to non-US
     if params[:return_address_id].present?
-      ra = ReturnAddress.find(params[:return_address_id])
+      ra = available_return_addresses.find_by(id: params[:return_address_id])
+      halt error: "Return address not found or not available to you" unless ra
       params[:postage_type] = "international_origin" if ra.country != "US"
     end
 
@@ -156,6 +159,11 @@ class LettersToolbox < ApplicationToolbox
 
   def require_letter_owner!
     halt error: "Only the letter owner or an admin can do that" unless @letter.user == current_user || admin?
+  end
+
+  def available_return_addresses
+    return ReturnAddress.all if admin?
+    ReturnAddress.shared.or(ReturnAddress.owned_by(current_user))
   end
 
   def create_letter_params

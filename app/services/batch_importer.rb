@@ -23,6 +23,9 @@ class BatchImporter
     count = 0
 
     ActiveRecord::Base.transaction do
+      @batch.lock!
+      raise AlreadyImported, "This batch has already been imported." unless @batch.awaiting_field_mapping?
+
       CSV.parse(@batch.csv_data, headers: true).each do |row|
         next if skip_invalid && validate_row(row).any?
         next if get(row, "first_name").blank?

@@ -90,7 +90,7 @@ class Warehouse::BatchesController < BaseBatchesController
     authorize @batch, policy_class: Warehouse::BatchPolicy
     if @batch.update(batch_params)
       # If template changed and batch hasn't been processed, recreate orders
-      if @batch.may_mark_processed? && @batch.saved_change_to_warehouse_template_id?
+      if (@batch.fields_mapped? || @batch.failed?) && @batch.saved_change_to_warehouse_template_id?
         # Delete existing orders
         @batch.orders.destroy_all
 
@@ -160,7 +160,7 @@ class Warehouse::BatchesController < BaseBatchesController
 
   def batch_params
     permitted = params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
-    permitted.delete(:warehouse_template_id) if @batch && !@batch.may_mark_processed?
+    permitted.delete(:warehouse_template_id) if @batch && !(@batch.fields_mapped? || @batch.failed?)
     if permitted[:warehouse_template_id].present? && !@allowed_templates.exists?(permitted[:warehouse_template_id])
       permitted.delete(:warehouse_template_id)
     end
