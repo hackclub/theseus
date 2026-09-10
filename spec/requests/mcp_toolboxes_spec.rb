@@ -65,6 +65,17 @@ RSpec.describe "MCP toolboxes", type: :request do
       expect(letter.postage_type).to eq("international_origin")
       expect(letter.return_address).to eq(international)
     end
+
+    it "does not show another user's letter to a non-admin" do
+      someone_else = create(:letter)
+      non_admin = create(:user)
+      restricted = Toolchest::AuthContext.new(resource_owner: non_admin, scopes: Toolchest.configuration.scopes.keys, token: nil)
+
+      response = Toolchest::Current.set(auth: restricted) { Toolchest.router.dispatch("letters_show", { "letter_id" => someone_else.public_id }) }
+
+      expect(response[:isError]).to be_truthy
+      expect(text_of(response)).not_to include(someone_else.address.line_1)
+    end
   end
 
   describe "warehouse orders" do

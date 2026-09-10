@@ -151,6 +151,7 @@ class LettersToolbox < ApplicationToolbox
 
   def set_letter
     @letter = Letter.find_by_public_id!(params[:letter_id])
+    halt error: "Couldn't find that letter" unless policy(@letter).show?
   end
 
   def require_letter_owner!

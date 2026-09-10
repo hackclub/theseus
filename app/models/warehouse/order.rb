@@ -188,7 +188,6 @@ class Warehouse::Order < ApplicationRecord
 
     ActiveRecord::Base.transaction do
       lock!
-      raise AASM::InvalidTransition, "wrong state" unless may_mark_dispatched?
       mark_dispatched!(zenventory_order[:id])
 
       labor_cents = Billing::Quote.new(billing_lines).now_cents

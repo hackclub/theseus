@@ -41,6 +41,7 @@ class Views::Letter::Queues::Index < Views::Base
                   mark_printed_instants_mailed_letter_queues_path,
                   method: :post,
                   form_class: "form-inline",
+                  form: { data: { turbo_confirm: "Mark every printed instant-queue letter as mailed?" } },
                   class: "btn-danger btn-sm"
       end
 
