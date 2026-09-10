@@ -172,4 +172,6 @@ class Warehouse::BatchesController < BaseBatchesController
   def set_allowed_templates
     @allowed_templates = Warehouse::Template.where(public: true).or(Warehouse::Template.where(user: current_user))
   end
+
+  def batch_scope = policy_scope(Warehouse::Batch)
 end

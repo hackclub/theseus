@@ -340,6 +340,8 @@ class Letter::BatchesController < BaseBatchesController
 
   private
 
+  def batch_scope = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope)
+
   def batch_params
     permitted = params.require(:letter_batch).permit(
       :csv,
