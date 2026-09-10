@@ -69,12 +69,32 @@ module API
         render json: { error: "Queue not found" }, status: :not_found
       rescue ActiveRecord::RecordInvalid => e
         render json: { error: e.record.errors.full_messages.join(", ") }, status: :unprocessable_entity
+      rescue Letter::InstantQueue::PurchaseUncertain => e
+        # 409, not 500: the request is finished, but whether postage was bought
+        # is unknown. Name the letter so a human can go and look.
+        render json: {
+          error: "postage_unresolved",
+          letter_id: e.letter.public_id,
+          message: e.message
+        }, status: :conflict
+      rescue USPS::IndiciumPurchase::PurchaseFailed => e
+        render json: {
+          error: "postage_purchase_failed",
+          refunded: e.refunded?,
+          message: e.message
+        }, status: :bad_gateway
+      rescue Billing::Rejected, Billing::InFlight => e
+        render json: { error: "payment_failed", message: e.message }, status: :payment_required
       end
 
       private
 
+      # Batch queues are owner-or-admin: Letter::QueuePolicy#create_letter? only
+      # asks for a logged-in user, so the scoping is what keeps someone else's
+      # queue from taking your letters. (Instant queues are open on purpose and
+      # go through set_instant_letter_queue instead.)
       def set_letter_queue
-        @letter_queue = Letter::Queue.find_by!(slug: params[:id])
+        @letter_queue = policy_scope(Letter::Queue).find_by!(slug: params[:id])
         # grossest hack on the planet, nora why are you like this
         raise ActiveRecord::RecordNotFound if @letter_queue.is_a?(Letter::InstantQueue)
       end

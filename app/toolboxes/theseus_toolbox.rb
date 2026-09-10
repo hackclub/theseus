@@ -119,7 +119,7 @@ class TheseusToolbox < ApplicationToolbox
   def authorized_to_see?(record)
     case record
     when Letter
-      true # LetterPolicy#show? is true for all users
+      LetterPolicy.new(current_user, record).show?
     when Warehouse::Order
       can_warehouse?
     when Warehouse::PurchaseOrder

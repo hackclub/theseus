@@ -1,3 +1,25 @@
+# Toolchest 0.4 returns nested objects as bare hashes, which have no `permit`,
+# and Parameters has no writer. Both are needed by the toolboxes below.
+module Toolchest
+  class Parameters
+    def [](key) = wrap(@params[key])
+
+    def []=(key, value)
+      @params[key] = value
+    end
+
+    private
+
+    def wrap(value)
+      case value
+      when Hash then self.class.new(value)
+      when Array then value.map { |v| wrap(v) }
+      else value
+      end
+    end
+  end
+end
+
 Toolchest.configure do |config|
   config.server_name = "Theseus"
   config.server_description = "Mail & fulfillment management for Hack Club"

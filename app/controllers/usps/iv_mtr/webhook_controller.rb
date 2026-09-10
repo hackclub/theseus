@@ -15,9 +15,23 @@ module USPS
       end
 
       def ingest
-        data = JSON.parse(request.raw_post)
-        batch = USPS::IVMTR::RawJSONBatch.create(
-          payload: data["events"],
+        data = begin
+          JSON.parse(request.raw_post)
+        rescue JSON::ParserError
+          nil
+        end
+
+        return render json: { error: "that isn't a JSON object" }, status: :bad_request unless data.is_a?(Hash)
+
+        events = data["events"]
+        return render json: { error: "expected an array of events" }, status: :bad_request unless events.is_a?(Array)
+
+        # A batch with no events makes an ImportEventsJob that can never do
+        # anything, so there's nothing worth saving.
+        return render json: { message: "nothing to do" } if events.empty?
+
+        batch = USPS::IVMTR::RawJSONBatch.create!(
+          payload: events,
           message_group_id: data["msgGrpId"],
           processed: false
         )

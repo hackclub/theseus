@@ -42,7 +42,10 @@ class PublicIdsController < ApplicationController
     # Generic resolution via PublicIdResolver
     result = PublicIdResolver.resolve(params[:id])
     if result
-      return redirect_to url_for(result.record)
+      path = path_for_record(result.record)
+      return redirect_to path if path
+      return redirect_back fallback_location: public_ids_path,
+        alert: "#{result.type} #{params[:id]} exists, but there's no page for it."
     end
 
     # LSV fallback for tracking numbers (Airtable, not in PublicIdResolver)
@@ -56,5 +59,28 @@ class PublicIdsController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     flash[:alert] = "Record not found"
     redirect_back fallback_location: public_ids_path
+  end
+
+  private
+
+  # url_for only works for records whose model name matches a route, which
+  # leaves out users, billing profiles, batches and indicia. nil means "no
+  # page for this one" and the caller sends the user back with an alert.
+  def path_for_record(record)
+    case record
+    when Letter then letter_path(record)
+    when Warehouse::Order then warehouse_order_path(record)
+    when Warehouse::Template then warehouse_template_path(record)
+    when Letter::Batch then letter_batch_path(record)
+    when Warehouse::Batch then warehouse_batch_path(record)
+    when USPS::Indicium
+      if current_user.admin?
+        inspect_indicium_path(record)
+      elsif record.letter.present?
+        public_letter_path(record.letter)
+      end
+    when User then (admin_user_path(record) if current_user.admin?)
+    when BillingProfile then (hcb_payment_account_path(record) if record.user == current_user || current_user.admin?)
+    end
   end
 end

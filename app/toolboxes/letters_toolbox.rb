@@ -1,5 +1,5 @@
 class LettersToolbox < ApplicationToolbox
-  default_param :letter_id, :string, "Letter ID (e.g. ltr_...)", except: [ :search, :create ]
+  default_param :letter_id, :string, "Letter ID (e.g. ltr!...)", except: [ :search, :create ]
   before_action :set_letter, except: [ :search, :create ]
   before_action :require_letter_owner!, only: [ :update, :generate_label, :mark_printed, :mark_mailed, :mark_received ]
 
@@ -50,6 +50,7 @@ class LettersToolbox < ApplicationToolbox
   def create
     @letter = Letter.new(create_letter_params)
     @letter.user = current_user
+    @letter.usps_mailer_id = current_user.home_mid
 
     # Auto-set postage type to international_origin if return address is not US
     if @letter.return_address&.country != "US"

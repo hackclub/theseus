@@ -4,7 +4,7 @@ class LetterPolicy < ApplicationPolicy
   end
 
   def show?
-    true
+    record_belongs_to_user || user_is_admin
   end
 
   def new?
@@ -77,7 +77,10 @@ class LetterPolicy < ApplicationPolicy
 
   private
 
+  # Batch and queue owners get their own letters back even when the letter's
+  # own user is whoever submitted it — the batch and queue pages link straight
+  # at letter_path.
   def record_belongs_to_user
-    user && (record.user == user || record.batch&.user == user)
+    user && (record.user == user || record.batch&.user == user || record.queue&.user == user)
   end
 end
