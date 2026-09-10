@@ -11,9 +11,24 @@ RSpec.describe "letters", type: :request do
     sign_in_as(user)
   end
 
-  it "does not wrap the form's cancel link around a submit button" do
-    get new_letter_path
+  def purchase_indicium!
+    letter.update!(postage_type: "indicia")
+    USPS::Indicium.create!(
+      letter: letter,
+      postage: 1,
+      fees: 0,
+      usps_sku: "DFCM",
+      mailing_date: Date.current,
+      payment_account: create(:usps_payment_account),
+    )
+  end
 
-    expect(response.body).not_to include(">Cancel</button>")
+  it "renders a letter whose indicium has been purchased" do
+    purchase_indicium!
+
+    get letter_path(letter)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("DFCM")
   end
 end

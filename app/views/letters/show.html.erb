@@ -79,8 +79,8 @@
           <span class="text-muted text-sm">indicia</span>
         </div>
         <div class="detail-grid mt-half text-sm">
-          <span class="detail-label">Tracking</span>
-          <code><%= @letter.usps_indicium.tracking_number || "—" %></code>
+          <span class="detail-label">Mailing date</span>
+          <code><%= @letter.usps_indicium.mailing_date&.strftime("%Y-%m-%d") || "—" %></code>
           <span class="detail-label">USPS SKU</span>
           <code><%= @letter.usps_indicium.usps_sku %></code>
           <span class="detail-label">Indicium</span>
