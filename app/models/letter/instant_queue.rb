@@ -42,6 +42,20 @@
 #  fk_rails_...  (usps_payment_account_id => usps_payment_accounts.id)
 #
 class Letter::InstantQueue < Letter::Queue
+  # Postage may have been sold, or money may have moved and we don't know
+  # which way. The letter and everything pointing at it stays exactly where it
+  # is; a human has to look. Retrying is not safe, so the idempotency key
+  # stays burned on purpose.
+  class PurchaseUncertain < StandardError
+    attr_reader :letter, :cause_error
+
+    def initialize(letter, cause_error)
+      @letter = letter
+      @cause_error = cause_error
+      super("postage for #{letter.public_id} is in an unknown state: #{cause_error.message}")
+    end
+  end
+
   # Validations
   validates :template, presence: true
   validates :postage_type, presence: true, inclusion: { in: %w[indicia stamps international_origin] }
@@ -103,13 +117,16 @@ class Letter::InstantQueue < Letter::Queue
           billing_profile: billing_profile,
           name_suffix: " via queue #{name} (#{slug})",
         ).call
-      rescue Billing::Rejected, Billing::InFlight => e
-        # No money moved and the indicium was cleaned up; the letter is the only trace.
-        letter.destroy!
-        raise "HCB payment failed: #{e.message}"
+      rescue Billing::Unconfirmed, USPS::IndiciumPurchase::Unrecorded => e
+        raise PurchaseUncertain.new(letter, e)
+      rescue Billing::Rejected, Billing::InFlight, USPS::IndiciumPurchase::PurchaseFailed => e
+        # Nothing was mailed: Rejected/InFlight never moved money, and
+        # PurchaseFailed means USPS sold us nothing and the charge was credited
+        # back. Free the idempotency key so the caller's retry isn't a
+        # permanent 400.
+        release_never_sent!(letter)
+        raise
       end
-      # Any other failure (Unconfirmed, Unrecorded, PurchaseFailed) leaves the
-      # letter and indicium in place as the audit trail and propagates.
     end
 
     # Phase 3: post-processing
@@ -118,5 +135,19 @@ class Letter::InstantQueue < Letter::Queue
       include_qr_code: include_qr_code,
     )
     letter
+  end
+
+  private
+
+  # Nothing was mailed, so the caller must be able to retry with the same
+  # idempotency key. Drop the letter if the purchase left nothing behind;
+  # otherwise the indicium and its ledger entries are the record that money
+  # moved and came home, so keep the row and only give the key up.
+  def release_never_sent!(letter)
+    if letter.reload.usps_indicium.nil?
+      letter.destroy!
+    else
+      letter.update_columns(idempotency_key: nil)
+    end
   end
 end

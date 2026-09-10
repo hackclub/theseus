@@ -69,6 +69,22 @@ module API
         render json: { error: "Queue not found" }, status: :not_found
       rescue ActiveRecord::RecordInvalid => e
         render json: { error: e.record.errors.full_messages.join(", ") }, status: :unprocessable_entity
+      rescue Letter::InstantQueue::PurchaseUncertain => e
+        # 409, not 500: the request is finished, but whether postage was bought
+        # is unknown. Name the letter so a human can go and look.
+        render json: {
+          error: "postage_unresolved",
+          letter_id: e.letter.public_id,
+          message: e.message
+        }, status: :conflict
+      rescue USPS::IndiciumPurchase::PurchaseFailed => e
+        render json: {
+          error: "postage_purchase_failed",
+          refunded: e.refunded?,
+          message: e.message
+        }, status: :bad_gateway
+      rescue Billing::Rejected, Billing::InFlight => e
+        render json: { error: "payment_failed", message: e.message }, status: :payment_required
       end
 
       private
