@@ -72,6 +72,27 @@ RSpec.describe "warehouse batches", type: :request do
     end
   end
 
+  describe "headers with brackets in them" do
+    it "maps them back onto the real CSV header" do
+      csv = Rack::Test::UploadedFile.new(
+        StringIO.new("first_name,last_name,Address[1],city,state,zip,email\nAlice,Smith,123 Main St,Burlington,VT,05401,alice@example.com\n"),
+        "text/csv", original_filename: "addresses.csv"
+      )
+      post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: csv } }
+      batch = Warehouse::Batch.last
+
+      get map_fields_warehouse_batch_path(batch)
+      expect(response.body).to include(%(name="field_mapping[Address1]"))
+
+      post set_mapping_warehouse_batch_path(batch), params: { field_mapping: {
+        "first_name" => "first_name", "last_name" => "last_name", "Address1" => "line_1",
+        "city" => "city", "state" => "state", "zip" => "postal_code", "email" => "email"
+      } }
+      expect(response).to redirect_to(process_confirm_warehouse_batch_path(batch))
+      expect(batch.reload.addresses.pluck(:line_1)).to eq([ "123 Main St" ])
+    end
+  end
+
   describe "import_with_skip" do
     it "redirects back to the map page instead of 500ing when the import refuses" do
       post warehouse_batches_path, params: { batch: { warehouse_template_id: template.id, csv: upload([ good_row ]) } }
