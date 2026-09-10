@@ -38,6 +38,39 @@ RSpec.describe "letters", type: :request do
     expect(response.body).not_to include(">Cancel</button>")
   end
 
+  describe "return addresses" do
+    let(:someone_else) { create(:return_address, user: create(:user), shared: false) }
+    let(:shared) { create(:return_address, shared: true) }
+
+    it "refuses to set another user's private return address" do
+      patch letter_path(letter), params: { letter: { return_address_id: someone_else.id } }
+
+      expect(flash[:alert]).to include("isn't available to you")
+      expect(letter.reload.return_address_id).not_to eq(someone_else.id)
+    end
+
+    it "accepts a shared return address" do
+      patch letter_path(letter), params: { letter: { return_address_id: shared.id } }
+
+      expect(letter.reload.return_address_id).to eq(shared.id)
+    end
+
+    it "refuses to create a letter with another user's private return address" do
+      expect {
+        post letters_path, params: {
+          letter: {
+            return_address_id: someone_else.id,
+            height: 4.125, width: 9.5, weight: 1, processing_category: "letter",
+            usps_mailer_id_id: user.home_mid_id,
+            address_attributes: { first_name: "A", line_1: "1 St", city: "B", state: "VT", postal_code: "05401", country: "US" }
+          }
+        }
+      }.not_to change(Letter, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
   describe "updating a batch letter" do
     let(:batch_letter) { create(:letter, user: user, postage_type: "stamps") }
 

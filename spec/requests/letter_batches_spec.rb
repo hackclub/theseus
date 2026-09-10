@@ -68,6 +68,15 @@ RSpec.describe "letter batches", type: :request do
     expect(response).to redirect_to(letter_batch_path(batch))
   end
 
+  it "refuses to set another user's private return address on a batch" do
+    someone_else = create(:return_address, user: create(:user), shared: false)
+
+    patch letter_batch_path(batch), params: { letter_batch: { letter_return_address_id: someone_else.id } }
+
+    expect(flash[:alert]).to include("isn't available to you")
+    expect(batch.reload.letter_return_address_id).not_to eq(someone_else.id)
+  end
+
   it "only offers batch delete to admins" do
     get letter_batch_path(batch)
     expect(response.body).not_to include("Delete this batch?")

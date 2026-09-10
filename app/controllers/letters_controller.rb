@@ -52,6 +52,13 @@ class LettersController < ApplicationController
     @letter = Letter.new(letter_params.merge(user: current_user))
     authorize @letter
 
+    if @letter.return_address_id.present? && !available_return_addresses.exists?(id: @letter.return_address_id)
+      @letter.errors.add(:return_address, "isn't available to you")
+      @letter.build_address if @letter.address.nil?
+      render Views::Letters::New.new(letter: @letter), status: :unprocessable_entity
+      return
+    end
+
     # Set postage type to international_origin if return address is not US
     if @letter.return_address && @letter.return_address.country != "US"
       @letter.postage_type = "international_origin"
@@ -79,7 +86,11 @@ class LettersController < ApplicationController
 
     # Set postage type to international_origin if return address is not US
     if params[:letter][:return_address_id].present?
-      return_address = ReturnAddress.find(params[:letter][:return_address_id])
+      return_address = available_return_addresses.find_by(id: params[:letter][:return_address_id])
+      if return_address.nil?
+        redirect_to @letter, alert: "That return address isn't available to you."
+        return
+      end
       if return_address.country != "US"
         params[:letter][:postage_type] = "international_origin"
       end
@@ -290,6 +301,13 @@ class LettersController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_letter
     @letter = Letter.find_by_public_id!(params[:id])
+  end
+
+  # The picker only ever offers these, so anything else is someone else's
+  # private sender.
+  def available_return_addresses
+    return ReturnAddress.all if current_user&.is_admin?
+    ReturnAddress.shared.or(ReturnAddress.owned_by(current_user))
   end
 
   def letter_json(letter)

@@ -88,6 +88,12 @@ class Letter::BatchesController < BaseBatchesController
     authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batch = Letter::Batch.new(batch_params.merge(user: current_user))
 
+    unless return_address_available?(@batch.letter_return_address_id)
+      @batch.errors.add(:letter_return_address, "isn't available to you")
+      render Views::Letter::Batches::New.new(batch: @batch), status: :unprocessable_entity
+      return
+    end
+
     if @batch.save
       redirect_to map_fields_letter_batch_path(@batch)
     else
@@ -98,6 +104,12 @@ class Letter::BatchesController < BaseBatchesController
   # PATCH /letter/batches/:id
   def update
     authorize @batch, policy_class: Letter::BatchPolicy
+
+    unless return_address_available?(batch_params[:letter_return_address_id])
+      redirect_to edit_letter_batch_path(@batch), alert: "That return address isn't available to you."
+      return
+    end
+
     if @batch.update(batch_params)
       validate_postage_types
       if @batch.errors.any?
@@ -350,6 +362,14 @@ class Letter::BatchesController < BaseBatchesController
   private
 
   def batch_scope = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope)
+
+  # The picker only ever offers these, so anything else is someone else's
+  # private sender.
+  def return_address_available?(id)
+    return true if id.blank?
+    return true if current_user&.is_admin?
+    ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).exists?(id: id)
+  end
 
   # The picklist ships one hidden field holding "12,13,14"; a plain form can
   # also send letter_ids[]. Accept either.
