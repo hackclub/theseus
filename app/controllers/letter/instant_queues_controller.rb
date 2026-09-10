@@ -58,24 +58,9 @@ class Letter::InstantQueuesController < Letter::QueuesController
     @letter_queue = Letter::InstantQueue.find_by!(slug: params[:id])
   end
 
+  INSTANT_QUEUE_ATTRIBUTES = (QUEUE_ATTRIBUTES - %i[letter_mailing_date] + %i[hcb_payment_account_id]).freeze
+
   def letter_queue_params
-    params.require(:letter_instant_queue).permit(
-      :name,
-      :type,
-      :letter_height,
-      :letter_width,
-      :letter_weight,
-      :letter_processing_category,
-      :letter_mailer_id_id,
-      :letter_return_address_id,
-      :letter_return_address_name,
-      :user_facing_title,
-      :template,
-      :postage_type,
-      :usps_payment_account_id,
-      :hcb_payment_account_id,
-      :include_qr_code,
-      tags: [],
-    )
+    params.require(:letter_instant_queue).permit(*admin_scoped(INSTANT_QUEUE_ATTRIBUTES), tags: [])
   end
 end

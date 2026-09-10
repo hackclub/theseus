@@ -8,6 +8,26 @@ RSpec.describe "letter queues", type: :request do
 
   FORM_ENCODED = { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }.freeze
 
+  def build_queue(user, **attrs)
+    Letter::Queue.create!(
+      {
+        user: user, name: "Batch queue", tags: [ "smoke" ],
+        letter_height: 1, letter_width: 1, letter_weight: 1,
+        letter_processing_category: "letter",
+        letter_mailer_id: user.home_mid,
+        letter_return_address: user.home_return_address
+      }.merge(attrs)
+    )
+  end
+
+  def queue_params(**overrides)
+    {
+      name: "Batch queue", tags: [ "smoke" ],
+      letter_height: 1, letter_width: 1, letter_weight: 1,
+      letter_processing_category: "letter"
+    }.merge(overrides)
+  end
+
   def build_instant_queue(user, **attrs)
     Letter::InstantQueue.create!(
       {
@@ -71,6 +91,50 @@ RSpec.describe "letter queues", type: :request do
       expect(hidden).not_to be_nil
       expect(box).not_to be_nil
       expect(hidden).to be < box
+    end
+  end
+
+  describe "the admin slug field" do
+    let(:queue) { build_queue(owner) }
+
+    it "lets an admin rename the slug" do
+      sign_in_as(admin)
+
+      patch letter_queue_path(queue), params: { letter_queue: queue_params(slug: "renamed") }
+
+      expect(queue.reload.slug).to eq("renamed")
+    end
+
+    it "ignores a slug from a non-admin" do
+      sign_in_as(owner)
+      before_slug = queue.slug
+
+      patch letter_queue_path(queue), params: { letter_queue: queue_params(slug: "renamed") }
+
+      expect(queue.reload.slug).to eq(before_slug)
+    end
+
+    it "lets an admin rename an instant queue slug" do
+      instant = build_instant_queue(owner)
+      sign_in_as(admin)
+
+      patch letter_instant_queue_path(instant), params: {
+        letter_instant_queue: queue_params(slug: "renamed-instant", template: "hackatime_template", postage_type: "stamps")
+      }
+
+      expect(instant.reload.slug).to eq("renamed-instant")
+    end
+
+    it "ignores an instant queue slug from a non-admin" do
+      instant = build_instant_queue(owner)
+      sign_in_as(owner)
+      before_slug = instant.slug
+
+      patch letter_instant_queue_path(instant), params: {
+        letter_instant_queue: queue_params(slug: "renamed-instant", template: "hackatime_template", postage_type: "stamps")
+      }
+
+      expect(instant.reload.slug).to eq(before_slug)
     end
   end
 end
