@@ -130,6 +130,39 @@ RSpec.describe Warehouse::Batch do
       expect(HCB::Transfer.count).to eq(1)
     end
 
+    it "does not dispatch the same order twice when two requests race" do
+      calls = 0
+      racer = nil
+      allow(Zenventory).to receive(:create_customer_order) do
+        calls += 1
+        racer = Warehouse::Batch.find(batch.id).process! if calls == 1
+        { id: 1000 + calls }
+      end
+
+      expect(batch.process!).to be_truthy
+      expect(racer).to be(false)
+      expect(calls).to eq(3)
+      expect(batch.reload.originated_orders.dispatched.count).to eq(3)
+    end
+
+    it "refuses a batch that isn't mapped yet" do
+      stub_zenventory
+      batch.update!(aasm_state: "processed")
+
+      expect(batch.process!).to be(false)
+      expect(batch.errors.full_messages.join).to match(/can't be processed/i)
+      expect(Zenventory).not_to have_received(:create_customer_order)
+    end
+
+    it "refuses a batch with no addresses" do
+      stub_zenventory
+      batch.addresses.destroy_all
+
+      expect(batch.process!).to be(false)
+      expect(batch.errors.full_messages.join).to match(/no addresses/i)
+      expect(batch.reload).to be_fields_mapped
+    end
+
     it "refuses the whole batch when a row can't be mailed" do
       stub_zenventory
       batch.addresses.first.update!(country: "RU") # warehouse won't ship there

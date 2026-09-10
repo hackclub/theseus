@@ -85,25 +85,73 @@ class Warehouse::Batch < Batch
   # phase here reconciles against what's already on disk instead of assuming a
   # clean slate.
   def process!(options = {})
-    return false unless fields_mapped?
+    unless fields_mapped?
+      errors.add(:base, "This batch can't be processed while it's #{aasm_state.humanize.downcase}.")
+      return false
+    end
 
-    undispatched = reconcile_orders!
-    return false if undispatched.nil?
+    unless addresses.exists?
+      errors.add(:base, "This batch has no addresses to process.")
+      return false
+    end
 
-    undispatched.each(&:dispatch!)
+    if Flipper.enabled?(:require_billing_profile_2026_09_08) && billing_profile.blank?
+      errors.add(:base, "Pick a billing profile before processing this batch.")
+      return false
+    end
 
-    # One charge for the whole batch's labor. `unclaimed` makes this idempotent:
-    # entries a previous run already claimed belong to a transfer and won't be
-    # picked up again. If a transfer is in flight the entries stay unclaimed and
-    # the sweep batches them.
-    if billing_profile.present?
-      Billing.charge!(
-        LedgerEntry.unclaimed.charges.labor.where(ledgerable: originated_orders),
-        name: "Labor for batch #{public_id}",
-      )
+    unless claim_for_dispatch!
+      errors.add(:base, "This batch is already being processed.")
+      return false
+    end
+
+    begin
+      undispatched = reconcile_orders!
+      if undispatched.nil?
+        release_dispatch_claim!
+        return false
+      end
+
+      undispatched.each(&:dispatch!)
+
+      # One charge for the whole batch's labor. `unclaimed` makes this idempotent:
+      # entries a previous run already claimed belong to a transfer and won't be
+      # picked up again. If a transfer is in flight the entries stay unclaimed and
+      # the sweep batches them.
+      if billing_profile.present?
+        Billing.charge!(
+          LedgerEntry.unclaimed.charges.labor.where(ledgerable: originated_orders),
+          name: "Labor for batch #{public_id}",
+        )
+      end
+    rescue StandardError
+      release_dispatch_claim!
+      raise
     end
 
     mark_processed!
+  end
+
+  # dispatch! POSTs to Zenventory before it takes its own row lock, so two
+  # concurrent process! calls would create the same order in the warehouse
+  # twice. Moving the batch out of fields_mapped with a conditional UPDATE lets
+  # exactly one caller past, and unlike a row lock it doesn't hold a transaction
+  # open across the HTTP round trips.
+  DISPATCH_CLAIM_STATE = "purchasing"
+
+  private def claim_for_dispatch!
+    claimed = self.class.where(id: id, aasm_state: "fields_mapped")
+                  .update_all(aasm_state: DISPATCH_CLAIM_STATE, updated_at: Time.current)
+    return false if claimed.zero?
+
+    reload
+    true
+  end
+
+  private def release_dispatch_claim!
+    self.class.where(id: id, aasm_state: DISPATCH_CLAIM_STATE)
+        .update_all(aasm_state: "fields_mapped", updated_at: Time.current)
+    reload
   end
 
   # Brings the batch's orders in line with its addresses and returns the ones
@@ -123,7 +171,7 @@ class Warehouse::Batch < Batch
   # twice.
   private def reconcile_orders!
     with_lock do
-      next nil unless fields_mapped?
+      next nil unless aasm_state == DISPATCH_CLAIM_STATE
 
       # origin_batch_id sticks to an order for life, so it's the honest answer
       # to "did this batch already produce an order for this address?" — and it

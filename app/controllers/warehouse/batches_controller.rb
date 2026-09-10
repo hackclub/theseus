@@ -1,5 +1,6 @@
 class Warehouse::BatchesController < BaseBatchesController
   before_action :set_allowed_templates, only: %i[ new create edit update ]
+  before_action :ensure_processable, only: %i[ process_form process_batch ]
 
   # GET /warehouse/batches
   def index
@@ -156,6 +157,19 @@ class Warehouse::BatchesController < BaseBatchesController
 
   def batch_params
     params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
+  end
+
+  def ensure_processable
+    return if @batch.fields_mapped?
+
+    alert = if @batch.processed?
+      "This batch has already been processed."
+    elsif @batch.awaiting_field_mapping?
+      "Map this batch's CSV fields before processing it."
+    else
+      "This batch is already being processed."
+    end
+    redirect_to warehouse_batch_path(@batch), alert: alert
   end
 
   def set_allowed_templates

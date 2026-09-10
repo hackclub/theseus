@@ -105,6 +105,19 @@ RSpec.describe "warehouse batches", type: :request do
       expect(response.body).not_to include("batch[hcb_payment_account_id]")
     end
 
+    it "sends an already-processed batch back to the batch with a message" do
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.update!(aasm_state: "processed")
+
+      get process_confirm_warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been processed")
+
+      post process_batch_warehouse_batch_path(batch)
+      expect(response).to redirect_to(warehouse_batch_path(batch))
+      expect(flash[:alert]).to include("already been processed")
+    end
+
     it "re-renders the page instead of raising when process! fails" do
       batch.mark_fields_mapped!
       allow_any_instance_of(Warehouse::Batch).to receive(:process!) { |b| b.errors.add(:base, "nope"); false }
