@@ -256,7 +256,7 @@ class Views::Letter::Batches::Show < Views::Base
         p(class: "reprint-warning-text") do
           strong { "Only reprint if the original was damaged, misprinted, or lost before mailing." }
         end
-        form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
+        form_with(url: print_subset_letter_batch_path(@batch), method: :post, data: { turbo_confirm: "These labels carry indicia that have already been paid for. Reprint anyway?" }, class: "form-inline") do
           div(class: "action-row mt-half") do
             input(type: "number", name: "count", value: "1", min: "1", max: @batch.letters.count.to_s, class: "w-4rem")
             plain " letters from the start"
@@ -369,7 +369,7 @@ class Views::Letter::Batches::Show < Views::Base
           input(type: "hidden", name: "letter_ids", "data-picklist-ids": true)
           button(type: "submit", class: "btn-sm", "data-picklist-action": true, disabled: true) { "✓ Printed" }
         end
-        form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+        form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, data: { turbo_confirm: "Mark the selected letters as mailed?" }, class: "form-inline") do
           input(type: "hidden", name: "letter_ids", "data-picklist-ids": true)
           button(type: "submit", class: "btn-sm", "data-picklist-action": true, disabled: true) { "✉ Mailed" }
         end

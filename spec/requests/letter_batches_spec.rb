@@ -151,6 +151,15 @@ RSpec.describe "letter batches", type: :request do
       expect(response.body).to include("instant_print_root")
     end
 
+    it "confirms before mailing a selection or reprinting paid indicia" do
+      letters.each { |l| l.update!(postage_type: "indicia", indicia_state: "purchased", printed_at: Time.current) }
+
+      get letter_batch_path(processed)
+
+      expect(response.body).to include("Mark the selected letters as mailed?")
+      expect(response.body).to include("Reprint anyway?")
+    end
+
     it "renders the picklist for a processed batch" do
       get letter_batch_path(processed)
 
