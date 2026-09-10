@@ -26,6 +26,8 @@ class SessionsController < ApplicationController
   end
 
   def stop_impersonating
+    return redirect_to root_path unless session[:impersonator_user_id]
+
     session[:user_id] = session[:impersonator_user_id]
     session[:impersonator_user_id] = nil
     redirect_to root_path, notice: "welcome back, 007!"
