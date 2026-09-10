@@ -57,7 +57,7 @@ class Views::APIKeys::Show < Views::Base
       hr
       div(class: "mt-half") do
         div(class: "flex-row") do
-          code(data_copy_to_clipboard: api_key.token) { api_key.token }
+          code(class: "pointer", data_copy_to_clipboard: api_key.token) { api_key.abbreviated }
           button(
             class: "btn-sm",
             data_copy_to_clipboard: api_key.token,
@@ -105,6 +105,13 @@ class Views::APIKeys::Show < Views::Base
       div(class: "detail-grid mt-half") do
         span(class: "detail-label") { "PII Access" }
         if api_key.pii
+          span(class: "text-success") { "✓ Enabled" }
+        else
+          span(class: "text-muted") { "✗ Disabled" }
+        end
+
+        span(class: "detail-label") { "QZ Tray Only" }
+        if api_key.qz_only?
           span(class: "text-success") { "✓ Enabled" }
         else
           span(class: "text-muted") { "✗ Disabled" }

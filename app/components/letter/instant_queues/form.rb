@@ -118,6 +118,7 @@ render Components::Shared::ErrorMessages.new(record: queue)
       # QR Code
       div(class: "form-field-lg") do
         checked = queue.include_qr_code.nil? ? true : queue.include_qr_code
+        input(type: :hidden, name: "letter_instant_queue[include_qr_code]", value: "0")
         label(class: "form-check-label") do
           input(
             type: :checkbox, name: "letter_instant_queue[include_qr_code]",
@@ -125,7 +126,6 @@ render Components::Shared::ErrorMessages.new(record: queue)
           )
           span { "Include QR Code" }
         end
-        input(type: :hidden, name: "letter_instant_queue[include_qr_code]", value: "0")
       end
 
       # Admin slug

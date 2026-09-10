@@ -163,25 +163,41 @@ class Letter::QueuesController < ApplicationController
     end
   end
 
+  QUEUE_ATTRIBUTES = %i[
+    name
+    type
+    letter_height
+    letter_width
+    letter_weight
+    letter_processing_category
+    letter_mailer_id_id
+    letter_return_address_id
+    letter_return_address_name
+    user_facing_title
+    template
+    postage_type
+    usps_payment_account_id
+    include_qr_code
+    letter_mailing_date
+  ].freeze
+
   # Only allow a list of trusted parameters through.
   def letter_queue_params
-    params.require(:letter_queue).permit(
-      :name,
-      :type,
-      :letter_height,
-      :letter_width,
-      :letter_weight,
-      :letter_processing_category,
-      :letter_mailer_id_id,
-      :letter_return_address_id,
-      :letter_return_address_name,
-      :user_facing_title,
-      :template,
-      :postage_type,
-      :usps_payment_account_id,
-      :include_qr_code,
-      :letter_mailing_date,
-      tags: [],
-    )
+    scoped_return_address(params.require(:letter_queue).permit(*admin_scoped(QUEUE_ATTRIBUTES), tags: []))
+  end
+
+  # The slug field is only rendered inside `admin_tool`.
+  def admin_scoped(attributes)
+    current_user&.admin? ? attributes + [ :slug ] : attributes
+  end
+
+  def scoped_return_address(attributes)
+    return attributes if current_user&.admin?
+
+    id = attributes[:letter_return_address_id]
+    return attributes if id.blank?
+    return attributes if ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).exists?(id: id)
+
+    attributes.except(:letter_return_address_id)
   end
 end

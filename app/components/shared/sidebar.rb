@@ -11,7 +11,6 @@ class Components::Shared::Sidebar < Components::Base
   end
 
   def view_template
-    render_mobile_toggle
     render_overlay
 
     nav(class: "theseus-sidebar", id: "sidebar") do
@@ -108,12 +107,6 @@ class Components::Shared::Sidebar < Components::Base
     end
   end
 
-  def render_mobile_toggle
-    button(
-      class: "sidebar-toggle btn-sm",
-      onclick: safe("toggleSidebar()")
-    ) { "☰" }
-  end
 
   def render_overlay
     div(class: "sidebar-overlay", onclick: safe("toggleSidebar()"))

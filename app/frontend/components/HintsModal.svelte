@@ -2,15 +2,12 @@
   import { onMount, onDestroy } from 'svelte';
 
   let isOpen = $state(false);
-  let hints = $state([]);
-  let slugs = $state([]);
   let dialogEl;
   let cleanup;
 
   function open() {
     isOpen = true;
     dialogEl?.showModal();
-    markSeen();
   }
 
   function close() {
@@ -18,34 +15,7 @@
     dialogEl?.close();
   }
 
-  async function markSeen() {
-    if (slugs.length === 0) return;
-    try {
-      await fetch('/back_office/hints/mark_seen', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content
-        },
-        body: JSON.stringify({ slugs })
-      });
-    } catch (err) {
-      console.error('Failed to mark hints as seen:', err);
-    }
-  }
-
   onMount(() => {
-    const dataEl = document.getElementById('hints-data');
-    if (dataEl) {
-      try {
-        const data = JSON.parse(dataEl.textContent);
-        hints = data.hints || [];
-        slugs = data.slugs || [];
-      } catch (err) {
-        console.error('Failed to parse hints data:', err);
-      }
-    }
-
     window.openHints = open;
 
     function handleKeyDown(e) {
@@ -95,23 +65,6 @@
         </div>
       {/each}
     </div>
-
-    {#if hints.length > 0}
-      <hr>
-      <span style="color: var(--foreground2);">This page</span>
-      <div class="hints-grid">
-        {#each hints as hint}
-          {#each hint.shortcuts as shortcut}
-            <div class="kbar-row">
-              {#each shortcut.keys as key}
-                <kbd>{key}</kbd>
-              {/each}
-              {shortcut.action}
-            </div>
-          {/each}
-        {/each}
-      </div>
-    {/if}
 
     <hr>
     <div class="kbar-row" style="color: var(--foreground2);">

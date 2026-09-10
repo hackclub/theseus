@@ -22,4 +22,29 @@ RSpec.describe "API keys", type: :request do
     expect(response).to redirect_to(api_key_path(api_key))
     expect(api_key.reload).to be_revoked
   end
+
+  it "offers the qz_only checkbox to admins and permits it" do
+    admin = create_admin
+    sign_in_as(admin)
+
+    get new_api_key_path
+    expect(response.body).to include(%(name="api_key[qz_only]"))
+
+    post api_keys_path, params: { api_key: { name: "printer", qz_only: "1" } }
+    expect(APIKey.order(:id).last).to be_qz_only
+  end
+
+  it "hides the qz_only checkbox from non-admins" do
+    get new_api_key_path
+
+    expect(response.body).not_to include(%(name="api_key[qz_only]"))
+  end
+
+  it "shows the abbreviated token, with the full one only in the copy attribute" do
+    get api_key_path(api_key)
+
+    expect(response.body).to include(api_key.abbreviated)
+    expect(response.body).to include(%(data-copy-to-clipboard="#{api_key.token}"))
+    expect(response.body).not_to match(/>\s*#{Regexp.escape(api_key.token)}\s*</)
+  end
 end

@@ -3,6 +3,7 @@ import '@hotwired/turbo-rails'
 import '~/js/click-to-copy.js'
 import '~/js/mount-svelte.js'
 import '~/js/grid-picklist.js'
+import '~/js/turbo-confirm.js'
 window.Alpine = Alpine
 Alpine.start()
 
