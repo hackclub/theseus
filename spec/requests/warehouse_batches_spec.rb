@@ -105,6 +105,25 @@ RSpec.describe "warehouse batches", type: :request do
       expect(response.body).not_to include("batch[hcb_payment_account_id]")
     end
 
+    it "shows the billing profile form when the profile is still required" do
+      Flipper.enable(:require_billing_profile_2026_09_08)
+      batch.update!(billing_profile: nil)
+      batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
+      batch.mark_fields_mapped!
+
+      get process_confirm_warehouse_batch_path(batch)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("Billing profile is required")
+      expect(response.body).to include("batch[hcb_payment_account_id]")
+
+      post process_batch_warehouse_batch_path(batch)
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("Pick a billing profile")
+      expect(batch.reload).to be_fields_mapped
+    ensure
+      Flipper.disable(:require_billing_profile_2026_09_08)
+    end
+
     it "sends an already-processed batch back to the batch with a message" do
       batch.addresses.create!(first_name: "Alice", last_name: "S", line_1: "1 Main St", city: "Burlington", state: "VT", postal_code: "05401", country: "US", email: "alice@example.com")
       batch.update!(aasm_state: "processed")

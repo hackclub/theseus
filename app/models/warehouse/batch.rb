@@ -191,17 +191,28 @@ class Warehouse::Batch < Batch
 
   # Surfaces every unmailable row at once instead of blowing up on the first one.
   def preflight(new_orders = addresses.map { |address| build_order_for(address) })
-    invalid = new_orders.reject(&:valid?)
-    return true if invalid.empty?
-
-    invalid.first(PREFLIGHT_ERROR_LIMIT).each do |order|
-      errors.add(:base, "#{order.address.name_line}: #{order.errors.full_messages.to_sentence}")
+    problems = new_orders.filter_map do |order|
+      messages = mailability_errors(order)
+      [ order, messages ] if messages.any?
     end
-    if invalid.size > PREFLIGHT_ERROR_LIMIT
-      errors.add(:base, "...and #{invalid.size - PREFLIGHT_ERROR_LIMIT} more rows with problems.")
+    return true if problems.empty?
+
+    problems.first(PREFLIGHT_ERROR_LIMIT).each do |order, messages|
+      errors.add(:base, "#{order.address.name_line}: #{messages.to_sentence}")
+    end
+    if problems.size > PREFLIGHT_ERROR_LIMIT
+      errors.add(:base, "...and #{problems.size - PREFLIGHT_ERROR_LIMIT} more rows with problems.")
     end
 
     false
+  end
+
+  # The billing profile is picked on the process page, which is the page this
+  # runs for: holding its absence against every row would hide the form that
+  # sets it. process! refuses without one instead.
+  private def mailability_errors(order)
+    order.valid?
+    order.errors.reject { |error| error.attribute == :billing_profile }.map(&:full_message)
   end
 
   private def build_order_for(address)
