@@ -88,6 +88,12 @@ class Letter::BatchesController < BaseBatchesController
     authorize Letter::Batch, policy_class: Letter::BatchPolicy
     @batch = Letter::Batch.new(batch_params.merge(user: current_user))
 
+    unless return_address_available?(@batch.letter_return_address_id)
+      @batch.errors.add(:letter_return_address, "isn't available to you")
+      render Views::Letter::Batches::New.new(batch: @batch), status: :unprocessable_entity
+      return
+    end
+
     if @batch.save
       redirect_to map_fields_letter_batch_path(@batch)
     else
@@ -98,6 +104,12 @@ class Letter::BatchesController < BaseBatchesController
   # PATCH /letter/batches/:id
   def update
     authorize @batch, policy_class: Letter::BatchPolicy
+
+    unless return_address_available?(batch_params[:letter_return_address_id])
+      redirect_to edit_letter_batch_path(@batch), alert: "That return address isn't available to you."
+      return
+    end
+
     if @batch.update(batch_params)
       validate_postage_types
       if @batch.errors.any?
@@ -166,8 +178,7 @@ class Letter::BatchesController < BaseBatchesController
         usps_payment_account_id: letter_batch_params[:usps_payment_account_id],
         hcb_payment_account_id: letter_batch_params[:hcb_payment_account_id],
         non_machinable: letter_batch_params[:non_machinable],
-        template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank.presence ||
-          [ SnailMail::PhlexService.templates_for_size(:standard).first ].compact,
+        template_cycle: template_cycle_from(letter_batch_params[:template_cycle]),
         user_facing_title: letter_batch_params[:user_facing_title],
         include_qr_code: letter_batch_params[:include_qr_code]
       }
@@ -210,20 +221,29 @@ class Letter::BatchesController < BaseBatchesController
 
   def mark_mailed
     authorize @batch, :mark_mailed?, policy_class: Letter::BatchPolicy
-    if @batch.processed?
-      @batch.letters.each do |letter|
-        letter.mark_mailed! if letter.may_mark_mailed?
-      end
-      User::UpdateTasksJob.perform_later(current_user)
-      redirect_to letter_batch_path(@batch), notice: "All letters have been marked as mailed."
-    else
+    unless @batch.processed?
       redirect_to letter_batch_path(@batch), status: :see_other, alert: "Cannot mark letters as mailed. Batch must be processed."
+      return
     end
+
+    ids = selected_letter_ids
+    letters = ids.any? ? @batch.letters.where(id: ids) : @batch.letters
+    count = 0
+
+    letters.find_each do |letter|
+      if letter.may_mark_mailed?
+        letter.mark_mailed!
+        count += 1
+      end
+    end
+
+    User::UpdateTasksJob.perform_later(current_user)
+    redirect_to letter_batch_path(@batch), notice: "Marked #{count} letters as mailed."
   end
 
   def print_subset
     authorize @batch, :show?, policy_class: Letter::BatchPolicy
-    result = Letter::PrintLabels.new(batch: @batch, letter_ids: params[:letter_ids], count: params[:count] || 100).call
+    result = Letter::PrintLabels.new(batch: @batch, letter_ids: selected_letter_ids, count: params[:count] || 100).call
     session[:last_print_letter_ids] = result[:letter_ids]
     send_data result[:pdf_data],
       filename: "batch_#{@batch.public_id}_#{result[:count]}letters.pdf",
@@ -236,7 +256,7 @@ class Letter::BatchesController < BaseBatchesController
   def confirm_printed
     authorize @batch, :mark_printed?, policy_class: Letter::BatchPolicy
 
-    letter_ids = params[:letter_ids] || session.delete(:last_print_letter_ids) || []
+    letter_ids = selected_letter_ids.presence || session.delete(:last_print_letter_ids) || []
     letters = @batch.letters.where(id: letter_ids)
     count = 0
 
@@ -325,9 +345,10 @@ class Letter::BatchesController < BaseBatchesController
 
   def regenerate_labels
     authorize @batch, :process_batch?, policy_class: Letter::BatchPolicy
+    opts = params.fetch(:batch, {}).permit(:template_cycle, :include_qr_code, template_cycle: [])
     @batch.regenerate_labels!(
-      template_cycle: letter_batch_params[:template_cycle].to_s.split(",").compact_blank,
-      include_qr_code: letter_batch_params[:include_qr_code],
+      template_cycle: template_cycle_from(opts[:template_cycle]),
+      include_qr_code: opts[:include_qr_code],
     )
     redirect_to letter_batch_path(@batch), notice: "Labels regenerated successfully"
   end
@@ -341,6 +362,20 @@ class Letter::BatchesController < BaseBatchesController
   private
 
   def batch_scope = policy_scope(Letter::Batch, policy_scope_class: Letter::BatchPolicy::Scope)
+
+  # The picker only ever offers these, so anything else is someone else's
+  # private sender.
+  def return_address_available?(id)
+    return true if id.blank?
+    return true if current_user&.is_admin?
+    ReturnAddress.shared.or(ReturnAddress.owned_by(current_user)).exists?(id: id)
+  end
+
+  # The picklist ships one hidden field holding "12,13,14"; a plain form can
+  # also send letter_ids[]. Accept either.
+  def selected_letter_ids
+    Array(params[:letter_ids]).flat_map { |v| v.to_s.split(",") }.compact_blank
+  end
 
   def batch_params
     permitted = params.require(:letter_batch).permit(
@@ -382,8 +417,16 @@ class Letter::BatchesController < BaseBatchesController
       :template_cycle,
       :non_machinable,
       tags: [],
+      template_cycle: [],
     )
     normalize_processing_category(permitted)
+  end
+
+  # The process form posts template_cycle[]; the regenerate form posts a
+  # comma-joined string built by the JS picker.
+  def template_cycle_from(value)
+    Array(value).flat_map { |v| v.to_s.split(",") }.compact_blank.presence ||
+      [ SnailMail::PhlexService.templates_for_size(:standard).first ].compact
   end
 
   def normalize_processing_category(permitted)

@@ -24,12 +24,19 @@ class Views::Letter::Batches::Show < Views::Base
       end
       div(class: "show-sidebar") do
         actions_box
+        instant_print_box
         stats_box
       end
     end
   end
 
   private
+
+  # Letter::Batch#model_name reports "Batch", so Pundit's inference lands on the
+  # warehouse BatchPolicy. Name the policy the controller uses.
+  def may_destroy?
+    ::Letter::BatchPolicy.new(current_user, @batch).destroy?
+  end
 
   def show_progress?
     @batch.purchasing? || @batch.generating_labels? || @batch.processed?
@@ -66,7 +73,7 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def purchasing_grid_cells
-    @batch.letters.select(:id, :public_id, :indicia_state).map do |letter|
+    @batch.letters.select(:id, :indicia_state).map do |letter|
       state = letter.indicia_state || "pending"
       icon = case state
       when "purchased" then "✓"
@@ -99,8 +106,10 @@ class Views::Letter::Batches::Show < Views::Base
             button(class: "btn-success btn-sm") { "▶ Process" }
           end
         end
-        form_with(url: letter_batch_path(@batch), method: :delete, data: { turbo_confirm: "Delete this batch?" }, class: "form-inline") do
-          button(type: "submit", class: "btn-danger btn-sm") { "✕" }
+        if may_destroy?
+          form_with(url: letter_batch_path(@batch), method: :delete, data: { turbo_confirm: "Delete this batch?" }, class: "form-inline") do
+            button(type: "submit", class: "btn-danger btn-sm") { "✕" }
+          end
         end
       end
     end
@@ -197,7 +206,14 @@ class Views::Letter::Batches::Show < Views::Base
           end
 
           hr
-          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+          # QZ's print button clicks #mark_printed once the spooler accepts the
+          # job, so this one deliberately has no confirm.
+          if @batch.letters.where(aasm_state: "pending").exists?
+            form_with(url: mark_printed_letter_batch_path(@batch), method: :post, class: "form-inline mb-075") do
+              button(type: "submit", id: "mark_printed", class: "btn-sm w-100") { "✓ Mark all printed" }
+            end
+          end
+          form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, data: { turbo_confirm: "Mark every letter in this batch as mailed?" }, class: "form-inline") do
             button(type: "submit", class: "btn-sm w-100") { "✉ Mark all mailed" }
           end
         end
@@ -215,6 +231,16 @@ class Views::Letter::Batches::Show < Views::Base
     end
   end
 
+  def instant_print_box
+    return unless @batch.processed? && @batch.pdf_label.attached?
+    return unless @batch.letters.where.not(aasm_state: "mailed").exists?
+
+    raw helpers.render(
+      partial: "shared/instant_print_window",
+      locals: { url: rails_blob_path(@batch.pdf_label, disposition: :inline) }
+    )
+  end
+
   def reprint_warning
     details(class: "my-quarter") do
       summary(class: "reprint-toggle") { "⚠ Reprint letters…" }
@@ -230,7 +256,7 @@ class Views::Letter::Batches::Show < Views::Base
         p(class: "reprint-warning-text") do
           strong { "Only reprint if the original was damaged, misprinted, or lost before mailing." }
         end
-        form_with(url: print_subset_letter_batch_path(@batch), method: :post, class: "form-inline") do
+        form_with(url: print_subset_letter_batch_path(@batch), method: :post, data: { turbo_confirm: "These labels carry indicia that have already been paid for. Reprint anyway?" }, class: "form-inline") do
           div(class: "action-row mt-half") do
             input(type: "number", name: "count", value: "1", min: "1", max: @batch.letters.count.to_s, class: "w-4rem")
             plain " letters from the start"
@@ -301,16 +327,17 @@ class Views::Letter::Batches::Show < Views::Base
   end
 
   def picklist_section
-    rows = @batch.letters.joins(:address).order("letters.id")
-      .pluck("letters.id", "letters.public_id", "letters.printed_at", "letters.indicia_state",
-             "addresses.first_name", "addresses.last_name", "addresses.city", "addresses.state")
+    rows = @batch.letters.joins(:address).order("letters.id").select(
+      "letters.id, letters.printed_at, letters.indicia_state",
+      "addresses.first_name, addresses.last_name, addresses.city, addresses.state"
+    )
 
-    cells = rows.map do |id, pub_id, printed_at, istate, fname, lname, city, state|
-      name = [ fname, lname ].compact_blank.join(" ")
-      loc = [ city, state ].compact_blank.join(", ")
-      state_class = printed_at ? "purchased" : "pending"
-      state_class = "failed" if istate == "failed"
-      { id: "pick-#{id}", letter_id: id, state: state_class, title: "#{name} — #{loc} (#{pub_id})" }
+    cells = rows.map do |letter|
+      name = [ letter.first_name, letter.last_name ].compact_blank.join(" ")
+      loc = [ letter.city, letter.state ].compact_blank.join(", ")
+      state_class = letter.printed_at ? "purchased" : "pending"
+      state_class = "failed" if letter.indicia_state == "failed"
+      { id: "pick-#{letter.id}", letter_id: letter.id, state: state_class, title: "#{name} — #{loc} (#{letter.public_id})" }
     end
 
     div("data-picklist-container": true, class: "mb-1h") do
@@ -342,7 +369,7 @@ class Views::Letter::Batches::Show < Views::Base
           input(type: "hidden", name: "letter_ids", "data-picklist-ids": true)
           button(type: "submit", class: "btn-sm", "data-picklist-action": true, disabled: true) { "✓ Printed" }
         end
-        form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, class: "form-inline") do
+        form_with(url: mark_mailed_letter_batch_path(@batch), method: :post, data: { turbo_confirm: "Mark the selected letters as mailed?" }, class: "form-inline") do
           input(type: "hidden", name: "letter_ids", "data-picklist-ids": true)
           button(type: "submit", class: "btn-sm", "data-picklist-action": true, disabled: true) { "✉ Mailed" }
         end

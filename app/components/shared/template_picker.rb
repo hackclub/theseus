@@ -13,7 +13,7 @@ class Components::Shared::TemplatePicker < Components::Base
   def view_template
     div(class: "mb-1") do
       select(
-        name: "#{form.object_name}[#{name}]",
+        name: field_name,
         id: "template-picker-select",
         class: "w-100"
       ) do
@@ -33,6 +33,12 @@ class Components::Shared::TemplatePicker < Components::Base
   private
 
   attr_reader :form, :name, :selected, :show_all
+
+  # A scopeless form_with(url:) has no object name, and "[template]" isn't a
+  # param name anything can read.
+  def field_name
+    form.object_name.presence ? "#{form.object_name}[#{name}]" : name.to_s
+  end
 
   def templates
     names = show_all ? Registry.available_templates : Registry.available_single_templates
