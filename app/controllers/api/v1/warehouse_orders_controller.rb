@@ -4,6 +4,7 @@ module API
       include AddressParameterParsing
 
       before_action :set_warehouse_order, only: [ :show ]
+      before_action :replay_idempotent_order, only: [ :create, :from_template ]
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         render json: { error: "Warehouse order not found" }, status: :not_found
@@ -25,8 +26,10 @@ module API
       end
 
       def from_template
-        @template = Warehouse::Template.find_by_public_id!(params[:template_id])
-        raise ActiveRecord::RecordNotFound unless @template.public? || @template.user == current_user || current_user.admin?
+        @template = Warehouse::Template.find_by_public_id(params[:template_id])
+        unless @template && (@template.public? || @template.user == current_user || current_user.admin?)
+          return render json: { error: "Template not found" }, status: :not_found
+        end
         billing_profile = resolve_billing_profile
         return if performed?
 
@@ -100,6 +103,20 @@ module API
         @warehouse_order = policy_scope(Warehouse::Order).find_by!(hc_id: params[:id])
       end
 
+      # The order is committed before dispatch! talks to Zenventory, so a failed
+      # dispatch leaves a draft holding the idempotency key. Rolling it back
+      # would let a retry create a second Zenventory order for a POST that may
+      # have landed; hand back the draft the first call already made instead.
+      def replay_idempotent_order
+        key = params[:warehouse_order].try(:[], :idempotency_key)
+        return if key.blank?
+
+        @warehouse_order = Warehouse::Order.find_by(user: current_user, idempotency_key: key)
+        return if @warehouse_order.nil?
+
+        render :show, status: :ok
+      end
+
       def warehouse_order_params
         params.require(:warehouse_order).permit(
           :recipient_email,
@@ -121,6 +138,10 @@ module API
           id = params[:billing_profile_id]
           current_user.billing_profiles.find_by(id: id) ||
             BillingProfile.find_by_public_id(id)&.then { |p| p if p.user == current_user }
+        elsif impersonating?
+          # The order belongs to the impersonated user and Warehouse::Order
+          # insists the profile does too, so the key owner's default is a 422.
+          nil
         else
           current_token.billing_profile
         end
