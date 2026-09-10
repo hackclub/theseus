@@ -2,7 +2,7 @@ class WarehouseTemplatesToolbox < ApplicationToolbox
   before_action :require_warehouse!
   before_action :set_template, except: [ :list ]
 
-  default_param :template_id, :string, "Template ID (e.g. wot_...)", except: [ :list ]
+  default_param :template_id, :string, "Template ID (e.g. wot!...)", except: [ :list ]
 
   tool "List saved warehouse order templates (shared + your own). Templates are pre-configured item lists for quickly creating package orders", access: :read do
     param :page, :integer, "Page number", optional: true

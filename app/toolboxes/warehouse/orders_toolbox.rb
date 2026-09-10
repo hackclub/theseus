@@ -6,7 +6,7 @@ module Warehouse
     before_action :set_order, except: [ :search, :create, :create_from_template ]
     before_action :require_owner_or_admin!, only: [ :update, :send_to_warehouse, :cancel, :destroy ]
 
-    default_param :order_id, :string, "Order ID (e.g. pkg_...)", except: [ :search, :create, :create_from_template ]
+    default_param :order_id, :string, "Order ID (e.g. pkg!...)", except: [ :search, :create, :create_from_template ]
 
     tool "Search warehouse package orders by keyword with optional state filter. Returns paginated list with recipient, status, and tracking", access: :read do
       param :query, :string, "Search term (matches order ID, recipient email, title, tags, address name)", optional: true
@@ -51,7 +51,7 @@ module Warehouse
     end
 
     tool "Create a warehouse package order from a saved template of pre-configured items", access: :write do
-      param :template_id, :string, "Template ID (e.g. wot_...)"
+      param :template_id, :string, "Template ID (e.g. wot!...)"
       param :recipient_email, :string, "Recipient email address"
       param :notify_on_dispatch, :boolean, "Email recipient when order ships", optional: true
       param :billing_profile_id, :string, "Billing profile for charging shipment costs (use postage_billing_profiles to find)", optional: true
