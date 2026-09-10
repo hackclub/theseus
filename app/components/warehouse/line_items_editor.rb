@@ -6,12 +6,14 @@ class Components::Warehouse::LineItemsEditor < Components::Base
     line_items: nil,
     scope: :in_inventory,
     show_unit_cost: false,
+    allow_pending_skus: false,
     add_button_text: "Add Item"
   )
     @form = form
     @line_items = line_items || form.object.line_items
     @scope = scope
     @show_unit_cost = show_unit_cost
+    @allow_pending_skus = allow_pending_skus
     @add_button_text = add_button_text
   end
 
@@ -233,7 +235,11 @@ class Components::Warehouse::LineItemsEditor < Components::Base
         end
 
         input(type: "hidden", ":name": field_name("sku_id"), ":value": "item.sku_id")
-        input(type: "hidden", ":name": field_name("sku_request_id"), ":value": "item.sku_request_id")
+
+        if @allow_pending_skus
+          input(type: "hidden", ":name": field_name("sku_request_id"), ":value": "item.sku_request_id")
+        end
+
         input(type: "hidden", ":name": field_name("quantity"), ":value": "item.quantity")
 
         if @show_unit_cost
@@ -341,6 +347,8 @@ class Components::Warehouse::LineItemsEditor < Components::Base
   end
 
   def pending_sku_requests
+    return [] unless @allow_pending_skus
+
     @pending_sku_requests ||= ::Warehouse::SKURequest.where(aasm_state: %w[submitted approved]).order(:name)
   end
 end

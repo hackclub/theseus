@@ -146,6 +146,9 @@
 
 // ── Line items editor ────────────────────────────────────
 
+// Alpine hasn't booted yet, so keep the editor's pre-hydration markup hidden.
+[x-cloak] { display: none; }
+
 .line-items-editor__list { padding: 0; }
 .line-items-editor__col-stock { width: 8rem; }
 .line-items-editor__col-qty { width: 6rem; }
