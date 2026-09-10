@@ -86,7 +86,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
       # Actions
       div(class: "page-actions") do
-        a(href: letters_path) { button(class: "btn-sm") { "Cancel" } }
+        a(href: letters_path, class: "cancel-link") { "Cancel" }
         button(type: "submit", class: "btn-success") do
           plain letter.persisted? ? "✓ Update Letter" : "✓ Create Letter"
         end

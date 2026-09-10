@@ -26,34 +26,54 @@ render Components::Shared::ErrorMessages.new(record: @batch)
 
         form_with(model: @batch, url: letter_batch_path(@batch), scope: :letter_batch, method: :patch) do |f|
           section(class: "mb-1") do
-            strong { "Letter Specs" }
+            strong { "Always Editable" }
             hr
             div(class: "mt-half") do
-              div(
-                data_svelte_component: "letter-attributes-picker",
-                data_form_scope: "letter_batch",
-                data_is_batch: "true",
-                data_initial_width: @batch.letter_width.to_s,
-                data_initial_height: @batch.letter_height.to_s,
-                data_initial_weight: (@batch.letter_weight || 1).to_s,
-                data_initial_processing_category: (@batch.letter_processing_category || "letter").to_s
-              )
+              div(class: "form-field-lg") do
+                label(class: "date-field-label", for: "letter_batch_user_facing_title") { "Title" }
+                input(
+                  type: "text",
+                  name: "letter_batch[user_facing_title]",
+                  id: "letter_batch_user_facing_title",
+                  value: @batch.user_facing_title,
+                  class: "w-100"
+                )
+                p(class: "form-hint") { "Visible to recipients. Shows in the batch list." }
+              end
+
+              tag_picker(f)
             end
           end
 
-          section(class: "mb-1") do
-            strong { "Sender & Postage" }
-            hr
-            div(class: "mt-half") do
-              sender_fields(f)
+          if @batch.may_mark_processed?
+            section(class: "mb-1") do
+              strong { "Letter Specs" }
+              hr
+              div(class: "mt-half") do
+                div(
+                  data_svelte_component: "letter-attributes-picker",
+                  data_form_scope: "letter_batch",
+                  data_is_batch: "true",
+                  data_initial_width: @batch.letter_width.to_s,
+                  data_initial_height: @batch.letter_height.to_s,
+                  data_initial_weight: (@batch.letter_weight || 1).to_s,
+                  data_initial_processing_category: (@batch.letter_processing_category || "letter").to_s
+                )
+              end
+            end
+
+            section(class: "mb-1") do
+              strong { "Sender & Postage" }
+              hr
+              div(class: "mt-half") do
+                sender_fields(f)
+              end
             end
           end
-
-          tag_picker(f)
 
           div(class: "form-actions-row") do
             button(type: "submit", class: "btn-success") { "✓ Update Batch" }
-            a(href: letter_batch_path(@batch)) { button { "Cancel" } }
+            a(href: letter_batch_path(@batch), class: "cancel-link") { "Cancel" }
           end
         end
       end

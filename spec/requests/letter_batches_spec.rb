@@ -49,6 +49,12 @@ RSpec.describe "letter batches", type: :request do
     expect(batch.reload.process_options["template_cycle"]).to eq(templates)
   end
 
+  it "does not put a submit button in the regenerate form's cancel link" do
+    get regenerate_form_letter_batch_path(batch)
+
+    expect(response.body).not_to include("<button>Cancel</button>")
+  end
+
   it "points the template picker's select-one guard at its own form" do
     get regenerate_form_letter_batch_path(batch)
 
@@ -60,6 +66,27 @@ RSpec.describe "letter batches", type: :request do
     post regenerate_labels_letter_batch_path(batch)
 
     expect(response).to redirect_to(letter_batch_path(batch))
+  end
+
+  describe "the edit form" do
+    it "offers the title and tags, plus specs while the batch can still be processed" do
+      batch.update_columns(aasm_state: "fields_mapped")
+
+      get edit_letter_batch_path(batch)
+
+      expect(response.body).to include('name="letter_batch[user_facing_title]"')
+      expect(response.body).to include('name="letter_batch[letter_return_address_id]"')
+      expect(response.body).not_to include("<button>Cancel</button>")
+    end
+
+    it "hides the specs once the batch is processed" do
+      batch.update_columns(aasm_state: "processed")
+
+      get edit_letter_batch_path(batch)
+
+      expect(response.body).to include('name="letter_batch[user_facing_title]"')
+      expect(response.body).not_to include('name="letter_batch[letter_return_address_id]"')
+    end
   end
 
   describe "picklist bulk actions" do
