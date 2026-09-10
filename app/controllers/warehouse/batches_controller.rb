@@ -1,5 +1,5 @@
 class Warehouse::BatchesController < BaseBatchesController
-  before_action :set_allowed_templates, only: %i[ new create edit ]
+  before_action :set_allowed_templates, only: %i[ new create edit update ]
 
   # GET /warehouse/batches
   def index

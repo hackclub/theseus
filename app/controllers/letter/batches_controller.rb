@@ -101,14 +101,14 @@ class Letter::BatchesController < BaseBatchesController
     if @batch.update(batch_params)
       validate_postage_types
       if @batch.errors.any?
-        render :edit, status: :unprocessable_entity
+        render Views::Letter::Batches::Edit.new(batch: @batch), status: :unprocessable_entity
         return
       end
 
       @batch.propagate_to_letters!
       redirect_to letter_batch_path(@batch), notice: "Batch was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render Views::Letter::Batches::Edit.new(batch: @batch), status: :unprocessable_entity
     end
   end
 
