@@ -86,6 +86,65 @@ RSpec.describe "letter batches", type: :request do
     expect(response.body).to include("Delete this batch?")
   end
 
+  it "creates a new letter batch with CSV upload and redirects to map_fields" do
+    csv_content = "first_name,last_name,address,city,state,zip,country\nJohn,Doe,123 Main,Boston,MA,02101,US\n"
+    csv_file = Rack::Test::UploadedFile.new(
+      StringIO.new(csv_content),
+      "text/csv",
+      original_filename: "test.csv"
+    )
+    return_address = create(:return_address, user: user)
+    mailer_id = create(:usps_mailer_id)
+
+    post letter_batches_path, params: {
+      letter_batch: {
+        csv: csv_file,
+        letter_height: 4.125,
+        letter_width: 9.5,
+        letter_weight: 1,
+        letter_processing_category: "letter",
+        letter_mailer_id_id: user.home_mid_id,
+        letter_return_address_id: return_address.id,
+        user_facing_title: "Test Batch"
+      }
+    }
+
+    expect(response).to redirect_to(map_fields_letter_batch_path(Letter::Batch.last))
+  end
+
+  it "renders the map_fields form with column dropdowns" do
+    batch.csv.attach(
+      io: StringIO.new("first_name,last_name,address,city,state,zip,country\nJohn,Doe,123 Main,Boston,MA,02101,US\n"),
+      filename: "test.csv", content_type: "text/csv"
+    )
+
+    get map_fields_letter_batch_path(batch)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("first_name")
+    expect(response.body).to include("<select")
+  end
+
+  it "renders the process form with letter grid, cost summary, and billing notice" do
+    batch.update_columns(aasm_state: "fields_mapped")
+    create(:letter, batch: batch, user: user)
+    profile = create(:billing_profile, user: user)
+
+    get process_confirm_letter_batch_path(batch)
+
+    expect(response).to have_http_status(:ok)
+  end
+
+  it "transitions letters through states when marking batch as printed" do
+    batch.update_columns(aasm_state: "processed")
+    letters = Array.new(2) { create(:letter, batch: batch, user: user) }
+
+    post mark_printed_letter_batch_path(batch)
+
+    expect(response).to redirect_to(letter_batch_path(batch))
+    expect(letters.map { |l| l.reload.aasm_state }).to all(eq("printed"))
+  end
+
   describe "the edit form" do
     it "offers the title and tags, plus specs while the batch can still be processed" do
       batch.update_columns(aasm_state: "fields_mapped")

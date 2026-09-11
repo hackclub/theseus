@@ -246,6 +246,13 @@ RSpec.describe "warehouse batches", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("nope").and include("Sticker pack")
     end
+
+    it "does not show private templates you don't own" do
+      private_other = Warehouse::Template.create!(name: "Other User's Private", user: create(:user), public: false)
+      
+      get new_warehouse_batch_path
+      expect(response.body).not_to include("Other User's Private")
+    end
   end
 
   describe "authorization" do

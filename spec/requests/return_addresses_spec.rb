@@ -6,7 +6,10 @@ RSpec.describe "Return addresses", type: :request do
   let(:user) { create(:user) }
   let(:other) { create(:user) }
 
-  before { sign_in_as(user) }
+  before do
+    fake_hcb!
+    sign_in_as(user)
+  end
 
   it "sets an address as default through a real POST form" do
     address = create(:return_address, user: user)
@@ -37,5 +40,105 @@ RSpec.describe "Return addresses", type: :request do
 
     patch return_address_path(address), params: { return_address: { shared: "0" } }
     expect(address.reload.shared).to be(false)
+  end
+
+  it "shows index with both shared and owned addresses" do
+    # Create owned address
+    owned = create(:return_address, user: user, name: "My Office")
+    # Create shared address from another user
+    shared = create(:return_address, user: other, shared: true, name: "Shared Desk")
+    # Create another address owned by other but NOT shared
+    other_private = create(:return_address, user: other, shared: false, name: "Private Desk")
+
+    get return_addresses_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("My Office")
+    expect(response.body).to include("Shared Desk")
+    expect(response.body).not_to include("Private Desk")
+  end
+
+  it "shows new form" do
+    get new_return_address_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("form")
+  end
+
+  it "creates a return address with valid params" do
+    post return_addresses_path, params: {
+      return_address: {
+        name: "My Headquarters",
+        line_1: "456 Oak Ave",
+        line_2: "Suite 100",
+        city: "Boston",
+        state: "MA",
+        postal_code: "02101",
+        country: "US"
+      }
+    }
+
+    expect(response).to redirect_to(return_addresses_url)
+    address = ReturnAddress.last
+    expect(address.name).to eq("My Headquarters")
+    expect(address.line_1).to eq("456 Oak Ave")
+    expect(address.city).to eq("Boston")
+    expect(address.user).to eq(user)
+  end
+
+  it "creates a return address from letter form and redirects" do
+    post return_addresses_path, params: {
+      from_letter: "true",
+      return_address: {
+        name: "Letter Office",
+        line_1: "789 Pine St",
+        city: "Denver",
+        state: "CO",
+        postal_code: "80202",
+        country: "US"
+      }
+    }
+
+    expect(response).to redirect_to(new_letter_path)
+    address = ReturnAddress.last
+    expect(address.name).to eq("Letter Office")
+    expect(address.user).to eq(user)
+  end
+
+  it "shows edit form for owned address" do
+    address = create(:return_address, user: user, name: "Editable Address")
+
+    get edit_return_address_path(address)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Editable Address")
+  end
+
+  it "updates a return address with valid params" do
+    address = create(:return_address, user: user, name: "Old Name", city: "Boston")
+
+    patch return_address_path(address), params: {
+      return_address: {
+        name: "New Name",
+        city: "Portland"
+      }
+    }
+
+    expect(response).to redirect_to(return_addresses_url)
+    expect(address.reload.name).to eq("New Name")
+    expect(address.reload.city).to eq("Portland")
+  end
+
+  it "updates a return address from letter form and redirects" do
+    address = create(:return_address, user: user, name: "Letter Address", city: "Seattle")
+
+    patch return_address_path(address), params: {
+      from_letter: "true",
+      return_address: {
+        name: "Updated Letter Address",
+        city: "Portland"
+      }
+    }
+
+    expect(response).to redirect_to(new_letter_path)
+    expect(address.reload.name).to eq("Updated Letter Address")
+    expect(address.reload.city).to eq("Portland")
   end
 end

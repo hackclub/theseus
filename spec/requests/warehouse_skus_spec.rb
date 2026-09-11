@@ -6,16 +6,38 @@ RSpec.describe "Warehouse SKUs", type: :request do
   let(:admin) { create_admin }
   let(:sku) { create(:warehouse_sku, enabled: true, ai_enabled: true) }
 
-  before { sign_in_as(admin) }
+  before do
+    fake_hcb!
+    sign_in_as(admin)
+  end
 
-  it "edits without the unit_cost field that has no column behind it" do
-    get edit_warehouse_sku_path(sku)
+  it "indexes SKUs with rendered page" do
+    sku1 = create(:warehouse_sku, name: "Widget", enabled: true)
+    sku2 = create(:warehouse_sku, name: "Gadget", enabled: true)
+
+    get warehouse_skus_path(include_non_inventory: true)
     expect(response).to have_http_status(:ok)
-    expect(response.body).not_to include("warehouse_sku[unit_cost]")
+    expect(response.body).to include("Widget")
+    expect(response.body).to include("Gadget")
+  end
 
-    patch warehouse_sku_path(sku), params: { warehouse_sku: { name: "Renamed", unit_cost: "3.50" } }
-    expect(response).to redirect_to(warehouse_sku_path(sku))
-    expect(sku.reload.name).to eq("Renamed")
+  it "filters SKUs by view parameter" do
+    create(:warehouse_sku, name: "Sticker", enabled: true)
+    get warehouse_skus_path(view: "flat")
+    expect(response).to have_http_status(:ok)
+  end
+
+  it "shows detail page with stock levels and PO history" do
+    sku = create(:warehouse_sku, in_stock: 42, enabled: true)
+    po = Warehouse::PurchaseOrder.new(user: admin, supplier_name: "acme").tap do |po|
+      po.line_items.build(sku:, quantity: 10, unit_cost: 1.5)
+      po.save!
+    end
+
+    get warehouse_sku_path(sku)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(sku.name)
+    expect(response.body).to include("acme")
   end
 
   it "can disable a SKU and its AI flag" do

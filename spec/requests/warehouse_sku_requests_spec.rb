@@ -20,7 +20,10 @@ RSpec.describe "Warehouse SKU requests", type: :request do
 
   def image = fixture_file_upload("item.png", "image/png")
 
-  before { sign_in_as(user) }
+  before do
+    fake_hcb!
+    sign_in_as(user)
+  end
 
   it "renders the new form as multipart" do
     get new_warehouse_sku_request_path
@@ -44,5 +47,16 @@ RSpec.describe "Warehouse SKU requests", type: :request do
     expect(response).to redirect_to(warehouse_sku_request_path(sku_request))
     expect(sku_request.reload.name).to eq("Sticker II")
     expect(sku_request.image).to be_attached
+  end
+
+  it "shows SKU request page" do
+    sku_request = Warehouse::SKURequest.new(attributes.merge(user:))
+    sku_request.image.attach(image)
+    sku_request.save!
+
+    get warehouse_sku_request_path(sku_request)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(sku_request.name)
+    expect(response.body).to include(sku_request.description)
   end
 end

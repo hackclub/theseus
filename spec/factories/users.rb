@@ -36,4 +36,8 @@ FactoryBot.define do
     association :home_mid, factory: :usps_mailer_id
     association :home_return_address, factory: :return_address
   end
+
+  factory :public_user, class: "Public::User" do
+    sequence(:email) { |n| "public#{n}@test.com" }
+  end
 end

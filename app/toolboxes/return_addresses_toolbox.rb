@@ -5,13 +5,14 @@ class ReturnAddressesToolbox < ApplicationToolbox
     param :page, :integer, "Page number", optional: true
   end
   def list
-    scope = ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
+    scope = admin? ? ReturnAddress.all : ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
     @return_addresses = paginate(scope.order(created_at: :desc))
   end
 
   tool "Show full detail for a sender return address", access: :read do; end
   def show
-    @return_address = ReturnAddress.find(params[:return_address_id])
+    scope = admin? ? ReturnAddress.all : ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
+    @return_address = scope.find(params[:return_address_id])
   end
 
   tool "Create a new sender return address for printing on letter envelopes", access: :write do
@@ -44,7 +45,8 @@ class ReturnAddressesToolbox < ApplicationToolbox
     param :shared, :boolean, "Visible to all users, not just the creator", optional: true
   end
   def update
-    @return_address = ReturnAddress.find(params[:return_address_id])
+    scope = admin? ? ReturnAddress.all : ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
+    @return_address = scope.find(params[:return_address_id])
     unless @return_address.user == current_user || admin?
       halt error: "Forbidden — you can only edit your own return addresses"
     end
@@ -56,7 +58,8 @@ class ReturnAddressesToolbox < ApplicationToolbox
 
   tool "Set a return address as your default for new letters", access: :write do; end
   def set_as_home
-    @return_address = ReturnAddress.find(params[:return_address_id])
+    scope = admin? ? ReturnAddress.all : ReturnAddress.where(shared: true).or(ReturnAddress.where(user: current_user))
+    @return_address = scope.find(params[:return_address_id])
     unless @return_address.user == current_user || @return_address.shared? || admin?
       halt error: "You can only set your own or shared addresses as default"
     end
