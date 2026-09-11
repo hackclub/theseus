@@ -161,7 +161,7 @@ class Warehouse::BatchesController < BaseBatchesController
   def batch_params
     permitted = params.require(:batch).permit(:warehouse_template_id, :warehouse_user_facing_title, :csv, tags: [])
     permitted.delete(:warehouse_template_id) if @batch && !(@batch.fields_mapped? || @batch.failed?)
-    if permitted[:warehouse_template_id].present? && !@allowed_templates.exists?(permitted[:warehouse_template_id])
+    if permitted[:warehouse_template_id].present? && !@allowed_templates.exists?(id: permitted[:warehouse_template_id])
       permitted.delete(:warehouse_template_id)
     end
     permitted

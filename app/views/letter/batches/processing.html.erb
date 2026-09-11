@@ -138,7 +138,7 @@
             <td class="text-muted"><%= t.created_at.strftime("%b %d %H:%M:%S") %></td>
             <td><%= t.direction %></td>
             <td><code><%= t.hq_organization_id %></code></td>
-            <td>$<%= '%.2f' % t.amount %></td>
+            <td><%= number_to_currency(t.amount) %></td>
             <td><code><%= t.state %></code></td>
             <td><code><%= t.idempotency_key %></code></td>
             <td><code><%= t.remote_id || "—" %></code></td>

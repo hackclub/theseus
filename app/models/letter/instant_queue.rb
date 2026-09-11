@@ -119,7 +119,7 @@ class Letter::InstantQueue < Letter::Queue
         ).call
       rescue Billing::Unconfirmed, USPS::IndiciumPurchase::Unrecorded => e
         raise PurchaseUncertain.new(letter, e)
-      rescue Billing::Rejected, Billing::InFlight, USPS::IndiciumPurchase::PurchaseFailed => e
+      rescue Billing::Rejected, Billing::InFlight, USPS::IndiciumPurchase::PurchaseFailed
         # Nothing was mailed: Rejected/InFlight never moved money, and
         # PurchaseFailed means USPS sold us nothing and the charge was credited
         # back. Free the idempotency key so the caller's retry isn't a

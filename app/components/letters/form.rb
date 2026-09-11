@@ -152,7 +152,6 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
     f.fields_for :address do |a|
       current_country = a.object&.country
-      current_entry = countries.find { |c| c[:code] == current_country }
       form_id = "address-form-#{SecureRandom.hex(4)}"
 
       div(id: form_id) do
@@ -277,10 +276,12 @@ render Components::Shared::ErrorMessages.new(record: letter)
 
     # Mailer ID
     field_group(label: "USPS Mailer ID") do
+      mailer_ids = USPS::MailerId.all.to_a
+      selected_id = letter.usps_mailer_id_id || mailer_ids.first&.id
       select(name: "letter[usps_mailer_id_id]", id: "letter_usps_mailer_id_id", class: "w-100") do
         option(value: "") { "Select a mailer ID..." }
-        USPS::MailerId.all.each do |m|
-          option(value: m.id, selected: m.id == (letter.usps_mailer_id_id || USPS::MailerId.first&.id)) { m.name }
+        mailer_ids.each do |m|
+          option(value: m.id, selected: m.id == selected_id) { m.name }
         end
       end
     end

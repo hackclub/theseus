@@ -113,7 +113,7 @@ class BatchProcessJob < ApplicationJob
             actual_cents.increment((indicium.cost * 100).ceil)
             purchased_count.increment
             broadcast_cell(batch, letter, "purchased")
-          rescue Faraday::UnauthorizedError, Faraday::ForbiddenError => e
+          rescue Faraday::UnauthorizedError, Faraday::ForbiddenError
             # Token expired — refresh and retry once (double-check to avoid thundering herd)
             stale_tok = tok
             new_tok = token_lock.synchronize do

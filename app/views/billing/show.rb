@@ -22,7 +22,7 @@ class Views::Billing::Show < Views::Base
 
         if @entry.reverses.present?
           span(class: "detail-label") { "Credit against" }
-          span { a(href: billing_path(@entry.reverses)) { "entry ##{@entry.reverses.id} ($#{"%.2f" % @entry.reverses.amount})" } }
+          span { a(href: billing_path(@entry.reverses)) { "entry ##{@entry.reverses.id} (#{number_to_currency(@entry.reverses.amount)})" } }
         end
 
         if @entry.reversals.any?

@@ -190,7 +190,7 @@ class Views::Admin::Users::Show < Views::Base
                 tr do
                   td(class: "text-muted") { entry.created_at.strftime("%b %d %H:%M") }
                   td { span(class: "badge badge-info") { entry.category } }
-                  td(class: "fw-600") { "#{entry.credit? ? "-" : ""}$#{"%.2f" % entry.amount.abs}" }
+                  td(class: "fw-600") { number_to_currency(entry.credit? ? -entry.amount.abs : entry.amount.abs) }
                   td { ledgerable_link(entry) }
                   td { state_badge(entry.state) }
                 end

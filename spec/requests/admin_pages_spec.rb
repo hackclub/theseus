@@ -14,8 +14,8 @@ RSpec.describe "Admin pages", type: :request do
 
   describe "Common tags" do
     it "renders common tags index" do
-      tag1 = CommonTag.create!(tag: "urgent")
-      tag2 = CommonTag.create!(tag: "bulk")
+      CommonTag.create!(tag: "urgent")
+      CommonTag.create!(tag: "bulk")
 
       get admin_common_tags_path
       expect(response).to have_http_status(:ok)

@@ -214,7 +214,7 @@ class LettersController < ApplicationController
       format.html { redirect_to @letter, notice: "Letter unmarked as mailed." }
       format.json { render json: { success: true, letter: letter_json(@letter) } }
     end
-  rescue AASM::InvalidTransition => e
+  rescue AASM::InvalidTransition
     respond_to do |format|
       format.html { redirect_to @letter, alert: "Letter not marked as mailed." }
       format.json { render json: { success: false, error: "not_mailed" }, status: :unprocessable_entity }
