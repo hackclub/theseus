@@ -1,4 +1,5 @@
 class LettersController < ApplicationController
+  include BillingProfileResolvable
   before_action :set_letter, except: %i[ index new create scanner ]
 
   # GET /letters
@@ -269,8 +270,8 @@ class LettersController < ApplicationController
       return
     end
 
-    billing_profile = current_user.billing_profiles.find_by(id: params[:hcb_payment_account_id])
-    if billing_profile.blank?
+    billing_profile = find_billing_profile(params[:hcb_payment_account_id])
+    if billing_profile.nil?
       redirect_to @letter, alert: "You must select a billing profile to purchase indicia."
       return
     end

@@ -1,4 +1,5 @@
 class APIKeysController < ApplicationController
+  include BillingProfileResolvable
   before_action :set_api_key, except: [ :index, :new, :create ]
 
   def index
@@ -19,17 +20,11 @@ class APIKeysController < ApplicationController
 
     key_params = params.require(:api_key).permit(*permitted_params)
 
-    # Resolve and scope billing profile
-    billing_profile = nil
-    if key_params[:billing_profile_id].present?
-      id = key_params[:billing_profile_id]
-      billing_profile = current_user.billing_profiles.find_by(id: id) ||
-                        BillingProfile.find_by_public_id(id)&.then { |p| p if p.user == current_user }
-      unless billing_profile
-        flash[:error] = "Billing profile not found or not yours."
-        redirect_to new_api_key_path
-        return
-      end
+    billing_profile = find_billing_profile(key_params[:billing_profile_id])
+    if key_params[:billing_profile_id].present? && billing_profile.nil?
+      flash[:error] = "Billing profile not found or not yours."
+      redirect_to new_api_key_path
+      return
     end
 
     @api_key = APIKey.new(key_params.except(:billing_profile_id).merge(user: current_user, billing_profile: billing_profile))

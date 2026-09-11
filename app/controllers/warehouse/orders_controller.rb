@@ -1,4 +1,5 @@
 class Warehouse::OrdersController < ApplicationController
+  include BillingProfileResolvable
   before_action :set_warehouse_order, except: [ :new, :create, :index ]
   # GET /warehouse/orders or /warehouse/orders.json
   def index
@@ -75,8 +76,11 @@ class Warehouse::OrdersController < ApplicationController
 
   # POST /warehouse/orders or /warehouse/orders.json
   def create
-    resolved_profile = resolve_billing_profile(params.dig(:warehouse_order, :billing_profile_id))
-    return if performed?
+    resolved_profile = find_billing_profile(params.dig(:warehouse_order, :billing_profile_id))
+    if params.dig(:warehouse_order, :billing_profile_id).present? && resolved_profile.nil?
+      redirect_to new_warehouse_order_path, alert: "Billing profile not found or not yours."
+      return
+    end
 
     @warehouse_order = Warehouse::Order.new(
       warehouse_order_params.except(:billing_profile_id).merge(
@@ -104,8 +108,11 @@ class Warehouse::OrdersController < ApplicationController
 
     update_params = warehouse_order_params
     if update_params[:billing_profile_id].present?
-      resolved = resolve_billing_profile(update_params.delete(:billing_profile_id))
-      return if performed?
+      resolved = find_billing_profile(update_params.delete(:billing_profile_id))
+      unless resolved
+        redirect_to edit_warehouse_order_path(@warehouse_order), alert: "Billing profile not found or not yours."
+        return
+      end
       @warehouse_order.billing_profile = resolved
     end
 
@@ -177,16 +184,4 @@ class Warehouse::OrdersController < ApplicationController
     )
   end
 
-  def resolve_billing_profile(id_or_public_id)
-    return nil if id_or_public_id.blank?
-
-    profile = current_user.billing_profiles.find_by(id: id_or_public_id) ||
-              BillingProfile.find_by_public_id(id_or_public_id)&.then { |p| p if p.user == current_user }
-
-    unless profile
-      redirect_to new_warehouse_order_path, alert: "Billing profile not found or not yours."
-    end
-
-    profile
-  end
 end

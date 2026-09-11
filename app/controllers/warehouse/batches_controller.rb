@@ -1,4 +1,5 @@
 class Warehouse::BatchesController < BaseBatchesController
+  include BillingProfileResolvable
   before_action :set_allowed_templates, only: %i[ new create edit update ]
   before_action :ensure_processable, only: %i[ process_form process_batch ]
 
@@ -142,7 +143,7 @@ class Warehouse::BatchesController < BaseBatchesController
     authorize @batch, :process_batch?, policy_class: Warehouse::BatchPolicy
     profile_id = params.dig(:batch, :hcb_payment_account_id)
     if profile_id.present?
-      profile = @batch.user.billing_profiles.find_by(id: profile_id)
+      profile = find_billing_profile(profile_id, user: @batch.user)
       unless profile
         redirect_to process_confirm_warehouse_batch_path(@batch), alert: "Billing profile not found or doesn't belong to the batch owner."
         return

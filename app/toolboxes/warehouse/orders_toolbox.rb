@@ -2,6 +2,7 @@
 
 module Warehouse
   class OrdersToolbox < ApplicationToolbox
+    include BillingProfileResolvable
     before_action :require_warehouse!
     before_action :set_order, except: [ :search, :create, :create_from_template ]
     before_action :require_owner_or_admin!, only: [ :update, :send_to_warehouse, :cancel, :destroy ]
@@ -153,9 +154,7 @@ module Warehouse
 
 
     def resolve_billing_profile(id_or_public_id)
-      return nil if id_or_public_id.blank?
-      profile = current_user.billing_profiles.find_by(id: id_or_public_id) ||
-                BillingProfile.find_by_public_id(id_or_public_id)&.then { |p| p if p.user == current_user }
+      profile = find_billing_profile(id_or_public_id)
       halt error: "Billing profile not found or not yours" unless profile
       profile
     end

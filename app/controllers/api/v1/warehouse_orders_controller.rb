@@ -2,6 +2,7 @@ module API
   module V1
     class WarehouseOrdersController < ApplicationController
       include AddressParameterParsing
+      include BillingProfileResolvable
 
       before_action :set_warehouse_order, only: [ :show ]
       before_action :replay_idempotent_order, only: [ :create, :from_template ]
@@ -134,10 +135,7 @@ module API
       # Per-request billing_profile_id overrides the API key's default
       def resolve_billing_profile
         profile = if params[:billing_profile_id].present?
-          # Accept public ID (bp!xxx) or numeric ID, scoped to current user
-          id = params[:billing_profile_id]
-          current_user.billing_profiles.find_by(id: id) ||
-            BillingProfile.find_by_public_id(id)&.then { |p| p if p.user == current_user }
+          find_billing_profile(params[:billing_profile_id])
         elsif impersonating?
           # The order belongs to the impersonated user and Warehouse::Order
           # insists the profile does too, so the key owner's default is a 422.
