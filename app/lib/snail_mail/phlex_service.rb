@@ -108,7 +108,7 @@ module SnailMail
           component.before_template if component.respond_to?(:before_template)
           component.view_template
           component.after_template if component.respond_to?(:after_template)
-        rescue Prawn::Errors::CannotFit => e
+        rescue Prawn::Errors::CannotFit
           address = letter.address
           raise Error, "Letter #{letter.id} (\"#{address&.line1}\", #{address&.city}, #{address&.state}) – address too long to fit on label"
         end

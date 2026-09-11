@@ -86,7 +86,7 @@ class AIService
           } ],
           temperature: 0.8
         })
-      rescue Faraday::TooManyRequestsError, Faraday::ServerError => e
+      rescue Faraday::TooManyRequestsError, Faraday::ServerError
         raise if retried
         retried = true
         sleep 1 + rand(2)

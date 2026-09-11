@@ -3,7 +3,7 @@ module Public
     def send_email
       begin
         @email = params.require(:email)
-      rescue ActionController::ParameterMissing => e
+      rescue ActionController::ParameterMissing
         @error = "you do need to enter an email address...."
         return render "public/static_pages/login"
       end

@@ -44,8 +44,6 @@ module API
         )
         render :create_letter, status: :created
 
-        #   rescue ActiveRecord::RecordInvalid => e
-        # render json: { error: e.record.errors.full_messages }, status: :unprocessable_entity
       end
 
       def create_instant_letter

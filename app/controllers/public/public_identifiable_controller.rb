@@ -16,7 +16,7 @@ module Public
       else
         raise ActiveRecord::RecordNotFound, "no record found with public_id: #{params[:public_id]}"
       end
-    rescue ActiveRecord::RecordNotFound => e
+    rescue ActiveRecord::RecordNotFound
       flash[:alert] = "what are you even looking for..?"
       redirect_to public_root_path
     end

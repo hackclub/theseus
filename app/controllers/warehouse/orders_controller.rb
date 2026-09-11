@@ -151,7 +151,7 @@ class Warehouse::OrdersController < ApplicationController
     redirect_to @warehouse_order, flash: { success: "order canceled." }
   end
 
-  # # DELETE /warehouse/orders/1 or /warehouse/orders/1.json
+  # DELETE /warehouse/orders/1
   def destroy
     authorize @warehouse_order
     @warehouse_order.destroy!

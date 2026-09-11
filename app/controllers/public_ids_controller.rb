@@ -57,7 +57,7 @@ class PublicIdsController < ApplicationController
 
     flash[:alert] = "nothing found at all."
     redirect_back fallback_location: public_ids_path
-  rescue ActiveRecord::RecordNotFound => e
+  rescue ActiveRecord::RecordNotFound
     flash[:alert] = "Record not found"
     redirect_back fallback_location: public_ids_path
   end
