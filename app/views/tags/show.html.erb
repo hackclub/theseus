@@ -88,20 +88,19 @@
 
 <script>
   function updateTimePeriod() {
-    const timePeriod = document.getElementById('time_period').value;
-    const year = document.getElementById('year').value;
-    const month = document.getElementById('month').value;
+    var url = new URL('<%= tag_stats_path(@tag) %>', window.location.origin);
+    url.searchParams.set('time_period', document.getElementById('time_period').value);
 
+    var timePeriod = document.getElementById('time_period').value;
     document.getElementById('year_selector').style.display =
       timePeriod === 'ytd' || timePeriod === 'month' ? 'inline' : 'none';
     document.getElementById('month_selector').style.display =
       timePeriod === 'month' ? 'inline' : 'none';
 
-    let url = '<%= tag_stats_path(@tag) %>?time_period=' + timePeriod;
-    if (timePeriod === 'ytd' || timePeriod === 'month') url += '&year=' + year;
-    if (timePeriod === 'month') url += '&month=' + month;
+    if (timePeriod === 'ytd' || timePeriod === 'month') url.searchParams.set('year', document.getElementById('year').value);
+    if (timePeriod === 'month') url.searchParams.set('month', document.getElementById('month').value);
 
-    window.location.href = url;
+    window.location.href = url.toString();
   }
 
   document.getElementById('time_period').addEventListener('change', function() {
