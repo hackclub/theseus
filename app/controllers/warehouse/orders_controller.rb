@@ -101,8 +101,16 @@ class Warehouse::OrdersController < ApplicationController
   # PATCH/PUT /warehouse/orders/1 or /warehouse/orders/1.json
   def update
     authorize @warehouse_order
+
+    update_params = warehouse_order_params
+    if update_params[:billing_profile_id].present?
+      resolved = resolve_billing_profile(update_params.delete(:billing_profile_id))
+      return if performed?
+      @warehouse_order.billing_profile = resolved
+    end
+
     respond_to do |format|
-      if @warehouse_order.update(warehouse_order_params)
+      if @warehouse_order.update(update_params)
         format.html { redirect_to @warehouse_order, notice: "Order was successfully updated." }
         format.json { render :show, status: :ok, location: @warehouse_order }
       else

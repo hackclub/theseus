@@ -44,26 +44,6 @@ module USPS
         end
       end
 
-      private
-
-      def extract_domestic_rate(price_type, processing_category, weight, non_machinable)
-        response = cached_domestic_response(processing_category, weight, non_machinable)
-        rate = response[:rates]&.find { |r| r[:priceType] == price_type } || response[:rates]&.first
-        raise "no #{price_type} rate from USPS for #{processing_category} #{weight}oz" unless rate
-        rate[:price].to_f + (rate[:fees] || []).sum { |f| f[:price].to_f }
-      end
-
-      def cached_domestic_response(processing_category, weight, non_machinable)
-        key = cache_key("fcm", processing_category, weight, non_machinable: non_machinable)
-        Rails.cache.fetch(key, expires_in: CACHE_TTL) do
-          USPS::APIService.letter_price(
-            processing_category: processing_category.to_s.pluralize.upcase,
-            weight: weight.to_f,
-            non_machinable_indicators: non_machinable ? { isRigid: true } : {},
-          )
-        end
-      end
-
       def extract_price(response)
         rate = response[:rates]&.first
         raise "no rate returned from USPS" unless rate
