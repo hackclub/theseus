@@ -17,6 +17,12 @@ html {
   zoom: 160%;
 }
 
+body {
+  background-image: url("/wallpaper.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+}
+
 input {
   color: black;
 }
