@@ -66,7 +66,7 @@ gem "foreman", "~> 0.88.1"
 
 gem "dotenv-rails", "~> 3.1"
 
-gem "net-http", "~> 0.6.0"
+gem "net-http", "~> 0.9.1"
 
 gem "http", "~> 5.2"
 
