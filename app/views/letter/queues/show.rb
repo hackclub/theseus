@@ -28,9 +28,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
     return unless queued_count > 0
 
     details(id: "make-batch-dialog") do
-      summary(class: "summary-plain") do
-        button(class: "btn-success w-100") { "⊞ Make Batch" }
-      end
+      summary(tabindex: "0", class: "summary-plain btn-success w-100") { "⊞ Make Batch" }
 
       div(class: "mt-half") do
         form_with url: make_batch_from_letter_queue_path(queue), method: :post do |f|
