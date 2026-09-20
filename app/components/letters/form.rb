@@ -204,11 +204,19 @@ render Components::Shared::ErrorMessages.new(record: letter)
             end
           end
         end
+
+        div(id: "#{form_id}_phone", hidden: !current_country.to_s.in?(phone_on_label_countries)) do
+          field_group(label: "Phone", caption: "Optional") do
+            input(type: "tel", name: a.field_name(:phone_number), value: a.object&.phone_number, class: "w-100")
+          end
+        end
       end
 
       country_filter_script(form_id)
     end
   end
+
+  def phone_on_label_countries = Rails.configuration.country_restrictions.phone_on_label
 
   def country_filter_script(form_id)
     script do
@@ -218,6 +226,13 @@ render Components::Shared::ErrorMessages.new(record: letter)
           if (!container) return;
           var select = container.querySelector('select[id$="_country"]');
           if (!select) return;
+          var phoneCountries = #{phone_on_label_countries.to_json};
+          var phoneField = document.getElementById('#{form_id}_phone');
+          if (phoneField) {
+            select.addEventListener('change', function() {
+              phoneField.hidden = phoneCountries.indexOf(select.value) === -1;
+            });
+          }
           var filterInput = document.createElement('input');
           filterInput.type = 'text';
           filterInput.placeholder = 'Filter countries...';
