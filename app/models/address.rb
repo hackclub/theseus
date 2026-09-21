@@ -38,7 +38,8 @@ class Address < ApplicationRecord
 
   def self.strip_gremlins(str) = str&.delete(GREMLINS)&.presence
 
-  validates_presence_of :first_name, :line_1, :city, :state, :postal_code, :country
+  validates_presence_of :first_name, :line_1, :city, :state, :country
+  validates_presence_of :postal_code, unless: :postal_code_optional?
   validate :country_not_usps_restricted
 
   before_validation :strip_gremlins_from_fields
@@ -56,8 +57,14 @@ class Address < ApplicationRecord
 
   def us? = country == "US"
 
+  def postal_code_optional? = country.present? && ISO3166::Country[country]&.postal_code == false
+
+  def phone_on_label?
+    phone_number.present? && country.to_s.in?(Rails.configuration.country_restrictions.phone_on_label)
+  end
+
   def snailify(origin = "US")
-    SnailButNbsp.new(
+    snail = SnailButNbsp.new(
       name: name_line.gsub(" ", " "),
       line_1:,
       line_2: line_2.presence,
@@ -66,7 +73,10 @@ class Address < ApplicationRecord
       postal_code:,
       country: country,
       origin: origin,
-    ).to_s
+    )
+    return snail.to_s unless phone_on_label?
+
+    snail.to_s.lines(chomp: true).insert(1, "Tel: #{phone_number}").join("\n")
   end
 
   private
