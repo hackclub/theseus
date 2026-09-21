@@ -58,7 +58,7 @@ class BillingProfile < ApplicationRecord
       client_id: ENV.fetch("HCB_CLIENT_ID"),
       client_secret: ENV.fetch("HCB_CLIENT_SECRET"),
       access_token: ENV.fetch("HCB_SERVICE_ACCESS_TOKEN"),
-      refresh_token: ENV.fetch("HCB_SERVICE_REFRESH_TOKEN"),
+      refresh_token: ENV["HCB_SERVICE_REFRESH_TOKEN"],
     )
   end
 
