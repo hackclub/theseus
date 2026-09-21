@@ -54,7 +54,7 @@ class HCB::OauthConnection < ApplicationRecord
   end
 
   def client
-    raise OauthConnectionInvalidatedError, "HCB connection has been invalidated — please relink your account" if invalidated?
+    raise HCB::OauthConnectionInvalidatedError, "HCB connection has been invalidated — please relink your account" if invalidated?
 
     @client ||= HCBV4::Client.from_credentials(
       client_id: ENV.fetch("HCB_CLIENT_ID"),
