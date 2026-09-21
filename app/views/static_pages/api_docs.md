@@ -352,6 +352,101 @@ a few things to know:
 - **no auth required.** the embed is public. anyone with the order ID can see it. this is by design — it's meant for recipient-facing contexts.
 - **frameable from anywhere.** the CSP is wide open on this endpoint, so you can iframe it from any domain.
 
+## Inventory (SKUs)
+
+want to know what's in stock before you build an order? these endpoints let you check.
+
+### listing all in-stock items:
+```
+GET /api/v1/warehouse/skus
+```
+
+returns every enabled item currently tracked in inventory, sorted by name.
+
+pass `?all=true` to include disabled items and items with no inventory data.
+
+**the response** (200 OK):
+```json
+{
+  "skus": [
+    {
+      "sku": "Sti/Sti/Bob/1st",
+      "name": "Boba Drops Sticker",
+      "description": null,
+      "category": "sticker",
+      "enabled": true,
+      "in_stock": 330,
+      "inbound": 2000,
+      "unit_cost": "0.1669",
+      "average_po_cost": "0.1669",
+      "actual_cost_to_hc": null,
+      "country_of_origin": null,
+      "customs_description": null,
+      "hs_code": null
+    },
+    {
+      "sku": "Swa/Shirt/CF/M",
+      "name": "Campfire T-shirt (medium)",
+      "description": null,
+      "category": "swag",
+      "enabled": true,
+      "in_stock": 1133,
+      "inbound": null,
+      "unit_cost": "3.55",
+      "average_po_cost": "3.55",
+      "actual_cost_to_hc": null,
+      "country_of_origin": null,
+      "customs_description": null,
+      "hs_code": null
+    }
+  ]
+}
+```
+
+### looking up a specific item:
+```
+GET /api/v1/warehouse/skus/:sku_code
+```
+
+`:sku_code` is the item's SKU (e.g. `Sti/Sti/Bob/1st`).
+
+**the response** (200 OK):
+```json
+{
+  "sku": {
+    "sku": "Sti/Sti/Bob/1st",
+    "name": "Boba Drops Sticker",
+    "description": null,
+    "category": "sticker",
+    "enabled": true,
+    "in_stock": 330,
+    "inbound": 2000,
+    "unit_cost": "0.1669",
+    "average_po_cost": "0.1669",
+    "actual_cost_to_hc": null,
+    "country_of_origin": null,
+    "customs_description": null,
+    "hs_code": null
+  }
+}
+```
+
+**the fields:**
+
+- `sku` — the SKU code. this is what you pass in `contents` when creating warehouse orders.
+- `name` — human-readable name.
+- `description` — longer description, if one exists.
+- `category` — item type (sticker, poster, card, flyer, hardware, book, swag, grant, prize, unknown).
+- `enabled` — whether this item is currently active.
+- `in_stock` — how many are currently in the warehouse.
+- `inbound` — how many are on the way from purchase orders (not yet in the warehouse).
+- `unit_cost` — our declared per-unit cost, as a string. this is what gets used for billing calculations on warehouse orders.
+- `average_po_cost` — average cost from purchase orders.
+- `actual_cost_to_hc` — what Hack Club actually pays for this item (may differ from declared cost).
+- `country_of_origin` — for customs declarations.
+- `customs_description` — customs-friendly item description.
+- `hs_code` — Harmonized System tariff code.
+
 ---
 
 **a note on countries:** we do our best to parse whatever you throw at us ("United States", "US", "USA", "us", etc.) but the safest bet is always ISO 3166 alpha-2 codes. same goes for states — "Vermont" and "VT" both work, but abbreviations are less likely to surprise you.

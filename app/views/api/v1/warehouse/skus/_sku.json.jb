@@ -1,5 +1,15 @@
 {
+  sku: sku.sku,
   name: sku.name,
+  description: sku.description,
+  category: sku.category,
+  enabled: sku.enabled,
   in_stock: sku.in_stock,
-  inbound: sku.inbound
+  inbound: sku.inbound,
+  unit_cost: sku.declared_unit_cost.to_s,
+  average_po_cost: sku.average_po_cost&.to_s,
+  actual_cost_to_hc: sku.actual_cost_to_hc&.to_s,
+  country_of_origin: sku.country_of_origin,
+  customs_description: sku.customs_description,
+  hs_code: sku.hs_code
 }

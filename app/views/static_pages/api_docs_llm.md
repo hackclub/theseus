@@ -336,6 +336,94 @@ Shows order timeline, backorder info, tracking link, and contents. Only works fo
 
 ---
 
+## Inventory (SKUs)
+
+Check what items are available and in stock before building warehouse orders.
+
+### List all in-stock items
+
+```
+GET /api/v1/warehouse/skus
+```
+
+Returns all enabled items currently tracked in inventory, sorted by name. Requires `can_warehouse?` permission.
+
+Pass `?all=true` to include disabled items and items with no inventory data.
+
+**Response (200):**
+```json
+{
+  "skus": [
+    {
+      "sku": "Sti/Sti/Bob/1st",
+      "name": "Boba Drops Sticker",
+      "description": null,
+      "category": "sticker",
+      "enabled": true,
+      "in_stock": 330,
+      "inbound": 2000,
+      "unit_cost": "0.1669",
+      "average_po_cost": "0.1669",
+      "actual_cost_to_hc": null,
+      "country_of_origin": null,
+      "customs_description": null,
+      "hs_code": null
+    }
+  ]
+}
+```
+
+### Get a specific item
+
+```
+GET /api/v1/warehouse/skus/:sku_code
+```
+
+`:sku_code` is the item's SKU string (e.g. `Sti/Sti/Bob/1st`). This is the same value used in `contents[].sku` when creating warehouse orders.
+
+**Response (200):**
+```json
+{
+  "sku": {
+    "sku": "Sti/Sti/Bob/1st",
+    "name": "Boba Drops Sticker",
+    "description": null,
+    "category": "sticker",
+    "enabled": true,
+    "in_stock": 330,
+    "inbound": 2000,
+    "unit_cost": "0.1669",
+    "average_po_cost": "0.1669",
+    "actual_cost_to_hc": null,
+    "country_of_origin": null,
+    "customs_description": null,
+    "hs_code": null
+  }
+}
+```
+
+**SKU response fields:**
+
+| Field | Type | Notes |
+|---|---|---|
+| `sku` | string | unique SKU code — use this in `contents[].sku` when creating warehouse orders |
+| `name` | string | human-readable item name |
+| `description` | string/null | longer description if available |
+| `category` | string | one of: sticker, poster, card, flyer, other_printed_material, hardware, book, swag, grant, prize, unknown |
+| `enabled` | boolean | whether this item is currently active |
+| `in_stock` | integer | current warehouse quantity |
+| `inbound` | integer/null | quantity in transit from purchase orders (not yet in warehouse) |
+| `unit_cost` | string | declared per-unit cost used for billing, as a decimal string (e.g. `"0.1669"`) |
+| `average_po_cost` | string/null | average cost from purchase orders |
+| `actual_cost_to_hc` | string/null | what Hack Club actually pays for this item |
+| `country_of_origin` | string/null | country of origin for customs |
+| `customs_description` | string/null | customs-friendly item description |
+| `hs_code` | string/null | Harmonized System tariff code |
+
+**Usage pattern:** Call `GET /api/v1/warehouse/skus` to discover available SKU codes and check stock levels, then use those SKU codes in `contents` when creating warehouse orders via `POST /api/v1/warehouse_orders`.
+
+---
+
 ## Tags
 
 Tags are how Theseus tracks what mail belongs to what program. Every letter queue assigns tags automatically; warehouse orders require at least one tag in the request.
@@ -461,6 +549,8 @@ Both APIs support `?expand=field1,field2` to opt into optional response fields. 
 | Create warehouse order (template) | POST | `/api/v1/warehouse_orders/from_template/:template_id` |
 | Get a warehouse order | GET | `/api/v1/warehouse_orders/:id` |
 | List warehouse orders | GET | `/api/v1/warehouse_orders` |
+| List inventory (SKUs) | GET | `/api/v1/warehouse/skus` |
+| Get a SKU | GET | `/api/v1/warehouse/skus/:sku_code` |
 | List tags | GET | `/api/v1/tags` |
 | Tag stats | GET | `/api/v1/tags/:tag_name` |
 | Tag letters | GET | `/api/v1/tags/:tag_name/letters` |

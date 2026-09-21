@@ -734,7 +734,8 @@ Rails.application.routes.draw do
             post "from_template/:template_id", to: "warehouse_orders#from_template", as: :from_template
           end
         end
-        resources :warehouse_skus, path: "warehouse/skus", only: [ :show ]
+        resources :warehouse_skus, path: "warehouse/skus", only: [ :index ]
+        get "warehouse/skus/*id", to: "warehouse_skus#show", as: :warehouse_sku
       end
     end
   end
