@@ -46,8 +46,8 @@ class Views::Admin::Users::Index < Views::Base
             end
             td(class: "text-muted") { user.email || "—" }
             td { role_badges(user) }
-            td(class: "text-muted") { user.letters.size.to_s }
-            td(class: "text-muted") { user.warehouse_orders.size.to_s }
+            td(class: "text-muted") { user.letter_count.to_s }
+            td(class: "text-muted") { user.warehouse_order_count.to_s }
             td(class: "text-muted text-right") { user.created_at.strftime("%b %d, %Y") }
           end
         end

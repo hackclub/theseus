@@ -38,7 +38,7 @@ class Letter::InstantQueuesController < Letter::QueuesController
                       .group(:aasm_state)
                       .count
 
-    letters = @letter_queue.letters.order(created_at: :desc)
+    letters = @letter_queue.letters.includes(:address).order(created_at: :desc)
     letters = letters.search(params[:search]) if params[:search].present?
     letters = letters.where(aasm_state: params[:status]) if params[:status].present?
 

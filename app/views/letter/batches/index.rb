@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 class Views::Letter::Batches::Index < Views::Base
-  def initialize(batches:, search: nil, state: nil, user_id: nil, users: [])
+  def initialize(batches:, search: nil, state: nil, user_id: nil, users: [], state_counts: {}, batch_letter_counts: {})
     @batches = batches
     @search = search
     @state = state
     @user_id = user_id
     @users = users
+    @state_counts = state_counts
+    @batch_letter_counts = batch_letter_counts
   end
 
   def view_template
@@ -17,7 +19,7 @@ class Views::Letter::Batches::Index < Views::Base
 
   private
 
-  attr_reader :batches, :search, :state, :user_id, :users
+  attr_reader :batches, :search, :state, :user_id, :users, :state_counts, :batch_letter_counts
 
   def toolbar
     render Components::Shared::PageToolbar.new(
@@ -46,12 +48,12 @@ class Views::Letter::Batches::Index < Views::Base
 
   def stat_filters
     stats = [
-      { param: nil, count: batches.count, label: "All" },
-      { param: "awaiting_field_mapping", count: batches.where(aasm_state: "awaiting_field_mapping").count, label: "Awaiting", color: "yellow" },
-      { param: "fields_mapped", count: batches.where(aasm_state: "fields_mapped").count, label: "Mapped", color: "blue" },
-      { param: "processed", count: batches.where(aasm_state: "processed").count, label: "Processed", color: "green" },
-      { param: "printed", count: batches.where(aasm_state: "printed").count, label: "Printed" },
-      { param: "mailed", count: batches.where(aasm_state: "mailed").count, label: "Mailed" }
+      { param: nil, count: state_counts.values.sum, label: "All" },
+      { param: "awaiting_field_mapping", count: state_counts.fetch("awaiting_field_mapping", 0), label: "Awaiting", color: "yellow" },
+      { param: "fields_mapped", count: state_counts.fetch("fields_mapped", 0), label: "Mapped", color: "blue" },
+      { param: "processed", count: state_counts.fetch("processed", 0), label: "Processed", color: "green" },
+      { param: "printed", count: state_counts.fetch("printed", 0), label: "Printed" },
+      { param: "mailed", count: state_counts.fetch("mailed", 0), label: "Mailed" }
     ]
 
     render Components::Shared::StatFilters.new(
@@ -102,7 +104,7 @@ class Views::Letter::Batches::Index < Views::Base
         end
       end
       td(class: "text-muted") { batch.origin || "—" }
-      td { format_number(batch.letters.size) }
+      td { format_number(batch_letter_counts[batch.id] || 0) }
       td(class: "text-muted") { batch.created_at.strftime("%b %-d, %Y") }
       td { render Components::Shared::StatusBadge.new(status: batch.aasm_state, type: :batch) }
     end

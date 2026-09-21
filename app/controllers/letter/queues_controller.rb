@@ -40,17 +40,19 @@ class Letter::QueuesController < ApplicationController
                       .group(:aasm_state)
                       .count
 
-    letters = @letter_queue.letters.order(created_at: :desc)
+    letters = @letter_queue.letters.includes(:address).order(created_at: :desc)
     letters = letters.search(params[:search]) if params[:search].present?
     letters = letters.where(aasm_state: params[:status]) if params[:status].present?
 
     @batches = @letter_queue.letter_batches.order(created_at: :desc)
+    batch_letter_counts = Letter.where(batch_id: @batches.select(:id)).group(:batch_id).count
 
     render Views::Letter::Queues::Show.new(
       queue: @letter_queue,
       letters: letters,
       batches: @batches,
       letter_counts: letter_counts,
+      batch_letter_counts: batch_letter_counts,
       search: params[:search],
       status: params[:status]
     )
@@ -125,12 +127,14 @@ class Letter::QueuesController < ApplicationController
     marked_count = 0
     failed_letters = []
 
-    printed_letters.each do |letter|
-      begin
-        letter.mark_mailed!
-        marked_count += 1
-      rescue => e
-        failed_letters << "#{letter.public_id} (#{e.message})"
+    Letter.transaction do
+      printed_letters.find_each do |letter|
+        begin
+          letter.mark_mailed!
+          marked_count += 1
+        rescue => e
+          failed_letters << "#{letter.public_id} (#{e.message})"
+        end
       end
     end
 

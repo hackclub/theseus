@@ -6,12 +6,12 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
   FUDGE_FACTOR = 2.weeks
 
   def perform(*args)
-    orders = Warehouse::Order.dispatched.order(dispatched_at: :asc)
+    orders = Warehouse::Order.dispatched
 
-    return if orders.empty?
+    return unless orders.exists?
 
-    start_date = orders.first.dispatched_at - FUDGE_FACTOR
-    end_date = orders.last.dispatched_at + FUDGE_FACTOR
+    start_date = orders.minimum(:dispatched_at) - FUDGE_FACTOR
+    end_date = orders.maximum(:dispatched_at) + FUDGE_FACTOR
 
     zen_orders = Zenventory.run_report(
       "shipment",
@@ -24,7 +24,7 @@ class Warehouse::UpdateMailingInfoJob < ApplicationJob
     # orders are left unclaimed for the sweep to batch per profile.
     orders_to_charge = []
 
-    orders.each do |order|
+    orders.find_each do |order|
       zen_order = zen_orders[order.hc_id]
       next unless zen_order
 

@@ -16,10 +16,19 @@ module AirtableETL
 
       case type
       when :letters
+        # Batch-load all letters instead of N+1 find_by_public_id calls
+        letter_ids = recs.filter_map { |rec|
+          pid = rec[field_map[:public_id]]
+          next unless pid.present?
+          hash = pid.split("!").last
+          Letter.decode_id(hash)
+        }.compact
+        letters_by_pid = Letter.where(id: letter_ids).index_by(&:public_id)
+
         recs.each do |rec|
           public_id = rec[field_map[:public_id]]
           next unless public_id.present?
-          letter = Letter.find_by_public_id(public_id)
+          letter = letters_by_pid[public_id]
           if letter.nil?
             Rails.logger.error("Letter not found for public_id: #{public_id}")
             rec[field_map[:aasm_state]] = "not_found"

@@ -45,10 +45,11 @@ class Views::Warehouse::Batches::Index < Views::Base
   end
 
   def stat_filters
+    state_counts = batches.unscope(:select, :order).group(:aasm_state).count
     counts = {
-      awaiting_field_mapping: batches.where(aasm_state: :awaiting_field_mapping).count,
-      fields_mapped: batches.where(aasm_state: :fields_mapped).count,
-      processed: batches.where(aasm_state: :processed).count
+      awaiting_field_mapping: state_counts["awaiting_field_mapping"] || 0,
+      fields_mapped: state_counts["fields_mapped"] || 0,
+      processed: state_counts["processed"] || 0
     }
 
     render Components::Shared::StatFilters.new(
@@ -59,7 +60,7 @@ class Views::Warehouse::Batches::Index < Views::Base
       ],
       active: status,
       base_path: ->(status: nil, **) { warehouse_batches_path(search: search, status: status, user_id: user_id) },
-      total: batches.count
+      total: state_counts.values.sum
     )
   end
 
@@ -104,7 +105,7 @@ class Views::Warehouse::Batches::Index < Views::Base
       td(class: "text-muted") { plain batch.created_at.strftime("%b %d") }
       td { plain batch.warehouse_template&.name || "—" }
       td(class: "text-muted") { plain batch.address_count&.to_s || "0" }
-      td(class: "text-muted") { plain batch.orders.size.to_s }
+      td(class: "text-muted") { plain (batch.try(:orders_count) || batch.orders.size).to_s }
       td { render Components::Shared::StatusBadge.new(status: batch.aasm.current_state, type: :batch) }
     end
   end

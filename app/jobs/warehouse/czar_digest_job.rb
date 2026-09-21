@@ -12,10 +12,8 @@ class Warehouse::CzarDigestJob < ApplicationJob
       .where(status: "submitted")
       .where("submitted_at < ?", 2.days.ago)
 
-    blocked_pos = ::Warehouse::PurchaseOrder
-      .where(status: "approved")
+    blocked_pos = ::Warehouse::PurchaseOrder.blocked_on_skus
       .includes(line_items: :sku_request)
-      .select(&:blocked_on_skus?)
 
     urgent_pos = ::Warehouse::PurchaseOrder
       .where.not(status: %w[open completed deleted])
@@ -34,7 +32,7 @@ class Warehouse::CzarDigestJob < ApplicationJob
     end
 
     # Nudge drafters about their own urgent POs still in draft
-    urgent_draft_pos = urgent_pos.select(&:draft?)
+    urgent_draft_pos = urgent_pos.where(status: "draft")
     urgent_draft_pos.group_by(&:user).each do |user, pos|
       next unless user&.email.present?
       Warehouse::CzarMailer.drafter_urgent_reminder(user: user, purchase_orders: pos).deliver_later

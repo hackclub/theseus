@@ -55,11 +55,12 @@ class Views::Warehouse::Orders::Index < Views::Base
   end
 
   def stat_filters
+    state_counts = all_orders.group(:aasm_state).count
     counts = {
-      draft: all_orders.where(aasm_state: :draft).count,
-      dispatched: all_orders.where(aasm_state: :dispatched).count,
-      mailed: all_orders.where(aasm_state: :mailed).count,
-      canceled: all_orders.where(aasm_state: :canceled).count
+      draft: state_counts["draft"] || 0,
+      dispatched: state_counts["dispatched"] || 0,
+      mailed: state_counts["mailed"] || 0,
+      canceled: state_counts["canceled"] || 0
     }
 
     render Components::Shared::StatFilters.new(

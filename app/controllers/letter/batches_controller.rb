@@ -7,12 +7,16 @@ class Letter::BatchesController < BaseBatchesController
     batches = batches.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
     batches = batches.search(params[:search]) if params[:search].present?
     users = current_user&.is_admin? ? User.where(id: all_batches.reorder(nil).select(:user_id).distinct).order(:email) : []
+    state_counts = batches.reorder(nil).group(:aasm_state).count
+    batch_letter_counts = Letter.where(batch_id: batches.reorder(nil).select(:id)).group(:batch_id).count
     render Views::Letter::Batches::Index.new(
       batches: batches,
       search: params[:search],
       state: params[:state],
       user_id: params[:user_id],
-      users: users
+      users: users,
+      state_counts: state_counts,
+      batch_letter_counts: batch_letter_counts
     )
   end
 

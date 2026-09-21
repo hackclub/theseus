@@ -16,9 +16,11 @@ class LettersController < ApplicationController
     letters = letters.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
     letters = letters.search(params[:search]) if params[:search].present?
 
+    letter_state_counts = all_letters.reorder(nil).group(:aasm_state).count
     render Views::Letters::Index.new(
       letters: letters.order(created_at: :desc).page(params[:page]).per(25),
       all_letters: all_letters,
+      letter_state_counts: letter_state_counts,
       search: params[:search],
       status: params[:status],
       origin: params[:origin],

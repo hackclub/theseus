@@ -68,7 +68,7 @@ class Views::Letter::Queues::Show < Views::Letter::Queues::ShowBase
               td do
                 a(href: letter_batch_path(batch), class: "no-underline") { "Batch ##{batch.id}" }
               end
-              td { plain "#{batch.letters.size}" }
+              td { plain "#{batch_letter_counts[batch.id] || 0}" }
               td(class: "text-muted") { batch.created_at.strftime("%b %-d, %Y") }
               td { render Components::Shared::StatusBadge.new(status: batch.aasm_state, type: :batch) }
             end

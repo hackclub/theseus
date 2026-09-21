@@ -6,7 +6,10 @@ class Warehouse::BatchesController < BaseBatchesController
   # GET /warehouse/batches
   def index
     authorize Warehouse::Batch, policy_class: Warehouse::BatchPolicy
-    all_batches = policy_scope(Warehouse::Batch, policy_scope_class: Warehouse::BatchPolicy::Scope).order(created_at: :desc)
+    all_batches = policy_scope(Warehouse::Batch, policy_scope_class: Warehouse::BatchPolicy::Scope)
+      .includes(:warehouse_template)
+      .select("batches.*, (SELECT COUNT(*) FROM warehouse_orders WHERE warehouse_orders.batch_id = batches.id) AS orders_count")
+      .order(created_at: :desc)
     batches = all_batches
     batches = batches.where(user_id: params[:user_id]) if params[:user_id].present? && current_user&.is_admin?
     batches = batches.search(params[:search]) if params[:search].present?

@@ -3,9 +3,10 @@
 class Views::Letters::Index < Views::Base
   include Phlex::Rails::Helpers::TimeAgoInWords
 
-  def initialize(letters:, all_letters:, search: nil, status: nil, origin: nil, user_id: nil, users: [])
+  def initialize(letters:, all_letters:, letter_state_counts: {}, search: nil, status: nil, origin: nil, user_id: nil, users: [])
     @letters = letters
     @all_letters = all_letters
+    @letter_state_counts = letter_state_counts
     @search = search
     @status = status
     @origin = origin
@@ -22,7 +23,7 @@ class Views::Letters::Index < Views::Base
 
   private
 
-  attr_reader :letters, :all_letters, :search, :status, :origin, :user_id, :users
+  attr_reader :letters, :all_letters, :letter_state_counts, :search, :status, :origin, :user_id, :users
 
   def toolbar
     render Components::Shared::PageToolbar.new(
@@ -57,19 +58,12 @@ class Views::Letters::Index < Views::Base
   end
 
   def stat_filters
-    counts = {
-      pending: all_letters.where(aasm_state: :pending).count,
-      printed: all_letters.where(aasm_state: :printed).count,
-      mailed: all_letters.where(aasm_state: :mailed).count,
-      received: all_letters.where(aasm_state: :received).count
-    }
-
     render Components::Shared::StatFilters.new(
       stats: [
-        { label: "Pending", count: counts[:pending], color: "yellow", param: "pending" },
-        { label: "Printed", count: counts[:printed], param: "printed" },
-        { label: "Mailed", count: counts[:mailed], color: "blue", param: "mailed" },
-        { label: "Received", count: counts[:received], color: "green", param: "received" }
+        { label: "Pending", count: letter_state_counts.fetch("pending", 0), color: "yellow", param: "pending" },
+        { label: "Printed", count: letter_state_counts.fetch("printed", 0), param: "printed" },
+        { label: "Mailed", count: letter_state_counts.fetch("mailed", 0), color: "blue", param: "mailed" },
+        { label: "Received", count: letter_state_counts.fetch("received", 0), color: "green", param: "received" }
       ],
       active: status,
       base_path: ->(params = {}) { letters_path(origin: origin, search: search, user_id: user_id, **params) },

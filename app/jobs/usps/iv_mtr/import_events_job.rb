@@ -8,13 +8,14 @@ class USPS::IVMTR::ImportEventsJob < ApplicationJob
   }
 
   def perform(batch)
+    mids = batch.payload.filter_map { |e| e["imbMid"] }.uniq
+    mailer_ids_by_mid = USPS::MailerId.where(mid: mids).index_by(&:mid)
+
     ActiveRecord::Base.transaction do
       batch.payload.each do |event|
-        # Extract the mailer ID from the IMB
         imb_mid = event["imbMid"]
-        mailer_id = USPS::MailerId.find_by(mid: imb_mid)
+        mailer_id = mailer_ids_by_mid[imb_mid]
 
-        # Find or create the event
         USPS::IVMTR::Event.find_or_create_from_payload(
           event,
           batch.id,
@@ -22,7 +23,6 @@ class USPS::IVMTR::ImportEventsJob < ApplicationJob
         )
       end
 
-      # Mark the batch as processed
       batch.update!(processed: true)
     end
   end

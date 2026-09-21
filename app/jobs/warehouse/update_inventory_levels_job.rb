@@ -51,7 +51,7 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
     costless_skus = []
     zero_cost_sku_names = zero_cost_items.map { |i| i[:sku] }.to_set
 
-    Warehouse::SKU.all.each do |i|
+    Warehouse::SKU.find_each do |i|
       sku = i.sku
       inv_item = inventory[sku]
       unit_cost = unit_costs[sku] || default_unit_costs[sku]
@@ -72,7 +72,7 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
     end
 
     local_skus = Warehouse::SKU.pluck(:sku).to_set
-    new_sku_codes = []
+    new_skus = {}
 
     inventory.each do |sku_code, inv_item|
       next if local_skus.include?(sku_code)
@@ -87,18 +87,17 @@ class Warehouse::UpdateInventoryLevelsJob < ApplicationJob
         s.inbound = nilify(inv_item[:inbound])
         s.average_po_cost = unit_costs[sku_code] || default_unit_costs[sku_code]
       end
-      new_sku_codes << sku_code if sku.previously_new_record?
+      new_skus[sku_code] = sku if sku.previously_new_record?
     rescue => e
       Rails.logger.error("failed to create SKU #{sku_code}: #{e.message}")
     end
 
-    if new_sku_codes.any?
-      Rails.logger.info("created #{new_sku_codes.length} new SKU(s) from zenventory: #{new_sku_codes.join(', ')}")
+    if new_skus.any?
+      Rails.logger.info("created #{new_skus.length} new SKU(s) from zenventory: #{new_skus.keys.join(', ')}")
     end
 
-    new_sku_codes.each do |sku_code|
-      sku = Warehouse::SKU.find_by(sku: sku_code)
-      next unless sku&.enabled? && !sku.declared_unit_cost.positive? && (sku.in_stock.present? || sku.inbound.present?)
+    new_skus.each do |sku_code, sku|
+      next unless sku.enabled? && !sku.declared_unit_cost.positive? && (sku.in_stock.present? || sku.inbound.present?)
       costless_skus << sku unless zero_cost_sku_names.include?(sku_code)
     end
 

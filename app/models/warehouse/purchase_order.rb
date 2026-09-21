@@ -45,6 +45,10 @@ class Warehouse::PurchaseOrder < ApplicationRecord
       tsearch: { prefix: true }
     }
 
+  scope :blocked_on_skus, -> {
+    where(status: "approved")
+      .where("EXISTS (SELECT 1 FROM warehouse_purchase_order_line_items WHERE purchase_order_id = warehouse_purchase_orders.id AND sku_id IS NULL)")
+  }
 
   belongs_to :user
   belongs_to :reviewed_by, class_name: "User", optional: true

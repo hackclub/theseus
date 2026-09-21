@@ -5,11 +5,12 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   LETTER_STATES = %w[queued pending printed mailed received].freeze
 
-  def initialize(queue:, letters:, batches:, letter_counts:, search: nil, status: nil)
+  def initialize(queue:, letters:, batches:, letter_counts:, batch_letter_counts: {}, search: nil, status: nil)
     @queue = queue
     @letters = letters
     @batches = batches
     @letter_counts = letter_counts
+    @batch_letter_counts = batch_letter_counts
     @search = search
     @status = status
   end
@@ -35,7 +36,7 @@ class Views::Letter::Queues::ShowBase < Views::Base
 
   private
 
-  attr_reader :queue, :letters, :batches, :letter_counts, :search, :status
+  attr_reader :queue, :letters, :batches, :letter_counts, :batch_letter_counts, :search, :status
 
   # --- Header ---
 
