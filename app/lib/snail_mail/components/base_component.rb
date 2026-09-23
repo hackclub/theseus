@@ -81,8 +81,8 @@ module SnailMail
         render IMbComponent.new(letter: letter, x: x, y: y, width: width, **opts.merge(preview_mode: preview_mode?))
       end
 
-      def render_qr_code(x, y, size = 70)
-        render QRCodeComponent.new(letter: letter, x: x, y: y, size: size, **options)
+      def render_qr_code(x, y, size = 70, **opts)
+        render QRCodeComponent.new(letter: letter, x: x, y: y, size: size, **options.merge(opts))
       end
 
       def render_letter_id(x, y, size, **opts)
