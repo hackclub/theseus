@@ -63,7 +63,7 @@ class Views::Warehouse::Batches::Process < Views::Base
           end
         else
           form(method: :post, action: process_batch_warehouse_batch_path(@batch)) do
-            input(type: :hidden, name: :authenticity_token, value: helpers.form_authenticity_token)
+            input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
             render Components::MoneyNotice.new(
               lines: @batch.billing_lines,
               profiles: @batch.user.billing_profiles,

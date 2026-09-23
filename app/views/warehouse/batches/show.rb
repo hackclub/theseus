@@ -33,8 +33,8 @@ class Views::Warehouse::Batches::Show < Views::Base
           end
         end
         form(method: :post, action: warehouse_batch_path(@batch)) do
-          input(type: :hidden, name: :_method, value: :delete)
-          input(type: :hidden, name: :authenticity_token, value: helpers.form_authenticity_token)
+          input(type: "hidden", name: "_method", value: "delete")
+          input(type: "hidden", name: "authenticity_token", value: helpers.form_authenticity_token)
           button(type: "submit", class: "btn-danger btn-sm", data: { turbo_confirm: "Delete this batch?" }) { "✕" }
         end
       end
