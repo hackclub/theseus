@@ -40,6 +40,7 @@ class LettersController < ApplicationController
     authorize Letter
     @letter = Letter.new
     @letter.return_address = current_user.home_return_address || ReturnAddress.first
+    @letter.usps_mailer_id = current_user.home_mid
     @letter.build_address
     render Views::Letters::New.new(letter: @letter)
   end
