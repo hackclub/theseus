@@ -20,3 +20,14 @@ shared:
   agh_restricted:
     - PS  # Palestine
     - RU  # Russia
+
+  phone_on_label:
+    - AE  # United Arab Emirates
+    - SA  # Saudi Arabia
+    - QA  # Qatar
+    - KW  # Kuwait
+    - OM  # Oman
+    - IN  # India
+    - CN  # China
+    - VN  # Vietnam
+    - EG  # Egypt
