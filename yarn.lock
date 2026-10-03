@@ -645,10 +645,10 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.1.5.tgz#74ee3aad995d0a3996a6bb9533d4d280514ede03"
   integrity sha512-oJ4F3TnvpXaQwZJNF3ZK+kLPHKarDmJjJ6jyzVNDKH9md1dptjC7lWR//jrGuLdek/U6iltWxqAnYOu8gCiOvA==
 
-"@webtui/css@^0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@webtui/css/-/css-0.1.7.tgz#9fe53161f387e3b50e6012dbacec17a2da2910b7"
-  integrity sha512-iPK/gRM0EPBSa1tyJINm2pRPuKoT1GryN0Qljar+gDaKHJPNExKvOmnVKk91JpsTUb8qXZd+ggSJJjns1fXLNg==
+"@webtui/css@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@webtui/css/-/css-0.1.10.tgz#8eeed81b16b0a705103987743efb58f9c65d3c13"
+  integrity sha512-iovJnGDbhi0vaaOjpG+i56HGKx5hHls8JhhQxwPTl5b5ddce7PO+r7F+S4EObYjQlaa1RfClahkmpiNF+R8y8w==
 
 "@webtui/theme-gruvbox@^0.0.2":
   version "0.0.2"
