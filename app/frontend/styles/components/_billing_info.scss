@@ -1,0 +1,14 @@
+.billing-info__voided td {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.billing-info__transfers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--money-border);
+}

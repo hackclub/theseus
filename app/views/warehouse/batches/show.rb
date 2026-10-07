@@ -45,6 +45,7 @@ class Views::Warehouse::Batches::Show < Views::Base
         batch_details
         orders_section if @batch.orders.any?
         addresses_section if @batch.addresses.any?
+        billing_section if @batch.ledger_entries.any?
       end
 
       div(class: "show-sidebar") do
@@ -125,6 +126,10 @@ class Views::Warehouse::Batches::Show < Views::Base
         end
       end
     end
+  end
+
+  def billing_section
+    render Components::BillingInfo.new(ledger_entries: @batch.ledger_entries)
   end
 
   def actions_box

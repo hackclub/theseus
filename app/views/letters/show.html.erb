@@ -150,6 +150,12 @@
       <a href="<%= rails_blob_path(@letter.label, disposition: :inline) %>" target="_blank">⬇ Label PDF</a>
     <% end %>
 
+    <% if @letter.usps_indicium&.ledger_entries&.any? %>
+      <section class="mb-1">
+        <%= render Components::BillingInfo.new(ledger_entries: @letter.usps_indicium.ledger_entries) %>
+      </section>
+    <% end %>
+
     <%= render 'admin_inspector', record: @letter %>
   </div>
 
