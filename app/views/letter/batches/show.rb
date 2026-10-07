@@ -21,6 +21,7 @@ class Views::Letter::Batches::Show < Views::Base
         progress_section if show_progress?
         letters_table if @batch.letters.any?
         addresses_table if @batch.addresses.any?
+        billing_section if @batch.ledger_entries.any?
       end
       div(class: "show-sidebar") do
         actions_box
@@ -386,6 +387,10 @@ class Views::Letter::Batches::Show < Views::Base
         end
       end
     end
+  end
+
+  def billing_section
+    render Components::BillingInfo.new(ledger_entries: @batch.ledger_entries)
   end
 
   def addresses_table

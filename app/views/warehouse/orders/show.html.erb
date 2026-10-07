@@ -166,6 +166,8 @@
       </section>
     <% end %>
 
+    <%= render Components::BillingInfo.new(ledger_entries: @warehouse_order.ledger_entries) %>
+
     <%= render partial: "admin_inspector", locals: { record: @warehouse_order } %>
     <% inspector_toggle :line_items %>
   </div>
