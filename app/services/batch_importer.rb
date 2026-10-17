@@ -77,14 +77,15 @@ class BatchImporter
     errs << "City blank" if get(row, "city").blank?
     errs << "State blank" if get(row, "state").blank?
     zip = get(row, "postal_code")
-    errs << "ZIP blank" if zip.blank?
 
     raw_country = get(row, "country")
     if raw_country.present? && resolved_country(row).nil?
       # build_address would hand this to the country enum and raise mid-import.
       errs << "Unrecognized country (#{raw_country})"
+      errs << "ZIP blank" if zip.blank?
     else
       cc = country_code(row)
+      errs << "ZIP blank" if zip.blank? && ISO3166::Country[cc]&.postal_code != false
       # Only the US has a shape we can meaningfully check; "SW1A 2AA" is fine.
       errs << "ZIP looks invalid (#{zip})" if zip.present? && cc == "US" && zip.gsub(/\D/, "").length < 3
       errs << restricted_message(country_name(cc)) if cc.in?(restricted_countries)

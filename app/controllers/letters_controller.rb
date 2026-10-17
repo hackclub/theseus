@@ -350,7 +350,8 @@ class LettersController < ApplicationController
         :city,
         :state,
         :postal_code,
-        :country
+        :country,
+        :phone_number
       ],
       return_address_attributes: [
         :id,
