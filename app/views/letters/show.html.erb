@@ -213,8 +213,8 @@
           <button type="submit" class="btn-sm w-100 text-danger letter-delete-btn" data-turbo-confirm="Delete this letter?">Delete</button>
         <% end %>
       <% end %>
-      <% admin_tool do %>
-        <% if @letter.label.attached? %>
+      <% if @letter.label.attached? %>
+        <% admin_tool do %>
           <%= form_with url: clear_label_letter_path(@letter), method: :post, class: "form-inline" do %>
             <button type="submit" class="btn-sm w-100" data-turbo-confirm="Clear label?">Clear label</button>
           <% end %>
