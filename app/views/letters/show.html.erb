@@ -207,7 +207,7 @@
       <% end %>
 
       <%# Destructive actions %>
-      <% if policy(@letter).destroy? && @letter.pending? && @letter.usps_indicium.nil? && @letter.batch_id.nil? %>
+      <% if policy(@letter).destroy? && (@letter.queued? || @letter.pending?) && @letter.usps_indicium.nil? %>
         <hr class="letter-hr-tight">
         <%= form_with url: letter_path(@letter), method: :delete, class: "form-inline" do %>
           <button type="submit" class="btn-sm w-100 text-danger letter-delete-btn" data-turbo-confirm="Delete this letter?">Delete</button>
