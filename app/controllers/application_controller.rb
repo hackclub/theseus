@@ -31,6 +31,10 @@ class ApplicationController < ActionController::Base
     PaperTrail.request.controller_info = { ip: request.remote_ip }
   end
 
+  def user_for_paper_trail
+    current_user&.id
+  end
+
   rescue_from Pundit::NotAuthorizedError do |e|
     flash[:error] = "you don't seem to be authorized – ask nora?"
     redirect_to root_path

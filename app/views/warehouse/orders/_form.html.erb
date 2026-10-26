@@ -88,8 +88,24 @@
 
   <%= render 'shared/primer_tag_picker', form: form, taggable: warehouse_order %>
 
-  <div class="flex-row">
-    <a href="<%= warehouse_order.persisted? ? warehouse_order_path(warehouse_order) : warehouse_orders_path %>">Cancel</a>
-    <button type="submit" class="btn-success">✓ <%= warehouse_order.persisted? ? "Update Order" : "Create Order" %></button>
-  </div>
+  <% if warehouse_order.dispatched? %>
+    <div class="banner banner-error mb-1">
+      Saving changes to a dispatched order can unpick active orders and cause fulfillment problems that strain our relationship with the warehouse. Do not save unless you have verified in Zenventory that no items have been allocated and the order is not being/has not been picked.
+      <div class="mt-half">
+        <label>
+          <input type="checkbox" id="zenv-check" onchange="document.getElementById('dispatched-submit').disabled = !this.checked">
+          I have verified this in Zenventory.
+        </label>
+      </div>
+    </div>
+    <div class="flex-row">
+      <a href="<%= warehouse_order_path(warehouse_order) %>">Cancel</a>
+      <button type="submit" id="dispatched-submit" class="btn-danger" disabled>⚠ Update Dispatched Order</button>
+    </div>
+  <% else %>
+    <div class="flex-row">
+      <a href="<%= warehouse_order.persisted? ? warehouse_order_path(warehouse_order) : warehouse_orders_path %>">Cancel</a>
+      <button type="submit" class="btn-success">✓ <%= warehouse_order.persisted? ? "Update Order" : "Create Order" %></button>
+    </div>
+  <% end %>
 <% end %>

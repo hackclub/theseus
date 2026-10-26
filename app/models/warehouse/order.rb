@@ -456,7 +456,12 @@ class Warehouse::Order < ApplicationRecord
   def set_hc_id = update_column(:hc_id, public_id)
 
   def update_costs
-    # Ensure line items are loaded and include their SKUs
+    # Costs are frozen at dispatch. The last calculation happens on the
+    # final draft save; once the state leaves draft, no re-pricing.
+    # This prevents background jobs (mailing info sync, cancellation)
+    # and stale form re-saves from repricing against current SKU costs.
+    return unless draft?
+
     line_items.includes(:sku).load
     self.labor_cost = labor_cost
     self.contents_cost = contents_actual_cost_to_hc

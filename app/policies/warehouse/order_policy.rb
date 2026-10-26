@@ -7,6 +7,7 @@ class Warehouse::OrderPolicy < ApplicationPolicy
 
   def edit?
     return false unless user_can_warehouse
+    return false if record.dispatched? || record.mailed? || record.canceled? unless user_is_admin
     record_belongs_to_user || user_is_admin
   end
 

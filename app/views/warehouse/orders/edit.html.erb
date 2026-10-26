@@ -8,6 +8,14 @@
   </div>
 </div>
 
+<% if @warehouse_order.dispatched? || @warehouse_order.mailed? %>
+  <div class="banner banner-error mb-1">
+    <strong>⚠ THIS ORDER HAS ALREADY BEEN SENT TO THE WAREHOUSE.</strong><br>
+    Before saving changes, go check in <a href="<%= @warehouse_order.zenventory_url %>" target="_blank">Zenventory</a> whether any items have been picked or packed.<br>
+    <strong>If they have, ABORT. Do not save.</strong> Editing a picked order will desync Theseus and the warehouse.
+  </div>
+<% end %>
+
 <div class="show-layout">
   <div class="show-main">
     <%= render "form", warehouse_order: @warehouse_order %>

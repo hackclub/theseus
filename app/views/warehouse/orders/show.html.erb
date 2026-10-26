@@ -17,7 +17,9 @@
   </div>
   <span class="spacer"></span>
   <div class="flex-row">
-    <a href="<%= edit_warehouse_order_path(@warehouse_order) %>">✎ Edit</a>
+    <% if policy(@warehouse_order).edit? %>
+      <a href="<%= edit_warehouse_order_path(@warehouse_order) %>">✎ Edit</a>
+    <% end %>
     <a href="<%= public_package_path(@warehouse_order) %>" target="_blank">↗ Public</a>
     <% if @warehouse_order.zenventory_url.present? %>
       <a href="<%= @warehouse_order.zenventory_url %>" target="_blank">↗ Zen</a>

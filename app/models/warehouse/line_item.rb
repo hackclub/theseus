@@ -23,6 +23,7 @@
 #  fk_rails_...  (template_id => warehouse_templates.id)
 #
 class Warehouse::LineItem < ApplicationRecord
+  has_paper_trail
   belongs_to :order, class_name: "Warehouse::Order", optional: true
   belongs_to :sku, class_name: "Warehouse::SKU", optional: true
   belongs_to :template, optional: true
