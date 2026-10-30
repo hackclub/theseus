@@ -11,8 +11,9 @@ module SnailMail
 
         if letter.postage_type == "indicia"
           IMI.render_indicium(self, letter, letter.usps_indicium, x_position)
-          FIM.render_fim_d(self, x_position - 62)
-          stroke_preview_bounds(x_position - 62, bounds.top, 200, 50, label: "postage + FIM-D")
+          shift = IMI.hashid_shift(self, letter.usps_indicium)
+          FIM.render_fim_d(self, x_position - 62 - shift)
+          stroke_preview_bounds(x_position - 62 - shift, bounds.top, 200 + shift, 50, label: "postage + FIM-D")
         elsif letter.postage_type == "stamps"
           render_stamps_postage(x_position)
           stroke_preview_bounds(bounds.right - 55, bounds.top - 5, 50, 50, label: "postage (stamps)")
