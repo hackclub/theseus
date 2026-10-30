@@ -157,7 +157,7 @@ GEM
     connection_pool (3.0.2)
     countries (8.1.0)
       unaccent (~> 0.3)
-    crass (1.0.7)
+    crass (1.0.8)
     csv (3.3.6)
     date (3.5.1)
     debug (1.11.1)
