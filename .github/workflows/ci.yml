@@ -29,6 +29,10 @@ jobs:
       # no master key in CI, so lockbox/blind_index need throwaway keys
       LOCKBOX_MASTER_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
       BLIND_INDEX_MASTER_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      HCB_USPS_ORG_ID: org_ci_usps
+      HCB_WAREHOUSE_ORG_ID: org_ci_warehouse
+      HCB_CLIENT_ID: ci_client_id
+      HCB_CLIENT_SECRET: ci_client_secret
 
     steps:
       - uses: actions/checkout@v4
