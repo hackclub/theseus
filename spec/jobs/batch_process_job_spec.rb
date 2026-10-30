@@ -142,7 +142,7 @@ RSpec.describe BatchProcessJob, type: :job do
 
         sent = hcb_disbursements.sole
         expect(sent[:profile]).to eq(hcb_account)
-        expect(sent[:amount_cents]).to eq((letters.sum(&:postage) * 100).ceil)
+        expect(sent[:amount_cents]).to eq(letters.sum { |l| (l.postage_for(postage_type: "indicia").to_d * 100).ceil })
         expect(sent[:name]).to start_with("Postage for #{batch.public_id}")
 
         entry = batch.ledger_entries.sole

@@ -95,9 +95,8 @@ module Warehouse
       param :address, :object, "Shipping address fields to update", optional: true
     end
     def update
-      billing_profile = resolve_billing_profile(params[:billing_profile_id])
       update_attrs = order_params
-      update_attrs[:billing_profile] = billing_profile if params.key?(:billing_profile_id)
+      update_attrs[:billing_profile] = resolve_billing_profile(params[:billing_profile_id]) if params.key?(:billing_profile_id)
 
       @order.update!(update_attrs)
       render :show

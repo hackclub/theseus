@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "USPS IV-MTR webhook", type: :request do
+  let(:password) { "iv_mtr_spec_password" }
   let(:headers) do
-    password = Rails.application.credentials.dig(:usps, :iv_mtr, :webhook_password)
     {
       "CONTENT_TYPE" => "application/json",
       "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials("my_best_friend_the_informed_visibility_robot", password)
@@ -15,7 +15,11 @@ RSpec.describe "USPS IV-MTR webhook", type: :request do
 
   def body = JSON.parse(response.body)
 
-  before { allow(USPS::IVMTR::ImportEventsJob).to receive(:perform_later) }
+  before do
+    allow(USPS::IVMTR::ImportEventsJob).to receive(:perform_later)
+    allow(Rails.application.credentials).to receive(:dig).and_call_original
+    allow(Rails.application.credentials).to receive(:dig).with(:usps, :iv_mtr, :webhook_password).and_return(password)
+  end
 
   it "accepts a real batch" do
     expect {
