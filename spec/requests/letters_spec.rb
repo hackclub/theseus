@@ -254,7 +254,7 @@ RSpec.describe "letters", type: :request do
 
       delete letter_path(standalone)
 
-      expect(response.status).to be_in([302, 303])
+      expect(response.status).to be_in([ 302, 303 ])
       expect { Letter.find(letter_id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end

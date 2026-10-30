@@ -43,7 +43,6 @@ module API
           letter_params.except(:address).merge(user: current_user),
         )
         render :create_letter, status: :created
-
       end
 
       def create_instant_letter

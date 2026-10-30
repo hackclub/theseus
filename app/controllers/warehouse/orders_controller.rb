@@ -183,5 +183,4 @@ class Warehouse::OrdersController < ApplicationController
       address_attributes: %i[first_name last_name line_1 line_2 city state postal_code country phone_number email],
     )
   end
-
 end

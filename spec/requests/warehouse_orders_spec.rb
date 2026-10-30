@@ -85,14 +85,14 @@ RSpec.describe "Warehouse orders", type: :request do
 
     it "POST create with address, line items, and tags saves as draft" do
       sku2 = create(:warehouse_sku, name: "Patches")
-      
+
       post warehouse_orders_path, params: {
         warehouse_order: {
           user_facing_title: "Custom order",
           user_facing_description: "A test order",
           recipient_email: "customer@example.com",
           notify_on_dispatch: "1",
-          tags: ["urgent", "custom"],
+          tags: [ "urgent", "custom" ],
           address_attributes: {
             first_name: "Jane",
             last_name: "Doe",
@@ -174,10 +174,10 @@ RSpec.describe "Warehouse orders", type: :request do
   describe "order show page" do
     it "GET show renders the order with line items table and status badge" do
       order.line_items.create!(sku: create(:warehouse_sku, name: "Extra SKU"), quantity: 3)
-      
+
       get warehouse_order_path(order)
       expect(response).to have_http_status(:ok)
-      
+
       # Check for line items - SKU names
       expect(response.body).to include(sku.name)
       expect(response.body).to include("Extra SKU")
@@ -187,7 +187,7 @@ RSpec.describe "Warehouse orders", type: :request do
   describe "order index" do
     let(:order2) do
       Warehouse::Order.from_template(
-        template, user: user, recipient_email: "b@c.com", 
+        template, user: user, recipient_email: "b@c.com",
         address: create(:address, country: "US"), billing_profile: profile
       ).tap(&:save!)
     end
@@ -224,8 +224,6 @@ RSpec.describe "Warehouse orders", type: :request do
       expect(response).to have_http_status(:ok)
       # Just verify the page renders without error
     end
-
-
   end
 
   describe "sending to warehouse" do

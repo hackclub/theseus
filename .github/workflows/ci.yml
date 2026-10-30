@@ -26,9 +26,21 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/theseus_test
+      # no master key in CI, so lockbox/blind_index need throwaway keys
+      LOCKBOX_MASTER_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      BLIND_INDEX_MASTER_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      HCB_USPS_ORG_ID: org_ci_usps
+      HCB_WAREHOUSE_ORG_ID: org_ci_warehouse
+      HCB_CLIENT_ID: ci_client_id
+      HCB_CLIENT_SECRET: ci_client_secret
 
     steps:
       - uses: actions/checkout@v4
+
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install --no-install-recommends -y imagemagick libmagickwand-dev ghostscript
+          sudo sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
 
       - uses: ruby/setup-ruby@v1
         with:

@@ -249,7 +249,7 @@ RSpec.describe "warehouse batches", type: :request do
 
     it "does not show private templates you don't own" do
       private_other = Warehouse::Template.create!(name: "Other User's Private", user: create(:user), public: false)
-      
+
       get new_warehouse_batch_path
       expect(response.body).not_to include("Other User's Private")
     end
