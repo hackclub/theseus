@@ -40,7 +40,7 @@ module SnailMail
           char_width = pdf.width_of("m", size: HASHID_SIZE)
         end
         overflow = text_width + HASHID_PADDING - HASHID_ROOM
-        overflow.positive? ? (overflow / char_width).ceil * char_width : 0
+        overflow.positive? ? (overflow / char_width).ceil * char_width + HASHID_NUDGE : 0
       end
 
       private
@@ -48,6 +48,7 @@ module SnailMail
       HASHID_SIZE = 6.2
       HASHID_ROOM = 79
       HASHID_PADDING = 2
+      HASHID_NUDGE = 2
 
       def hashid_text(indicium) = "#{Rails.env.production? ? "hackapost" : "DEV"}!/#{indicium.hashid}"
 
