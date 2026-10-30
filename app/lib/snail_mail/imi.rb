@@ -16,21 +16,40 @@ module SnailMail
           at: [ x + 79, pdf.bounds.top - 8 ],
           width: 51,
         )
-        pdf.bounding_box([ x, pdf.bounds.top - 11 ], width: 90, height: 45) do
+        text_x = x - hashid_shift(pdf, indicium)
+        pdf.bounding_box([ text_x, pdf.bounds.top - 11 ], width: 90 + x - text_x, height: 45) do
           pdf.font_size(8)
           pdf.text("U.S. POSTAGE", style: :bold)
           pdf.text(letter.mailing_date.strftime("%m/%d/%Y")) unless options[:no_indicia_date]
           pdf.text(ActiveSupport::NumberHelper.number_to_currency(indicium.cost))
           pdf.text("LFP", style: :bold)
-          pdf.font("f25") { pdf.text("#{Rails.env.production? ? "hackapost" : "DEV"}!/#{indicium.hashid}", size: 6.2) }
+          pdf.font("f25") { pdf.text(hashid_text(indicium), size: HASHID_SIZE) }
         end
 
-        pdf.image(StringIO.new(WATERMARK), at: [ x, pdf.bounds.top - 5 ], width: 121) if (wm = svg % "#watermark") && wm["visibility"] != "hidden"
+        pdf.image(StringIO.new(WATERMARK), at: [ text_x, pdf.bounds.top - 5 ], width: 121) if (wm = svg % "#watermark") && wm["visibility"] != "hidden"
       rescue StandardError => e
         render_no_indicium(pdf, letter, e.class == StandardError ? e.message : "#{e.class}: #{e.message}")
       end
 
+      def hashid_shift(pdf, indicium)
+        return 0 unless indicium
+
+        text_width = char_width = nil
+        pdf.font("f25") do
+          text_width = pdf.width_of(hashid_text(indicium), size: HASHID_SIZE)
+          char_width = pdf.width_of("m", size: HASHID_SIZE)
+        end
+        overflow = text_width + HASHID_PADDING - HASHID_ROOM
+        overflow.positive? ? (overflow / char_width).ceil * char_width : 0
+      end
+
       private
+
+      HASHID_SIZE = 6.2
+      HASHID_ROOM = 79
+      HASHID_PADDING = 2
+
+      def hashid_text(indicium) = "#{Rails.env.production? ? "hackapost" : "DEV"}!/#{indicium.hashid}"
 
       def render_no_indicium(pdf, letter, reason)
         error_text = <<~EOT
