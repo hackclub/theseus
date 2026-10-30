@@ -30,6 +30,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install --no-install-recommends -y imagemagick libmagickwand-dev ghostscript
+          sudo sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4.4"
