@@ -9,7 +9,7 @@
       "note": "admin-only inspector; awesome_print output passed through sanitize with an explicit tag/attribute allowlist"
     },
     {
-      "fingerprint": "c3445cfef0c4723db5eabf5877e65e4c64a37158e3413a5fe96bad689c3c61b7",
+      "fingerprint": "5ebf484f7d05aa2b6ec7b4e78af7beade81858b7924e28897b8e8c3abe89fff8",
       "note": "tracking_url is built by Tracking.tracking_url_for from a fixed carrier template, not from user input"
     }
   ],

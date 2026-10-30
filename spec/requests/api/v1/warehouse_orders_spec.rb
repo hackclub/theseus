@@ -114,7 +114,7 @@ RSpec.describe "API v1 warehouse orders", type: :request do
       expect(response).to have_http_status(:ok)
       expect(body).to have_key("warehouse_orders")
       expect(body["warehouse_orders"].count).to eq(2)
-      expect(body["warehouse_orders"].map { |o| o["id"] }).to match_array([order1.hc_id, order2.hc_id])
+      expect(body["warehouse_orders"].map { |o| o["id"] }).to match_array([ order1.hc_id, order2.hc_id ])
     end
 
     it "respects API key scoping — only shows the key owner's orders" do

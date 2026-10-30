@@ -123,7 +123,7 @@ RSpec.describe "Edge cases", type: :request do
       }
 
       # Should fail validation or redirect on error
-      expect([302, 400, 422]).to include(response.status)
+      expect([ 302, 400, 422 ]).to include(response.status)
     end
 
     it "handles CSV with bad UTF-8 encoding gracefully" do
@@ -154,7 +154,7 @@ RSpec.describe "Edge cases", type: :request do
       # Should not return 500 error
       expect(response.status).not_to eq(500)
       # Should be either validation error (400/422) or redirect (302)
-      expect([302, 400, 422]).to include(response.status)
+      expect([ 302, 400, 422 ]).to include(response.status)
     end
 
     it "accepts valid CSV file upload to letter batch" do
@@ -183,7 +183,7 @@ RSpec.describe "Edge cases", type: :request do
       }
 
       # Should redirect or show form, not crash (500)
-      expect([302, 400, 422]).to include(response.status)
+      expect([ 302, 400, 422 ]).to include(response.status)
     end
   end
 
@@ -205,7 +205,7 @@ RSpec.describe "Edge cases", type: :request do
       }
 
       # Should fail validation or redirect on error
-      expect([302, 400, 422]).to include(response.status)
+      expect([ 302, 400, 422 ]).to include(response.status)
     end
 
     it "handles warehouse CSV with bad UTF-8 encoding gracefully" do
@@ -231,7 +231,7 @@ RSpec.describe "Edge cases", type: :request do
       # Should not return 500 error
       expect(response.status).not_to eq(500)
       # Should be either validation error (400/422) or redirect (302)
-      expect([302, 400, 422]).to include(response.status)
+      expect([ 302, 400, 422 ]).to include(response.status)
     end
   end
 
@@ -240,13 +240,13 @@ RSpec.describe "Edge cases", type: :request do
       get letter_path(id: "nonexistent")
 
       # Should handle gracefully (either 404 or redirect)
-      expect([302, 404]).to include(response.status)
+      expect([ 302, 404 ]).to include(response.status)
     end
 
     it "does not crash when accessing invalid batch ID" do
       get letter_batch_path(id: "nonexistent")
 
-      expect([302, 404]).to include(response.status)
+      expect([ 302, 404 ]).to include(response.status)
     end
 
     it "returns error when submitting batch with invalid return address" do
@@ -259,7 +259,7 @@ RSpec.describe "Edge cases", type: :request do
         }
       }
 
-      expect([302, 422]).to include(response.status)
+      expect([ 302, 422 ]).to include(response.status)
       # Error should be present in response
       expect(response.body).to include("error") if response.status == 422
     end
@@ -272,7 +272,7 @@ RSpec.describe "Edge cases", type: :request do
       get "/letters/#{letter.id}"
 
       # Should render or redirect, not crash (500)
-      expect([200, 302, 403, 404]).to include(response.status)
+      expect([ 200, 302, 403, 404 ]).to include(response.status)
     end
 
     it "renders public package page without crashing" do
@@ -291,7 +291,7 @@ RSpec.describe "Edge cases", type: :request do
       get "/packages/#{order.id}"
 
       # Should render or redirect, not crash (500)
-      expect([200, 302, 403, 404]).to include(response.status)
+      expect([ 200, 302, 403, 404 ]).to include(response.status)
     end
   end
 end

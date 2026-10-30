@@ -112,7 +112,7 @@ class Views::Billing::Index < Views::Base
 
     active = @billing_profiles.select { |p| profile_has_activity?(p) }
     inactive_count = @billing_profiles.size - active.size
-    profiles_to_show = @show_all_profiles ? @billing_profiles.sort_by { |p| p.organization_name.downcase } : active.sort_by { |p| [-p.hcb_transfers.where(state: [ :unknown, :failed ]).count, p.organization_name.downcase] }
+    profiles_to_show = @show_all_profiles ? @billing_profiles.sort_by { |p| p.organization_name.downcase } : active.sort_by { |p| [ -p.hcb_transfers.where(state: [ :unknown, :failed ]).count, p.organization_name.downcase ] }
 
     section(class: "mb-1h") do
       div(class: "toolbar mb-half") do

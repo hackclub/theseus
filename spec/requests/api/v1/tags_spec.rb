@@ -25,10 +25,10 @@ RSpec.describe "API v1 tags", type: :request do
     it "returns tags from common tags, letters, and warehouse orders" do
       # Create a common tag
       CommonTag.create!(tag: "urgent")
-      
+
       # Create a letter with a tag
-      create(:letter, user: user, tags: ["billing"])
-      
+      create(:letter, user: user, tags: [ "billing" ])
+
       get "/api/v1/tags", headers: headers
 
       expect(response).to have_http_status(:ok)
@@ -47,8 +47,8 @@ RSpec.describe "API v1 tags", type: :request do
   describe "GET /api/v1/tags/:id" do
     it "returns tag statistics for a tag with letters" do
       CommonTag.create!(tag: "marketing")
-      letter = create(:letter, user: user, tags: ["marketing"], postage: 0.58, aasm_state: "mailed")
-      
+      letter = create(:letter, user: user, tags: [ "marketing" ], postage: 0.58, aasm_state: "mailed")
+
       get "/api/v1/tags/marketing", headers: headers
 
       expect(response).to have_http_status(:ok)
@@ -63,12 +63,12 @@ RSpec.describe "API v1 tags", type: :request do
       sku = create(:warehouse_sku, declared_unit_cost_override: 2.0, actual_cost_to_hc: 1.0)
       template = Warehouse::Template.create!(name: "Test", user: user, public: true)
         .tap { |t| t.line_items.create!(sku: sku, quantity: 1) }
-      
+
       profile = create(:billing_profile, user: user)
       order = Warehouse::Order.from_template(
         template, user: user, recipient_email: "test@example.com",
         address: create(:address, country: "US"), billing_profile: profile
-      ).tap { |o| o.save!; o.update_columns(tags: ["fulfillment"], aasm_state: "dispatched") }
+      ).tap { |o| o.save!; o.update_columns(tags: [ "fulfillment" ], aasm_state: "dispatched") }
 
       get "/api/v1/tags/fulfillment", headers: headers
 
@@ -90,7 +90,7 @@ RSpec.describe "API v1 tags", type: :request do
 
     it "requires authentication" do
       CommonTag.create!(tag: "test")
-      
+
       get "/api/v1/tags/test"
 
       expect(response).not_to have_http_status(:ok)
@@ -100,20 +100,20 @@ RSpec.describe "API v1 tags", type: :request do
   describe "GET /api/v1/tags/:id/letters" do
     it "only returns the key owner's letters for a tag" do
       other_user = create(:user)
-      
-      mine = create(:letter, user: user, tags: ["archived"])
-      create(:letter, user: other_user, tags: ["archived"])
+
+      mine = create(:letter, user: user, tags: [ "archived" ])
+      create(:letter, user: other_user, tags: [ "archived" ])
 
       get "/api/v1/tags/archived/letters", headers: headers
 
       expect(response).to have_http_status(:ok)
       expect(body).to have_key("letters")
-      expect(body["letters"].map { |l| l["id"] }).to eq([mine.public_id])
+      expect(body["letters"].map { |l| l["id"] }).to eq([ mine.public_id ])
     end
 
     it "returns empty letters for a tag with no items visible to the user" do
       other_user = create(:user)
-      create(:letter, user: other_user, tags: ["secret"])
+      create(:letter, user: other_user, tags: [ "secret" ])
 
       get "/api/v1/tags/secret/letters", headers: headers
 
