@@ -30,9 +30,11 @@ module SnailMail
             font("arial") do
               text_box(
                 letter.rubber_stamps,
-                at: [ 7, 200 ],
+                # with a QR code the letter ID is hidden, so the stamps can start
+                # higher up and stop short of the QR caption
+                at: [ 7, options[:include_qr_code] ? 218 : 200 ],
                 width: 100,
-                height: 80,
+                height: options[:include_qr_code] ? 74 : 80,
                 overflow: :shrink_to_fit,
                 disable_wrap_by_char: true,
                 min_size: 1
