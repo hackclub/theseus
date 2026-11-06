@@ -1528,10 +1528,10 @@ quote-stream@^1.0.1, quote-stream@~1.0.2:
     minimist "^1.1.3"
     through2 "^2.0.0"
 
-qz-tray@^2.2.4:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/qz-tray/-/qz-tray-2.2.4.tgz#14f2e5eb14656dfc3da71fa20d1517906466427c"
-  integrity sha512-5beEVkqewsuB//B0p+1guP7w45VU6kILazYa+VePHy5k0U2EzmE8JnZ/06pspgVgeeKIJDKb/Uu4Cu6tGi1cIw==
+qz-tray@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/qz-tray/-/qz-tray-2.3.0.tgz#865ba77891317b642c498e57b4c4188420e185bd"
+  integrity sha512-hviWThaaUHdjSTjs1q7D8ow8F7l1iBUhbM3J+sOL2DgkTlXO5DmxQewMdirdQgnUQAuaiSzVB9wIhiltOn1aaQ==
 
 readable-stream@^2.0.2, readable-stream@^2.2.2, readable-stream@~2.3.3, readable-stream@~2.3.6:
   version "2.3.8"
