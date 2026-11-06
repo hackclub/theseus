@@ -57,6 +57,11 @@ Rails.application.configure do
     billing_reconcile: {
       cron: "*/10 * * * *",  # resolve unknown / stale-pending transfers against HCB
       class: "BillingReconcileJob"
+    },
+    stale_batch_check: {
+      cron: "*/15 * * * *",
+      class: "BatchStaleCheckJob",
+      description: "Detect and fail batches stuck in processing states"
     }
   }
 end

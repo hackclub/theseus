@@ -3,6 +3,15 @@
 class BatchProcessJob < ApplicationJob
   queue_as :default
 
+  discard_on(StandardError) do |job, error|
+    batch = Letter::Batch.find_by(id: job.arguments.first)
+    if batch && !batch.processed?
+      batch.update(process_error: "Job failed unexpectedly: #{error.message}"[0..500])
+      batch.mark_failed! if batch.may_mark_failed?
+    end
+    Sentry.capture_exception(error, extra: { batch_id: job.arguments.first })
+  end
+
   good_job_control_concurrency_with(
     perform_limit: 1,
     key: -> { "batch_process_#{arguments.first}" }
@@ -166,10 +175,17 @@ class BatchProcessJob < ApplicationJob
             broadcast_cell(batch, letter, "failed")
             broadcast_letter_error(batch, letter, e.message[0..200])
             Sentry.capture_exception(e, tags: { money: true }, extra: { letter_id: letter.id, batch_id: batch.id })
-          ensure
-            broadcast_summary(batch, purchased: purchased_count.value, total: total, failed: failed_count.value)
           end
         end
+      rescue => e
+        # Connection pool exhaustion or other infrastructure error outside with_connection
+        letter.update_columns(indicia_state: "failed", indicia_error: e.message[0..500])
+        failed_count.increment
+        broadcast_cell(batch, letter, "failed")
+        broadcast_letter_error(batch, letter, e.message[0..200])
+        Sentry.capture_exception(e, tags: { money: true }, extra: { letter_id: letter.id, batch_id: batch.id })
+      ensure
+        broadcast_summary(batch, purchased: purchased_count.value, total: total, failed: failed_count.value)
       end
     end
 
