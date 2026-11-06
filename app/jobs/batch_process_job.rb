@@ -16,7 +16,15 @@ class BatchProcessJob < ApplicationJob
     options = (batch.process_options || {}).symbolize_keys
 
     # Phase 1: configure letters
-    configure_letters(batch, options)
+    config_failures = begin
+      configure_letters(batch, options)
+    rescue => e
+      batch.update!(process_error: "Configuration failed: #{e.message}")
+      batch.mark_failed! if batch.may_mark_failed?
+      broadcast_error_banner(batch, "Configuration failed: #{e.message}")
+      Sentry.capture_exception(e, extra: { batch_id: batch.id })
+      return
+    end
 
     # Phase 2: purchase indicia if needed
     if options[:us_postage_type] == "indicia" || options[:intl_postage_type] == "indicia"
@@ -68,6 +76,7 @@ class BatchProcessJob < ApplicationJob
   private
 
   def configure_letters(batch, options)
+    failed = 0
     batch.letters.includes(:address).find_each do |letter|
       letter.mailing_date = batch.letter_mailing_date
       if letter.address&.us?
@@ -78,7 +87,23 @@ class BatchProcessJob < ApplicationJob
       letter.user_facing_title = options[:user_facing_title] if options[:user_facing_title].present?
       letter.non_machinable = options[:non_machinable] if options.key?(:non_machinable)
       letter.save!
+    rescue USPS::USPSError => e
+      # USPS pricing can reject certain country/rate combos during the
+      # before_save :set_postage callback. Persist the intended attributes
+      # (bypassing callbacks) so the letter is findable on retry, and record
+      # the error so the UI shows what went wrong.
+      letter.update_columns(
+        postage_type: letter.postage_type,
+        mailing_date: letter.mailing_date,
+        non_machinable: letter.non_machinable,
+        indicia_state: "failed",
+        indicia_error: e.message[0..500],
+      )
+      broadcast_cell(batch, letter, "failed")
+      broadcast_letter_error(batch, letter, e.message[0..200])
+      failed += 1
     end
+    failed
   end
 
   def purchase_indicia(batch, options)

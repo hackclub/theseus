@@ -90,7 +90,7 @@ class Batch < ApplicationRecord
     end
 
     event :mark_failed do
-      transitions from: [ :purchasing, :generating_labels ], to: :failed
+      transitions from: [ :fields_mapped, :purchasing, :generating_labels ], to: :failed
     end
   end
 

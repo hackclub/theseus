@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_15_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -382,6 +382,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.index ["hcb_payment_account_id"], name: "index_letter_queues_on_hcb_payment_account_id"
     t.index ["letter_mailer_id_id"], name: "index_letter_queues_on_letter_mailer_id_id"
     t.index ["letter_return_address_id"], name: "index_letter_queues_on_letter_return_address_id"
+    t.index ["slug"], name: "index_letter_queues_on_slug", unique: true
     t.index ["type"], name: "index_letter_queues_on_type"
     t.index ["user_id"], name: "index_letter_queues_on_user_id"
   end
@@ -426,6 +427,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.index ["created_via"], name: "index_letters_on_created_via"
     t.index ["idempotency_key"], name: "index_letters_on_idempotency_key", unique: true
     t.index ["imb_serial_number"], name: "index_letters_on_imb_serial_number"
+    t.index ["indicia_state"], name: "index_letters_on_indicia_state"
     t.index ["letter_queue_id"], name: "index_letters_on_letter_queue_id"
     t.index ["return_address_id"], name: "index_letters_on_return_address_id"
     t.index ["tags"], name: "index_letters_on_tags", using: :gin
@@ -470,6 +472,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.string "hca_id"
     t.boolean "opted_out_of_map", default: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_public_users_on_email", unique: true
     t.index ["hca_id"], name: "index_public_users_on_hca_id", unique: true
   end
 
@@ -544,6 +547,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
   create_table "users", force: :cascade do |t|
     t.boolean "can_impersonate_public"
     t.boolean "can_use_indicia", default: false, null: false
+    t.boolean "can_view_all", default: false, null: false
     t.boolean "can_warehouse"
     t.datetime "created_at", null: false
     t.string "email"
@@ -622,6 +626,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_160000) do
     t.string "account_number"
     t.integer "account_type"
     t.boolean "ach"
+    t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.string "manifest_mid"
     t.string "name"

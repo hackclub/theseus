@@ -57,6 +57,7 @@ class Views::Letter::Batches::Show < Views::Base
           end
           raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
           raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
+          failed_letters_table
           div(class: "retry-actions-row") do
             form_with(url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline") do
               button(type: "submit", class: "btn-warning btn-sm") { "⟳ Retry" }
@@ -70,6 +71,7 @@ class Views::Letter::Batches::Show < Views::Base
             end
             raw helpers.render(partial: "letter/batches/grid", locals: { cells: purchasing_grid_cells })
             raw helpers.render(partial: "letter/batches/grid_summary", locals: { batch: @batch })
+            failed_letters_table
             div(class: "retry-actions-row") do
               form_with(url: retry_failed_letter_batch_path(@batch), method: :post, class: "form-inline") do
                 button(type: "submit", class: "btn-warning btn-sm") { "⟳ Retry Failed" }
@@ -93,6 +95,36 @@ class Views::Letter::Batches::Show < Views::Base
       else ""
       end
       { id: letter.id, state: state, title: letter.public_id, icon: icon }
+    end
+  end
+
+  def failed_letters_table
+    failed = @batch.letters.where(indicia_state: "failed").includes(:address)
+    return unless failed.any?
+
+    div(class: "mt-half") do
+      table do
+        thead do
+          tr do
+            th { "Letter" }
+            th { "Recipient" }
+            th { "Country" }
+            th { "Error" }
+          end
+        end
+        tbody do
+          failed.each do |letter|
+            tr do
+              td do
+                a(href: letter_path(letter), class: "no-underline") { letter.public_id }
+              end
+              td { plain [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ").presence || "—" }
+              td(class: "text-muted") { plain letter.address&.country || "—" }
+              td(class: "text-danger") { plain letter.indicia_error || "Unknown error" }
+            end
+          end
+        end
+      end
     end
   end
 

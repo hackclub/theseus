@@ -114,6 +114,59 @@ RSpec.describe BatchProcessJob, type: :job do
       intl_letter.reload
       expect(intl_letter.postage_type).to eq("stamps")
     end
+
+    context "when USPS pricing rejects a letter during configuration" do
+      it "marks only the failing letter as failed and continues the batch" do
+        allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
+        us_letter = create_letters(1).first
+        # Create intl letter with postage_type: "indicia" so configure_letters
+        # changing it to "stamps" triggers should_reprice? → set_postage.
+        intl_letter = create_letters(1,
+          address_attrs: { country: "GB", state: "London", postal_code: "SW1A 1AA" },
+          letter_attrs: { postage_type: "indicia", mailing_date: batch.letter_mailing_date },
+        ).first
+        # Use stamps for intl so purchase_indicia (which queries postage_type:
+        # "indicia") won't re-buy the failed letter and mask the configure error.
+        batch.update!(process_options: process_options.merge(intl_postage_type: "stamps"))
+
+        Rails.cache.clear
+        allow(USPS::PricingEngine).to receive(:fcmi_price)
+          .and_raise(USPS::USPSError, "no valid international price group")
+        stub_buy_success
+
+        perform_job
+
+        intl_letter.reload
+        expect(intl_letter.indicia_state).to eq("failed")
+        expect(intl_letter.indicia_error).to include("no valid international price group")
+        expect(intl_letter.postage_type).to eq("stamps") # persisted via update_columns
+
+        us_letter.reload
+        expect(us_letter.indicia_state).to eq("purchased")
+        expect(batch.reload).to be_processed
+      end
+
+      it "surfaces per-letter errors to the UI with letter identity" do
+        allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
+        intl_letter = create_letters(1, address_attrs: { country: "GB", state: "London", postal_code: "SW1A 1AA" }).first
+        batch.update!(process_options: process_options.merge(intl_postage_type: "indicia"))
+
+        Rails.cache.clear
+        allow(USPS::PricingEngine).to receive(:fcmi_price)
+          .and_raise(USPS::USPSError, "no valid international price group")
+        stub_buy_success
+
+        perform_job
+
+        # Verify the error row broadcast includes the specific letter
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with(
+          [ batch, :progress ],
+          target: "batch-error-tbody",
+          partial: "letter/batches/error_row",
+          locals: hash_including(letter: intl_letter),
+        )
+      end
+    end
   end
 
   describe "phase 2: purchase indicia" do
