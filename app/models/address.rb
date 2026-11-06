@@ -54,12 +54,11 @@ class Address < ApplicationRecord
     EOA
   end
 
-  # USPS treats US territories as domestic mail — same rates, same APIs.
-  # AS=American Samoa, GU=Guam, MP=Northern Mariana Islands,
-  # PR=Puerto Rico, VI=US Virgin Islands.
-  # Freely Associated States (MH, FM, PW) have special postal agreements
-  # but are technically international — leave them out for now.
-  US_AND_TERRITORIES = %w[US AS GU MP PR VI].to_set.freeze
+  # USPS treats US territories and Freely Associated States as domestic
+  # mail — same rates, same APIs (DMM 608 §2.1–2.2). The international
+  # pricing API rejects all of these as "not a valid international price
+  # group" — confirmed empirically.
+  US_AND_TERRITORIES = %w[US AS GU MH FM MP PW PR VI].to_set.freeze
   def us? = country.in?(US_AND_TERRITORIES)
 
   def snailify(origin = "US")
