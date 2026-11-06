@@ -54,7 +54,13 @@ class Address < ApplicationRecord
     EOA
   end
 
-  def us? = country == "US"
+  # USPS treats US territories as domestic mail — same rates, same APIs.
+  # AS=American Samoa, GU=Guam, MP=Northern Mariana Islands,
+  # PR=Puerto Rico, VI=US Virgin Islands.
+  # Freely Associated States (MH, FM, PW) have special postal agreements
+  # but are technically international — leave them out for now.
+  US_AND_TERRITORIES = %w[US AS GU MP PR VI].to_set.freeze
+  def us? = country.in?(US_AND_TERRITORIES)
 
   def snailify(origin = "US")
     SnailButNbsp.new(

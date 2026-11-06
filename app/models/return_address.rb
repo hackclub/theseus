@@ -47,7 +47,7 @@ class ReturnAddress < ApplicationRecord
 
   def location = "#{city}, #{state} #{postal_code} #{country}"
 
-  def us? = country == "US"
+  def us? = country.in?(Address::US_AND_TERRITORIES)
 
   private
 
