@@ -64,7 +64,7 @@ class LettersController < ApplicationController
     end
 
     # Set postage type to international_origin if return address is not US
-    if @letter.return_address && @letter.return_address.country != "US"
+    if @letter.return_address && !@letter.return_address.country.in?(Address::US_AND_TERRITORIES)
       @letter.postage_type = "international_origin"
     end
 
@@ -95,7 +95,7 @@ class LettersController < ApplicationController
         redirect_to @letter, alert: "That return address isn't available to you."
         return
       end
-      if return_address.country != "US"
+      if !return_address.country.in?(Address::US_AND_TERRITORIES)
         params[:letter][:postage_type] = "international_origin"
       end
     end

@@ -324,8 +324,8 @@ class Letter::BatchesController < BaseBatchesController
   def update_costs
     authorize @batch, :update_costs?, policy_class: Letter::BatchPolicy
     # Calculate counts without saving
-    us_letters = @batch.letters.joins(:address).where(addresses: { country: "US" })
-    intl_letters = @batch.letters.joins(:address).where.not(addresses: { country: "US" })
+    us_letters = @batch.letters.joins(:address).where(addresses: { country: Address::US_AND_TERRITORIES.to_a })
+    intl_letters = @batch.letters.joins(:address).where.not(addresses: { country: Address::US_AND_TERRITORIES.to_a })
 
     non_machinable = ActiveModel::Type::Boolean.new.cast(params[:non_machinable])
 

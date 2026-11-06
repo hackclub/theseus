@@ -86,7 +86,7 @@ class BatchImporter
     else
       cc = country_code(row)
       # Only the US has a shape we can meaningfully check; "SW1A 2AA" is fine.
-      errs << "ZIP looks invalid (#{zip})" if zip.present? && cc == "US" && zip.gsub(/\D/, "").length < 3
+      errs << "ZIP looks invalid (#{zip})" if zip.present? && cc.in?(Address::US_AND_TERRITORIES) && zip.gsub(/\D/, "").length < 3
       errs << restricted_message(country_name(cc)) if cc.in?(restricted_countries)
     end
 
@@ -120,7 +120,7 @@ class BatchImporter
     zip = get(row, "postal_code")
 
     state = FrickinCountryNames.normalize_state(country, state) if country
-    zip = zip.rjust(5, "0") if country&.alpha2 == "US" && zip.present? && zip.length < 5
+    zip = zip.rjust(5, "0") if country&.alpha2&.in?(Address::US_AND_TERRITORIES) && zip.present? && zip.length < 5
 
     {
       first_name: get(row, "first_name"),

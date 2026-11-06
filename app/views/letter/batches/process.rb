@@ -133,7 +133,7 @@ class Views::Letter::Batches::Process < Views::Base
   end
 
   def postage_box
-    us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count
+    us_count = @batch.letters.joins(:address).where(addresses: { country: Address::US_AND_TERRITORIES.to_a }).count
     intl_count = @batch.letters.count - us_count
     default_postage = @batch.letter_queue&.postage_type || "indicia"
 

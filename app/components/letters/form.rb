@@ -303,6 +303,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
             var postageOptions = document.getElementById('postage-options');
             var stampsRadio = document.querySelector('input[name="letter[postage_type]"][value="stamps"]');
             var returnAddresses = #{address_data.to_json};
+            var US_TERRITORIES = ['US','AS','GU','MH','FM','MP','PW','PR','VI'];
 
             function updatePostageOptions() {
               var selectedId = parseInt(returnAddressSelect.value);
@@ -311,7 +312,7 @@ render Components::Shared::ErrorMessages.new(record: letter)
               var existingHidden = postageOptions.querySelector('input[type="hidden"][name="letter[postage_type]"]');
               if (existingHidden) existingHidden.remove();
 
-              if (address && address.country === 'US') {
+              if (address && US_TERRITORIES.includes(address.country)) {
                 postageOptions.style.display = '';
                 if (!document.querySelector('input[name="letter[postage_type]"]:checked')) {
                   stampsRadio.checked = true;

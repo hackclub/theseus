@@ -19,7 +19,7 @@
 <%= render partial: "letter/batches/progress_summary", locals: { purchased: purchased, total: total, failed: failed } %>
 
 <%# ── Breakdown ── %>
-<% us_count = @batch.letters.joins(:address).where(addresses: { country: "US" }).count %>
+<% us_count = @batch.letters.joins(:address).where(addresses: { country: Address::US_AND_TERRITORIES.to_a }).count %>
 <% intl_count = total - us_count %>
 <div class="batch-breakdown">
   <span>US: <%= us_count %></span>

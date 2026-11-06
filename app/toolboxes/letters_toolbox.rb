@@ -56,7 +56,7 @@ class LettersToolbox < ApplicationToolbox
       halt error: "Return address not found or not available to you"
     end
 
-    if @letter.return_address&.country != "US"
+    if !@letter.return_address&.country&.in?(Address::US_AND_TERRITORIES)
       @letter.postage_type = "international_origin"
     end
 
@@ -94,7 +94,7 @@ class LettersToolbox < ApplicationToolbox
     if params[:return_address_id].present?
       ra = available_return_addresses.find_by(id: params[:return_address_id])
       halt error: "Return address not found or not available to you" unless ra
-      params[:postage_type] = "international_origin" if ra.country != "US"
+      params[:postage_type] = "international_origin" if !ra.country.in?(Address::US_AND_TERRITORIES)
     end
 
     @letter.update!(update_letter_params)
