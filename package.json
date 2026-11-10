@@ -24,7 +24,7 @@
     "@oddcamp/cocoon-vanilla-js": "^1.1.3",
     "@open-iframe-resizer/core": "^1.4.3",
     "@selectize/selectize": "^0.15.2",
-    "@tsparticles/confetti": "^3.8.1",
+    "@tsparticles/confetti": "^4.4.0",
     "@webtui/css": "^0.1.7",
     "@webtui/theme-gruvbox": "^0.0.2",
     "@webtui/theme-vitesse": "^0.0.2",
