@@ -53,3 +53,5 @@ node_modules
 
 app/frontend/images/template_previews/*
 public/.vite/*
+
+.omp/
