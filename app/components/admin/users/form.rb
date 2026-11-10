@@ -19,8 +19,7 @@ class Components::Admin::Users::Form < Components::Base
         # Identity
         render Components::Shared::FormField.new(label: "Username", name: "user[username]", value: @user.username)
         render Components::Shared::FormField.new(label: "Email", name: "user[email]", value: @user.email, type: "email")
-        render Components::Shared::FormField.new(label: "Slack ID", name: "user[slack_id]", value: @user.slack_id, hint: "Slack member ID")
-        render Components::Shared::FormField.new(label: "HCA ID", name: "user[hca_id]", value: @user.hca_id, hint: "Hack Club Airtable ID")
+        render Components::Shared::FormField.new(label: "HCA ID", name: "user[hca_id]", value: @user.hca_id, hint: "Hack Club Auth ID")
         render Components::Shared::FormField.new(label: "Icon URL", name: "user[icon_url]", value: @user.icon_url, hint: "Avatar image URL")
 
         # Permissions section
