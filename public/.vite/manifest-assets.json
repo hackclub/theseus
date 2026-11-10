@@ -44,10 +44,20 @@
     "src": "images/template_previews/blueprint_template.png",
     "integrity": "sha384-R9HO0sS0Ww3tL0NW5LmZ8S5lFwpPN+MdE7kNst4GZQ+xy3rxFqv74wSY/NKw2Mx6"
   },
+  "images/template_previews/calculate_template.png": {
+    "file": "assets/calculate_template-yZXHIzzR.png",
+    "src": "images/template_previews/calculate_template.png",
+    "integrity": "sha384-3aFoqhabuiIul9s0cJQK9cB6U0hjNNeI6D8VN7gSI0Z9rnEAJ8h2o54oC1Y6eUcQ"
+  },
   "images/template_previews/dino_waving_template.png": {
     "file": "assets/dino_waving_template-Gn0jnNTr.png",
     "src": "images/template_previews/dino_waving_template.png",
     "integrity": "sha384-V0jrk8GXFU5P7+q28O3fNZEb9j4yf3RRzVgo5DxF3SOZy5T/KJ10e4z1iIw1f2v4"
+  },
+  "images/template_previews/fallout_template.png": {
+    "file": "assets/fallout_template-B6F0KA8t.png",
+    "src": "images/template_previews/fallout_template.png",
+    "integrity": "sha384-XqB63oWEjt+cceprfLwXn+1O/CIJhkIlYjY3phBkHX00gvj7cld6XqnL4HMHRUJ4"
   },
   "images/template_previews/flavortown_free_stickers_fulfillment_template.png": {
     "file": "assets/flavortown_free_stickers_fulfillment_template-DRaOncXO.png",
@@ -104,6 +114,11 @@
     "src": "images/template_previews/heidi_readme_template.png",
     "integrity": "sha384-5W2kcr0ea5pRTaXb+Z+Y/HTsQTVXLLDX7gWByukADII1sc/jXEibHyvaWXArNN8g"
   },
+  "images/template_previews/horizons_template.png": {
+    "file": "assets/horizons_template-D3MSg0Uy.png",
+    "src": "images/template_previews/horizons_template.png",
+    "integrity": "sha384-TzVej4ppHpJlufaKGu5NCu5Jh+OBaaF8+7LRhu1n5ij68IJ8QKElvtnHgnuYRTB1"
+  },
   "images/template_previews/joyous_cat_template.png": {
     "file": "assets/joyous_cat_template-B0GzEj9D.png",
     "src": "images/template_previews/joyous_cat_template.png",
@@ -119,6 +134,11 @@
     "src": "images/template_previews/kestrel_heidi_template.png",
     "integrity": "sha384-6kNd6tCVgJ4Vi3Khi25dVi24bu0WH1pS0qwe6Pna/92+FKedzbe2NHGdc4H9Gk7W"
   },
+  "images/template_previews/macondo_template.png": {
+    "file": "assets/macondo_template-BVAOZOwC.png",
+    "src": "images/template_previews/macondo_template.png",
+    "integrity": "sha384-7ggsi2hzRuApMUGEwQVvWZrnYvdzvMEwG87klIgmrLIDzcaO3uusLACxCe7Zfu0e"
+  },
   "images/template_previews/mail_orpheus_template.png": {
     "file": "assets/mail_orpheus_template-CT8oSvqs.png",
     "src": "images/template_previews/mail_orpheus_template.png",
@@ -128,6 +148,11 @@
     "file": "assets/pyramid_scheme_template-B6N8re29.png",
     "src": "images/template_previews/pyramid_scheme_template.png",
     "integrity": "sha384-JYOB7ti/o0SMAFQkCWeEvdH78VgUIOCQT/Qbl45sAgvp9A3PpRjEzYnbrZZF2Bgx"
+  },
+  "images/template_previews/sd_super_star.png": {
+    "file": "assets/sd_super_star-DbPegVI4.png",
+    "src": "images/template_previews/sd_super_star.png",
+    "integrity": "sha384-F6/nPlFIJOHkVvrM1ld/SKfl0MSo40oz1/gqC2ORUFW2/BZdb3mGPmsrUT7BRM+H"
   },
   "images/template_previews/ship_mail_template.png": {
     "file": "assets/ship_mail_template-DeAuWAif.png",
@@ -143,6 +168,16 @@
     "file": "assets/som_magic_happening-BY7C8vmS.png",
     "src": "images/template_previews/som_magic_happening.png",
     "integrity": "sha384-A7lMzx8+tANjTJ71jpIoTOJRFBzMZ69Q6U44p+zj7GenDDZ6ZZpSyW2dqIth38kg"
+  },
+  "images/template_previews/stardance_free_stickers_fulfillment_template.png": {
+    "file": "assets/stardance_free_stickers_fulfillment_template-D9UA495Z.png",
+    "src": "images/template_previews/stardance_free_stickers_fulfillment_template.png",
+    "integrity": "sha384-8Z4wblacMU6qTkcUovvr+9UUEvNyoo5eowDLC2UtKmUihHBbI82qwo1n9bEf0xTU"
+  },
+  "images/template_previews/stardance_fulfillment_template.png": {
+    "file": "assets/stardance_fulfillment_template-DupC0v5Q.png",
+    "src": "images/template_previews/stardance_fulfillment_template.png",
+    "integrity": "sha384-F3gamAVSt4K3HOzgq076zMruYkFkIgDsWfv5OhsXLhtD1ayVIiqjggOQjgOObSSI"
   },
   "images/template_previews/summer_of_making_free_stickers_template.png": {
     "file": "assets/summer_of_making_free_stickers_template-C0Z-504v.png",
