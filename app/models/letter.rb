@@ -233,7 +233,7 @@ class Letter < ApplicationRecord
         source: "USPS IV-MTR",
         location: "#{e.scan_facility_city}, #{e.scan_facility_state} #{e.scan_facility_zip}",
         facility: "#{e.scan_facility_name} (#{e.scan_locale_key})",
-        description: "[OP#{e.opcode.code}] #{e.opcode.process_description}",
+        description: e.opcode ? "[OP#{e.opcode.code}] #{e.opcode.process_description}" : "[OP#{e.scan_event_code}] Unknown operation",
         extra_info: "#{e.handling_event_type_description} – #{e.mail_phase} – #{e.machine_name} (#{event.payload.dig("machineId") || "no ID"})"
       }
     end
