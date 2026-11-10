@@ -35,7 +35,7 @@ jobs:
       HCB_CLIENT_SECRET: ci_client_secret
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - run: |
           sudo apt-get update -qq
