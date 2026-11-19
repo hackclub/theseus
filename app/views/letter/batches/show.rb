@@ -118,7 +118,7 @@ class Views::Letter::Batches::Show < Views::Base
               td do
                 a(href: letter_path(letter), class: "no-underline") { letter.public_id }
               end
-              td { plain [letter.address&.first_name, letter.address&.last_name].compact_blank.join(" ").presence || "—" }
+              td { plain [ letter.address&.first_name, letter.address&.last_name ].compact_blank.join(" ").presence || "—" }
               td(class: "text-muted") { plain letter.address&.country || "—" }
               td(class: "text-danger") { plain letter.indicia_error || "Unknown error" }
             end

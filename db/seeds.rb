@@ -7,7 +7,7 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-ReturnAddress.find_or_create_by!(id: 1) do |address|
+return_address = ReturnAddress.find_or_create_by!(id: 1) do |address|
   address.name = "Hack Club"
   address.line_1 = "15 Falls Rd."
   address.city = "Shelburne"
@@ -17,10 +17,14 @@ ReturnAddress.find_or_create_by!(id: 1) do |address|
   address.shared = true
 end
 
-USPS::MailerId.find_or_create_by(id: 1) do |mid|
+mailer_id = USPS::MailerId.find_or_create_by(id: 1) do |mid|
   mid.name = "Hack Club (Shelburne)"
   mid.crid = "40039652"
   mid.mid = "903258919"
+end
+
+[ return_address, mailer_id ].select(&:previously_new_record?).each do |record|
+  record.class.connection.reset_pk_sequence!(record.class.table_name)
 end
 
 # Warehouse::PurposeCode.find_or_create_by!(
