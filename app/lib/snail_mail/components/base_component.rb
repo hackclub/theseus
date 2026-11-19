@@ -86,7 +86,7 @@ module SnailMail
       end
 
       def render_letter_id(x, y, size, **opts)
-        render LetterIdComponent.new(letter: letter, x: x, y: y, size: size, **opts.merge(options))
+        render LetterIdComponent.new(letter: letter, x: x, y: y, size: size, **options.merge(opts))
       end
 
       def render_postage(x = nil)
