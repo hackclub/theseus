@@ -28,8 +28,8 @@ module SnailMail
             size: 12, valign: :center, align: :left
           )
 
-          render_qr_code(8, 168, 50)
-          render_letter_id(100, 50, 8)
+          render_qr_code(372, 100, 40)
+          render_letter_id(100, 30, 8)
           render_imb(240, 24, 185)
 
           render_preview_bounds if preview_mode?
