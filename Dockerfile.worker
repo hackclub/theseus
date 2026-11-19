@@ -6,7 +6,7 @@
 # Run: docker run -d -e RAILS_MASTER_KEY=<value from config/master.key> --name theseus-worker theseus-worker
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.4.4
+ARG RUBY_VERSION=3.4.13
 FROM docker.io/library/ruby:$RUBY_VERSION-slim
 
 # Set production environment
