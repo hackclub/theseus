@@ -32,7 +32,7 @@ module SnailMail
 
           render_destination_address(
             100, 204, 212, 114,
-            size: 14, valign: :bottom, align: :left
+            size: 14, valign: :center, align: :left
           )
 
           render_imb(100, 86, 210)
