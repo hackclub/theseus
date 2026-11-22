@@ -151,7 +151,7 @@ gem "blind_index", "~> 2.7"
 
 gem "ruby-openai", "~> 8.1"
 
-gem "parallel", "~> 1.26"
+gem "parallel", "~> 2.2"
 
 gem "sentry-ruby"
 gem "sentry-rails"
