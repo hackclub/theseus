@@ -85,7 +85,7 @@ gem "faraday", "~> 2.13"
 
 gem "oauth2", "~> 2.0"
 
-gem "omniauth", "~> 2.1"
+gem "omniauth", "~> 2.2"
 gem "omniauth_openid_connect", "~> 0.7"
 
 gem "snail", "~> 2.3"
