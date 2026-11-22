@@ -72,7 +72,7 @@ gem "http", "~> 5.2"
 
 gem "annotaterb", "~> 4.16"
 
-gem "aasm", "~> 5.5"
+gem "aasm", "~> 6.0"
 
 gem "norairrecord", "~> 0.4.0"
 
