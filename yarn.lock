@@ -232,10 +232,10 @@
   resolved "https://registry.npmjs.org/@oddcamp/cocoon-vanilla-js/-/cocoon-vanilla-js-1.1.3.tgz"
   integrity sha512-zvi0GZznB0Wf/pC3M68sZVcnIxJwe785tqBoinBWHWgGHRwXZ96WJgyBrTBTDOkbgU2Tp40U/VZaDMVAofqLmw==
 
-"@open-iframe-resizer/core@^1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@open-iframe-resizer/core/-/core-1.4.3.tgz#18ae9f4860b90c75e3db0922d5d3f725f313cec7"
-  integrity sha512-wf3jqOGMDsu2NQyA7597B1lDa7hkboU13Cmw7PxjMw0FBGBtqj/gv1HWJlx4V4B3hnI9U0R31ZBBMFDV/ArdcQ==
+"@open-iframe-resizer/core@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@open-iframe-resizer/core/-/core-2.4.1.tgz#6360ba021a7a9f393811031461e024d7b63821b4"
+  integrity sha512-8Did6I3xNjrLtvb+dgWHEOZ+PEQGdP307eyKKo1Kwp2chr98zJLk1XbjwYcq7LAX/dxHPp7DY1irwNmE2X4yXA==
 
 "@rails/actioncable@^7.0":
   version "7.2.201"
