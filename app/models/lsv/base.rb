@@ -1,5 +1,5 @@
 module LSV
-  class Base < Norairrecord::Table
+  class Base < AirctiveRecord::Base
     def inspect = "<#{self.class.name} #{id}> #{fields.inspect}"
 
     def to_partial_path = "lsv/type/base"
@@ -21,13 +21,9 @@ module LSV
         super
       end
 
-      def email_column = responsible_class.instance_variable_get(:@email_column)
-
-      attr_writer :email_column
-
       def find_by_email(email)
         raise ArgumentError, "no email?" if email.nil? || email.empty?
-        records filter: "LOWER(TRIM({#{self.email_column}}))='#{email.downcase}'"
+        where(email: email.downcase.strip).to_a
       end
     end
 
@@ -49,8 +45,6 @@ module LSV
     def shipped? = nil
 
     def description = nil
-
-    def email = fields[self.class.email_column]
 
     def to_json(options = {})
       {

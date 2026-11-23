@@ -4,7 +4,10 @@ module LSV
 
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :msr_table)
-    self.email_column = "Email"
+
+    field :email, "Email"
+    field :airtable_automation_id, "Airtable ID (Automation)"
+    field :tracking_number, "Warehouse–Tracking Number"
 
     def type_text = "Warehouse"
 

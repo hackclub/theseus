@@ -2,7 +2,7 @@ module LSV
   class PrintfulShipment < Base
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :pf_table)
-    self.email_column = "%order:recipient:email"
+    field :email, "%order:recipient:email"
 
     def to_partial_path = "lsv/type/printful_shipment"
 
