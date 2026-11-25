@@ -2,7 +2,8 @@ module LSV
   class HighSeasShipment < Base
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :hso_table)
-    self.email_column = "recipient:email"
+
+    field :email, "recipient:email"
 
     has_subtypes "shop_item:fulfillment_type", {
       [ "minuteman" ] => "LSV::HsMinutemanShipment",

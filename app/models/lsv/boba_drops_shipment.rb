@@ -2,7 +2,7 @@ module LSV
   class BobaDropsShipment < Base
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :boba_table)
-    self.email_column = "Email"
+    field :email, "Email"
 
     def title_text = "Boba Drops!"
 

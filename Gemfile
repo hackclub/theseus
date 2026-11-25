@@ -74,7 +74,7 @@ gem "annotaterb", "~> 4.16"
 
 gem "aasm", "~> 5.5"
 
-gem "norairrecord", "~> 0.4.0"
+gem "airctiverecord", "~> 0.2.0"
 
 
 gem "hashid-rails", "~> 1.4"
