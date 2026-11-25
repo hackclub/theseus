@@ -4,17 +4,9 @@ module LSV
 
     def to_partial_path = "lsv/type/base"
 
-    class << self
-      def responsible_class
-        # this is FUCKING DISGUSTING
-        return self if superclass == Base
-        if superclass.singleton_class.method_defined?(:responsible_class)
-          superclass.responsible_class
-        else
-          self
-        end
-      end
+    class_attribute :slug
 
+    class << self
       def records(**args)
         return [] unless table_name
         raise "don't use Shipment directly!" unless self < Base

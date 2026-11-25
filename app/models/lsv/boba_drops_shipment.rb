@@ -2,6 +2,7 @@ module LSV
   class BobaDropsShipment < Base
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :boba_table)
+    self.slug = :boba
     field :email, "Email"
     field :physical_status, "Physical Status"
     field :approved_at, "[Shipment Viewer] Approved/pending at"

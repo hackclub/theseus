@@ -4,6 +4,7 @@ module LSV
 
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :msr_table)
+    self.slug = :msr
 
     field :email, "Email"
     field :airtable_automation_id, "Airtable ID (Automation)"

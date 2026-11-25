@@ -2,6 +2,7 @@ module LSV
   class HighSeasShipment < Base
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :hso_table)
+    self.slug = :hs
 
     field :email, "recipient:email"
     field :status, "status"

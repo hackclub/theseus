@@ -7,9 +7,7 @@ module LSV
     pf: PrintfulShipment
   }
 
-  INVERSE = SLUGS.invert.freeze
-
-  def self.slug_for(lsv) = INVERSE[lsv.class.responsible_class]
+  def self.slug_for(lsv) = lsv.class.slug
 
   TYPES = SLUGS.values.freeze
 end
