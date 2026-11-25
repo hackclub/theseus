@@ -2,6 +2,7 @@ module LSV
   class OneOffShipment < Base
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :oo_table)
+    self.slug = :oo
     field :email, "email"
     field :tracking_number, "tracking_number"
     field :status_text, "status_text"

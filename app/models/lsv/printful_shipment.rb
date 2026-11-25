@@ -2,6 +2,7 @@ module LSV
   class PrintfulShipment < Base
     self.base_key = Rails.application.credentials.dig(:lsv, :sv_base)
     self.table_name = Rails.application.credentials.dig(:lsv, :pf_table)
+    self.slug = :pf
     field :email, "%order:recipient:email"
     field :status, "status"
     field :service, "service"
