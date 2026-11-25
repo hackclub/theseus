@@ -3,7 +3,7 @@ module LSV
     def type_text = "High Seas 3rd-party physical"
 
     def status_text
-      case fields["status"]
+      case status
       when "pending_nightly"
         "will be ordered soon..."
       when "fulfilled"

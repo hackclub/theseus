@@ -53,17 +53,17 @@ module CustomsReceipt
         zenv = Zenventory.order_by_hc_id(msr.source_id)
         additional_info = nil
 
-        puts msr["Request Type"]
-        if msr["Request Type"]&.include? "High Seas"
+        puts msr.request_type
+        if msr.request_type&.include? "High Seas"
           additional_info = 'This shipment was sent out as part of <a href="https://highseas.hackclub.com">High Seas</a>, a grant program that rewards students for time spent programming.'
         end
 
         receiptable_from_zenventory_order(
           order: zenv,
           order_number: msr.source_id,
-          tracking_number: msr["Warehouse–Tracking Number"],
-          carrier: msr["Warehouse–Service"],
-          shipping_cost: msr["Warehouse–Postage Cost"]&.to_f,
+          tracking_number: msr.tracking_number,
+          carrier: msr.warehouse_service,
+          shipping_cost: msr.postage_cost&.to_f,
           additional_info:,
         )
       end

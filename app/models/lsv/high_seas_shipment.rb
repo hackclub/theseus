@@ -4,6 +4,10 @@ module LSV
     self.table_name = Rails.application.credentials.dig(:lsv, :hso_table)
 
     field :email, "recipient:email"
+    field :status, "status"
+    field :shop_item_name, "shop_item:name"
+    field :tracking_number, "tracking_number"
+    field :airtable_created_at, "created_at"
 
     has_subtypes "shop_item:fulfillment_type", {
       [ "minuteman" ] => "LSV::HsMinutemanShipment",
@@ -15,12 +19,12 @@ module LSV
 
     def type_text = "High Seas order"
 
-    def title_text = "High Seas – #{fields["shop_item:name"] || "unknown?!"}"
+    def title_text = "High Seas – #{shop_item_name || "unknown?!"}"
 
-    def date = self["created_at"]
+    def date = airtable_created_at
 
     def status_text
-      case fields["status"]
+      case status
       when "PENDING_MANUAL_REVIEW", "on_hold"
         "awaiting manual review..."
       when "AWAITING_YSWS_VERIFICATION"
@@ -35,7 +39,7 @@ module LSV
     end
 
     def status_icon
-      case fields["status"]
+      case status
       when "PENDING_MANUAL_REVIEW", "on_hold"
         '<i class="fa-solid fa-hourglass-half"></i>'
       when "AWAITING_YSWS_VERIFICATION"
@@ -47,16 +51,14 @@ module LSV
       end
     end
 
-    def tracking_number = fields["tracking_number"]
-
     def tracking_link = tracking_number && "https://parcelsapp.com/en/tracking/#{tracking_number}"
 
     def icon
-      return "🎁" if fields["shop_item:name"]&.start_with? "Free"
+      return "🎁" if shop_item_name&.start_with? "Free"
       super
     end
 
-    def shipped? = fields["status"] == "fulfilled"
+    def shipped? = status == "fulfilled"
 
     def internal_info_partial = :_highseas_internal_info
   end
