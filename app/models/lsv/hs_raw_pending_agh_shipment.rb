@@ -3,7 +3,7 @@ module LSV
     def type_text = "Pending warehouse shipment"
 
     def status_text
-      case fields["status"]
+      case status
       when "pending_nightly"
         "will be sent to the warehouse with the next batch!"
       else
@@ -12,7 +12,7 @@ module LSV
     end
 
     def status_icon
-      return '<i class="fa-solid fa-boxes-stacked"></i>' if fields["status"] == "pending_nightly"
+      return '<i class="fa-solid fa-boxes-stacked"></i>' if status == "pending_nightly"
       super
     end
   end

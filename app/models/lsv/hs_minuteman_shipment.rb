@@ -1,7 +1,7 @@
 module LSV
   class HsMinutemanShipment < HighSeasShipment
     def status_text
-      case fields["status"]
+      case status
       when "pending_nightly"
         "will go out in next week's batch..."
       when "fulfilled"
@@ -12,7 +12,7 @@ module LSV
     end
 
     def status_icon
-      case fields["status"]
+      case status
       when "pending_nightly"
         '<i class="fa-solid fa-envelopes-bulk"></i>'
       when "fulfilled"

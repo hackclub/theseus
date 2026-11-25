@@ -56,19 +56,19 @@
       <span><%= printful_shipment.created_at %></span>
     </div>
     <% back_office_tool do %>
-      <% if printful_shipment.fields["%order:pretty_id"] %>
+      <% if printful_shipment.order_pretty_id %>
         <div class="field-row mb-half">
           <label class="w-80">Order:</label>
           <span>
-            <%= link_to printful_shipment.fields["%order:pretty_id"], printful_shipment.fields["%order:dashboard_url"], target: "_blank", class: "link" %>
+            <%= link_to printful_shipment.order_pretty_id, printful_shipment.order_dashboard_url, target: "_blank", class: "link" %>
           </span>
         </div>
       <% end %>
-      <% if printful_shipment.fields["packing_slip_url"] %>
+      <% if printful_shipment.packing_slip_url %>
         <div class="field-row mb-half">
           <label class="w-80">Packing:</label>
           <span>
-            <%= link_to "View Packing Slip", printful_shipment.fields["packing_slip_url"], target: "_blank", class: "link" %>
+            <%= link_to "View Packing Slip", printful_shipment.packing_slip_url, target: "_blank", class: "link" %>
           </span>
         </div>
       <% end %>

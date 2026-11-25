@@ -27,10 +27,10 @@
       <label class="w-80">Status:</label>
       <span><%= msr.status_text %></span>
     </div>
-    <% if msr["Warehouse-Service"] %>
+    <% if msr.warehouse_service %>
       <div class="field-row mb-half">
         <label class="w-80">Service:</label>
-        <span><%= msr["Warehouse–Service"] %></span>
+        <span><%= msr.warehouse_service %></span>
       </div>
     <% end %>
     <% if msr.tracking_number %>
